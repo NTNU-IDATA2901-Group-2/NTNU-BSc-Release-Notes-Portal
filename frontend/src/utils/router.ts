@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import ChangeNotesView from './views/ChangeNotesView.vue'
-import ReleaseNotesView from './views/ReleaseNotesView.vue'
+import ChangeNotesView from '../views/ChangeNotesView.vue'
+import ReleaseNotesView from '../views/ReleaseNotesView.vue'
 
 export const routeNames = {
   releaseNotes: '/',
