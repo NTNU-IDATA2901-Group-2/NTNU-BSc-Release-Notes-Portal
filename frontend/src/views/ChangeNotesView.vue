@@ -3,5 +3,5 @@
 </script>
 
 <template>
-    <h1>Change Notes</h1> 
+    <h1>Change Notes</h1>
 </template>
