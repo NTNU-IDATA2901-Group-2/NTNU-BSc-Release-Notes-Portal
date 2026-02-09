@@ -31,7 +31,6 @@ frontend!**/src/test/**/build/
 
 ### VS Code ###
 frontend.vscode/
-.vscode/
 
 # Logs
 frontend/logs
