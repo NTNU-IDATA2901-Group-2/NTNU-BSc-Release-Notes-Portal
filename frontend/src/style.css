@@ -16,6 +16,7 @@
   --color-destructive: var(--destructive);
   --color-success: var(--success);
   --color-text-primary: var(--text);
+  --color-border: var(--border);
 
   --color-background-light-static: oklch(0.9848 0.0013 106.42);
   --color-foreground-light-static: oklch(0.9232 0.0026 48.72);
@@ -35,6 +36,7 @@
 
   --background: oklch(0.9848 0.0013 106.42);
   --foreground: oklch(0.9232 0.0026 48.72);
+  --border: oklch(0.5534 0.0116 58.07);
   --text: oklch(0.2103 0.0059 285.89);
   --accent: oklch(0.9511 0.2093 116.34);
   --destructive: oklch(0.7106 0.1661 22.22);
@@ -44,18 +46,22 @@
 .dark {
   --background: oklch(0.2103 0.0059 285.89);
   --foreground: oklch(0.2739 0.0055 286.03);
+  --border: oklch(0.3703 0.0119 285.81);
   --text: oklch(0.9219 0 0);
   --accent: oklch(0.9511 0.2093 116.34);
   --destructive: oklch(0.7106 0.1661 22.22);
   --success: oklch(0.8003 0.1821 151.71);
 }
 
-
 @layer base {
   * {
   }
   body {
     @apply bg-background text-foreground;
+    font-family: "Roboto", sans-serif;
+  }
+  p,h1,h2,h3,h4,h5 {
+    color: var(--text);
   }
   p,h1,h2,h3,h4,h5 {
     color: var(--text);

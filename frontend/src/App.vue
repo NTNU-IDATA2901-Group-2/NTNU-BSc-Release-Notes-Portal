@@ -1,20 +1,9 @@
 <script setup lang="ts">
-
-import Button from './components/ui/button/Button.vue';
-import { routeNames } from './utils/router';
-import { useTheme } from './utils/theme';
-
-const { theme } = useTheme()
+import Header from './components/Header.vue';
 </script>
 
 <template>
-  <Button variant="outline" @click="theme = theme === 'dark' ? 'light' : 'dark'">
-    Toggle theme
-  </Button>
-  <nav>
-    <RouterLink :to="routeNames.releaseNotes">Go to Release Notes</RouterLink>
-    <RouterLink :to="routeNames.changeNotes">Go to Change Notes</RouterLink>
-  </nav>
+  <Header />
   <main>
     <RouterView />
   </main>
