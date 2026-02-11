@@ -32,6 +32,8 @@
 }
 
 :root {
+  --radius: 10px;
+
   --background: oklch(0.9848 0.0013 106.42);
   --foreground: oklch(0.9232 0.0026 48.72);
   --border: oklch(0.5534 0.0116 58.07);
@@ -60,5 +62,11 @@
   }
   p,h1,h2,h3,h4,h5 {
     color: var(--text);
+  }
+  p,h1,h2,h3,h4,h5 {
+    color: var(--text);
+  }
+  p {
+    font-size: 14px;
   }
 }

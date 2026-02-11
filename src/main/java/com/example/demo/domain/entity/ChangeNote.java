@@ -9,19 +9,22 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @NoArgsConstructor
 @Getter
+@Setter
 public class ChangeNote {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private String reference;
-  private String description;
-  private String developerNotes;
-  private String upgradeNotes;
+  private String reference = "";
+  private String description = "";
+  private String developerNotes = "";
+  private String upgradeNotes = "";
+  private String changeSource = "";
   private final long timestamp = new Date().getTime();
   private boolean published = false;
   private boolean archived = false;
