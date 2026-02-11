@@ -31,6 +31,8 @@
 }
 
 :root {
+  --radius: 10px;
+
   --background: oklch(0.9848 0.0013 106.42);
   --foreground: oklch(0.9232 0.0026 48.72);
   --text: oklch(0.2103 0.0059 285.89);
@@ -48,15 +50,17 @@
   --success: oklch(0.8003 0.1821 151.71);
 }
 
-p,h1,h2,h3,h4,h5 {
-  color: var(--text);
-}
-
 
 @layer base {
   * {
   }
   body {
     @apply bg-background text-foreground;
+  }
+  p,h1,h2,h3,h4,h5 {
+    color: var(--text);
+  }
+  p {
+    font-size: 14px;
   }
 }

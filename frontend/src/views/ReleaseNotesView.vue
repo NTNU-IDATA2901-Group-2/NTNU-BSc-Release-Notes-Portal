@@ -6,6 +6,5 @@ import ReleaseNoteCard from '@/components/ReleaseNoteCard.vue';
 
 <template>
     <h1>Release Notes</h1>
-    <p>p</p>
-    <ReleaseNoteCard />
+    <ReleaseNoteCard title="Test" content="This is a test release note." :published="true" />
 </template>
