@@ -1,0 +1,25 @@
+meta {
+  name: Create Change Note
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseurl}}/changenotes
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "reference" : "kjgfkhgfjhfdjhgf",
+    "description": "What changed for the users",
+    "developerNotes": "What changed from a developers perspective",
+    "upgradeNotes": "What needs to be done to upgrade"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
