@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.example.demo.exception.ChangeNoteNotFoundException;
 import com.example.demo.exception.CustomerNotFoundException;
 import com.example.demo.exception.FeatureNotFoundException;
 import com.example.demo.exception.ProductNotFoundException;
@@ -44,5 +45,11 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleGenericException(Exception e) {
     logger.error("An unexpected error occurred: {}", e.getMessage());
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred: " + e.getMessage());
+  }
+
+  @ExceptionHandler(value = {ChangeNoteNotFoundException.class})
+  public ResponseEntity<String> handleChangeNoteNotFoundException(ChangeNoteNotFoundException e) {
+    logger.warn("Change note not found: {}", e.getChangeNoteId());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Change note with ID %d not found", e.getChangeNoteId()));
   }
 }
