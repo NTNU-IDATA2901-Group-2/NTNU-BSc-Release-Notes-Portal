@@ -28,12 +28,12 @@ const { theme } = useTheme()
 		<RouterLink class="text-xl text-text-dark-static" :to="routeNames.changeNotes">Change Notes</RouterLink>
 	    </nav>
 	    <DropdownMenu >
-		<DropdownMenuTrigger class="ml-auto">
+		<DropdownMenuTrigger class="ml-auto cursor-pointer">
 		    <Avatar class=" w-10 h-10 items-center justify-center">
 			<p class="text-sm font-bold text-text-light-static">LL</p>
 		    </Avatar>
 		</DropdownMenuTrigger>
-		<DropdownMenuContent >
+		<DropdownMenuContent class="mr-8 mt-2">
 		    <DropdownMenuItem @click="theme = theme === 'dark' ? 'light' : 'dark'">
 			<div class="w-full flex gap-2">
 			    <p class="text-text-dark-static ml-auto">Toggle theme</p>
@@ -50,8 +50,8 @@ const { theme } = useTheme()
 	    </DropdownMenu>
 
 	</div>
+	<Separator/>
 	<div class="md:hidden">
-	    <Separator/>
 	    <nav class="flex items-center justify-between px-12 h-12">
 		<RouterLink class="text-lg text-text-dark-static" :to="routeNames.releaseNotes">Release Notes</RouterLink>
 		<RouterLink class="text-lg text-text-dark-static" :to="routeNames.changeNotes">Change Notes</RouterLink>
