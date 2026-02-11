@@ -8,11 +8,9 @@ const { theme } = useTheme()
 </script>
 
 <template>
-  <!--
   <Button variant="outline" @click="theme = theme === 'dark' ? 'light' : 'dark'">
     Toggle theme
   </Button>
-  -->
   <nav>
     <RouterLink :to="routeNames.releaseNotes">Go to Release Notes</RouterLink>
     <RouterLink :to="routeNames.changeNotes">Go to Change Notes</RouterLink>

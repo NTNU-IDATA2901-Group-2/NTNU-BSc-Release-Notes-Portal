@@ -15,20 +15,19 @@
   --color-accent: var(--accent);
   --color-destructive: var(--destructive);
   --color-success: var(--success);
-  --text: var(--text);
+  --color-text-primary: var(--text);
 
+  --color-background-light-static: oklch(0.9848 0.0013 106.42);
+  --color-foreground-light-static: oklch(0.9232 0.0026 48.72);
+  --color-text-light-static: oklch(0.2103 0.0059 285.89);
 
-  --background-light-static: oklch(0.9848 0.0013 106.42);
-  --foreground-light-static: oklch(0.9232 0.0026 48.72);
-  --text-light-static: oklch(0.2103 0.0059 285.89);
+  --color-background-dark-static: oklch(0.2103 0.0059 285.89);
+  --color-foreground-dark-static: oklch(0.2739 0.0055 286.03);
+  --color-text-dark-static: oklch(0.9219 0 0);
 
-  --background-dark-static: oklch(0.2103 0.0059 285.89);
-  --foreground-dark-static: oklch(0.2739 0.0055 286.03);
-  --text-dark-static: oklch(0.9219 0 0);
-
-  --accent-static: oklch(0.9511 0.2093 116.34);
-  --destructive-static: oklch(0.7106 0.1661 22.22);
-  --success-static: oklch(0.8003 0.1821 151.71);
+  --color-accent-static: oklch(0.9511 0.2093 116.34);
+  --color-destructive-static: oklch(0.7106 0.1661 22.22);
+  --color-success-static: oklch(0.8003 0.1821 151.71);
 }
 
 :root {
@@ -56,7 +55,6 @@ p,h1,h2,h3,h4,h5 {
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
