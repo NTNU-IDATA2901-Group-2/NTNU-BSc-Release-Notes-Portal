@@ -9,7 +9,7 @@ export const badgeVariants = cva(
     variants: {
       variant: {
         default:
-          "border-transparent bg-text-primary text-background [a&]:hover:bg-primary/90",
+          "border-transparent bg-border text-text-primary [a&]:hover:bg-primary/90",
         destructive:
          "border-transparent bg-destructive text-background [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
         success:

@@ -54,18 +54,15 @@
 }
 
 @layer base {
-  * {
-  }
   body {
     @apply bg-background text-foreground;
     font-family: "Roboto", sans-serif;
   }
+  
   p,h1,h2,h3,h4,h5 {
     color: var(--text);
   }
-  p,h1,h2,h3,h4,h5 {
-    color: var(--text);
-  }
+
   p {
     font-size: 14px;
   }
