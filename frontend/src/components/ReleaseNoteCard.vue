@@ -4,9 +4,9 @@
 
 
     const props = defineProps<PrimitiveProps & {
-        title: String,
-        content: String,
-        published: Boolean,
+        title: string,
+        content: string,
+        published: boolean,
     }>()
 </script>
 
