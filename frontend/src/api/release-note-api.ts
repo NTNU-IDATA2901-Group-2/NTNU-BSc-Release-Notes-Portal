@@ -1,16 +1,28 @@
 import type { ReleaseNote } from "@/types"
-import { useQuery } from "@tanstack/vue-query";
+import { useMutation, useQuery } from "@tanstack/vue-query";
+
+
+export const createReleaseNoteMutation = (onSuccess : (releaseId : number) => void) => useMutation<number>({
+    mutationFn: () => createReleaseNote(),
+    onSuccess: (data) => {
+      console.log("Release note created with ID:", data);
+      onSuccess(data);
+    }
+});
+
+export const createReleaseNote = async (): Promise<number> => {
+  return 1
+}
 
 export const useReleaseNote = (id: string ) => useQuery<ReleaseNote>({
     queryKey: ['releaseNote', id],
     queryFn: () => getReleaseNote(id),
 });
 
-
 const getReleaseNote = async (id: string): Promise<ReleaseNote> => {
-  const parsedId = parseInt(id, 10)
-  if (isNaN(parsedId)) {
-    throw new Error("Invalid release note ID")
+  const parsedId = Number.parseInt(id, 10)
+  if (Number.isNaN(parsedId)) {
+    throw new TypeError("Invalid release note ID")
   }
 
     const releaseNote: ReleaseNote = {
