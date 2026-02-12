@@ -38,6 +38,7 @@ import Multiselect from '@/components/Multiselect.vue';
       <Button disabled v-if="isEditing" variant="outline" >Save <Save /></Button>
     </div>
     <Spinner v-if="isPending || isFetching" />
+    <h1 v-if="isError">Error retreiving change note</h1>
 
     <div v-if="!isPending && !isFetching && !isError && releaseNote" class="flex flex-col gap-16 flex-1 w-full items-center mt-16 md:mt-24 mx-4 lg:w-4xl md:mt-42">
       <div class="flex flex-col gap-4 w-full">
@@ -59,19 +60,19 @@ import Multiselect from '@/components/Multiselect.vue';
                         <Pencil class="text-text-dark-static"/>
                     </div>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem disabled>
                     <div class="w-full flex gap-2">
                         <p class="ml-auto text-text-dark-static">Delete</p>
                         <Trash2 class="text-text-dark-static"/>
                     </div>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem disabled>
                     <div class="w-full flex gap-2">
-                        <p class="ml-auto text-text-dark-static">{{ releaseNote.published ? 'Unpublish' : 'Publish' }}</p>
+                        <p class="ml-auto text-text-dark-static">{{ releaseNote.published ? 'Publish' : 'Unpublish' }}</p>
                         <Eye class="text-text-dark-static"/>
                     </div>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem disabled>
                     <div class="w-full flex gap-2">
                         <p class="ml-auto text-text-dark-static">Export</p>
                         <FileDown class="text-text-dark-static"/>

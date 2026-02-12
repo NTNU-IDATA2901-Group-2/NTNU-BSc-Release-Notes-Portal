@@ -6,15 +6,14 @@ import { Button } from '@/components/ui/button'
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { TagsInput, TagsInputInput, TagsInputItem, TagsInputItemDelete, TagsInputItemText } from '@/components/ui/tags-input'
 import type { ChangeNote } from '@/types'
+import { useChangeNotes } from '@/api/change-note-api'
 
-const changenotes = [
-  { value: 'next.js', label: 'Next.js' },
-  { value: 'sveltekit', label: 'SvelteKit' },
-  { value: 'nuxt', label: 'Nuxt' },
-  { value: 'remix', label: 'Remix' },
-  { value: 'astro', label: 'Astro' },
-]
 
+const { isLoading, isError, data: changeNotes } = useChangeNotes();
+
+const changenotes = computed(() =>
+  (changeNotes.value ?? []).map(cn => ({ value: cn.id, label: cn.reference }))
+)
 
 
 const props = defineProps<PrimitiveProps & {
@@ -29,8 +28,8 @@ const { contains } = useFilter({ sensitivity: 'base' })
 
 const filteredFrameworks = computed(() =>
   searchTerm.value === ''
-    ? changenotes
-    : changenotes.filter(option => contains(option.label, searchTerm.value)),
+    ? changenotes.value
+    : changenotes.value.filter(option => contains(option.label, searchTerm.value)),
 )
 
 watch(searchTerm, (f) => {
