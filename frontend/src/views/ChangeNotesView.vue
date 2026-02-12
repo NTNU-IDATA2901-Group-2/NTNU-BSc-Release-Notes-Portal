@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useChangeNotes } from '@/api/change-note-api';
+import { createChangeNoteMutation, createPublishChangeNoteMutation, useChangeNotes } from '@/api/change-note-api';
 import { createReleaseNoteMutation } from '@/api/release-note-api';
 import ChangeNoteCard from '@/components/ChangeNoteCard.vue';
 import Button from '@/components/ui/button/Button.vue';
@@ -21,13 +21,22 @@ const toggleSelection = (id: number) => {
   }
 }
 
+const publishChangeNoteMutation = createPublishChangeNoteMutation();
+
 const handlePublish = () => {
   console.log('Publish button clicked. Selected change note IDs:', selectedItems.value);
+  for (const id of selectedItems.value) {
+    publishChangeNoteMutation.mutate(id);
+  }
 }
 
+const createChangeNoteMutationInstance = createChangeNoteMutation((data: number) => {
+  router.push(`/change-notes/${data}`);
+})
+
 const handleCreateChangeNote = () => {
-  console.log('Create Change Note button clicked');
-  
+  console.log('Create Change Note button clicked'); 
+  createChangeNoteMutationInstance.mutate()
 }
 
 const createReleaseNoteMutationInstance = createReleaseNoteMutation((data: number) => {
