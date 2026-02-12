@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Footer from './components/Footer.vue';
 import Header from './components/Header.vue';
 </script>
 
@@ -9,5 +10,5 @@ import Header from './components/Header.vue';
       <RouterView class="w-full h-full"/>
     </main>
   </div>
-  
+  <Footer />
 </template>
