@@ -1,0 +1,29 @@
+meta {
+  name: post_sample_change_note_1
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseurl}}/changenotes
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "reference" : "kjgfkhgfjhfdjhgf",
+    "description": "What changed for the users",
+    "developerNotes": "What changed from a developers perspective",
+    "upgradeNotes": "What needs to be done to upgrade"
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

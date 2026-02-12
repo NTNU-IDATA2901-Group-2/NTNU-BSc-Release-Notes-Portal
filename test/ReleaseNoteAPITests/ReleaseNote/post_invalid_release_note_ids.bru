@@ -1,0 +1,26 @@
+meta {
+  name: post_invalid_release_note_ids
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseurl}}/releasenotes
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "changeNoteIds": [-999],
+    "tag": "v1.0.0",
+    "summary": "Initial release with core features",
+    "published": false,
+    "createdAt": 1739270400000,
+    "archived": false
+  }
+}
+
+assert {
+  res.status: eq 404
+}

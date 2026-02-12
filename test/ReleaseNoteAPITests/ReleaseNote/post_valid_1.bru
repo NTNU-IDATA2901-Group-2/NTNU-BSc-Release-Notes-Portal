@@ -1,0 +1,26 @@
+meta {
+  name: post_valid_1
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseurl}}/releasenotes
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "changeNoteIds": [1, 2],
+    "tag": "v1.0.0",
+    "summary": "Initial release with core features",
+    "published": false,
+    "createdAt": 1739270400000,
+    "archived": false
+  }
+}
+
+assert {
+  res.status: eq 201
+}

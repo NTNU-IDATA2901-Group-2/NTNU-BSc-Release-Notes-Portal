@@ -11,6 +11,7 @@ import com.example.demo.exception.ChangeNoteNotFoundException;
 import com.example.demo.exception.CustomerNotFoundException;
 import com.example.demo.exception.FeatureNotFoundException;
 import com.example.demo.exception.ProductNotFoundException;
+import com.example.demo.exception.ReleaseNoteNotFoundException;
 import com.example.demo.exception.ScopeNotFoundException;
 
 @ControllerAdvice
@@ -51,5 +52,17 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleChangeNoteNotFoundException(ChangeNoteNotFoundException e) {
     logger.warn("Change note not found: {}", e.getChangeNoteId());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Change note with ID %d not found", e.getChangeNoteId()));
+  }
+
+  /**
+   * Handles the case where a release note is not found. Logs the event and returns a 404 response with a message.
+   *
+   * @param e the exception containing details about the missing release note
+   * @return a ResponseEntity with a 404 status and a message indicating the release note was not found
+   */
+  @ExceptionHandler (value = {ReleaseNoteNotFoundException.class})
+  public ResponseEntity<String> handleReleaseNoteNotFoundException(ReleaseNoteNotFoundException e) {
+    logger.warn("Release note not found: {}", e.getReleaseNoteId());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Release note with ID %d not found", e.getReleaseNoteId()));
   }
 }

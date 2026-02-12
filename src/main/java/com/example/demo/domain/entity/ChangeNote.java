@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,6 +29,10 @@ public class ChangeNote {
   private final long timestamp = new Date().getTime();
   private boolean published = false;
   private boolean archived = false;
+
+  @ManyToOne
+  @JoinColumn(name = "release_note_id")
+  private ReleaseNote releaseNote;
 
   @ManyToOne(optional = true)
   private Product product;
