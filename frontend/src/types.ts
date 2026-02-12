@@ -1,10 +1,10 @@
 export interface ChangeNote {
-    id: Number,
-    reference: String,
-    description: String,
-    developerNotes: String,
-    upgradeNotes: String,
-    changeSource: String,
+    id: number,
+    reference: string,
+    description: string,
+    developerNotes: string,
+    upgradeNotes: string,
+    changeSource: string,
     product: Product,
     scope: Scope,
     feature: Feature,
@@ -14,49 +14,49 @@ export interface ChangeNote {
 }
 
 export interface PersistChangeNoteDTO {
-    reference?: String,
-    description?: String,
-    developerNotes?: String,
-    upgradeNotes?: String,
-    changeSource?: String,
-    productId?: Number,
-    scopeId?: Number,
-    featureId?: Number,
+    reference?: string,
+    description?: string,
+    developerNotes?: string,
+    upgradeNotes?: string,
+    changeSource?: string,
+    productId?: number,
+    scopeId?: number,
+    featureId?: number,
     published?: boolean,
-    customerId?: Number
+    customerId?: number
 }
 
 export interface Customer {
-    id: Number,
-    name: String
+    id: number,
+    name: string
 }
 
 export interface Feature {
-    id: Number,
-    name: String
+    id: number,
+    name: string
 }
 
 export interface Product {
-    id: Number,
-    name: String
+    id: number,
+    name: string
 }
 
 export interface Scope {
-    id: Number,
-    name: String
+    id: number,
+    name: string
 }
 
 export interface ReleaseNote {
-    id: Number,
-    version: String,
-    description: String,
+    id: number,
+    version: string,
+    description: string,
     published: boolean,
     changeNotes: ChangeNote[]
 }
 
 export interface PersistReleaseNoteDTO {
-    version?: String,
-    description?: String,
+    version?: string,
+    description?: string,
     published?: boolean,
-    changeNoteIds?: Number[]
+    changeNoteIds?: number[]
 }
