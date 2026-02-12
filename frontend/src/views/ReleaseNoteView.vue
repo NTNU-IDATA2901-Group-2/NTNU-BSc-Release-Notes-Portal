@@ -19,6 +19,8 @@ import { Pencil, Trash2, Eye, FileDown, Ban, Save } from "lucide-vue-next"
 import { ref } from 'vue';
 import Input from '@/components/ui/input/Input.vue';
 import { Textarea } from '@/components/ui/textarea';
+import TagsInput from '@/components/ui/tags-input/TagsInput.vue';
+import Multiselect from '@/components/Multiselect.vue';
 
   const isEditing = ref(false)
 
@@ -88,6 +90,7 @@ import { Textarea } from '@/components/ui/textarea';
       <Separator class="w-full h-2"/>
       <div class="flex flex-col gap-4 w-full text-xl gap-10">
         <h2>Change Notes</h2>
+        <Multiselect v-if="isEditing" :change-notes="releaseNote.changeNotes"/>
         <div
             v-if="!isEditing"
             v-for="change in releaseNote.changeNotes"
