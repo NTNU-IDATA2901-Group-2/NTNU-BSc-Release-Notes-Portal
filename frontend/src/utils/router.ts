@@ -8,8 +8,8 @@ import ChangeNoteView from '@/views/ChangeNoteView.vue'
 export const routeNames = {
   releaseNotes: '/',
   changeNotes: '/change-notes',
-  releaseNote: '/release-note/:id',
-  changeNote: '/change-note/:id',
+  releaseNote: '/release-notes/:id',
+  changeNote: '/change-notes/:id',
 }
 
 const routes = [
