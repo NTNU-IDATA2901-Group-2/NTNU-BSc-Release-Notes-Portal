@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import Button from '@/components/ui/button/Button.vue';
 import { useRoute } from 'vue-router';
-import { ArrowLeft, EllipsisVertical  } from "lucide-vue-next"
 import Separator from '@/components/ui/separator/Separator.vue';
 import Badge from '@/components/ui/badge/Badge.vue';
 import {
@@ -12,7 +11,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useReleaseNote } from '@/api/release-note-api';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
-import { Pencil, Trash2, Eye, FileDown, Ban, Save } from "lucide-vue-next"
+
+import { Pencil, Trash2, Eye, FileDown, Ban, Save, ArrowLeft, EllipsisVertical } from "lucide-vue-next"
 import { ref } from 'vue';
 import Input from '@/components/ui/input/Input.vue';
 import { Textarea } from '@/components/ui/textarea';
@@ -36,6 +36,7 @@ import MultiselectChangeNotes from '@/components/MultiselectChangeNotes.vue';
     <Spinner v-if="isPending || isFetching" />
     <h1 v-if="isError">Error retreiving change note</h1>
 
+    <div v-if="!isPending && !isFetching && !isError && releaseNote" class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
     <div v-if="!isPending && !isFetching && !isError && releaseNote" class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
       <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-row items-center justify-between w-full">
@@ -85,6 +86,7 @@ import MultiselectChangeNotes from '@/components/MultiselectChangeNotes.vue';
           <Textarea v-if="isEditing" class="w-full" v-model="releaseNote.description"/>
       </div>
       <Separator class="w-full h-2"/>
+      <div class="flex flex-col w-full text-xl gap-10">
       <div class="flex flex-col w-full text-xl gap-10">
         <h2>Change Notes</h2>
         <MultiselectChangeNotes v-if="isEditing" :change-notes="releaseNote.changeNotes"/>

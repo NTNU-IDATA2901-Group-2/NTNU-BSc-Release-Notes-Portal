@@ -3,8 +3,12 @@ import { createChangeNoteMutation, createPublishChangeNoteMutation, useChangeNot
 import { createReleaseNoteMutation } from '@/api/release-note-api';
 import ChangeNoteCard from '@/components/ChangeNoteCard.vue';
 import Button from '@/components/ui/button/Button.vue';
+import { InputGroup, InputGroupInput } from '@/components/ui/input-group';
 import Separator from '@/components/ui/separator/Separator.vue';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
+import { TagsInput, TagsInputItemDelete, TagsInputItemText } from '@/components/ui/tags-input';
+import TagsInputItem from '@/components/ui/tags-input/TagsInputItem.vue';
+import { Eye, FilePlus, LayersPlus, ListFilterPlus, Search } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -12,6 +16,11 @@ const router = useRouter();
 const { isLoading, isFetching, isError, data } = useChangeNotes();
 
 const selectedItems = ref<number[]>([]);
+
+const getTitleById = (id: number): string => {
+  const changeNote = data.value?.find(note => note.id === id);
+  return changeNote ? changeNote.reference : `Item-${id}`;
+}
 
 const toggleSelection = (id: number) => {
   if (selectedItems.value.includes(id)) {
@@ -35,7 +44,7 @@ const createChangeNoteMutationInstance = createChangeNoteMutation((data: number)
 })
 
 const handleCreateChangeNote = () => {
-  console.log('Create Change Note button clicked'); 
+  console.log('Create Change Note button clicked');
   createChangeNoteMutationInstance.mutate()
 }
 
@@ -58,16 +67,50 @@ const handleCreateReleaseNote = () => {
 
     <p v-else-if="isError">Failed to load change notes. Please try again later.</p>
 
-    <div v-else class="flex gap-8 flex-col h-min w-full md:flex-row justify-center mt-8 ">
-      <div class="p-4 h-min">
-        <h1 class="text-2xl">Change Notes</h1>
+    <div v-else class="flex gap-8 flex-col h-min w-full md:flex-row justify-center p-4">
+      <div class="h-min hidden md:block">
+        <h1 class="text-2xl text-nowrap">Change Notes</h1>
       </div>
 
-      <div class="flex flex-col w-full gap-4 max-w-3xl">
-        <div class="w-full flex justify-end gap-4 flex-wrap">
-          <Button variant="outline" @click="handlePublish">Publish</Button>
-          <Button variant="outline" @click="handleCreateChangeNote">Create Change Note</Button>
-          <Button variant="outline" @click="handleCreateReleaseNote">Create Release Note</Button>
+      <div class="flex flex-col w-full gap-4 max-w-4xl">
+        <div class="w-full flex flex-col md:flex-row-reverse justify-center md:justify-end gap-2">
+          <div class="flex justify-center gap-2 flex-wrap md:flex-nowrap">
+            <Button variant="outline" @click="handlePublish">Publish
+              <Eye />
+            </Button>
+            <Button variant="outline" @click="handleCreateChangeNote">Create Change Note
+              <LayersPlus />
+            </Button>
+            <Button variant="solidaccent" @click="handleCreateReleaseNote">Create Release Note
+              <FilePlus />
+            </Button>
+          </div>
+
+          <div class="flex gap-2 w-full">
+            <InputGroup>
+              <InputGroupInput placeholder="Search" disabled/>
+              <Button class="ml-2" disabled>
+                <Search />
+              </Button>
+            </InputGroup>
+            <Button variant="outline" class="flex md:hidden" disabled>
+              <p>Filter</p>
+              <ListFilterPlus />
+            </Button>
+          </div>
+        </div>
+
+        <div>
+          <TagsInput disabled>
+            <TagsInputItem v-for="id in selectedItems" :key="id" :value="getTitleById(id)" readonly>
+              <TagsInputItemText />
+              <TagsInputItemDelete disabled/>
+            </TagsInputItem>
+
+            <TagsInputItem v-if="selectedItems.length === 0" value="No items selected" readonly class="end">
+              <TagsInputItemText />
+            </TagsInputItem>
+          </TagsInput>
         </div>
 
         <div v-for="changeNote in data" class="flex flex-col gap-4">
