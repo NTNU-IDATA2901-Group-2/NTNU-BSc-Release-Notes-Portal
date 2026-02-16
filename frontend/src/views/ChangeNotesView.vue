@@ -51,25 +51,24 @@ const handleCreateReleaseNote = () => {
 </script>
 
 <template>
-  <div class="min-h-full flex justify-center">
+  <div class="min-h-screen flex justify-center align-bottom">
     <div v-if="isLoading || isFetching">
       <Spinner />
     </div>
 
     <p v-else-if="isError">Failed to load change notes. Please try again later.</p>
 
-    <div v-else class="flex gap-8 w-full flex-wrap justify-center mt-8">
-      <div class="p-4">
+    <div v-else class="flex gap-8 flex-col h-min w-full md:flex-row justify-center mt-8 ">
+      <div class="p-4 h-min">
         <h1 class="text-2xl">Change Notes</h1>
       </div>
 
       <div class="flex flex-col w-full gap-4 max-w-3xl">
-        <div class="w-full flex justify-end gap-4">
+        <div class="w-full flex justify-end gap-4 flex-wrap">
           <Button variant="outline" @click="handlePublish">Publish</Button>
           <Button variant="outline" @click="handleCreateChangeNote">Create Change Note</Button>
           <Button variant="outline" @click="handleCreateReleaseNote">Create Release Note</Button>
         </div>
-
 
         <div v-for="changeNote in data" class="flex flex-col gap-4">
           <ChangeNoteCard :key="changeNote.id" :selected="selectedItems.includes(changeNote.id)"
