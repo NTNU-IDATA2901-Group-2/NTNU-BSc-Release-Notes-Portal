@@ -26,7 +26,7 @@ const open = ref(false)
 
 const { contains } = useFilter({ sensitivity: 'base' })
 
-const filteredFrameworks = computed(() =>
+const filteredChangenotes = computed(() =>
   searchTerm.value === ''
     ? changenotes.value
     : changenotes.value.filter(option => contains(option.label, searchTerm.value)),
@@ -95,7 +95,7 @@ onUnmounted(() => {
         <ListboxContent class="max-h-[300px] scroll-py-1 overflow-x-hidden overflow-y-auto empty:after:content-['No_options'] empty:p-1 empty:after:block" tabindex="0">
           <!-- <CommandEmpty>No results found.</CommandEmpty> -->
           <ListboxItem
-            v-for="item in filteredFrameworks" :key="item.value" class="text-text-primary data-[highlighted]:bg-border/25 [&_svg:not([class*=\'text-\'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*=\'size-\'])]:size-4" :value="item.label" @select="() => {
+            v-for="item in filteredChangenotes" :key="item.value" class="text-text-primary data-[highlighted]:bg-border/25 [&_svg:not([class*=\'text-\'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*=\'size-\'])]:size-4" :value="item.label" @select="() => {
               searchTerm = ''
             }"
           >

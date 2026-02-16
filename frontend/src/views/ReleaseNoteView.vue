@@ -12,12 +12,11 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useReleaseNote } from '@/api/release-note-api';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
-
 import { Pencil, Trash2, Eye, FileDown, Ban, Save } from "lucide-vue-next"
 import { ref } from 'vue';
 import Input from '@/components/ui/input/Input.vue';
 import { Textarea } from '@/components/ui/textarea';
-import Multiselect from '@/components/Multiselect.vue';
+import MultiselectChangeNotes from '@/components/MultiselectChangeNotes.vue';
 
   const isEditing = ref(false)
 
@@ -37,11 +36,11 @@ import Multiselect from '@/components/Multiselect.vue';
     <Spinner v-if="isPending || isFetching" />
     <h1 v-if="isError">Error retreiving change note</h1>
 
-    <div v-if="!isPending && !isFetching && !isError && releaseNote" class="flex flex-col gap-16 flex-1 w-full items-center mt-16 md:mt-24 mx-4 lg:w-4xl md:mt-42">
+    <div v-if="!isPending && !isFetching && !isError && releaseNote" class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
       <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-row items-center justify-between w-full">
           <div class="flex items-center gap-4">
-            <h1 v-if="!isEditing" class="text-2xl max-w-60 whitespace-nowrap overflow-hidden">Release Note {{ releaseNote.version }}</h1>
+            <h1 v-if="!isEditing" class="text-2xl max-w-60 whitespace-nowrap overflow-hidden">{{ releaseNote.version }}</h1>
             <Input v-if="isEditing" class="w-full" v-model="releaseNote.version"/>
             <Badge v-if="!isEditing" class="h-6" :variant="releaseNote.published ? 'success' : 'destructive'">{{ releaseNote.published ? 'Published' : 'Private' }}</Badge>
           </div>
@@ -50,7 +49,7 @@ import Multiselect from '@/components/Multiselect.vue';
               <DropdownMenuTrigger class="cursor-pointer hover:bg-border/50 rounded-md p-2 transition-colors">
                 <EllipsisVertical class="text-text-primary"/>
               </DropdownMenuTrigger>
-              <DropdownMenuContent class="mr-20 mt-2">
+              <DropdownMenuContent class="mr-6 lg:mr-20 mt-2">
                   <DropdownMenuItem @click="isEditing = !isEditing">
                     <div class="w-full flex gap-2">
                         <p class="text-text-dark-static ml-auto">Edit</p>
@@ -86,9 +85,9 @@ import Multiselect from '@/components/Multiselect.vue';
           <Textarea v-if="isEditing" class="w-full" v-model="releaseNote.description"/>
       </div>
       <Separator class="w-full h-2"/>
-      <div class="flex flex-col gap-4 w-full text-xl gap-10">
+      <div class="flex flex-col w-full text-xl gap-10">
         <h2>Change Notes</h2>
-        <Multiselect v-if="isEditing" :change-notes="releaseNote.changeNotes"/>
+        <MultiselectChangeNotes v-if="isEditing" :change-notes="releaseNote.changeNotes"/>
         <div
             v-if="!isEditing"
             v-for="change in releaseNote.changeNotes"
