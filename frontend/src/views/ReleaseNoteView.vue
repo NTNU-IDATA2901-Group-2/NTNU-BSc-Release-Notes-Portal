@@ -15,8 +15,14 @@ import { useTheme } from '@/utils/theme';
 import { useReleaseNote } from '@/api/release-note-api';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 
+import { Pencil, Trash2, Eye, FileDown, Ban, Save } from "lucide-vue-next"
+import { ref } from 'vue';
+import Input from '@/components/ui/input/Input.vue';
+import { Textarea } from '@/components/ui/textarea';
+import TagsInput from '@/components/ui/tags-input/TagsInput.vue';
+import Multiselect from '@/components/Multiselect.vue';
 
-  const { theme } = useTheme()
+  const isEditing = ref(false)
 
   const route = useRoute();
 
@@ -25,74 +31,88 @@ import Spinner from '@/components/ui/spinner/Spinner.vue';
 </script>
 
 <template>
-  <div class="flex flex-col items-center px-4 mb-20">
-    <Button variant="outline" class="mb-4 absolute left-10 mt-10" @click="$router.push('/')"><ArrowLeft />Previous</Button>
+  <main class="flex flex-col items-center px-4 mb-20">
+    <Button variant="outline" class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10" @click="$router.push('/')"><ArrowLeft />Previous</Button>
+    <div class="md:hidden flex w-full mt-4 justify-end gap-2">
+      <Button v-if="isEditing" variant="outline" @click="isEditing = false">Cancel <Ban /></Button>
+      <Button disabled v-if="isEditing" variant="outline" >Save <Save /></Button>
+    </div>
     <Spinner v-if="isPending || isFetching" />
+    <h1 v-if="isError">Error retreiving change note</h1>
 
-    <div v-if="!isPending && !isFetching && !isError && releaseNote" class="flex flex-col gap-16 flex-1 w-full items-center mt-24 mx-4 lg:w-4xl md:mt-42">
+    <div v-if="!isPending && !isFetching && !isError && releaseNote" class="flex flex-col gap-16 flex-1 w-full items-center mt-16 md:mt-24 mx-4 lg:w-4xl md:mt-42">
       <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-row items-center justify-between w-full">
           <div class="flex items-center gap-4">
-            <h1 v-if="releaseNote" class="text-2xl">Release Note {{ releaseNote.version }}</h1>
-            <Badge v-if="releaseNote" class="h-6" :variant="releaseNote.published ? 'success' : 'destructive'">{{ releaseNote.published ? 'Published' : 'Private' }}</Badge>
+            <h1 v-if="!isEditing" class="text-2xl max-w-60 whitespace-nowrap overflow-hidden">Release Note {{ releaseNote.version }}</h1>
+            <Input v-if="isEditing" class="w-full" v-model="releaseNote.version"/>
+            <Badge v-if="!isEditing" class="h-6" :variant="releaseNote.published ? 'success' : 'destructive'">{{ releaseNote.published ? 'Published' : 'Private' }}</Badge>
           </div>
-          	<DropdownMenu >
-              <DropdownMenuTrigger class="ml-auto cursor-pointer hover:bg-border/50 rounded-md p-2 transition-colors">
+          <div class="flex gap-4">
+          	<DropdownMenu v-if="!isEditing">
+              <DropdownMenuTrigger class="cursor-pointer hover:bg-border/50 rounded-md p-2 transition-colors">
                 <EllipsisVertical class="text-text-primary"/>
               </DropdownMenuTrigger>
-              <DropdownMenuContent class="mr-8 mt-2">
-                  <DropdownMenuItem @click="theme = theme === 'dark' ? 'light' : 'dark'">
-                <div class="w-full flex gap-2">
-                    <p class="text-text-dark-static ml-auto">Toggle theme</p>
-                    <SunMoon class="text-text-dark-static"/>
-                </div>
+              <DropdownMenuContent class="mr-20 mt-2">
+                  <DropdownMenuItem @click="isEditing = !isEditing">
+                    <div class="w-full flex gap-2">
+                        <p class="text-text-dark-static ml-auto">Edit</p>
+                        <Pencil class="text-text-dark-static"/>
+                    </div>
                   </DropdownMenuItem>
                   <DropdownMenuItem disabled>
-                <div class="w-full flex gap-2">
-                    <p class="ml-auto text-text-dark-static">Sign out</p>
-                    <LogOut class="text-text-dark-static"/>
-                </div>
+                    <div class="w-full flex gap-2">
+                        <p class="ml-auto text-text-dark-static">Delete</p>
+                        <Trash2 class="text-text-dark-static"/>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem disabled>
+                    <div class="w-full flex gap-2">
+                        <p class="ml-auto text-text-dark-static">{{ releaseNote.published ? 'Publish' : 'Unpublish' }}</p>
+                        <Eye class="text-text-dark-static"/>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem disabled>
+                    <div class="w-full flex gap-2">
+                        <p class="ml-auto text-text-dark-static">Export</p>
+                        <FileDown class="text-text-dark-static"/>
+                    </div>
                   </DropdownMenuItem>
               </DropdownMenuContent>
 	          </DropdownMenu>
+            <Button class="hidden md:flex" v-if="isEditing" variant="outline" @click="isEditing = false">Cancel <Ban /></Button>
+          	<Button class="hidden md:flex" disabled v-if="isEditing" variant="outline" >Save <Save /></Button>
+          </div>
           </div>
 
-          <p v-if="releaseNote" class="">{{ releaseNote.description }}</p>
+          <p v-if="!isEditing" class="">{{ releaseNote.description }}</p>
+          <Textarea v-if="isEditing" class="w-full" v-model="releaseNote.description"/>
       </div>
       <Separator class="w-full h-2"/>
-      <div class="flex flex-col gap-4 w-full text-xl">
-        <h2>Changes</h2>
-        <div 
+      <div class="flex flex-col gap-4 w-full text-xl gap-10">
+        <h2>Change Notes</h2>
+        <Multiselect v-if="isEditing" :change-notes="releaseNote.changeNotes"/>
+        <div
+            v-if="!isEditing"
             v-for="change in releaseNote.changeNotes"
             :key="change.id" 
-            class="flex flex-col gap-2"
+            class="flex flex-col gap-4"
             >
           <h3 class="text-lg">{{ change.reference }}</h3>
-          <p class="text-sm">{{ change.description }}</p>
-        </div>
-      </div>
-      <div class="flex flex-col gap-4 w-full text-xl">
-        <h2>Developer Notes</h2>
-        <div
-            v-for="change in releaseNote.changeNotes"
-            :key="change.id"
-            class="flex flex-col gap-2"
-            >
-          <h3 class="text-lg">{{ change.reference }}</h3>
-          <p class="text-sm">{{ change.developerNotes }}</p>
-        </div>
-      </div>
-      <div class="flex flex-col gap-4 w-full text-xl">
-        <h2>Upgrade Requirements</h2>
-        <div
-            v-for="change in releaseNote.changeNotes"
-            :key="change.id"
-            class="flex flex-col gap-2"
-            >
-          <h3 class="text-lg">{{ change.reference }}</h3>
-          <p class="text-sm">{{ change.upgradeNotes }}</p>
+          <div>
+            <h3 class="text-lg">Description</h3>
+            <p class="text-sm">{{ change.description }}</p>
+          </div>
+          <div>
+            <h3 class="text-lg">Developer Notes</h3>
+            <p class="text-sm">{{ change.developerNotes }}</p>
+          </div>
+          <div>
+            <h3 class="text-lg">Upgrade Notes</h3>
+            <p class="text-sm">{{ change.upgradeNotes }}</p>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </main>
 </template>
