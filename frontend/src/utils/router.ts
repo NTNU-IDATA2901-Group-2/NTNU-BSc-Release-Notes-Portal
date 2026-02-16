@@ -4,12 +4,14 @@ import ChangeNotesView from '../views/ChangeNotesView.vue'
 import ReleaseNotesView from '../views/ReleaseNotesView.vue'
 import ReleaseNoteView from '@/views/ReleaseNoteView.vue'
 import ChangeNoteView from '@/views/ChangeNoteView.vue'
+import SignInView from '@/views/SignInView.vue'
 
 export const routeNames = {
   releaseNotes: '/',
   changeNotes: '/change-notes',
   releaseNote: '/release-notes/:id',
   changeNote: '/change-notes/:id',
+  signIn: '/sign-in',
 }
 
 const routes = [
@@ -17,6 +19,7 @@ const routes = [
   { path: routeNames.changeNotes, component: ChangeNotesView },
   { path: routeNames.releaseNote, component: ReleaseNoteView },
   { path: routeNames.changeNote, component: ChangeNoteView },
+  { path: routeNames.signIn, component: SignInView },
 ]
 
 export const router = createRouter({
