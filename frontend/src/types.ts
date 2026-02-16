@@ -60,3 +60,8 @@ export interface PersistReleaseNoteDTO {
     published?: boolean,
     changeNoteIds?: number[]
 }
+
+export interface Tag {
+    id: number,
+    name: string
+}
