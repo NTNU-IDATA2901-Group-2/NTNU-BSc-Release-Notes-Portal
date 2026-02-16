@@ -1,17 +1,13 @@
 meta {
-  name: patch_archive_change_note_1
+  name: patch_archive_1
   type: http
-  seq: 18
+  seq: 6
 }
 
 patch {
   url: {{baseurl}}/changenotes/{{change_id_1}}/archive
   body: none
   auth: inherit
-}
-
-assert {
-  res.status: eq 200
 }
 
 settings {

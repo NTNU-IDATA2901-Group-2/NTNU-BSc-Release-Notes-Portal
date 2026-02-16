@@ -1,7 +1,7 @@
 meta {
   name: get_all_should_exclude_patched
   type: http
-  seq: 14
+  seq: 21
 }
 
 get {
@@ -12,7 +12,7 @@ get {
 
 assert {
   res.status: eq 200
-  res.body.length: eq 1
+  res.body.length: eq 0
 }
 
 settings {

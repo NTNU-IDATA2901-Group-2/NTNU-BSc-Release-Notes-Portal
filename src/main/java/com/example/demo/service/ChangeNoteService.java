@@ -93,6 +93,7 @@ public class ChangeNoteService {
   public List<ChangeNoteDTO> getAllChangeNotes() {
     return changeNoteRepository.findByArchivedFalse().stream()
         .map(ChangeNoteDTO::fromChangeNote)
+        .filter(changeNoteDTO -> !changeNoteDTO.archived())
         .toList();
   }
 
@@ -106,6 +107,11 @@ public class ChangeNoteService {
    */
   public ChangeNoteDTO getChangeNoteById(long id) {
     ChangeNote changeNote = changeNoteRepository.findById(id).orElseThrow(() -> new ChangeNoteNotFoundException(id));
+
+    if (changeNote.isArchived()) {
+      throw new ChangeNoteNotFoundException(id);
+    }
+
     return ChangeNoteDTO.fromChangeNote(changeNote);
   }
 

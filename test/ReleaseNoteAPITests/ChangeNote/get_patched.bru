@@ -1,0 +1,20 @@
+meta {
+  name: get_patched
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseurl}}/changenotes/{{change_id_1}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 404
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
