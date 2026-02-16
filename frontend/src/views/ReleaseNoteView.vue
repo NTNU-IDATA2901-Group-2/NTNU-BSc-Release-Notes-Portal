@@ -3,7 +3,6 @@ import Button from '@/components/ui/button/Button.vue';
 import { useRoute } from 'vue-router';
 import { ArrowLeft, EllipsisVertical  } from "lucide-vue-next"
 import Separator from '@/components/ui/separator/Separator.vue';
-import type { ReleaseNote } from '@/types';
 import Badge from '@/components/ui/badge/Badge.vue';
 import {
   DropdownMenu,
@@ -11,7 +10,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useTheme } from '@/utils/theme';
 import { useReleaseNote } from '@/api/release-note-api';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 
@@ -19,7 +17,6 @@ import { Pencil, Trash2, Eye, FileDown, Ban, Save } from "lucide-vue-next"
 import { ref } from 'vue';
 import Input from '@/components/ui/input/Input.vue';
 import { Textarea } from '@/components/ui/textarea';
-import TagsInput from '@/components/ui/tags-input/TagsInput.vue';
 import Multiselect from '@/components/Multiselect.vue';
 
   const isEditing = ref(false)
@@ -32,7 +29,7 @@ import Multiselect from '@/components/Multiselect.vue';
 
 <template>
   <main class="flex flex-col items-center px-4 mb-20">
-    <Button variant="outline" class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10" @click="$router.push('/')"><ArrowLeft />Previous</Button>
+    <Button variant="outline" class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10" @click="$router.back()"><ArrowLeft />Previous</Button>
     <div class="md:hidden flex w-full mt-4 justify-end gap-2">
       <Button v-if="isEditing" variant="outline" @click="isEditing = false">Cancel <Ban /></Button>
       <Button disabled v-if="isEditing" variant="outline" >Save <Save /></Button>
