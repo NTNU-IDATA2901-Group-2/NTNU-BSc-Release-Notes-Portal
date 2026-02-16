@@ -97,7 +97,13 @@ import TagSelect from '@/components/TagSelect.vue';
 
           <p v-if="!isEditing" class="">{{ changeNote.description }}</p>
           <Textarea v-if="isEditing" class="w-full" v-model="changeNote.description"/>
-          <div v-if="isEditing" class="flex flex-wrap static justify-between gap-4">
+          <div v-if="!isEditing" class="flex flex-wrap gap-4">
+            <Badge v-if="changeNote.product" class="h-6">{{ changeNote.product.name }}</Badge>
+            <Badge v-if="changeNote.scope" class="h-6">{{ changeNote.scope.name }}</Badge>
+            <Badge v-if="changeNote.feature" class="h-6">{{ changeNote.feature.name }}</Badge>
+            <Badge v-if="changeNote.customer" class="h-6">{{ changeNote.customer.name }}</Badge>
+          </div>
+          <div v-if="isEditing" class="flex flex-wrap justify-between gap-4">
             <div class="flex flex-col gap-1">
               <h4 class="text-md">Product</h4>
               <TagSelect mode="product" :selected-id="changeNote.product.id" v-model="selectedProduct"/>
