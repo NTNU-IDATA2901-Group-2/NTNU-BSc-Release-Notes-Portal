@@ -27,12 +27,18 @@ import ArchivePrompt from '@/components/ArchivePrompt.vue';
   const { isPending, isFetching, isError, data: releaseNote } = useReleaseNote(id);
 
   const archivePromptOpen = ref(false);
+
+  const archiveReleaseNote = () => {
+    console.log('Archiving release note with ID:', id);
+  }
 </script>
 
 <template>
   
   <main class="flex flex-col items-center px-4 mb-20">
-    <ArchivePrompt v-model:open="archivePromptOpen" />
+    <ArchivePrompt v-model:open="archivePromptOpen"
+    :onConfirm="archiveReleaseNote"
+    />
     <Button variant="outline" class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10" @click="$router.push('/')"><ArrowLeft />Previous</Button>
     <div class="md:hidden flex w-full mt-4 justify-end gap-2">
       <Button v-if="isEditing" variant="outline" @click="isEditing = false">Cancel <Ban /></Button>

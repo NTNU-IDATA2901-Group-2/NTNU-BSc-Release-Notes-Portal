@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 
 const props = defineProps<{
   open: boolean;
+  onConfirm: () => void;
 }>()
 
 console.log('ArchivePrompt open:', props.open);
@@ -17,8 +18,10 @@ const handleClose = () => {
 }
 
 const handleConfirm = () => {
+  props.onConfirm();
   emit('update:open', false);
 }
+
 </script>
 
 <template>
