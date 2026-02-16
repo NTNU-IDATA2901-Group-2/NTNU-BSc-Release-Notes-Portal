@@ -1,12 +1,12 @@
 import type { ChangeNote } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 
-const queryClient = useQueryClient();
-
 export const createPublishChangeNoteMutation = () => useMutation<boolean, void, number>({
     mutationFn: (changeNoteId: number) => publishChangeNote(changeNoteId),
     onSuccess: (data) => {
       console.log("Change note published with ID:", data);
+
+      const queryClient = useQueryClient();
       queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
     }
 });
@@ -20,6 +20,8 @@ export const createChangeNoteMutation = (onSuccess : (changeId : number) => void
     mutationFn: () => createChangeNote(),
     onSuccess: (data) => {
       console.log("Change note created with ID:", data);
+
+      const queryClient = useQueryClient();
       queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
       onSuccess(data);
     }
@@ -35,7 +37,6 @@ export const useChangeNotes = () => useQuery<ChangeNote[]>({
 });
 
 const getChangeNotes = async () => {
-  
   return [
     {
       id: 1,
