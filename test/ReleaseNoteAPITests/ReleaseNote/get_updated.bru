@@ -1,0 +1,24 @@
+meta {
+  name: get_updated
+  type: http
+  seq: 16
+}
+
+get {
+  url: {{baseurl}}/releasenotes/{{release_id_2}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body.changeNotes: isEmpty
+  res.body.tag: eq updated
+  res.body.summary: eq updated
+  res.body.published: eq true
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

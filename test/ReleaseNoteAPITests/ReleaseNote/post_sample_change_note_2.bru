@@ -23,6 +23,10 @@ assert {
   res.status: eq 201
 }
 
+script:post-response {
+  bru.setEnvVar("change_id_2", res.body)
+}
+
 settings {
   encodeUrl: true
   timeout: 0

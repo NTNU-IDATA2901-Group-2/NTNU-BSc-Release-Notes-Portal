@@ -13,6 +13,7 @@ import com.example.demo.exception.FeatureNotFoundException;
 import com.example.demo.exception.ProductNotFoundException;
 import com.example.demo.exception.ReleaseNoteNotFoundException;
 import com.example.demo.exception.ScopeNotFoundException;
+import com.example.demo.exception.ChangeNoteAlreadyHasReleaseNoteException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -64,5 +65,11 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleReleaseNoteNotFoundException(ReleaseNoteNotFoundException e) {
     logger.warn("Release note not found: {}", e.getReleaseNoteId());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Release note with ID %d not found", e.getReleaseNoteId()));
+  }
+
+  @ExceptionHandler(value = {ChangeNoteAlreadyHasReleaseNoteException.class})
+  public ResponseEntity<String> handleChangeNoteAlreadyHasReleaseNoteException(ChangeNoteAlreadyHasReleaseNoteException e) {
+    logger.warn("Change note already has a release note: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
   }
 }

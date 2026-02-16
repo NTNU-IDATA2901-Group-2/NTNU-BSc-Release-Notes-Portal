@@ -1,18 +1,17 @@
 meta {
-  name: get_all_should_exclude_patched
+  name: patch_archive_change_note_3
   type: http
-  seq: 14
+  seq: 21
 }
 
-get {
-  url: {{baseurl}}/releasenotes
+patch {
+  url: {{baseurl}}/changenotes/{{change_id_2}}/archive
   body: none
   auth: inherit
 }
 
 assert {
   res.status: eq 200
-  res.body.length: eq 1
 }
 
 settings {

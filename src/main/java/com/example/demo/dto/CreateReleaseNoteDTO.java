@@ -9,9 +9,7 @@ public record CreateReleaseNoteDTO(
     List<Long> changeNoteIds,
     String tag,
     String summary,
-    Boolean published,
-    Long createdAt,
-    Boolean archived) {
+    Boolean published) {
     
 
 } 

@@ -14,7 +14,7 @@ import com.example.demo.dto.CreateReleaseNoteDTO;
 import com.example.demo.dto.ReleaseNoteDTO;
 import com.example.demo.exception.ChangeNoteNotFoundException;
 import com.example.demo.exception.ReleaseNoteNotFoundException;
-
+import com.example.demo.exception.ChangeNoteAlreadyHasReleaseNoteException;
 import lombok.AllArgsConstructor;
 
 /**
@@ -37,21 +37,31 @@ public class ReleaseNoteService {
    */
   public long createReleaseNote(CreateReleaseNoteDTO createReleaseNoteDTO) {
     ReleaseNote releaseNote = new ReleaseNote();
+    releaseNote.setTag(createReleaseNoteDTO.tag());
+    releaseNote.setSummary(createReleaseNoteDTO.summary());
+    releaseNote.setPublished(createReleaseNoteDTO.published());
 
     List<ChangeNote> changeNotesInReleaseNote = new ArrayList<>();
     if (createReleaseNoteDTO.changeNoteIds() != null) {
       for (Long changeNoteId : createReleaseNoteDTO.changeNoteIds()) {
         ChangeNote changeNote = changeNoteRepository.findById(changeNoteId)
             .orElseThrow(() -> new ChangeNoteNotFoundException(changeNoteId));
+
+        if (changeNote.getReleaseNote() != null) {
+          throw new ChangeNoteAlreadyHasReleaseNoteException(changeNoteId, changeNote.getReleaseNote().getId());
+        }
+        releaseNote = releaseNoteRepository.save(releaseNote);
+        changeNote.setReleaseNote(releaseNote);
+        changeNoteRepository.save(changeNote);
         changeNotesInReleaseNote.add(changeNote);
+        System.out.println("Added change note with id " + changeNoteId + " to release note");
       }
     }
     
     releaseNote.setChangeNotes(changeNotesInReleaseNote);
-    releaseNote.setTag(createReleaseNoteDTO.tag());
-    releaseNote.setSummary(createReleaseNoteDTO.summary());
-    releaseNote.setPublished(createReleaseNoteDTO.published());
-    releaseNote.setArchived(createReleaseNoteDTO.archived());
+
+
+    System.out.println(releaseNote);
 
     return releaseNoteRepository.save(releaseNote).getId();
   }
@@ -115,6 +125,11 @@ public class ReleaseNoteService {
 
     ReleaseNote releaseNote = releaseNoteOptional.get();
 
+    for (ChangeNote changeNote : releaseNote.getChangeNotes()) {
+      changeNote.setReleaseNote(null);
+      changeNoteRepository.save(changeNote);
+    }
+
     List<ChangeNote> changeNotesInReleaseNote = new ArrayList<>();
     if (createReleaseNoteDTO.changeNoteIds() == null) {
       releaseNote.setChangeNotes(new ArrayList<ChangeNote>());
@@ -122,6 +137,12 @@ public class ReleaseNoteService {
       for (Long changeNoteId : createReleaseNoteDTO.changeNoteIds()) {
         ChangeNote changeNote = changeNoteRepository.findById(changeNoteId)
             .orElseThrow(() -> new ChangeNoteNotFoundException(changeNoteId));
+
+        if (changeNote.getReleaseNote() != null && changeNote.getReleaseNote().getId() != releaseNote.getId()) {
+          throw new ChangeNoteAlreadyHasReleaseNoteException(changeNoteId, changeNote.getReleaseNote().getId());
+        }
+        changeNote.setReleaseNote(releaseNote);
+        changeNoteRepository.save(changeNote);
         changeNotesInReleaseNote.add(changeNote);
       }
     }
@@ -130,7 +151,6 @@ public class ReleaseNoteService {
     releaseNote.setTag(createReleaseNoteDTO.tag());
     releaseNote.setSummary(createReleaseNoteDTO.summary());
     releaseNote.setPublished(createReleaseNoteDTO.published());
-    releaseNote.setArchived(createReleaseNoteDTO.archived());
 
     releaseNoteRepository.save(releaseNote);
     return ReleaseNoteDTO.fromReleaseNote(releaseNote);

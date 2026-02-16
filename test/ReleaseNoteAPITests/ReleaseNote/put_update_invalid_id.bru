@@ -1,0 +1,30 @@
+meta {
+  name: put_update_invalid_id
+  type: http
+  seq: 17
+}
+
+put {
+  url: {{baseurl}}/releasenotes/-99999
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "changeNoteIds": [],
+    "tag": "updated",
+    "summary": "updated",
+    "published": true,
+    "createdAt": 0
+  }
+}
+
+assert {
+  res.status: eq 404
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

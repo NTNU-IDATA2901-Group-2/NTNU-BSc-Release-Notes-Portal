@@ -13,8 +13,7 @@ public record ReleaseNoteDTO(
     String tag,
     String summary,
     boolean published,
-    long createdAt,
-    boolean archived) {
+    long createdAt) {
 
     /**
      * Converts a ReleaseNote entity to a ReleaseNoteDTO.
@@ -33,8 +32,7 @@ public record ReleaseNoteDTO(
             releaseNote.getTag(),
             releaseNote.getSummary(),
             releaseNote.getPublished(),
-            releaseNote.getCreatedAt(),
-            releaseNote.getArchived());
+            releaseNote.getCreatedAt());
         return releaseNoteDTO;
     }
 }
