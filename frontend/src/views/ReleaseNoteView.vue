@@ -34,9 +34,8 @@ import MultiselectChangeNotes from '@/components/MultiselectChangeNotes.vue';
       <Button disabled v-if="isEditing" variant="outline" >Save <Save /></Button>
     </div>
     <Spinner v-if="isPending || isFetching" />
-    <h1 v-if="isError">Error retreiving change note</h1>
+    <h1 v-if="isError">Error retreiving release note</h1>
 
-    <div v-if="!isPending && !isFetching && !isError && releaseNote" class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
     <div v-if="!isPending && !isFetching && !isError && releaseNote" class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
       <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-row items-center justify-between w-full">
@@ -110,6 +109,7 @@ import MultiselectChangeNotes from '@/components/MultiselectChangeNotes.vue';
             <p class="text-sm">{{ change.upgradeNotes }}</p>
           </div>
         </div>
+      </div>
       </div>
     </div>
   </main>
