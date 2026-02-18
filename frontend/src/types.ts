@@ -48,8 +48,8 @@ export interface Scope {
 
 export interface ReleaseNote {
     id: number,
-    version: string,
-    description: string,
+    tag: string,
+    summary: string,
     published: boolean,
     changeNotes: ChangeNote[]
 }

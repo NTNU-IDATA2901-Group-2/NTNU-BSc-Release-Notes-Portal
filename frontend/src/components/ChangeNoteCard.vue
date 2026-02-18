@@ -28,7 +28,7 @@ const handleCheckboxClick = (event: Event) => {
   <RouterLink :to="`/change-notes/${changeNote.id}`" class="block">
     
     <div
-      class="flex flex-col p-4 gap-2 overflow-hidden text-wrap rounded-lg hover:bg-text-primary/10 transition-colors">
+      class="flex flex-col p-4 gap-2 h-30 overflow-hidden text-wrap rounded-lg hover:bg-text-primary/10 transition-colors">
       <div class="flex justify-between">
         <div class="flex gap-4 items-center">
 

@@ -51,8 +51,8 @@ import MultiselectChangeNotes from '@/components/MultiselectChangeNotes.vue';
       <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-row items-center justify-between w-full">
           <div class="flex items-center gap-4">
-            <h1 v-if="!isEditing" class="text-2xl max-w-60 whitespace-nowrap overflow-hidden">{{ releaseNote.version }}</h1>
-            <Input v-if="isEditing" class="w-full" v-model="releaseNote.version"/>
+            <h1 v-if="!isEditing" class="text-2xl max-w-60 whitespace-nowrap overflow-hidden">{{ releaseNote.tag }}</h1>
+            <Input v-if="isEditing" class="w-full" v-model="releaseNote.tag"/>
             <Badge v-if="!isEditing" class="h-6" :variant="releaseNote.published ? 'success' : 'destructive'">{{ releaseNote.published ? 'Published' : 'Private' }}</Badge>
           </div>
           <div class="flex gap-4">
@@ -92,8 +92,8 @@ import MultiselectChangeNotes from '@/components/MultiselectChangeNotes.vue';
           </div>
           </div>
 
-          <p v-if="!isEditing" class="">{{ releaseNote.description }}</p>
-          <Textarea v-if="isEditing" class="w-full" v-model="releaseNote.description"/>
+          <p v-if="!isEditing" class="">{{ releaseNote.summary }}</p>
+          <Textarea v-if="isEditing" class="w-full" v-model="releaseNote.summary"/>
       </div>
       <Separator class="w-full h-2"/>
       <div class="flex flex-col w-full text-xl gap-10">
