@@ -61,6 +61,18 @@ export interface PersistReleaseNoteDTO {
     changeNoteIds?: number[]
 }
 
+export interface PersistChangeNoteDTO {
+    reference?: string,
+    description?: string,
+    developerNotes?: string,
+    upgradeNotes?: string,
+    changeSource?: string,
+    productId?: number,
+    scopeId?: number,
+    featureId?: number,
+    customerId?: number
+}
+
 export interface Tag {
     id: number,
     name: string

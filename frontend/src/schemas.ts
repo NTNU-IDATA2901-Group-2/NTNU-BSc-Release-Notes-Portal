@@ -8,13 +8,13 @@ export const EditReleaseNoteSchema = z.object({
 })
 
 export const EditChangeNoteSchema = z.object({
-  id: z.number(),
+  reference: z.string().optional(),
   description: z.string().optional(),
+  developerNotes: z.string().optional(),
+  upgradeNotes: z.string().optional(),
+  changeSource: z.string().optional(),
   productId: z.number().optional(),
   scopeId: z.number().optional(),
   featureId: z.number().optional(),
   customerId: z.number().optional(),
-  developerNotes: z.string().optional(),
-  upgradeNotes: z.string().optional(),
-  changeSource: z.string().optional(),
 })

@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -13,18 +15,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.ScopeDTO;
+import com.example.demo.service.ScopeService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AllArgsConstructor;
 
 @Tag(name = "Scopes", description = "Endpoints for managing scopes")
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api/scopes")
 public class ScopeController {
+  private final ScopeService scopeService;
   private final Logger logger = LoggerFactory.getLogger(ScopeController.class);
-
   
   @Operation(summary = "Get all scopes", description = "Retrieves a list of all scopes")
   @ApiResponses(value = {
@@ -32,9 +37,9 @@ public class ScopeController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @GetMapping("")
-  public ResponseEntity<String> getAllScopes() {
+  public ResponseEntity<List<ScopeDTO>> getAllScopes() {
     logger.info("Retrieved all scopes");
-    return ResponseEntity.ok("List of all scopes");
+    return ResponseEntity.ok(scopeService.getAllScopes());
   }
 
   @Operation(summary = "Get scope by ID", description = "Retrieves details of a specific scope by its ID")
@@ -44,9 +49,9 @@ public class ScopeController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @GetMapping("/{id}")
-  public ResponseEntity<String> getScopeById(@PathVariable Long id) {
+  public ResponseEntity<ScopeDTO> getScopeById(@PathVariable Long id) {
     logger.info("Retrieved scope with id: {}", id);
-    return ResponseEntity.ok("Details of scope with ID: " + id);
+    return ResponseEntity.ok(scopeService.getScopeById(id));
   }
 
   @Operation(summary = "Create scope", description = "Creates a new scope with provided details")
@@ -56,9 +61,10 @@ public class ScopeController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PostMapping("")
-  public ResponseEntity<String> createScope(ScopeDTO scopeDetails) {
+  public ResponseEntity<Long> createScope(ScopeDTO scopeDetails) {
     logger.info("Created scope with details: {}", scopeDetails);
-    return ResponseEntity.ok("Created scope with details: " + scopeDetails);
+    long createdScope = scopeService.createScope(scopeDetails);
+    return ResponseEntity.ok(createdScope);
   }
 
   @Operation(summary = "Update scope", description = "Updates an existing scope with new details")
@@ -69,8 +75,9 @@ public class ScopeController {
   })
   @PutMapping("/{id}")
   public ResponseEntity<String> updateScope(@PathVariable Long id, @RequestBody ScopeDTO scopeDetails) {
-    logger.info("Updated scope with id: {}", id);
-    return ResponseEntity.ok("Updated scope with ID: " + id + " and details: " + scopeDetails);
+    ScopeDTO updatedScope = scopeService.updateScope(id, scopeDetails);
+    logger.info("Updated scope with id: {} and details: {}", id, updatedScope);
+    return ResponseEntity.ok("Updated scope with ID: " + id);
   }
 
   @Operation(summary = "Delete scope", description = "Deletes an existing scope by its ID")
@@ -81,6 +88,7 @@ public class ScopeController {
   })
   @DeleteMapping("/{id}")
   public ResponseEntity<String> deleteScope(@PathVariable Long id) {
+    scopeService.deleteScope(id);
     logger.info("Deleted scope with id: {}", id);
     return ResponseEntity.ok("Deleted scope with ID: " + id);
   }

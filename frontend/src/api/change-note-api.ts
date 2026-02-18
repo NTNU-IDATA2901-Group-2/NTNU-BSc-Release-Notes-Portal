@@ -1,5 +1,5 @@
 import { config } from "@/constants";
-import type { ChangeNote, Customer, Feature, Product, Scope } from "@/types";
+import type { ChangeNote, Customer, Feature, PersistChangeNoteDTO, Product, Scope } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import axios from "axios";
 
@@ -23,6 +23,10 @@ export const createChangeNote = async (): Promise<number> => {
   return response.data as number;
 }
 
+export const updateChangeNote = async (changeNoteId: number, changeNoteData: PersistChangeNoteDTO): Promise<void> => {
+  await axios.put(`${config.API_URL}changenotes/${changeNoteId}`, changeNoteData);
+}
+
 export const useChangeNotes = () => useQuery<ChangeNote[]>({
     queryKey: ['changeNotes'],
     queryFn: () => getChangeNotes(),
@@ -33,7 +37,7 @@ export const useChangeNote = (id: string ) => useQuery<ChangeNote>({
     queryFn: () => getChangeNote(id),
 });
 
-const getChangeNote = async (id: string): Promise<ChangeNote> => {
+export const getChangeNote = async (id: string): Promise<ChangeNote> => {
   const response = await axios.get(`${config.API_URL}changenotes/${id}`)
   return response.data as ChangeNote;
 }
