@@ -14,13 +14,13 @@ const releaseNote = props.releaseNote;
 <template>
   <RouterLink :to="`/release-notes/${releaseNote.id}`" >
     <div
-      class="flex flex-col p-4 gap-2 overflow-hidden text-wrap rounded-lg hover:bg-text-primary/10 transition-colors">
+      class="flex flex-col p-4 gap-2 h-30 overflow-hidden text-wrap rounded-lg hover:bg-text-primary/10 transition-colors">
       <div class="flex flex-row justify-between">
-        <h3 class="text-xl">{{ releaseNote.version }}</h3>
+        <h3 class="text-xl">{{ releaseNote.tag }}</h3>
         <Badge :variant="releaseNote.published ? 'success' : 'destructive'">{{ releaseNote.published
           ? 'Published' : 'Private' }}</Badge>
       </div>
-      <p>{{ releaseNote.description }}</p>
+      <p>{{ releaseNote.summary }}</p>
     </div>
   </RouterLink>
 </template>
