@@ -30,6 +30,6 @@ public class ReleaseNote {
   private String tag;
   private String summary;
   private Boolean published;
-  private Boolean archived;
+  private Boolean archived = false;
   private final Long createdAt = new Date().getTime();
 }

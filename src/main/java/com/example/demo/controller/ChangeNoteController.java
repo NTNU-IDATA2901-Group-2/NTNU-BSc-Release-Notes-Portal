@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -53,7 +54,7 @@ public class ChangeNoteController {
     @ApiResponse(responseCode = "404", description = "Change note not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
-  @PostMapping("/{id}/archive")
+  @PatchMapping("/{id}/archive")
   public ResponseEntity<String> archiveChangeNote(@PathVariable long id) {
     changeNoteService.archiveChangeNote(id);
     logger.info("Change note archived with id: {}", id);

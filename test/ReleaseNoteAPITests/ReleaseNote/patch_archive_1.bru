@@ -1,18 +1,17 @@
 meta {
-  name: get_all
+  name: patch_archive_1
   type: http
-  seq: 8
+  seq: 11
 }
 
-get {
-  url: {{baseurl}}/releasenotes
+patch {
+  url: {{baseurl}}/releasenotes/{{release_id_1}}/archive
   body: none
   auth: inherit
 }
 
 assert {
   res.status: eq 200
-  res.body.length: eq 2
 }
 
 settings {

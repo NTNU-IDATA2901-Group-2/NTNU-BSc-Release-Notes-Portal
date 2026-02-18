@@ -1,7 +1,7 @@
 meta {
-  name: post_sample_change_note_1
+  name: post_2
   type: http
-  seq: 1
+  seq: 2
 }
 
 post {
@@ -24,7 +24,7 @@ assert {
 }
 
 script:post-response {
-  bru.setEnvVar("change_id_1", res.body)
+  bru.setEnvVar("change_id_2", res.body)
 }
 
 settings {

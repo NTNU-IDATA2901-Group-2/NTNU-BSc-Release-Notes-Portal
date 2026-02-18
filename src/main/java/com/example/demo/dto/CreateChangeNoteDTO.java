@@ -10,5 +10,5 @@ public record CreateChangeNoteDTO (
   Long scopeId,
   Long featureId,
   Long customerId,
-  boolean published
+  Boolean published
 ) {}

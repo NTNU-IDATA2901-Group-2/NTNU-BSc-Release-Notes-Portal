@@ -1,11 +1,11 @@
 meta {
-  name: Get All Change Notes
+  name: patch_archive_1
   type: http
-  seq: 2
+  seq: 6
 }
 
-get {
-  url: {{baseurl}}/changenotes
+patch {
+  url: {{baseurl}}/changenotes/{{change_id_1}}/archive
   body: none
   auth: inherit
 }

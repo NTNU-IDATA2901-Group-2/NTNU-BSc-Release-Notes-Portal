@@ -1,11 +1,11 @@
 meta {
-  name: get_patched
+  name: patch_archive_invalid_id
   type: http
-  seq: 13
+  seq: 8
 }
 
-get {
-  url: {{baseurl}}/releasenotes/{{release_id_1}}
+patch {
+  url: {{baseurl}}/changenotes/-9999/archive
   body: none
   auth: inherit
 }
