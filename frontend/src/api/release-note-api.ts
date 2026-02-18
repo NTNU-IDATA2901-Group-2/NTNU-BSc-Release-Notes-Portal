@@ -1,3 +1,4 @@
+import { config } from "@/constants";
 import type { ReleaseNote } from "@/types"
 import { useMutation, useQuery } from "@tanstack/vue-query";
 
@@ -95,6 +96,7 @@ export const useReleaseNote = (id: string) => useQuery<ReleaseNote>({
 });
 
 const getReleaseNote = async (id: string): Promise<ReleaseNote> => {
+  console.log(config.API_URL)
   const parsedId = Number.parseInt(id, 10)
   if (Number.isNaN(parsedId)) {
     throw new TypeError("Invalid release note ID")
