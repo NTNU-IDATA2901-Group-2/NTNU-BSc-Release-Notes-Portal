@@ -13,7 +13,7 @@ public record ChangeNoteDTO(
     ScopeDTO scope,
     FeatureDTO feature,
     CustomerDTO customer,
-    boolean archived) {
+    boolean published) {
   public static ChangeNoteDTO fromChangeNote(ChangeNote changeNote) {
     return new ChangeNoteDTO(
         changeNote.getId(),
@@ -26,6 +26,6 @@ public record ChangeNoteDTO(
         changeNote.getScope() != null ? ScopeDTO.fromScope(changeNote.getScope()) : null,
         changeNote.getFeature() != null ? FeatureDTO.fromFeature(changeNote.getFeature()) : null,
         changeNote.getCustomer() != null ? CustomerDTO.fromCustomer(changeNote.getCustomer()) : null,
-        changeNote.isArchived());
+        changeNote.isPublished());
   }
 }
