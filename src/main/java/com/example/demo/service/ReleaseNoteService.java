@@ -54,14 +54,12 @@ public class ReleaseNoteService {
         changeNote.setReleaseNote(releaseNote);
         changeNoteRepository.save(changeNote);
         changeNotesInReleaseNote.add(changeNote);
-        System.out.println("Added change note with id " + changeNoteId + " to release note");
       }
     }
     
     releaseNote.setChangeNotes(changeNotesInReleaseNote);
 
 
-    System.out.println(releaseNote);
 
     return releaseNoteRepository.save(releaseNote).getId();
   }

@@ -10,8 +10,8 @@ import com.example.demo.domain.repository.CustomerRepository;
 import com.example.demo.domain.repository.FeatureRepository;
 import com.example.demo.domain.repository.ProductRepository;
 import com.example.demo.domain.repository.ScopeRepository;
-import com.example.demo.dto.CreateChangeNoteDTO;
 import com.example.demo.dto.ChangeNoteDTO;
+import com.example.demo.dto.CreateChangeNoteDTO;
 import com.example.demo.exception.ChangeNoteNotFoundException;
 import com.example.demo.exception.CustomerNotFoundException;
 import com.example.demo.exception.FeatureNotFoundException;
@@ -93,7 +93,6 @@ public class ChangeNoteService {
   public List<ChangeNoteDTO> getAllChangeNotes() {
     return changeNoteRepository.findByArchivedFalse().stream()
         .map(ChangeNoteDTO::fromChangeNote)
-        .filter(changeNoteDTO -> !changeNoteDTO.archived())
         .toList();
   }
 
@@ -106,11 +105,7 @@ public class ChangeNoteService {
    *                                     exists
    */
   public ChangeNoteDTO getChangeNoteById(long id) {
-    ChangeNote changeNote = changeNoteRepository.findById(id).orElseThrow(() -> new ChangeNoteNotFoundException(id));
-
-    if (changeNote.isArchived()) {
-      throw new ChangeNoteNotFoundException(id);
-    }
+    ChangeNote changeNote = changeNoteRepository.findByIdAndArchivedFalse(id).orElseThrow(() -> new ChangeNoteNotFoundException(id));
 
     return ChangeNoteDTO.fromChangeNote(changeNote);
   }
