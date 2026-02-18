@@ -1,16 +1,8 @@
 import { config } from "@/constants";
 import type { ReleaseNote } from "@/types"
-import { useMutation, useQuery } from "@tanstack/vue-query";
+import { useQuery } from "@tanstack/vue-query";
 
 import axios from 'axios';
-
-export const createReleaseNoteMutation = (onSuccess: (releaseId: number) => void) => useMutation<number>({
-  mutationFn: () => createReleaseNote(),
-  onSuccess: (data) => {
-    console.log("Release note created with ID:", data);
-    onSuccess(data);
-  }
-});
 
 export const createReleaseNote = async (): Promise<number> => {
   return 1

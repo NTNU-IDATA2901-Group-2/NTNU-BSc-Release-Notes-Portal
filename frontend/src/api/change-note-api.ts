@@ -1,36 +1,26 @@
 import { config } from "@/constants";
-import type { ChangeNote } from "@/types";
+import type { ChangeNote, Customer, Feature, Product, Scope } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import axios from "axios";
 
-export const createPublishChangeNoteMutation = () => useMutation<boolean, void, number>({
-    mutationFn: (changeNoteId: number) => publishChangeNote(changeNoteId),
-    onSuccess: (data) => {
-      console.log("Change note published with ID:", data);
 
-      const queryClient = useQueryClient();
-      queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
-    }
-});
-
-const publishChangeNote = async (changeNoteId: number): Promise<boolean> => {
-  console.log(`Publishing change note with ID: ${changeNoteId}`);
+export const publishChangeNote = async (changeNoteId: number): Promise<boolean> => {
+  await axios.patch(`${config.API_URL}changenotes/${changeNoteId}/publish`);
   return true;
 }
 
-export const createChangeNoteMutation = (onSuccess : (changeId : number) => void) => useMutation<number>({
+export const createChangeNoteMutation = (onSuccesss : (changeId : number) => void) => useMutation<number>({
     mutationFn: () => createChangeNote(),
     onSuccess: (data) => {
-      console.log("Change note created with ID:", data);
-
+      onSuccesss(data);
       const queryClient = useQueryClient();
       queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
-      onSuccess(data);
     }
 });
 
-const createChangeNote = async (): Promise<number> => {
-  return 1
+export const createChangeNote = async (): Promise<number> => {
+  const response = await axios.post(`${config.API_URL}changenotes`);
+  return response.data as number;
 }
 
 export const useChangeNotes = () => useQuery<ChangeNote[]>({
@@ -44,11 +34,6 @@ export const useChangeNote = (id: string ) => useQuery<ChangeNote>({
 });
 
 const getChangeNote = async (id: string): Promise<ChangeNote> => {
-  const parsedId = Number.parseInt(id, 10)
-  if (Number.isNaN(parsedId)) {
-    throw new TypeError("Invalid change note ID")
-  }
-
   const response = await axios.get(`${config.API_URL}changenotes/${id}`)
   return response.data as ChangeNote;
 }
@@ -79,30 +64,21 @@ export const useCustomers = () => useQuery({
 });
 
 const getProducts = async () => {
-  return [
-    { id: 1, name: "Product A" },
-  ]
+  const response = await axios.get(`${config.API_URL}products`)
+  return response.data as Product[];
 }
 
 const getScopes = async () => {
-  return [
-    { id: 1, name: "Scope A" },
-    { id: 2, name: "Scope B" },
-  ]
+  const response = await axios.get(`${config.API_URL}scopes`)
+  return response.data as Scope[];
 }
 
 const getFeatures = async () => {
-  return [
-    { id: 1, name: "Feature A" },
-    { id: 2, name: "Feature B" },
-    { id: 3, name: "Feature C" },
-    { id: 3, name: "Feature C" }
-  ]
+  const response = await axios.get(`${config.API_URL}features`)
+  return response.data as Feature[];
 }
 
 const getCustomers = async () => {
-  return [
-    { id: 1, name: "Customer A" },
-    { id: 2, name: "Customer B" },
-  ]
+  const response = await axios.get(`${config.API_URL}customers`)
+  return response.data as Customer[];
 }
