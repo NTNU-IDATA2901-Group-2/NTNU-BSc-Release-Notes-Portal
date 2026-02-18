@@ -34,7 +34,6 @@ import MultiselectChangeNotes from '@/components/MultiselectChangeNotes.vue';
 </script>
 
 <template>
-  
   <main class="flex flex-col items-center px-4 mb-20">
     <ArchivePrompt v-model:open="archivePromptOpen"
     :onConfirm="archiveReleaseNote"
