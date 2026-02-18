@@ -26,7 +26,7 @@ import { toast } from 'vue-sonner';
   const route = useRoute();
 
   const id = route.params.id as string;
-  const { isPending: createIsPending, isFetching: createIsFetching, isError: createError, data: releaseNote } = useReleaseNote(id);
+  const { isPending, isFetching, isError, data: releaseNote } = useReleaseNote(id);
   const { mutate: archiveReleaseNote } = useArchiveReleaseNote(id,
     {
       onSettled: () => {
@@ -55,10 +55,10 @@ import { toast } from 'vue-sonner';
       <Button v-if="isEditing" variant="outline" @click="isEditing = false">Cancel <Ban /></Button>
       <Button disabled v-if="isEditing" variant="outline" >Save <Save /></Button>
     </div>
-    <Spinner v-if="createIsPending || createIsFetching" />
-    <h1 v-if="createError">Error retreiving release note</h1>
+    <Spinner v-if="isPending || isFetching" />
+    <h1 v-if="isError">Error retreiving release note</h1>
 
-    <div v-if="!createIsPending && !createIsFetching && !createError && releaseNote" class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
+    <div v-if="!isPending && !isFetching && !isError && releaseNote" class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
       <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-row items-center justify-between w-full">
           <div class="flex items-center gap-4">
