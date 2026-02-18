@@ -8,6 +8,7 @@ import Spinner from '@/components/ui/spinner/Spinner.vue';
 import { FilePlus, ListFilterPlus, Search } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { toast } from 'vue-sonner';
 
 const router = useRouter();
 const { isLoading, isFetching, isError, data } = useReleaseNotes();
