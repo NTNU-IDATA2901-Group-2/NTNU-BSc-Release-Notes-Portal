@@ -9,7 +9,7 @@ export const publishChangeNote = async (changeNoteId: number): Promise<boolean> 
   return true;
 }
 
-export const createChangeNoteMutation = (onSuccesss : (changeId : number) => void) => useMutation<number>({
+export const useCreateChangeNote = (onSuccesss : (changeId : number) => void) => useMutation<number>({
     mutationFn: () => createChangeNote(),
     onSuccess: (data) => {
       onSuccesss(data);
@@ -27,12 +27,12 @@ export const updateChangeNote = async (changeNoteId: number, changeNoteData: Per
   await axios.put(`${config.API_URL}changenotes/${changeNoteId}`, changeNoteData);
 }
 
-export const useChangeNotes = () => useQuery<ChangeNote[]>({
+export const useGetChangeNotes = () => useQuery<ChangeNote[]>({
     queryKey: ['changeNotes'],
     queryFn: () => getChangeNotes(),
 });
 
-export const useChangeNote = (id: string ) => useQuery<ChangeNote>({
+export const useGetChangeNote = (id: string ) => useQuery<ChangeNote>({
     queryKey: ['changeNote', id],
     queryFn: () => getChangeNote(id),
 });

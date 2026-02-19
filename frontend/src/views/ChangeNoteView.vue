@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 import { ArrowLeft } from "lucide-vue-next"
 import { ref } from 'vue';
-import { useChangeNote } from '@/api/change-note-api';
+import { useGetChangeNote } from '@/api/change-note-api';
 import ChangeNoteEdit from '@/components/ChangeNote/ChangeNoteEdit.vue';
 import ChangeNoteDetail from '@/components/ChangeNote/ChangeNoteDetail.vue';
 
@@ -12,7 +12,7 @@ const isEditing = ref(false);
 const route = useRoute();
 
 const id = route.params.id as string;
-const { isPending, isFetching, isError, data: changeNote } = useChangeNote(id);
+const { isPending, isFetching, isError, data: changeNote } = useGetChangeNote(id);
 
 </script>
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { createChangeNote, publishChangeNote, useChangeNotes } from '@/api/change-note-api';
+import { createChangeNote, publishChangeNote, useGetChangeNotes } from '@/api/change-note-api';
 import { createReleaseNote } from '@/api/release-note-api';
 import ChangeNoteCard from '@/components/ChangeNoteCard.vue';
 import Button from '@/components/ui/button/Button.vue';
@@ -14,7 +14,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-const { isLoading, isFetching, isError, data } = useChangeNotes();
+const { isLoading, isFetching, isError, data } = useGetChangeNotes();
 
 const selectedItems = ref<number[]>([]);
 

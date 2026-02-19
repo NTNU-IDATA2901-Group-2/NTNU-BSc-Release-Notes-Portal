@@ -6,10 +6,10 @@ import { Button } from '@/components/ui/button'
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { TagsInput, TagsInputInput, TagsInputItem, TagsInputItemDelete, TagsInputItemText } from '@/components/ui/tags-input'
 import type { ChangeNote } from '@/types'
-import { useChangeNotes } from '@/api/change-note-api'
+import { useGetChangeNotes } from '@/api/change-note-api'
 
 
-const { isLoading, isError, data: changeNotes } = useChangeNotes();
+const { isLoading, isError, data: changeNotes } = useGetChangeNotes();
 
 const changenotes = computed(() =>
   (changeNotes.value ?? []).map(cn => ({ value: cn.id, label: cn.reference }))

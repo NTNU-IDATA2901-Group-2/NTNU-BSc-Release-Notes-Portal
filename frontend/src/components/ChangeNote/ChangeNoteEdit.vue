@@ -73,7 +73,7 @@ const onCancel = () => {
     <Button type="button" @click="onCancel" variant="outline">Cancel
         <Ban />
     </Button>
-    <Button type="submit" disabled variant="outline">Save
+    <Button type="submit" variant="outline">Save
         <Save />
     </Button>
     </div>
