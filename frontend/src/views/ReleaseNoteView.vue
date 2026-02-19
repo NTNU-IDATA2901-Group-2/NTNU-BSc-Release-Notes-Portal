@@ -9,15 +9,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useReleaseNote } from '@/api/release-note-api';
+import { useReleaseNote, useArchiveReleaseNote } from '@/api/release-note-api';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 
 import { Pencil, Trash2, Eye, FileDown, Ban, Save, ArrowLeft, EllipsisVertical } from "lucide-vue-next"
 import { ref } from 'vue';
 import Input from '@/components/ui/input/Input.vue';
 import { Textarea } from '@/components/ui/textarea';
-import ArchivePrompt from '@/components/ArchivePrompt.vue';
+import DeletePrompt from '@/components/DeletePrompt.vue';
 import MultiselectChangeNotes from '@/components/MultiselectChangeNotes.vue';
+import { routeNames, router } from '@/utils/router';
+import { toast } from 'vue-sonner';
 
   const isEditing = ref(false)
 
@@ -25,19 +27,28 @@ import MultiselectChangeNotes from '@/components/MultiselectChangeNotes.vue';
 
   const id = route.params.id as string;
   const { isPending, isFetching, isError, data: releaseNote } = useReleaseNote(id);
+  const { mutate: archiveReleaseNote } = useArchiveReleaseNote(id,
+    {
+      onSettled: () => {
+        deletePromptOpen.value = false;
+      },
+      onSuccess: () => {
+        router.push(routeNames.releaseNotes);
+        toast.success(`Release note ${releaseNote?.value?.tag ?? ""} successfully deleted`);
+      },
+      onError: () => {
+        toast.error(`Failed to delete release note ${releaseNote?.value?.tag ?? ""}`);
+      }
+    }
+  );
 
-  const archivePromptOpen = ref(false);
+  const deletePromptOpen = ref(false);
 
-  const archiveReleaseNote = () => {
-    console.log('Archiving release note with ID:', id);
-  }
 </script>
 
 <template>
   <main class="flex flex-col items-center px-4 mb-20">
-    <ArchivePrompt v-model:open="archivePromptOpen"
-    :onConfirm="archiveReleaseNote"
-    />
+    <DeletePrompt v-model:open="deletePromptOpen" :onConfirm="() =>archiveReleaseNote()" />
     <Button variant="outline" class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10" @click="$router.back()"><ArrowLeft />Previous</Button>
     <div class="md:hidden flex w-full mt-4 justify-end gap-2">
       <Button v-if="isEditing" variant="outline" @click="isEditing = false">Cancel <Ban /></Button>
@@ -66,9 +77,9 @@ import MultiselectChangeNotes from '@/components/MultiselectChangeNotes.vue';
                         <Pencil class="text-text-dark-static"/>
                     </div>
                   </DropdownMenuItem>
-                  <DropdownMenuItem @click="archivePromptOpen = true">
+                  <DropdownMenuItem @click="deletePromptOpen = true">
                     <div class="w-full flex gap-2">
-                        <p class="ml-auto text-text-dark-static">Archive</p>
+                        <p class="ml-auto text-text-dark-static">Delete</p>
                         <Trash2 class="text-text-dark-static"/>
                     </div>
                   </DropdownMenuItem>
