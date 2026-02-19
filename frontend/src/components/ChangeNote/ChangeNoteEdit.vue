@@ -59,6 +59,10 @@ const updateChangeNoteMutation = useMutation({
 })
 
 const onSubmit = handleSubmit((values : PersistChangeNoteDTO) => {
+    values.productId = values.productId === -1 ? undefined : values.productId;
+    values.scopeId = values.scopeId === -1 ? undefined : values.scopeId;
+    values.featureId = values.featureId === -1 ? undefined : values.featureId;
+    values.customerId = values.customerId === -1 ? undefined : values.customerId;
   updateChangeNoteMutation.mutate(values);
 });
 

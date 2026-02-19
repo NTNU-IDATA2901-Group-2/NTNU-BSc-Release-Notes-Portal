@@ -40,7 +40,7 @@ const queryClient = useQueryClient();
 // Publish selected changenotes
 
 const publishChangeNoteMutation = useMutation({
-    mutationFn: (changeNoteId: number) => publishChangeNote(changeNoteId),
+    mutationFn: (changeNoteId: number) => publishChangeNote(changeNoteId, true),
     onSuccess: (_) => {
       queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
     }
