@@ -8,10 +8,12 @@ import Separator from '@/components/ui/separator/Separator.vue';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 import { TagsInput, TagsInputItemText } from '@/components/ui/tags-input';
 import TagsInputItem from '@/components/ui/tags-input/TagsInputItem.vue';
+import type { ChangeNote, ReleaseNote } from '@/types';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { Eye, FilePlus, LayersPlus, ListFilterPlus, Search } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { toast } from 'vue-sonner';
 
 const router = useRouter();
 const { isLoading, isFetching, isError, data } = useGetChangeNotes();
@@ -71,11 +73,15 @@ const handleCreateChangeNote = () => {
 // Creation of release note
 
 const createReleaseNoteMutation = useMutation({
-    mutationFn: () => createReleaseNote(),
-    onSuccess: (data) => {
+    mutationFn: () => createReleaseNote(selectedItems.value),
+      onSuccess: (data) => {
       router.push(`/release-notes/${data}?edit=true`);
       console.log('Release Note created with ID:', data);
       queryClient.invalidateQueries({ queryKey: ['releaseNotes'] });
+    },
+    onError: (error) => {
+      console.error('Error creating release note:', error);
+      toast.error(error.name)
     }
 })
 

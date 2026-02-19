@@ -4,8 +4,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 
 import axios from 'axios';
 
-export const createReleaseNote = async (): Promise<number> => {
-  return 1
+export const createReleaseNote = async (selectedItems: number[]) => {
+  const response = await axios.post(`${config.API_URL}releasenotes`, { changeNoteIds: selectedItems })
+  return response.data as number;
 }
 
 export const useReleaseNote = (id: string) => useQuery<ReleaseNote>({

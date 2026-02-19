@@ -12,6 +12,7 @@ import { EditChangeNoteSchema } from '@/schemas';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { updateChangeNote } from '@/api/change-note-api';
 import { toast } from 'vue-sonner';
+import { router } from '@/utils/router';
 
 const props = defineProps<{
   changeNote: ChangeNote;
@@ -27,10 +28,10 @@ const { handleSubmit, defineField } = useForm({
   initialValues: {
     reference: props.changeNote.reference,
     description: props.changeNote.description,
-    productId: props.changeNote.product.id,
-    scopeId: props.changeNote.scope.id,
-    featureId: props.changeNote.feature.id,
-    customerId: props.changeNote.customer.id,
+    productId: props.changeNote.product?.id,
+    scopeId: props.changeNote.scope?.id,
+    featureId: props.changeNote.feature?.id,
+    customerId: props.changeNote.customer?.id,
     developerNotes: props.changeNote.developerNotes,
     upgradeNotes: props.changeNote.upgradeNotes,
     changeSource: props.changeNote.changeSource,
@@ -52,6 +53,7 @@ const updateChangeNoteMutation = useMutation({
     onSuccess: () => {
         toast.success('Change note updated successfully');
         emit('update:modelValue', false);
+        router.push(`/change-notes/${props.changeNote.id}`);
         queryClient.invalidateQueries({ queryKey: ['changeNote', props.changeNote.id] });
     }
 })
@@ -62,6 +64,7 @@ const onSubmit = handleSubmit((values : PersistChangeNoteDTO) => {
 
 const onCancel = () => {
     emit('update:modelValue', false);
+    router.push(`/change-notes/${props.changeNote.id}`);
 }
 
 </script>

@@ -27,9 +27,9 @@ public class ReleaseNote {
   @OneToMany(mappedBy = "releaseNote")
   private List<ChangeNote> changeNotes;
 
-  private String tag;
-  private String summary;
-  private Boolean published;
+  private String tag = "";
+  private String summary = "";
+  private Boolean published = false;
   private Boolean archived = false;
   private final Long createdAt = new Date().getTime();
 }
