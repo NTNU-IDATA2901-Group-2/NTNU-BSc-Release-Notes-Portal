@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.CreateReleaseNoteDTO;
@@ -24,6 +25,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 /**
@@ -145,5 +147,21 @@ public class ReleaseNoteController {
     ReleaseNoteDTO releaseNote = releaseNoteService.updateReleaseNote(id, createReleaseNoteDTO);
     logger.info("Updated release note with id: {}", id);
     return ResponseEntity.ok(releaseNote);
+  }
+
+  /**
+   * Publishes an existing release note by its ID. Privates release note if publish is false.
+   */
+  @Operation(summary = "Publish release note", description = "Publishes an existing release note by its ID. Privates release note if publish is false.")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Release note published successfully"),
+      @ApiResponse(responseCode = "404", description = "Release note not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
+  @PatchMapping("/{id}/publish")
+  public ResponseEntity<Long> publishReleaseNote(@PathVariable long id, @Valid @RequestParam(required = true) boolean publish) {
+    releaseNoteService.publishReleaseNote(id, publish);
+    logger.info("Release note with id {} published: {}", id, publish);
+    return ResponseEntity.ok(id);
   }
 }

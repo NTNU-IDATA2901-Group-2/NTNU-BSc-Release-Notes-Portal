@@ -154,4 +154,23 @@ public class ReleaseNoteService {
 
   }
   
+  /**
+   * Publishes an existing release note by its ID. Privates release note if publish is false.
+   *
+   * @param id the ID of the release note to be published
+   * @param publish a boolean indicating whether to publish (true) or private (false) the release note
+   * @throws ReleaseNoteNotFoundException if the specified ID does not correspond to an existing
+   * release note
+   */
+  public void publishReleaseNote(long id, boolean publish) {
+    Optional<ReleaseNote> releaseNoteOptional = releaseNoteRepository.findById(id);
+
+    if (releaseNoteOptional.isEmpty() || releaseNoteOptional.get().getArchived()) {
+      throw new ReleaseNoteNotFoundException(id);
+    }
+
+    ReleaseNote releaseNote = releaseNoteOptional.get();
+    releaseNote.setPublished(publish);
+    releaseNoteRepository.save(releaseNote);
+  }
 }

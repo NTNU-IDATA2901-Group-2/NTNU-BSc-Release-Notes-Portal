@@ -1,5 +1,5 @@
 import { config } from "@/constants";
-import type { OnApiCallFinished, ReleaseNote } from "@/types"
+import type { OnApiCallFinished, PersistReleaseNoteDTO, ReleaseNote } from "@/types"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 
 import axios from 'axios';
@@ -53,6 +53,10 @@ export const useArchiveReleaseNote = (id: string, onFinished: OnApiCallFinished)
 })
 }
 
+export const updateReleaseNote = async (id: string, releaseNoteData: PersistReleaseNoteDTO): Promise<void> => {
+  await axios.put(`${config.API_URL}releasenotes/${id}`, releaseNoteData);
+}
+
 const archiveReleaseNote = async (id: string): Promise<number> => {
   const parsedId = Number.parseInt(id, 10)
   if (Number.isNaN(parsedId)) {
@@ -61,4 +65,8 @@ const archiveReleaseNote = async (id: string): Promise<number> => {
   
   const response = await axios.patch(`${config.API_URL}releasenotes/${id}/archive`)
   return response.data as number;
+}
+
+export const publishReleaseNote = async (id: string, publish: boolean): Promise<void> => {
+  await axios.patch(`${config.API_URL}releasenotes/${id}/publish?publish=${publish}`);
 }

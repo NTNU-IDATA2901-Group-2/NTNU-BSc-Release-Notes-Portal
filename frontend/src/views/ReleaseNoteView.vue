@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useReleaseNote, useArchiveReleaseNote } from '@/api/release-note-api';
+import { useReleaseNote, useArchiveReleaseNote, updateReleaseNote, publishReleaseNote } from '@/api/release-note-api';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 
 import { Pencil, Trash2, Eye, FileDown, Ban, Save, ArrowLeft, EllipsisVertical } from "lucide-vue-next"
@@ -20,12 +20,18 @@ import DeletePrompt from '@/components/DeletePrompt.vue';
 import MultiselectChangeNotes from '@/components/MultiselectChangeNotes.vue';
 import { routeNames, router } from '@/utils/router';
 import { toast } from 'vue-sonner';
+import { useForm } from 'vee-validate';
+import { toTypedSchema } from '@vee-validate/zod';
+import type { ChangeNote, PersistReleaseNoteDTO } from '@/types';
+import { EditReleaseNoteSchema } from '@/schemas';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
   const isEditing = ref(false)
 
   const route = useRoute();
 
   const id = route.params.id as string;
+
   const { isPending, isFetching, isError, data: releaseNote } = useReleaseNote(id);
   const { mutate: archiveReleaseNote } = useArchiveReleaseNote(id,
     {
@@ -44,94 +50,156 @@ import { toast } from 'vue-sonner';
 
   const deletePromptOpen = ref(false);
 
+  const changeNotes = ref<ChangeNote[]>(releaseNote?.value?.changeNotes || [])
+
+
+  const form = useForm({
+    validationSchema: toTypedSchema(EditReleaseNoteSchema),
+    initialValues: {
+      tag: '',
+      summary: '',
+      changeNoteIds: [],
+      published: false,
+    }
+  })
+
+  const [tag] = form.defineField('tag');
+  const [summary] = form.defineField('summary');
+
+  const startEditing = () => {
+    if (!releaseNote.value) return
+
+    changeNotes.value = [...releaseNote.value.changeNotes]
+
+    form.setValues({
+      tag: releaseNote.value.tag,
+      summary: releaseNote.value.summary ?? '',
+      changeNoteIds: releaseNote.value.changeNotes.map(c => c.id),
+      published: releaseNote.value.published,
+    })
+
+    isEditing.value = true
+  }
+
+  const onSubmit = form.handleSubmit((values) => {
+    const payload = {
+      ...values,
+      changeNoteIds: changeNotes.value.map(c => c.id),
+    }
+    updateReleaseNoteMutation.mutate(payload);
+    isEditing.value = false;
+  })
+
+  const queryClient = useQueryClient();
+  const updateReleaseNoteMutation = useMutation({
+      mutationFn: (values: PersistReleaseNoteDTO) => updateReleaseNote(id, values),
+      onSuccess: () => {
+          toast.success('Release note updated successfully');
+          queryClient.invalidateQueries({ queryKey: ['releaseNote', id] });
+      }
+  })
+
+  const handlePublish = () => {
+    publishReleaseNoteMutation.mutate();
+  }
+
+  const publishReleaseNoteMutation = useMutation({
+    mutationFn: () => publishReleaseNote(id, !releaseNote.value?.published),
+    onSuccess: () => {
+      toast.success(`Release note ${releaseNote.value?.published ? 'privated' : 'published'} successfully`);
+      queryClient.invalidateQueries({ queryKey: ['releaseNote', id] });
+    }
+  })
 </script>
 
 <template>
-  <main class="flex flex-col items-center px-4 mb-20">
-    <DeletePrompt v-model:open="deletePromptOpen" :onConfirm="() =>archiveReleaseNote()" />
-    <Button variant="outline" class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10" @click="$router.back()"><ArrowLeft />Previous</Button>
-    <div class="md:hidden flex w-full mt-4 justify-end gap-2">
-      <Button v-if="isEditing" variant="outline" @click="isEditing = false">Cancel <Ban /></Button>
-      <Button disabled v-if="isEditing" variant="outline" >Save <Save /></Button>
-    </div>
-    <Spinner v-if="isPending || isFetching" />
-    <h1 v-if="isError">Error retreiving release note</h1>
-
-    <div v-if="!isPending && !isFetching && !isError && releaseNote" class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
-      <div class="flex flex-col gap-4 w-full">
-        <div class="flex flex-row items-center justify-between w-full">
-          <div class="flex items-center gap-4">
-            <h1 v-if="!isEditing" class="text-2xl max-w-60 whitespace-nowrap overflow-hidden">{{ releaseNote.tag }}</h1>
-            <Input v-if="isEditing" class="w-full" v-model="releaseNote.tag"/>
-            <Badge v-if="!isEditing" class="h-6" :variant="releaseNote.published ? 'success' : 'destructive'">{{ releaseNote.published ? 'Published' : 'Private' }}</Badge>
-          </div>
-          <div class="flex gap-4">
-          	<DropdownMenu v-if="!isEditing">
-              <DropdownMenuTrigger class="cursor-pointer hover:bg-border/50 rounded-md p-2 transition-colors">
-                <EllipsisVertical class="text-text-primary"/>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent class="mr-6 lg:mr-20 mt-2">
-                  <DropdownMenuItem @click="isEditing = !isEditing">
-                    <div class="w-full flex gap-2">
-                        <p class="text-text-dark-static ml-auto">Edit</p>
-                        <Pencil class="text-text-dark-static"/>
-                    </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem @click="deletePromptOpen = true">
-                    <div class="w-full flex gap-2">
-                        <p class="ml-auto text-text-dark-static">Delete</p>
-                        <Trash2 class="text-text-dark-static"/>
-                    </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem disabled>
-                    <div class="w-full flex gap-2">
-                        <p class="ml-auto text-text-dark-static">{{ releaseNote.published ? 'Publish' : 'Unpublish' }}</p>
-                        <Eye class="text-text-dark-static"/>
-                    </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem disabled>
-                    <div class="w-full flex gap-2">
-                        <p class="ml-auto text-text-dark-static">Export</p>
-                        <FileDown class="text-text-dark-static"/>
-                    </div>
-                  </DropdownMenuItem>
-              </DropdownMenuContent>
-	          </DropdownMenu>
-            <Button class="hidden md:flex" v-if="isEditing" variant="outline" @click="isEditing = false">Cancel <Ban /></Button>
-          	<Button class="hidden md:flex" disabled v-if="isEditing" variant="outline" >Save <Save /></Button>
-          </div>
-          </div>
-
-          <p v-if="!isEditing" class="">{{ releaseNote.summary }}</p>
-          <Textarea v-if="isEditing" class="w-full" v-model="releaseNote.summary"/>
+  <div class="flex flex-col items-center px-4 mb-20">
+  <DeletePrompt v-model:open="deletePromptOpen" :onConfirm="() =>archiveReleaseNote()" />
+    <form @submit="onSubmit">
+      <Button variant="outline" class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10" @click="$router.back()"><ArrowLeft />Previous</Button>
+      <div class="md:hidden flex w-full mt-4 justify-end gap-2">
+        <Button v-if="isEditing" variant="outline" @click="isEditing = false">Cancel <Ban /></Button>
+        <Button v-if="isEditing" variant="outline" type="submit">Save <Save /></Button>
       </div>
-      <Separator class="w-full h-2"/>
-      <div class="flex flex-col w-full text-xl gap-10">
-      <div class="flex flex-col w-full text-xl gap-10">
-        <h2>Change Notes</h2>
-        <MultiselectChangeNotes v-if="isEditing" :change-notes="releaseNote.changeNotes"/>
-        <div
-            v-if="!isEditing"
-            v-for="change in releaseNote.changeNotes"
-            :key="change.id" 
-            class="flex flex-col gap-4"
-            >
-          <h3 class="text-lg">{{ change.reference }}</h3>
-          <div>
-            <h3 class="text-lg">Description</h3>
-            <p class="text-sm">{{ change.description }}</p>
-          </div>
-          <div>
-            <h3 class="text-lg">Developer Notes</h3>
-            <p class="text-sm">{{ change.developerNotes }}</p>
-          </div>
-          <div>
-            <h3 class="text-lg">Upgrade Notes</h3>
-            <p class="text-sm">{{ change.upgradeNotes }}</p>
+      <Spinner v-if="isPending || isFetching" />
+      <h1 v-if="isError">Error retreiving release note</h1>
+
+      <div v-if="!isPending && !isFetching && !isError && releaseNote" class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
+        <div class="flex flex-col gap-4 w-full">
+          <div class="flex flex-row items-center justify-between w-full">
+            <div class="flex items-center gap-4">
+              <h1 v-if="!isEditing" class="text-2xl max-w-60 whitespace-nowrap overflow-hidden">{{ releaseNote.tag }}</h1>
+              <Input v-if="isEditing" class="w-full" v-model="tag"/>
+              <Badge v-if="!isEditing" class="h-6" :variant="releaseNote.published ? 'success' : 'destructive'">{{ releaseNote.published ? 'Published' : 'Private' }}</Badge>
+            </div>
+            <div class="flex gap-4">
+              <DropdownMenu v-if="!isEditing">
+                <DropdownMenuTrigger class="cursor-pointer hover:bg-border/50 rounded-md p-2 transition-colors">
+                  <EllipsisVertical class="text-text-primary"/>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent class="mr-6 lg:mr-20 mt-2">
+                    <DropdownMenuItem @click="startEditing">
+                      <div class="w-full flex gap-2">
+                          <p class="text-text-dark-static ml-auto">Edit</p>
+                          <Pencil class="text-text-dark-static"/>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem @click="deletePromptOpen = true">
+                      <div class="w-full flex gap-2">
+                          <p class="ml-auto text-text-dark-static">Archive</p>
+                          <Trash2 class="text-text-dark-static"/>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem @click="handlePublish">
+                      <div class="w-full flex gap-2">
+                          <p class="ml-auto text-text-dark-static">{{ releaseNote.published ? 'Publish' : 'Unpublish' }}</p>
+                          <Eye class="text-text-dark-static"/>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem disabled>
+                      <div class="w-full flex gap-2">
+                          <p class="ml-auto text-text-dark-static">Export</p>
+                          <FileDown class="text-text-dark-static"/>
+                      </div>
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Button class="hidden md:flex" v-if="isEditing" variant="outline" @click="isEditing = false">Cancel <Ban /></Button>
+              <Button class="hidden md:flex" v-if="isEditing" variant="outline" type="submit">Save <Save /></Button>
+            </div>
+            </div>
+
+            <p v-if="!isEditing" class="">{{ releaseNote.summary }}</p>
+            <Textarea v-if="isEditing" class="w-full" v-model="summary"/>
+        </div>
+        <Separator class="w-full h-2"/>
+        <div class="flex flex-col w-full text-xl gap-10">
+        <div class="flex flex-col w-full text-xl gap-10">
+          <h2>Change Notes</h2>
+          <MultiselectChangeNotes v-if="isEditing" v-model="changeNotes"/>
+          <div
+              v-if="!isEditing"
+              v-for="change in releaseNote.changeNotes"
+              :key="change.id" 
+              class="flex flex-col gap-4"
+              >
+            <h3 class="text-lg">{{ change.reference }}</h3>
+            <div>
+              <h3 class="text-lg">Description</h3>
+              <p class="text-sm">{{ change.description }}</p>
+            </div>
+            <div>
+              <h3 class="text-lg">Developer Notes</h3>
+              <p class="text-sm">{{ change.developerNotes }}</p>
+            </div>
+            <div>
+              <h3 class="text-lg">Upgrade Notes</h3>
+              <p class="text-sm">{{ change.upgradeNotes }}</p>
+            </div>
           </div>
         </div>
+        </div>
       </div>
-      </div>
-    </div>
-  </main>
+    </form>
+  </div>
 </template>
