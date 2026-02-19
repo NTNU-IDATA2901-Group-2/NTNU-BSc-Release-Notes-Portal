@@ -7,9 +7,11 @@ import { ref } from 'vue';
 import { useGetChangeNote } from '@/api/change-note-api';
 import ChangeNoteEdit from '@/components/ChangeNote/ChangeNoteEdit.vue';
 import ChangeNoteDetail from '@/components/ChangeNote/ChangeNoteDetail.vue';
+import { router } from '@/utils/router';
 
-const isEditing = ref(false);
 const route = useRoute();
+
+const isEditing = ref(route.query.edit === 'true');
 
 const id = route.params.id as string;
 const { isPending, isFetching, isError, data: changeNote } = useGetChangeNote(id);
@@ -23,8 +25,8 @@ const { isPending, isFetching, isError, data: changeNote } = useGetChangeNote(id
       <ArrowLeft/>Previous
     </Button>
 
-    <ChangeNoteEdit v-if="!isPending && !isFetching && !isError && changeNote && isEditing" :changeNote="changeNote" v-model="isEditing"/>
-    <ChangeNoteDetail v-if="!isPending && !isFetching && !isError && changeNote && !isEditing" :changeNote="changeNote" v-model="isEditing"/>
+    <ChangeNoteEdit v-if="!isPending && !isFetching && !isError && changeNote !== undefined && isEditing" :changeNote="changeNote" v-model="isEditing"/>
+    <ChangeNoteDetail v-if="!isPending && !isFetching && !isError && changeNote !== undefined && !isEditing" :changeNote="changeNote" v-model="isEditing"/>
     <div v-else-if="isPending || isFetching"><Spinner/></div>
     <h1 v-else-if="isError">Error retreiving change note</h1>
 
