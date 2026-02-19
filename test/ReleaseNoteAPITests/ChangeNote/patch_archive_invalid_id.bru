@@ -1,0 +1,20 @@
+meta {
+  name: patch_archive_invalid_id
+  type: http
+  seq: 8
+}
+
+patch {
+  url: {{baseurl}}/changenotes/-9999/archive
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 404
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

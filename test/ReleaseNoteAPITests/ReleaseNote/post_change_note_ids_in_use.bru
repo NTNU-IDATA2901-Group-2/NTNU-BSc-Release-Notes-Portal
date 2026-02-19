@@ -1,0 +1,24 @@
+meta {
+  name: post_change_note_ids_in_use
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseurl}}/releasenotes
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "changeNoteIds": [{{change_id_1}}],
+    "tag": "v1.0.0",
+    "summary": "Initial release with core features",
+    "published": false
+  }
+}
+
+assert {
+  res.status: eq 400
+}

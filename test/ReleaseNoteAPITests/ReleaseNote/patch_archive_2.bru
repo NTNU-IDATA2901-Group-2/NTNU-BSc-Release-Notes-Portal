@@ -1,0 +1,20 @@
+meta {
+  name: patch_archive_2
+  type: http
+  seq: 17
+}
+
+patch {
+  url: {{baseurl}}/releasenotes/{{release_id_2}}/archive
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,16 @@
+meta {
+  name: patch_archive_1
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseurl}}/changenotes/{{change_id_1}}/archive
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

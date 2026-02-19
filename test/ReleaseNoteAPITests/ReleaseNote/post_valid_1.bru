@@ -1,0 +1,28 @@
+meta {
+  name: post_valid_1
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseurl}}/releasenotes
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "changeNoteIds": [{{change_id_1}}, {{change_id_2}}],
+    "tag": "v1.0.0",
+    "summary": "Initial release with core features",
+    "published": false
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+script:post-response {
+  bru.setEnvVar("release_id_1", res.body)
+}

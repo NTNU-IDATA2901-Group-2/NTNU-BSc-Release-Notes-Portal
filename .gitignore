@@ -30,6 +30,7 @@ frontend!**/src/main/**/build/
 frontend!**/src/test/**/build/
 
 ### VS Code ###
+.vscode/
 frontend.vscode/
 
 # Logs
@@ -57,3 +58,8 @@ frontend/*.ntvs*
 frontend/*.njsproj
 frontend/*.sln
 frontend/*.sw?
+
+# Ignore env
+.env
+
+

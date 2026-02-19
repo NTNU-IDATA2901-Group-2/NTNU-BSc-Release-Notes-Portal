@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/release-notes-data
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.5.2
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_USERNAME}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_PASSWORD}
+    ports:
+      - "8081:8080"
+    entrypoint: ["/opt/keycloak/bin/kc.sh", "start-dev"]
+    volumes:
+      - keycloak_data:/opt/keycloak/release-notes-data
+
+
+volumes:
+  db_data:
+  keycloak_data:

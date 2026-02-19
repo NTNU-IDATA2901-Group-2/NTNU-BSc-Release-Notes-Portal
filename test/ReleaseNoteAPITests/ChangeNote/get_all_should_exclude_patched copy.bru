@@ -1,0 +1,21 @@
+meta {
+  name: get_all_should_exclude_patched copy
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseurl}}/changenotes
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body.length: eq 0
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
