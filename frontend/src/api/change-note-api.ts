@@ -23,6 +23,11 @@ export const createChangeNote = async (): Promise<number> => {
   return response.data as number;
 }
 
+export const archiveChangeNote = async (changeNoteId: number) => {
+  await axios.patch(`${config.API_URL}changenotes/${changeNoteId}/archive`);
+  return true;
+}
+
 export const updateChangeNote = async (changeNoteId: number, changeNoteData: PersistChangeNoteDTO): Promise<void> => {
   await axios.put(`${config.API_URL}changenotes/${changeNoteId}`, changeNoteData);
 }

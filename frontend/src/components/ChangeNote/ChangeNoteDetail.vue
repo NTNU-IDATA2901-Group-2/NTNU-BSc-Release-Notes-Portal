@@ -10,6 +10,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { EllipsisVertical, Eye, FileDown, Pencil, Trash2 } from 'lucide-vue-next';
+import DeletePrompt from '../DeletePrompt.vue';
+import { ref } from 'vue';
+import { useMutation } from '@tanstack/vue-query';
+import { archiveChangeNote } from '@/api/change-note-api';
+import { toast } from 'vue-sonner';
+import { router } from '@/utils/router';
 
 const props = defineProps<{
     changeNote: ChangeNote;
@@ -20,9 +26,28 @@ const emit = defineEmits<{
   'update:modelValue': [value: boolean]
 }>();
 
+const showDeletePrompt = ref(false);
+
+const deleteChangeNoteMutation = useMutation({
+  mutationFn: () => archiveChangeNote(props.changeNote.id),
+  onSuccess: () => {
+    toast.success('Change note deleted successfully');
+    router.push("/change-notes");
+  },
+  onError: () => {
+    toast.error('Failed to delete change note');
+  },
+});
+
+const onDelete = () => {
+  deleteChangeNoteMutation.mutate();
+  emit('update:modelValue', false);
+}
+
 </script>
 
 <template>
+  <DeletePrompt :open="showDeletePrompt" @update:open="showDeletePrompt = false" @confirm="onDelete" />
     <div class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
       <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-row items-center justify-between w-full">
@@ -46,7 +71,7 @@ const emit = defineEmits<{
                     <Pencil class="text-text-dark-static" />
                   </div>
                 </DropdownMenuItem>
-                <DropdownMenuItem disabled>
+                <DropdownMenuItem @click="showDeletePrompt = true">
                   <div class="w-full flex gap-2">
                     <p class="ml-auto text-text-dark-static">Delete</p>
                     <Trash2 class="text-text-dark-static" />
