@@ -10,7 +10,7 @@ import { Toaster } from './components/ui/sonner';
     <Toaster position="bottom-center" />
     <Header />
     <main class="flex flex-1">
-      <RouterView class="w-full h-full"/>
+      <RouterView class="w-full flex-1"/>
     </main>
   </div>
   <Footer />

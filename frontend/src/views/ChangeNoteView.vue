@@ -41,7 +41,7 @@ import TagSelect from '@/components/TagSelect.vue';
 </script>
 
 <template>
-  <main class="flex flex-col items-center px-4 mb-20">
+  <div class="flex flex-col items-center px-4 mb-20">
     <Button variant="outline" class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10" @click="$router.back()"><ArrowLeft />Previous</Button>
     <div class="md:hidden flex w-full mt-4 justify-end gap-2">
       <Button v-if="isEditing" variant="outline" @click="isEditing = false">Cancel <Ban /></Button>
@@ -136,5 +136,5 @@ import TagSelect from '@/components/TagSelect.vue';
           </div>
       </div>
     </div>
-  </main>
+  </div>
 </template>

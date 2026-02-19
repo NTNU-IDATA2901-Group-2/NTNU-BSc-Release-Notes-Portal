@@ -11,10 +11,10 @@ const handleSignIn = () => {
 
 
 <template>
-    <div class="flex flex-1 min-h-full justify-center items-center">
-        <div class="flex flex-col items-center gap-10 md:flex-row mt-12 md:mt-60">
-            <img src="@/assets/welcome_drawing.svg" alt="Welcome Drawing" class="h-60"/>
-            <div class="flex flex-col gap-4 items-center">
+    <div class="flex flex-col min-h-full justify-center items-center relative">
+        <div class="flex flex-col md:flex-row items-center gap-8">
+            <img class="w-60 md:w-80 lg:w-100" src="@/assets/welcome_drawing.svg" alt="Welcome Drawing"/>
+            <div class="w-60 md:w-80 lg:w-100 flex flex-col gap-4 items-center">
                 <h1 class="text-2xl">Sign In</h1>
                 <Input placeholder="Email" class="w-64"/>
                 <Input placeholder="Password" type="password" class="w-64"/>
