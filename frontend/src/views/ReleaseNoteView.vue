@@ -12,7 +12,7 @@ import {
 import { useReleaseNote, useArchiveReleaseNote, updateReleaseNote, publishReleaseNote } from '@/api/release-note-api';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 
-import { Pencil, Trash2, Eye, FileDown, Ban, Save, ArrowLeft, EllipsisVertical } from "lucide-vue-next"
+import { Pencil, Trash2, Eye, EyeOff, FileDown, Ban, Save, ArrowLeft, EllipsisVertical } from "lucide-vue-next"
 import { ref } from 'vue';
 import Input from '@/components/ui/input/Input.vue';
 import { Textarea } from '@/components/ui/textarea';
@@ -113,9 +113,9 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
 </script>
 
 <template>
-  <div class="flex flex-col items-center px-4 mb-20">
+  <div class="flex flex-col w-full items-center px-4 mb-20">
   <DeletePrompt v-model:open="deletePromptOpen" :onConfirm="() =>archiveReleaseNote()" />
-    <form @submit="onSubmit">
+    <form class="w-full flex flex-col items-center" @submit="onSubmit">
       <Button variant="outline" class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10" @click="$router.back()"><ArrowLeft />Previous</Button>
       <div class="md:hidden flex w-full mt-4 justify-end gap-2">
         <Button v-if="isEditing" variant="outline" @click="isEditing = false">Cancel <Ban /></Button>
@@ -152,8 +152,8 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
                     </DropdownMenuItem>
                     <DropdownMenuItem @click="handlePublish">
                       <div class="w-full flex gap-2">
-                          <p class="ml-auto text-text-dark-static">{{ releaseNote.published ? 'Publish' : 'Unpublish' }}</p>
-                          <Eye class="text-text-dark-static"/>
+                          <p class="ml-auto text-text-dark-static">{{ !releaseNote.published ? 'Publish' : 'Unpublish' }}</p>
+                          <component :is="!releaseNote.published ? Eye : EyeOff" class="text-text-dark-static"/>
                       </div>
                     </DropdownMenuItem>
                     <DropdownMenuItem disabled>
