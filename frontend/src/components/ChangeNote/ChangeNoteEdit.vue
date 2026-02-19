@@ -54,7 +54,7 @@ const updateChangeNoteMutation = useMutation({
         toast.success('Change note updated successfully');
         emit('update:modelValue', false);
         router.push(`/change-notes/${props.changeNote.id}`);
-        queryClient.invalidateQueries({ queryKey: ['changeNote', props.changeNote.id] });
+        queryClient.invalidateQueries({ queryKey: ['changeNote', `${props.changeNote.id}`] });
     }
 })
 
