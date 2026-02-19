@@ -41,7 +41,7 @@ public class ChangeNoteController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PostMapping("")
-  public ResponseEntity<String> createChangeNote(@RequestBody CreateChangeNoteDTO createChangeNoteDTO) {
+  public ResponseEntity<String> createChangeNote(@RequestBody(required = false) CreateChangeNoteDTO createChangeNoteDTO) {
     long id = changeNoteService.createChangeNote(createChangeNoteDTO);
       logger.info("Change note created with id: {}", id);
       return ResponseEntity.status(HttpStatus.CREATED).body(String.valueOf(id));
@@ -99,5 +99,19 @@ public class ChangeNoteController {
     ChangeNoteDTO changeNote = changeNoteService.updateChangeNote(id, createChangeNoteDTO);
     logger.info("Updated change note with id: {}", id);
     return ResponseEntity.ok(changeNote);
+  }
+
+
+  @Operation(summary = "Publish change note", description = "Publishes an existing change note by its ID")
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "Change note published successfully"),
+    @ApiResponse(responseCode = "404", description = "Change note not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
+  @PatchMapping("/{id}/publish")
+  public ResponseEntity<String> publishChangeNote(@PathVariable long id) {
+    changeNoteService.publishChangeNote(id);
+    logger.info("Published change note with id: {}", id);
+    return ResponseEntity.ok().body("Change note published successfully");
   }
 }

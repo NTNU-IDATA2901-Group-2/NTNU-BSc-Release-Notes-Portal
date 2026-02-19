@@ -1,22 +1,24 @@
 <script setup lang="ts">
-import { createChangeNoteMutation, createPublishChangeNoteMutation, useChangeNotes } from '@/api/change-note-api';
-import { createReleaseNoteMutation } from '@/api/release-note-api';
+import { createChangeNote, publishChangeNote, useGetChangeNotes } from '@/api/change-note-api';
+import { createReleaseNote } from '@/api/release-note-api';
 import ChangeNoteCard from '@/components/ChangeNoteCard.vue';
 import Button from '@/components/ui/button/Button.vue';
 import { InputGroup, InputGroupInput } from '@/components/ui/input-group';
 import Separator from '@/components/ui/separator/Separator.vue';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
-import { TagsInput, TagsInputItemDelete, TagsInputItemText } from '@/components/ui/tags-input';
+import { TagsInput, TagsInputItemText } from '@/components/ui/tags-input';
 import TagsInputItem from '@/components/ui/tags-input/TagsInputItem.vue';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { Eye, FilePlus, LayersPlus, ListFilterPlus, Search } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { toast } from 'vue-sonner';
 
 const router = useRouter();
-const { isLoading, isFetching, isError, data } = useChangeNotes();
+const { isLoading, isFetching, isError, data } = useGetChangeNotes();
 
 const selectedItems = ref<number[]>([]);
+
+console.log('Fetched change notes:', data);
 
 const getTitleById = (id: number): string => {
   const changeNote = data.value?.find(note => note.id === id);
@@ -31,31 +33,55 @@ const toggleSelection = (id: number) => {
   }
 }
 
-const publishChangeNoteMutation = createPublishChangeNoteMutation();
+const queryClient = useQueryClient();
+
+// Publish selected changenotes
+
+const publishChangeNoteMutation = useMutation({
+    mutationFn: (changeNoteId: number) => publishChangeNote(changeNoteId),
+    onSuccess: (_) => {
+      queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
+    }
+});;
 
 const handlePublish = () => {
   console.log('Publish button clicked. Selected change note IDs:', selectedItems.value);
   for (const id of selectedItems.value) {
     publishChangeNoteMutation.mutate(id);
   }
+  selectedItems.value = [];
 }
 
-const createChangeNoteMutationInstance = createChangeNoteMutation((data: number) => {
-  router.push(`/change-notes/${data}`);
-})
+// Create change note
+
+const createChangeNoteMutation = useMutation({
+    mutationFn: () => createChangeNote(),
+    onSuccess: (data) => {
+      router.push(`/change-notes/${data}?edit=true`);
+      console.log('Change Note created with ID:', data);
+      queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
+    }
+});;
 
 const handleCreateChangeNote = () => {
   console.log('Create Change Note button clicked');
-  createChangeNoteMutationInstance.mutate()
+  createChangeNoteMutation.mutate()
 }
 
-const createReleaseNoteMutationInstance = createReleaseNoteMutation((data: number) => {
-  router.push(`/release-notes/${data}`);
+// Creation of release note
+
+const createReleaseNoteMutation = useMutation({
+    mutationFn: () => createReleaseNote(),
+    onSuccess: (data) => {
+      router.push(`/release-notes/${data}?edit=true`);
+      console.log('Release Note created with ID:', data);
+      queryClient.invalidateQueries({ queryKey: ['releaseNotes'] });
+    }
 })
 
 const handleCreateReleaseNote = () => {
   console.log('Creating a Release Note with selected change notes. Selected change note IDs:', selectedItems.value);
-  createReleaseNoteMutationInstance.mutate()
+  createReleaseNoteMutation.mutate();
 }
 
 </script>
@@ -105,7 +131,6 @@ const handleCreateReleaseNote = () => {
           <TagsInput disabled>
             <TagsInputItem v-for="id in selectedItems" :key="id" :value="getTitleById(id)" readonly>
               <TagsInputItemText />
-              <TagsInputItemDelete disabled/>
             </TagsInputItem>
 
             <TagsInputItem v-if="selectedItems.length === 0" value="No items selected" readonly class="end">
@@ -119,7 +144,6 @@ const handleCreateReleaseNote = () => {
             :changeNote="changeNote" @update:selected="toggleSelection(changeNote.id)" />
           <Separator />
         </div>
-
       </div>
     </div>
   </div>

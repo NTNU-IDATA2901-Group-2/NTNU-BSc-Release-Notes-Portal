@@ -1,28 +1,16 @@
 <script setup lang="ts">
-import { createReleaseNoteMutation, useReleaseNotes } from '@/api/release-note-api';
+import { useReleaseNotes } from '@/api/release-note-api';
 import ReleaseNoteCard from '@/components/ReleaseNoteCard.vue';
 import Button from '@/components/ui/button/Button.vue';
 import { InputGroup, InputGroupInput } from '@/components/ui/input-group';
 import Separator from '@/components/ui/separator/Separator.vue';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
-import { FilePlus, ListFilterPlus, Search } from 'lucide-vue-next';
+import { ListFilterPlus, Search } from 'lucide-vue-next';
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { toast } from 'vue-sonner';
 
-const router = useRouter();
 const { isLoading, isFetching, isError, data } = useReleaseNotes();
 
 const selectedItems = ref<number[]>([]);
-
-const createReleaseNoteMutationInstance = createReleaseNoteMutation((data: number) => {
-  router.push(`/release-notes/${data}`);
-})
-
-const handleCreateReleaseNote = () => {
-  console.log('Creating a Release Note with selected change notes. Selected change note IDs:', selectedItems.value);
-  createReleaseNoteMutationInstance.mutate()
-}
 
 </script>
 
@@ -41,11 +29,6 @@ const handleCreateReleaseNote = () => {
 
       <div class="flex flex-col w-full gap-4 max-w-4xl">
         <div class="w-full flex flex-col md:flex-row-reverse justify-center md:justify-end gap-2">
-          <div class="flex justify-center gap-2 flex-wrap md:flex-nowrap">
-            <Button variant="solidaccent" class="hidden" @click="handleCreateReleaseNote">Create Release Note
-              <FilePlus />
-            </Button>
-          </div>
 
           <div class="flex gap-2 w-full">
             <InputGroup>
