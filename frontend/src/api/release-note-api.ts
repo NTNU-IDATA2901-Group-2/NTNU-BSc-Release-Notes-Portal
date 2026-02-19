@@ -65,3 +65,7 @@ const archiveReleaseNote = async (id: string): Promise<number> => {
   const response = await axios.patch(`${config.API_URL}releasenotes/${id}/archive`)
   return response.data as number;
 }
+
+export const publishReleaseNote = async (id: string, publish: boolean): Promise<void> => {
+  await axios.patch(`${config.API_URL}releasenotes/${id}/publish?publish=${publish}`);
+}

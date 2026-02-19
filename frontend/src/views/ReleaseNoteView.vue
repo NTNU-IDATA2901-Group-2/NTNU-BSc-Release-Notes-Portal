@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useReleaseNote, useArchiveReleaseNote, updateReleaseNote } from '@/api/release-note-api';
+import { useReleaseNote, useArchiveReleaseNote, updateReleaseNote, publishReleaseNote } from '@/api/release-note-api';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 
 import { Pencil, Trash2, Eye, FileDown, Ban, Save, ArrowLeft, EllipsisVertical } from "lucide-vue-next"
@@ -31,6 +31,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
   const route = useRoute();
 
   const id = route.params.id as string;
+
   const { isPending, isFetching, isError, data: releaseNote } = useReleaseNote(id);
   const { mutate: archiveReleaseNote } = useArchiveReleaseNote(id,
     {
@@ -50,8 +51,6 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
   const deletePromptOpen = ref(false);
 
   const changeNotes = ref<ChangeNote[]>(releaseNote?.value?.changeNotes || [])
-
-  const archivePromptOpen = ref(false);
 
 
   const form = useForm({
@@ -99,6 +98,18 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
           queryClient.invalidateQueries({ queryKey: ['releaseNote', id] });
       }
   })
+
+  const handlePublish = () => {
+    publishReleaseNoteMutation.mutate();
+  }
+
+  const publishReleaseNoteMutation = useMutation({
+    mutationFn: () => publishReleaseNote(id, !releaseNote.value?.published),
+    onSuccess: () => {
+      toast.success(`Release note ${releaseNote.value?.published ? 'privated' : 'published'} successfully`);
+      queryClient.invalidateQueries({ queryKey: ['releaseNote', id] });
+    }
+  })
 </script>
 
 <template>
@@ -133,13 +144,13 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
                           <Pencil class="text-text-dark-static"/>
                       </div>
                     </DropdownMenuItem>
-                    <DropdownMenuItem @click="archivePromptOpen = true">
+                    <DropdownMenuItem @click="deletePromptOpen = true">
                       <div class="w-full flex gap-2">
                           <p class="ml-auto text-text-dark-static">Archive</p>
                           <Trash2 class="text-text-dark-static"/>
                       </div>
                     </DropdownMenuItem>
-                    <DropdownMenuItem disabled>
+                    <DropdownMenuItem @click="handlePublish">
                       <div class="w-full flex gap-2">
                           <p class="ml-auto text-text-dark-static">{{ releaseNote.published ? 'Publish' : 'Unpublish' }}</p>
                           <Eye class="text-text-dark-static"/>
