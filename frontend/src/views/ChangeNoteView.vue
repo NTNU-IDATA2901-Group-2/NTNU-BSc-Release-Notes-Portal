@@ -19,7 +19,7 @@ const { isPending, isFetching, isError, data: changeNote } = useGetChangeNote(id
 </script>
 
 <template>
-  <main class="flex flex-col items-center px-4 mb-20">
+  <div class="flex flex-col items-center px-4 mb-20">
     <Button variant="outline" class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10"
       @click="$router.back()">
       <ArrowLeft/>Previous
@@ -30,5 +30,5 @@ const { isPending, isFetching, isError, data: changeNote } = useGetChangeNote(id
     <div v-else-if="isPending || isFetching"><Spinner/></div>
     <h1 v-else-if="isError">Error retreiving change note</h1>
 
-  </main>
+  </div>
 </template>
