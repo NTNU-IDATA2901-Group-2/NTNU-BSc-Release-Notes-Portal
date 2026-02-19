@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.CreateChangeNoteDTO;
@@ -23,6 +24,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 @Tag(name = "Change Notes", description = "Endpoints for managing change notes")
@@ -109,8 +111,8 @@ public class ChangeNoteController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PatchMapping("/{id}/publish")
-  public ResponseEntity<String> publishChangeNote(@PathVariable long id) {
-    changeNoteService.publishChangeNote(id);
+  public ResponseEntity<String> publishChangeNote(@PathVariable long id, @Valid @RequestParam boolean publish) {
+    changeNoteService.publishChangeNote(id, publish);
     logger.info("Published change note with id: {}", id);
     return ResponseEntity.ok().body("Change note published successfully");
   }

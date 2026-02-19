@@ -4,18 +4,18 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import axios from "axios";
 
 
-export const publishChangeNote = async (changeNoteId: number): Promise<boolean> => {
-  await axios.patch(`${config.API_URL}changenotes/${changeNoteId}/publish`);
+export const publishChangeNote = async (changeNoteId: number, publish: boolean): Promise<boolean> => {
+  await axios.patch(`${config.API_URL}changenotes/${changeNoteId}/publish?publish=${publish}`);
   return true;
 }
 
-export const useCreateChangeNote = (onSuccesss : (changeId : number) => void) => useMutation<number>({
-    mutationFn: () => createChangeNote(),
-    onSuccess: (data) => {
-      onSuccesss(data);
-      const queryClient = useQueryClient();
-      queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
-    }
+export const useCreateChangeNote = (onSuccesss: (changeId: number) => void) => useMutation<number>({
+  mutationFn: () => createChangeNote(),
+  onSuccess: (data) => {
+    onSuccesss(data);
+    const queryClient = useQueryClient();
+    queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
+  }
 });
 
 export const createChangeNote = async (): Promise<number> => {
@@ -33,13 +33,13 @@ export const updateChangeNote = async (changeNoteId: number, changeNoteData: Per
 }
 
 export const useGetChangeNotes = () => useQuery<ChangeNote[]>({
-    queryKey: ['changeNotes'],
-    queryFn: () => getChangeNotes(),
+  queryKey: ['changeNotes'],
+  queryFn: () => getChangeNotes(),
 });
 
-export const useGetChangeNote = (id: string ) => useQuery<ChangeNote>({
-    queryKey: ['changeNote', id],
-    queryFn: () => getChangeNote(id),
+export const useGetChangeNote = (id: string) => useQuery<ChangeNote>({
+  queryKey: ['changeNote', id],
+  queryFn: () => getChangeNote(id),
 });
 
 export const getChangeNote = async (id: string): Promise<ChangeNote> => {
@@ -53,23 +53,23 @@ const getChangeNotes = async () => {
 }
 
 export const useProducts = () => useQuery({
-    queryKey: ['products'],
-    queryFn: () => getProducts(),
+  queryKey: ['products'],
+  queryFn: () => getProducts(),
 });
 
 export const useScopes = () => useQuery({
-    queryKey: ['scopes'],
-    queryFn: () => getScopes(),
+  queryKey: ['scopes'],
+  queryFn: () => getScopes(),
 });
 
 export const useFeatures = () => useQuery({
-    queryKey: ['features'],
-    queryFn: () => getFeatures(),
+  queryKey: ['features'],
+  queryFn: () => getFeatures(),
 });
 
 export const useCustomers = () => useQuery({
-    queryKey: ['customers'],
-    queryFn: () => getCustomers(),
+  queryKey: ['customers'],
+  queryFn: () => getCustomers(),
 });
 
 const getProducts = async () => {

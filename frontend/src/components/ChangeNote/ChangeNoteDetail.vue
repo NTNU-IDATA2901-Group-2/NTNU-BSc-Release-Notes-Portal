@@ -12,8 +12,8 @@ import {
 import { EllipsisVertical, Eye, FileDown, Pencil, Trash2 } from 'lucide-vue-next';
 import DeletePrompt from '../DeletePrompt.vue';
 import { ref } from 'vue';
-import { useMutation } from '@tanstack/vue-query';
-import { archiveChangeNote } from '@/api/change-note-api';
+import { QueryClient, useMutation, useQueryClient } from '@tanstack/vue-query';
+import { archiveChangeNote, publishChangeNote } from '@/api/change-note-api';
 import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';
 
@@ -21,6 +21,8 @@ const props = defineProps<{
     changeNote: ChangeNote;
     modelValue?: boolean;
 }>();
+
+const queryClient = useQueryClient();
 
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
@@ -43,6 +45,23 @@ const onDelete = () => {
   deleteChangeNoteMutation.mutate();
   emit('update:modelValue', false);
 }
+
+
+const publishChangeNoteMutation = useMutation({
+  mutationFn: (publish: boolean) => publishChangeNote(props.changeNote.id, publish),
+  onSuccess: () => {
+    toast.success(`Change note ${props.changeNote.published ? 'unpublished' : 'published'} successfully`);
+    queryClient.invalidateQueries({ queryKey: ['changeNote', `${props.changeNote.id}`] });
+  },
+  onError: () => {
+    toast.error(`Failed to ${props.changeNote.published ? 'unpublish' : 'publish'} change note`);
+  },
+});
+
+const onPublishToggle = () => {
+  publishChangeNoteMutation.mutate(!props.changeNote.published);
+  
+} 
 
 </script>
 
@@ -77,10 +96,10 @@ const onDelete = () => {
                     <Trash2 class="text-text-dark-static" />
                   </div>
                 </DropdownMenuItem>
-                <DropdownMenuItem disabled>
+                <DropdownMenuItem @click="onPublishToggle">
                   <div class="w-full flex gap-2">
-                    <p class="ml-auto text-text-dark-static">{{ changeNote.published ? 'Publish' :
-                      'Unpublish' }}</p>
+                    <p class="ml-auto text-text-dark-static">{{ changeNote.published ? 'Unpublish' :
+                      'Publish' }}</p>
                     <Eye class="text-text-dark-static" />
                   </div>
                 </DropdownMenuItem>

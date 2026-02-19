@@ -171,9 +171,9 @@ public class ChangeNoteService {
    * @throws ChangeNoteNotFoundException if no change note with the given ID
    *                                     exists
    */
-  public void publishChangeNote(long id) {
+  public void publishChangeNote(long id, boolean publish) {
     ChangeNote changeNote = changeNoteRepository.findById(id).orElseThrow(() -> new ChangeNoteNotFoundException(id));
-    changeNote.setPublished(true);
+    changeNote.setPublished(publish);
     changeNoteRepository.save(changeNote);
   }
 }
