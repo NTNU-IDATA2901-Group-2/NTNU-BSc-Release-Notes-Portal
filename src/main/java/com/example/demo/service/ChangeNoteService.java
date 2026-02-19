@@ -43,30 +43,33 @@ public class ChangeNoteService {
   public long createChangeNote(CreateChangeNoteDTO changeNoteDTO) {
     ChangeNote changeNote = new ChangeNote();
 
-    changeNote.setReference(changeNoteDTO.reference());
-    changeNote.setDescription(changeNoteDTO.description());
-    changeNote.setDeveloperNotes(changeNoteDTO.developerNotes());
-    changeNote.setUpgradeNotes(changeNoteDTO.upgradeNotes());
-    changeNote.setChangeSource(changeNoteDTO.changeSource());
+    if (changeNoteDTO != null) {
+      changeNote.setReference(changeNoteDTO.reference());
+      changeNote.setDescription(changeNoteDTO.description());
+      changeNote.setDeveloperNotes(changeNoteDTO.developerNotes());
+      changeNote.setUpgradeNotes(changeNoteDTO.upgradeNotes());
+      changeNote.setChangeSource(changeNoteDTO.changeSource());
 
-    if (changeNoteDTO.productId() != null) {
-      changeNote.setProduct(productRepository.findById(changeNoteDTO.productId())
-          .orElseThrow(() -> new ProductNotFoundException(changeNoteDTO.productId())));
-    }
+      if (changeNoteDTO.productId() != null) {
+        changeNote.setProduct(productRepository.findById(changeNoteDTO.productId())
+            .orElseThrow(() -> new ProductNotFoundException(changeNoteDTO.productId())));
+      }
 
-    if (changeNoteDTO.scopeId() != null) {
-      changeNote.setScope(scopeRepository.findById(changeNoteDTO.scopeId())
-          .orElseThrow(() -> new ScopeNotFoundException(changeNoteDTO.scopeId())));
-    }
+      if (changeNoteDTO.scopeId() != null) {
+        changeNote.setScope(scopeRepository.findById(changeNoteDTO.scopeId())
+            .orElseThrow(() -> new ScopeNotFoundException(changeNoteDTO.scopeId())));
+      }
 
-    if (changeNoteDTO.featureId() != null) {
-      changeNote.setFeature(featureRepository.findById(changeNoteDTO.featureId())
-          .orElseThrow(() -> new FeatureNotFoundException(changeNoteDTO.featureId())));
-    }
+      if (changeNoteDTO.featureId() != null) {
+        changeNote.setFeature(featureRepository.findById(changeNoteDTO.featureId())
+            .orElseThrow(() -> new FeatureNotFoundException(changeNoteDTO.featureId())));
+      }
 
-    if (changeNoteDTO.customerId() != null) {
-      changeNote.setCustomer(customerRepository.findById(changeNoteDTO.customerId())
-          .orElseThrow(() -> new CustomerNotFoundException(changeNoteDTO.customerId())));
+      if (changeNoteDTO.customerId() != null) {
+        changeNote.setCustomer(customerRepository.findById(changeNoteDTO.customerId())
+            .orElseThrow(() -> new CustomerNotFoundException(changeNoteDTO.customerId())));
+      }
+
     }
 
     return changeNoteRepository.save(changeNote).getId();
@@ -105,18 +108,21 @@ public class ChangeNoteService {
    *                                     exists
    */
   public ChangeNoteDTO getChangeNoteById(long id) {
-    ChangeNote changeNote = changeNoteRepository.findByIdAndArchivedFalse(id).orElseThrow(() -> new ChangeNoteNotFoundException(id));
+    ChangeNote changeNote = changeNoteRepository.findByIdAndArchivedFalse(id)
+        .orElseThrow(() -> new ChangeNoteNotFoundException(id));
 
     return ChangeNoteDTO.fromChangeNote(changeNote);
   }
 
   /**
-   * Updates an existing change note with new details from the provided DTO. 
+   * Updates an existing change note with new details from the provided DTO.
    * 
-   * @param id the ID of the change note to update
-   * @param createChangeNoteDTO the DTO containing updated details for the change note
+   * @param id                  the ID of the change note to update
+   * @param createChangeNoteDTO the DTO containing updated details for the change
+   *                            note
    * @return a DTO representing the updated change note
-   * @throws ChangeNoteNotFoundException if no change note with the given ID exists
+   * @throws ChangeNoteNotFoundException if no change note with the given ID
+   *                                     exists
    */
   public ChangeNoteDTO updateChangeNote(long id, CreateChangeNoteDTO createChangeNoteDTO) {
     ChangeNote changeNote = changeNoteRepository.findById(id).orElseThrow(() -> new ChangeNoteNotFoundException(id));
@@ -156,5 +162,18 @@ public class ChangeNoteService {
     }
 
     return ChangeNoteDTO.fromChangeNote(changeNoteRepository.save(changeNote));
+  }
+
+  /**
+   * Publishes a change note by setting its published status to true.
+   * 
+   * @param id the ID of the change note to publish
+   * @throws ChangeNoteNotFoundException if no change note with the given ID
+   *                                     exists
+   */
+  public void publishChangeNote(long id, boolean publish) {
+    ChangeNote changeNote = changeNoteRepository.findById(id).orElseThrow(() -> new ChangeNoteNotFoundException(id));
+    changeNote.setPublished(publish);
+    changeNoteRepository.save(changeNote);
   }
 }

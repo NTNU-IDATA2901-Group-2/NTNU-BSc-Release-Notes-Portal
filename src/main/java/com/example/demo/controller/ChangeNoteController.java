@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.CreateChangeNoteDTO;
@@ -23,6 +24,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 @Tag(name = "Change Notes", description = "Endpoints for managing change notes")
@@ -41,7 +43,7 @@ public class ChangeNoteController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PostMapping("")
-  public ResponseEntity<String> createChangeNote(@RequestBody CreateChangeNoteDTO createChangeNoteDTO) {
+  public ResponseEntity<String> createChangeNote(@RequestBody(required = false) CreateChangeNoteDTO createChangeNoteDTO) {
     long id = changeNoteService.createChangeNote(createChangeNoteDTO);
       logger.info("Change note created with id: {}", id);
       return ResponseEntity.status(HttpStatus.CREATED).body(String.valueOf(id));
@@ -99,5 +101,19 @@ public class ChangeNoteController {
     ChangeNoteDTO changeNote = changeNoteService.updateChangeNote(id, createChangeNoteDTO);
     logger.info("Updated change note with id: {}", id);
     return ResponseEntity.ok(changeNote);
+  }
+
+
+  @Operation(summary = "Publish change note", description = "Publishes an existing change note by its ID")
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "Change note published successfully"),
+    @ApiResponse(responseCode = "404", description = "Change note not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
+  @PatchMapping("/{id}/publish")
+  public ResponseEntity<String> publishChangeNote(@PathVariable long id, @Valid @RequestParam boolean publish) {
+    changeNoteService.publishChangeNote(id, publish);
+    logger.info("Published change note with id: {}", id);
+    return ResponseEntity.ok().body("Change note published successfully");
   }
 }

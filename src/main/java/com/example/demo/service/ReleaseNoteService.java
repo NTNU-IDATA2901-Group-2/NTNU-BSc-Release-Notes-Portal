@@ -39,7 +39,7 @@ public class ReleaseNoteService {
     ReleaseNote releaseNote = new ReleaseNote();
     releaseNote.setTag(createReleaseNoteDTO.tag());
     releaseNote.setSummary(createReleaseNoteDTO.summary());
-    releaseNote.setPublished(createReleaseNoteDTO.published());
+    releaseNote.setPublished(createReleaseNoteDTO.published() != null ? createReleaseNoteDTO.published() : false);
 
     List<ChangeNote> changeNotesInReleaseNote = new ArrayList<>();
     if (createReleaseNoteDTO.changeNoteIds() != null) {
@@ -85,11 +85,10 @@ public class ReleaseNoteService {
    */
   public List<ReleaseNoteDTO> getAllReleaseNotes() {
     List<ReleaseNote> releaseNotes = releaseNoteRepository.findAll();
-    List<ReleaseNoteDTO> releaseNoteDTOs = releaseNotes.stream()
+    return releaseNotes.stream()
         .filter(releaseNote -> !releaseNote.getArchived())
-        .map(releaseNote -> ReleaseNoteDTO.fromReleaseNote(releaseNote))
+        .map(ReleaseNoteDTO::fromReleaseNote)
         .toList();
-    return releaseNoteDTOs;
   }
 
   /**
@@ -101,7 +100,7 @@ public class ReleaseNoteService {
   public ReleaseNoteDTO getReleaseNoteById(long id) {
     Optional<ReleaseNote> releaseNoteOptional = releaseNoteRepository.findById(id);
     
-    if (releaseNoteOptional.isEmpty() || releaseNoteOptional.get().getArchived()) {
+    if (releaseNoteOptional.isEmpty() || Boolean.TRUE.equals(releaseNoteOptional.get().getArchived())) {
       throw new ReleaseNoteNotFoundException(id);
     }
     return ReleaseNoteDTO.fromReleaseNote(releaseNoteOptional.get());
@@ -117,7 +116,7 @@ public class ReleaseNoteService {
   public ReleaseNoteDTO updateReleaseNote(long id, CreateReleaseNoteDTO createReleaseNoteDTO) {
     Optional<ReleaseNote> releaseNoteOptional = releaseNoteRepository.findById(id);
 
-    if (releaseNoteOptional.isEmpty() || releaseNoteOptional.get().getArchived()) {
+    if (releaseNoteOptional.isEmpty() || Boolean.TRUE.equals(releaseNoteOptional.get().getArchived())) {
       throw new ReleaseNoteNotFoundException(id);
     }
 
@@ -155,4 +154,23 @@ public class ReleaseNoteService {
 
   }
   
+  /**
+   * Publishes an existing release note by its ID. Privates release note if publish is false.
+   *
+   * @param id the ID of the release note to be published
+   * @param publish a boolean indicating whether to publish (true) or private (false) the release note
+   * @throws ReleaseNoteNotFoundException if the specified ID does not correspond to an existing
+   * release note
+   */
+  public void publishReleaseNote(long id, boolean publish) {
+    Optional<ReleaseNote> releaseNoteOptional = releaseNoteRepository.findById(id);
+
+    if (releaseNoteOptional.isEmpty() || releaseNoteOptional.get().getArchived()) {
+      throw new ReleaseNoteNotFoundException(id);
+    }
+
+    ReleaseNote releaseNote = releaseNoteOptional.get();
+    releaseNote.setPublished(publish);
+    releaseNoteRepository.save(releaseNote);
+  }
 }

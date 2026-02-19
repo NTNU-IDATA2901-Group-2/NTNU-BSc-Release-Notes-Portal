@@ -7,8 +7,6 @@ const props = defineProps<{
   onConfirm: () => void;
 }>()
 
-console.log('ArchivePrompt open:', props.open);
-
 const emit = defineEmits<{
   'update:open': [value: boolean];
 }>()
@@ -28,14 +26,14 @@ const handleConfirm = () => {
   <Dialog :open="open" @update:open="handleClose">
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Are you sure you want to archive this change note?</DialogTitle>
+        <DialogTitle>Are you sure you want to delete this change note?</DialogTitle>
         <DialogDescription>
           This action cannot be undone.
         </DialogDescription>
       </DialogHeader>
       <DialogFooter>
         <Button variant="outline" @click="handleClose">Cancel</Button>
-        <Button variant="destructive" @click="handleConfirm">Archive</Button>
+        <Button variant="destructive" @click="handleConfirm">Delete</Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>
