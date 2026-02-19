@@ -1,5 +1,5 @@
 import { config } from "@/constants";
-import type { OnApiCallFinished, ReleaseNote } from "@/types"
+import type { OnApiCallFinished, PersistReleaseNoteDTO, ReleaseNote } from "@/types"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 
 import axios from 'axios';
@@ -50,6 +50,10 @@ export const useArchiveReleaseNote = (id: string, onFinished: OnApiCallFinished)
   },
 
 })
+}
+
+export const updateReleaseNote = async (id: string, releaseNoteData: PersistReleaseNoteDTO): Promise<void> => {
+  await axios.put(`${config.API_URL}releasenotes/${id}`, releaseNoteData);
 }
 
 const archiveReleaseNote = async (id: string): Promise<number> => {

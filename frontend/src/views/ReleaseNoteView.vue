@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useReleaseNote, useArchiveReleaseNote } from '@/api/release-note-api';
+import { useReleaseNote, useArchiveReleaseNote, updateReleaseNote } from '@/api/release-note-api';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 
 import { Pencil, Trash2, Eye, FileDown, Ban, Save, ArrowLeft, EllipsisVertical } from "lucide-vue-next"
@@ -22,8 +22,9 @@ import { routeNames, router } from '@/utils/router';
 import { toast } from 'vue-sonner';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
-import type { ChangeNote } from '@/types';
+import type { ChangeNote, PersistReleaseNoteDTO } from '@/types';
 import { EditReleaseNoteSchema } from '@/schemas';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
   const isEditing = ref(false)
 
@@ -58,7 +59,7 @@ import { EditReleaseNoteSchema } from '@/schemas';
     initialValues: {
       tag: '',
       summary: '',
-      changeNotes: [],
+      changeNoteIds: [],
       published: false,
     }
   })
@@ -74,7 +75,7 @@ import { EditReleaseNoteSchema } from '@/schemas';
     form.setValues({
       tag: releaseNote.value.tag,
       summary: releaseNote.value.summary ?? '',
-      changeNotes: releaseNote.value.changeNotes.map(c => c.id),
+      changeNoteIds: releaseNote.value.changeNotes.map(c => c.id),
       published: releaseNote.value.published,
     })
 
@@ -84,16 +85,24 @@ import { EditReleaseNoteSchema } from '@/schemas';
   const onSubmit = form.handleSubmit((values) => {
     const payload = {
       ...values,
-      changeNotes: changeNotes.value.map(c => c.id),
+      changeNoteIds: changeNotes.value.map(c => c.id),
     }
+    updateReleaseNoteMutation.mutate(payload);
     isEditing.value = false;
-    console.log('Form submitted with payload:', payload);
   })
 
+  const queryClient = useQueryClient();
+  const updateReleaseNoteMutation = useMutation({
+      mutationFn: (values: PersistReleaseNoteDTO) => updateReleaseNote(id, values),
+      onSuccess: () => {
+          toast.success('Release note updated successfully');
+          queryClient.invalidateQueries({ queryKey: ['releaseNote', id] });
+      }
+  })
 </script>
 
 <template>
-  <main class="flex flex-col items-center px-4 mb-20">
+  <div class="flex flex-col items-center px-4 mb-20">
   <DeletePrompt v-model:open="deletePromptOpen" :onConfirm="() =>archiveReleaseNote()" />
     <form @submit="onSubmit">
       <Button variant="outline" class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10" @click="$router.back()"><ArrowLeft />Previous</Button>
@@ -181,5 +190,5 @@ import { EditReleaseNoteSchema } from '@/schemas';
         </div>
       </div>
     </form>
-  </main>
+  </div>
 </template>
