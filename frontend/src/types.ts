@@ -77,3 +77,9 @@ export interface Tag {
     id: number,
     name: string
 }
+
+export interface OnApiCallFinished {
+    onSettled?: () => void,
+    onSuccess: () => void,
+    onError: () => void
+}
