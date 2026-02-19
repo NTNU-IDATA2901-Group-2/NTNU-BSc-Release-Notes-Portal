@@ -1,0 +1,30 @@
+meta {
+  name: post_scope_without_body
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseurl}}/scopes
+  body: none
+  auth: inherit
+}
+
+body:json {
+  {
+    "name" : "testScope"
+  }
+}
+
+assert {
+  res.status: eq 500
+}
+
+script:post-response {
+  bru.setEnvVar("scope_create_scope", res.body)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

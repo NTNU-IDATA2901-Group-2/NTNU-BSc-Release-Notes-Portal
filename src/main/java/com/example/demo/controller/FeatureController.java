@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.CreateTagDTO;
 import com.example.demo.dto.FeatureDTO;
 import com.example.demo.service.FeatureService;
 
@@ -22,6 +23,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 @Tag(name = "Features", description = "Endpoints for managing features")
@@ -40,7 +42,7 @@ public class FeatureController {
 		@ApiResponse(responseCode = "500", description = "Internal server error")
 	})
 	@PostMapping("")
-	public ResponseEntity<String> createFeature(@RequestBody FeatureDTO featureDTO) {
+	public ResponseEntity<String> createFeature(@Valid @RequestBody CreateTagDTO featureDTO) {
 		long id = featureService.createFeature(featureDTO);
 		logger.info("Feature created with id: {}", id);
 		return ResponseEntity.status(HttpStatus.CREATED).body(String.valueOf(id));
@@ -78,7 +80,7 @@ public class FeatureController {
 		@ApiResponse(responseCode = "500", description = "Internal server error")
 	})
 	@PutMapping("/{id}")
-	public ResponseEntity<FeatureDTO> updateFeature(@PathVariable long id, @RequestBody FeatureDTO featureDTO) {
+	public ResponseEntity<FeatureDTO> updateFeature(@PathVariable long id, @Valid @RequestBody CreateTagDTO featureDTO) {
 		FeatureDTO feature = featureService.updateFeature(id, featureDTO);
 		logger.info("Updated feature with id: {}", id);
 		return ResponseEntity.ok(feature);

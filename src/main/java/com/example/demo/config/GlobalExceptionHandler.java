@@ -4,11 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.example.demo.exception.ChangeNoteNotFoundException;
 import com.example.demo.exception.CustomerNotFoundException;
+import com.example.demo.exception.FailedToSaveEntityException;
 import com.example.demo.exception.FeatureNotFoundException;
 import com.example.demo.exception.ProductNotFoundException;
 import com.example.demo.exception.ReleaseNoteNotFoundException;
@@ -53,6 +55,18 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleChangeNoteNotFoundException(ChangeNoteNotFoundException e) {
     logger.warn("Change note not found: {}", e.getChangeNoteId());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Change note with ID %d not found", e.getChangeNoteId()));
+  }
+
+  @ExceptionHandler(value = {IllegalArgumentException.class})
+  public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
+    logger.warn("Invalid argument: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument: " + e.getMessage());
+  }
+
+  @ExceptionHandler(value = {FailedToSaveEntityException.class})
+  public ResponseEntity<String> handleFailedToSaveEntityException(FailedToSaveEntityException e) {
+    logger.warn("Failed to save entity: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to save entity: " + e.getMessage());
   }
 
   /**

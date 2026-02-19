@@ -1,0 +1,25 @@
+meta {
+  name: update_with_invalid_info
+  type: http
+  seq: 8
+}
+
+put {
+  url: {{baseurl}}/scopes/{{scope_create_scope}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+  }
+}
+
+assert {
+  res.status: eq 500
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

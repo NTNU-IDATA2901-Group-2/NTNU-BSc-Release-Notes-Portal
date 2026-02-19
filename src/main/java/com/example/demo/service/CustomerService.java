@@ -6,8 +6,10 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.domain.entity.Customer;
 import com.example.demo.domain.repository.CustomerRepository;
+import com.example.demo.dto.CreateTagDTO;
 import com.example.demo.dto.CustomerDTO;
 import com.example.demo.exception.CustomerNotFoundException;
+import com.example.demo.exception.FailedToSaveEntityException;
 
 import lombok.AllArgsConstructor;
 
@@ -22,10 +24,14 @@ public class CustomerService {
    * @param customerDTO the DTO containing details for the new customer
    * @return the ID of the created customer
    */
-  public long createCustomer(CustomerDTO customerDTO) {
+  public long createCustomer(CreateTagDTO customerDTO) {
     Customer customer = new Customer();
     customer.setName(customerDTO.name());
-    return customerRepository.save(customer).getId();
+    try {
+      return customerRepository.save(customer).getId();
+    } catch (Exception _) {
+      throw new FailedToSaveEntityException("Failed to create customer");
+    }
   }
 
   /**
@@ -60,11 +66,15 @@ public class CustomerService {
    * @return a DTO representing the updated customer
    * @throws CustomerNotFoundException if no customer with the given ID exists
    */
-  public CustomerDTO updateCustomer(long id, CustomerDTO customerDTO) {
+  public CustomerDTO updateCustomer(long id, CreateTagDTO customerDTO) {
     Customer customer = customerRepository.findById(id)
         .orElseThrow(() -> new CustomerNotFoundException(id));
     customer.setName(customerDTO.name());
-    return CustomerDTO.fromCustomer(customerRepository.save(customer));
+    try {
+      return CustomerDTO.fromCustomer(customerRepository.save(customer));
+    } catch (Exception _) {
+      throw new FailedToSaveEntityException("Failed to update customer with ID " + id);
+    }
   }
 
   /**

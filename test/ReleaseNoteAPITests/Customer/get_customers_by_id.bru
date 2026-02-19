@@ -1,0 +1,22 @@
+meta {
+  name: get_customers_by_id
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseurl}}/customers/{{customer_create_customer}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.body: isJson
+  res.body.id: eq {{customer_create_customer}}
+  res.body.name: eq testCustomer
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

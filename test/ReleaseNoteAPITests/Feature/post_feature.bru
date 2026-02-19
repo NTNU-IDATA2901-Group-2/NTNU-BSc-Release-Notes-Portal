@@ -1,0 +1,30 @@
+meta {
+  name: post_feature
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseurl}}/features
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name" : "testFeature"
+  }
+}
+
+assert {
+  res.body: isNumber
+}
+
+script:post-response {
+  bru.setEnvVar("feature_create_feature", res.body)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

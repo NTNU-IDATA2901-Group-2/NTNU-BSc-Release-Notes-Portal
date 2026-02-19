@@ -1,0 +1,20 @@
+meta {
+  name: get_features_by_id_not
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseurl}}/features/{{feature_create_feature}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 404
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

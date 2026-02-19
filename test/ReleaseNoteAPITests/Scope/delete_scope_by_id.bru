@@ -1,0 +1,20 @@
+meta {
+  name: delete_scope_by_id
+  type: http
+  seq: 9
+}
+
+delete {
+  url: {{baseurl}}/scopes/{{scope_create_scope}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
