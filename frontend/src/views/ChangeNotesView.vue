@@ -8,7 +8,6 @@ import Separator from '@/components/ui/separator/Separator.vue';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 import { TagsInput, TagsInputItemText } from '@/components/ui/tags-input';
 import TagsInputItem from '@/components/ui/tags-input/TagsInputItem.vue';
-import type { ChangeNote, ReleaseNote } from '@/types';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { Eye, FilePlus, LayersPlus, ListFilterPlus, Search } from 'lucide-vue-next';
 import { ref } from 'vue';
@@ -40,9 +39,10 @@ const queryClient = useQueryClient();
 // Publish selected changenotes
 
 const publishChangeNoteMutation = useMutation({
-    mutationFn: (changeNoteId: number) => publishChangeNote(changeNoteId),
+    mutationFn: (changeNoteId: number) => publishChangeNote(changeNoteId, true),
     onSuccess: (_) => {
       queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
+      toast.success(`Selected changenote published successfully!`);
     }
 });;
 

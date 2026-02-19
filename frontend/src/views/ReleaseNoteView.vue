@@ -152,7 +152,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
                     </DropdownMenuItem>
                     <DropdownMenuItem @click="handlePublish">
                       <div class="w-full flex gap-2">
-                          <p class="ml-auto text-text-dark-static">{{ releaseNote.published ? 'Publish' : 'Unpublish' }}</p>
+                          <p class="ml-auto text-text-dark-static">{{ !releaseNote.published ? 'Publish' : 'Unpublish' }}</p>
                           <Eye class="text-text-dark-static"/>
                       </div>
                     </DropdownMenuItem>
