@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { useCustomers, useFeatures, useProducts, useScopes } from '@/api/change-note-api';
+import { useCustomers } from '@/api/customers-api';
+import { useFeatures } from '@/api/features-api';
+import { useProducts } from '@/api/products-api';
+import { useScopes } from '@/api/scopes-api';
 import {
   Select,
   SelectContent,
@@ -8,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import type { Tag } from '@/types';
 import type { PrimitiveProps } from 'reka-ui';
 
 const props = defineProps<PrimitiveProps & {
@@ -33,7 +37,7 @@ const { isLoading, isError, data: tags } = hookMap[props.mode]()
 
 const getTagFromId = (id?: number) => {
     if (id === undefined || id === -1) return 'None'
-    const tag = tags.value?.find(t => t.id === id)
+    const tag: Tag | undefined = tags.value?.find(t => t.id === id)
     return tag ? tag.name : 'None'
 }
 

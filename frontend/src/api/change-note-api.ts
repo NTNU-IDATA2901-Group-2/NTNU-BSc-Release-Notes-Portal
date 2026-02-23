@@ -52,42 +52,5 @@ const getChangeNotes = async () => {
   return response.data as ChangeNote[];
 }
 
-export const useProducts = () => useQuery({
-  queryKey: ['products'],
-  queryFn: () => getProducts(),
-});
 
-export const useScopes = () => useQuery({
-  queryKey: ['scopes'],
-  queryFn: () => getScopes(),
-});
 
-export const useFeatures = () => useQuery({
-  queryKey: ['features'],
-  queryFn: () => getFeatures(),
-});
-
-export const useCustomers = () => useQuery({
-  queryKey: ['customers'],
-  queryFn: () => getCustomers(),
-});
-
-const getProducts = async () => {
-  const response = await axios.get(`${config.API_URL}products`)
-  return response.data as Product[];
-}
-
-const getScopes = async () => {
-  const response = await axios.get(`${config.API_URL}scopes`)
-  return response.data as Scope[];
-}
-
-const getFeatures = async () => {
-  const response = await axios.get(`${config.API_URL}features`)
-  return response.data as Feature[];
-}
-
-const getCustomers = async () => {
-  const response = await axios.get(`${config.API_URL}customers`)
-  return response.data as Customer[];
-}
