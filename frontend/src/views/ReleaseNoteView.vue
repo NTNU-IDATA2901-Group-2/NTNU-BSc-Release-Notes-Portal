@@ -114,7 +114,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 <template>
   <div class="flex flex-col w-full items-center px-4 mb-20">
-  <DeletePrompt v-model:open="deletePromptOpen" :onConfirm="() =>archiveReleaseNote()" />
+  <DeletePrompt v-model:open="deletePromptOpen" :on-confirm="() =>archiveReleaseNote()" />
     <form class="w-full flex flex-col items-center" @submit="onSubmit">
       <Button variant="outline" class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10" @click="$router.back()"><ArrowLeft />Previous</Button>
       <div class="md:hidden flex w-full mt-4 justify-end gap-2">

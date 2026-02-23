@@ -73,7 +73,8 @@ const onPublishToggle = () => {
           <div class="flex items-center gap-4">
             <h1 class="text-2xl max-w-60 whitespace-nowrap overflow-hidden">{{
               changeNote.reference }}</h1>
-            <Badge class="h-6"
+            <Badge
+class="h-6"
               :variant="changeNote.published ? 'success' : 'destructive'">{{ changeNote.published ?
                 'Published' : 'Private' }}</Badge>
           </div>

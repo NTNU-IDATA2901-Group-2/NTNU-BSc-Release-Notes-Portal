@@ -45,7 +45,7 @@ const currentValue = () => (props.modelValue ?? props.selectedId ?? -1).toString
     <Select :model-value="currentValue()" @update:model-value="(val) => emit('update:modelValue', val ? parseInt(val as string) : -1)">
     <SelectTrigger class="w-[180px]">
         <SelectValue 
-        :textValue="getTagFromId(parseInt(currentValue()))"/>
+        :text-value="getTagFromId(parseInt(currentValue()))"/>
     </SelectTrigger>
     <SelectContent>
         <SelectGroup>

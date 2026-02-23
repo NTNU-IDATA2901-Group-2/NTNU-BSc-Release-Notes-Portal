@@ -5,7 +5,7 @@ import globals from 'globals';
 import typescriptEslint from 'typescript-eslint';
 
 export default [
-  { ignores: ['*.d.ts', '**/coverage', '**/dist'] },
+  { ignores: ['*.d.ts', '**/coverage', '**/dist', '**/components/ui'] },
   eslint.configs.recommended,
   ...typescriptEslint.configs.recommended,
   ...eslintPluginVue.configs['flat/strongly-recommended-error'],

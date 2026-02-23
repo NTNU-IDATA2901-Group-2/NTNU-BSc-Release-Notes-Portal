@@ -146,8 +146,9 @@ const handleCreateReleaseNote = () => {
         </div>
 
         <div v-for="changeNote in data" class="flex flex-col gap-4">
-          <ChangeNoteCard :key="changeNote.id" :selected="selectedItems.includes(changeNote.id)"
-            :changeNote="changeNote" @update:selected="toggleSelection(changeNote.id)" />
+          <ChangeNoteCard
+:key="changeNote.id" :selected="selectedItems.includes(changeNote.id)"
+            :change-note="changeNote" @update:selected="toggleSelection(changeNote.id)" />
           <Separator />
         </div>
       </div>

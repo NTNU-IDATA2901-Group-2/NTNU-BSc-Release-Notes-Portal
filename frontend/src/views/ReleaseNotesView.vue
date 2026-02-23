@@ -45,8 +45,9 @@ const selectedItems = ref<number[]>([]);
         </div>
 
         <div v-for="releaseNote in data" class="flex flex-col gap-4">
-          <ReleaseNoteCard :key="releaseNote.id" :selected="selectedItems.includes(releaseNote.id)"
-            :releaseNote="releaseNote" />
+          <ReleaseNoteCard
+:key="releaseNote.id" :selected="selectedItems.includes(releaseNote.id)"
+            :release-note="releaseNote" />
           <Separator />
         </div>
       </div>
