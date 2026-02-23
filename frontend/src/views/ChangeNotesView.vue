@@ -40,7 +40,7 @@ const queryClient = useQueryClient();
 
 const publishChangeNoteMutation = useMutation({
     mutationFn: (changeNoteId: number) => publishChangeNote(changeNoteId, true),
-    onSuccess: (_) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
       toast.success(`Selected changenote published successfully!`);
     }
@@ -145,9 +145,10 @@ const handleCreateReleaseNote = () => {
           </TagsInput>
         </div>
 
-        <div v-for="changeNote in data" class="flex flex-col gap-4">
-          <ChangeNoteCard :key="changeNote.id" :selected="selectedItems.includes(changeNote.id)"
-            :changeNote="changeNote" @update:selected="toggleSelection(changeNote.id)" />
+        <div v-for="changeNote in data" :key="changeNote.id" class="flex flex-col gap-4">
+          <ChangeNoteCard
+:key="changeNote.id" :selected="selectedItems.includes(changeNote.id)"
+            :change-note="changeNote" @update:selected="toggleSelection(changeNote.id)" />
           <Separator />
         </div>
       </div>

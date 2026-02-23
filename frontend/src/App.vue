@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Footer from './components/Footer.vue';
-import Header from './components/Header.vue';
+import Footer from './components/AppFooter.vue';
+import Header from './components/AppHeader.vue';
 import { Toaster } from './components/ui/sonner';
 
 </script>
@@ -10,7 +10,7 @@ import { Toaster } from './components/ui/sonner';
     <Toaster position="bottom-center" />
     <Header />
     <main class="flex flex-1">
-      <RouterView class="w-full h-full"/>
+      <RouterView class="w-full flex-1"/>
     </main>
   </div>
   <Footer />

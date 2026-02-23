@@ -59,6 +59,10 @@ const updateChangeNoteMutation = useMutation({
 })
 
 const onSubmit = handleSubmit((values : PersistChangeNoteDTO) => {
+    values.productId = values.productId === -1 ? undefined : values.productId;
+    values.scopeId = values.scopeId === -1 ? undefined : values.scopeId;
+    values.featureId = values.featureId === -1 ? undefined : values.featureId;
+    values.customerId = values.customerId === -1 ? undefined : values.customerId;
   updateChangeNoteMutation.mutate(values);
 });
 
@@ -81,7 +85,7 @@ const onCancel = () => {
     </Button>
     </div>
 
-    <div class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
+    <div class="flex flex-col gap-16 flex-1 w-full items-center mt-16 lg:w-4xl md:mt-42">
     <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-row items-center justify-between w-full">
         <div class="flex items-center gap-4">

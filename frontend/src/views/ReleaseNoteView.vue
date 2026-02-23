@@ -12,7 +12,7 @@ import {
 import { useReleaseNote, useArchiveReleaseNote, updateReleaseNote, publishReleaseNote } from '@/api/release-note-api';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 
-import { Pencil, Trash2, Eye, FileDown, Ban, Save, ArrowLeft, EllipsisVertical } from "lucide-vue-next"
+import { Pencil, Trash2, Eye, EyeOff, FileDown, Ban, Save, ArrowLeft, EllipsisVertical } from "lucide-vue-next"
 import { ref } from 'vue';
 import Input from '@/components/ui/input/Input.vue';
 import { Textarea } from '@/components/ui/textarea';
@@ -33,6 +33,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
   const id = route.params.id as string;
 
   const { isPending, isFetching, isError, data: releaseNote } = useReleaseNote(id);
+
   const { mutate: archiveReleaseNote } = useArchiveReleaseNote(id,
     {
       onSettled: () => {
@@ -72,7 +73,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
     changeNotes.value = [...releaseNote.value.changeNotes]
 
     form.setValues({
-      tag: releaseNote.value.tag,
+      tag: releaseNote.value.tag ?? '',
       summary: releaseNote.value.summary ?? '',
       changeNoteIds: releaseNote.value.changeNotes.map(c => c.id),
       published: releaseNote.value.published,
@@ -113,9 +114,9 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
 </script>
 
 <template>
-  <div class="flex flex-col items-center px-4 mb-20">
-  <DeletePrompt v-model:open="deletePromptOpen" :onConfirm="() =>archiveReleaseNote()" />
-    <form @submit="onSubmit">
+  <div class="flex flex-col w-full items-center px-4 mb-20">
+  <DeletePrompt v-model:open="deletePromptOpen" :on-confirm="() =>archiveReleaseNote()" />
+    <form class="w-full flex flex-col items-center" @submit="onSubmit">
       <Button variant="outline" class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10" @click="$router.back()"><ArrowLeft />Previous</Button>
       <div class="md:hidden flex w-full mt-4 justify-end gap-2">
         <Button v-if="isEditing" variant="outline" @click="isEditing = false">Cancel <Ban /></Button>
@@ -146,14 +147,14 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
                     </DropdownMenuItem>
                     <DropdownMenuItem @click="deletePromptOpen = true">
                       <div class="w-full flex gap-2">
-                          <p class="ml-auto text-text-dark-static">Archive</p>
+                          <p class="ml-auto text-text-dark-static">Delete</p>
                           <Trash2 class="text-text-dark-static"/>
                       </div>
                     </DropdownMenuItem>
                     <DropdownMenuItem @click="handlePublish">
                       <div class="w-full flex gap-2">
                           <p class="ml-auto text-text-dark-static">{{ !releaseNote.published ? 'Publish' : 'Unpublish' }}</p>
-                          <Eye class="text-text-dark-static"/>
+                          <component :is="!releaseNote.published ? Eye : EyeOff" class="text-text-dark-static"/>
                       </div>
                     </DropdownMenuItem>
                     <DropdownMenuItem disabled>
@@ -177,8 +178,8 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
         <div class="flex flex-col w-full text-xl gap-10">
           <h2>Change Notes</h2>
           <MultiselectChangeNotes v-if="isEditing" v-model="changeNotes"/>
-          <div
-              v-if="!isEditing"
+          <div v-if="!isEditing">
+            <div
               v-for="change in releaseNote.changeNotes"
               :key="change.id" 
               class="flex flex-col gap-4"
@@ -196,6 +197,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
               <h3 class="text-lg">Upgrade Notes</h3>
               <p class="text-sm">{{ change.upgradeNotes }}</p>
             </div>
+          </div>
           </div>
         </div>
         </div>

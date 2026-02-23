@@ -1,0 +1,39 @@
+name: GitHub Actions Demo
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+jobs:
+  build-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run ESLint
+        run: pnpm eslint
+
+      - name: Build project
+        run: pnpm build
+      
+      - name: Upload static content artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: frontend-static-content
+          path: frontend/dist/

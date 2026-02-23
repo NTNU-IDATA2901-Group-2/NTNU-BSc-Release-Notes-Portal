@@ -11,8 +11,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
-import { SunMoon } from "lucide-vue-next"
-import { LogOut } from "lucide-vue-next"
+import { SunMoon } from "lucide-vue-next"
+import { LogOut } from "lucide-vue-next"
 import { useTheme } from '@/utils/theme';
 
 const { theme } = useTheme()
