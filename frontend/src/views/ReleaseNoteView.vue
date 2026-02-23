@@ -72,7 +72,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
     changeNotes.value = [...releaseNote.value.changeNotes]
 
     form.setValues({
-      tag: releaseNote.value.tag,
+      tag: releaseNote.value.tag ?? '',
       summary: releaseNote.value.summary ?? '',
       changeNoteIds: releaseNote.value.changeNotes.map(c => c.id),
       published: releaseNote.value.published,
