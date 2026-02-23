@@ -12,7 +12,7 @@ import {
 import { EllipsisVertical, Eye, FileDown, Pencil, Trash2 } from 'lucide-vue-next';
 import DeletePrompt from '../DeletePrompt.vue';
 import { ref } from 'vue';
-import { QueryClient, useMutation, useQueryClient } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { archiveChangeNote, publishChangeNote } from '@/api/change-note-api';
 import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';

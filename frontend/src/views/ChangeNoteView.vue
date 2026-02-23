@@ -7,7 +7,6 @@ import { ref } from 'vue';
 import { useGetChangeNote } from '@/api/change-note-api';
 import ChangeNoteEdit from '@/components/ChangeNote/ChangeNoteEdit.vue';
 import ChangeNoteDetail from '@/components/ChangeNote/ChangeNoteDetail.vue';
-import { router } from '@/utils/router';
 
 const route = useRoute();
 

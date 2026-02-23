@@ -177,8 +177,8 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
         <div class="flex flex-col w-full text-xl gap-10">
           <h2>Change Notes</h2>
           <MultiselectChangeNotes v-if="isEditing" v-model="changeNotes"/>
-          <div
-              v-if="!isEditing"
+          <div v-if="!isEditing">
+            <div
               v-for="change in releaseNote.changeNotes"
               :key="change.id" 
               class="flex flex-col gap-4"
@@ -196,6 +196,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
               <h3 class="text-lg">Upgrade Notes</h3>
               <p class="text-sm">{{ change.upgradeNotes }}</p>
             </div>
+          </div>
           </div>
         </div>
         </div>
