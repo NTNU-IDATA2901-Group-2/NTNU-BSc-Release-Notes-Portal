@@ -1,0 +1,20 @@
+meta {
+  name: delete_product_by_id
+  type: http
+  seq: 9
+}
+
+delete {
+  url: {{baseurl}}/products/{{product_create_product}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

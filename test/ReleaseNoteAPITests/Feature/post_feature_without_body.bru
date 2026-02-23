@@ -1,0 +1,26 @@
+meta {
+  name: post_feature_without_body
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseurl}}/features
+  body: none
+  auth: inherit
+}
+
+body:json {
+  {
+    "name" : "testFeature"
+  }
+}
+
+assert {
+  res.status: eq 500
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

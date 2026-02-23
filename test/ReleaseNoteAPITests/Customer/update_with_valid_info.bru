@@ -1,0 +1,26 @@
+meta {
+  name: update_with_valid_info
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{baseurl}}/customers/{{customer_create_customer}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name" : "ChangedTest"
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

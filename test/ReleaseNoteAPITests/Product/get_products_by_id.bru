@@ -1,0 +1,22 @@
+meta {
+  name: get_products_by_id
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseurl}}/products/{{product_create_product}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.body: isJson
+  res.body.id: eq {{product_create_product}}
+  res.body.name: eq testProduct
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

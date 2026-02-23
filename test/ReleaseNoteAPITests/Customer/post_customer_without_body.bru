@@ -1,0 +1,26 @@
+meta {
+  name: post_customer_without_body
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseurl}}/customers
+  body: none
+  auth: inherit
+}
+
+body:json {
+  {
+    "name" : "testCustomer"
+  }
+}
+
+assert {
+  res.status: eq 500
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

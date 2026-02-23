@@ -1,0 +1,20 @@
+meta {
+  name: get_customers_by_id_not
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseurl}}/customers/{{customer_create_customer}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 404
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

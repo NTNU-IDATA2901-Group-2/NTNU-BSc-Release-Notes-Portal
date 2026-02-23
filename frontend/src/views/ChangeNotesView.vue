@@ -42,6 +42,7 @@ const publishChangeNoteMutation = useMutation({
     mutationFn: (changeNoteId: number) => publishChangeNote(changeNoteId, true),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
+      toast.success(`Selected changenote published successfully!`);
     }
 });;
 

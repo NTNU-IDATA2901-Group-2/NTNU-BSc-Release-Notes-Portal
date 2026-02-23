@@ -6,8 +6,10 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.domain.entity.Product;
 import com.example.demo.domain.repository.ProductRepository;
+import com.example.demo.dto.CreateTagDTO;
 import com.example.demo.dto.ProductDTO;
 import com.example.demo.exception.ProductNotFoundException;
+import com.example.demo.exception.FailedToSaveEntityException;
 
 import lombok.AllArgsConstructor;
 
@@ -22,10 +24,14 @@ public class ProductService {
    * @param productDTO the DTO containing details for the new product
    * @return the ID of the created product
    */
-  public long createProduct(ProductDTO productDTO) {
+  public long createProduct(CreateTagDTO productDTO) {
     Product product = new Product();
     product.setName(productDTO.name());
-    return productRepository.save(product).getId();
+    try {
+      return productRepository.save(product).getId();
+    } catch (Exception _) {
+      throw new FailedToSaveEntityException("Failed to create product");
+    }
   }
 
   /**
@@ -60,11 +66,15 @@ public class ProductService {
    * @return a DTO representing the updated product
    * @throws ProductNotFoundException if no product with the given ID exists
    */
-  public ProductDTO updateProduct(long id, ProductDTO productDTO) {
+  public ProductDTO updateProduct(long id, CreateTagDTO productDTO) {
     Product product = productRepository.findById(id)
         .orElseThrow(() -> new ProductNotFoundException(id));
     product.setName(productDTO.name());
-    return ProductDTO.fromProduct(productRepository.save(product));
+    try {
+      return ProductDTO.fromProduct(productRepository.save(product));
+    } catch (Exception _) {
+      throw new FailedToSaveEntityException("Failed to update product with ID " + id);
+    }
   }
 
   /**

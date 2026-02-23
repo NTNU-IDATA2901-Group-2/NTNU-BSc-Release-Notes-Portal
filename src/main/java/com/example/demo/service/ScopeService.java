@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.domain.entity.Scope;
 import com.example.demo.domain.repository.ScopeRepository;
+import com.example.demo.dto.CreateTagDTO;
 import com.example.demo.dto.ScopeDTO;
+import com.example.demo.exception.FailedToSaveEntityException;
 import com.example.demo.exception.ScopeNotFoundException;
 
 import lombok.AllArgsConstructor;
@@ -15,17 +17,20 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class ScopeService {
   private final ScopeRepository scopeRepository;
-
   /**
    * Creates a new scope based on the provided DTO.
    *
    * @param scopeDTO the DTO containing details for the new scope
    * @return the ID of the created scope
    */
-  public long createScope(ScopeDTO scopeDTO) {
+  public long createScope(CreateTagDTO scopeDTO) {
     Scope scope = new Scope();
     scope.setName(scopeDTO.name());
-    return scopeRepository.save(scope).getId();
+    try {
+      return scopeRepository.save(scope).getId();
+    } catch (Exception _) {
+      throw new FailedToSaveEntityException("Failed to create scope");
+    }
   }
 
   /**
@@ -60,11 +65,18 @@ public class ScopeService {
    * @return a DTO representing the updated scope
    * @throws ScopeNotFoundException if no scope with the given ID exists
    */
-  public ScopeDTO updateScope(long id, ScopeDTO scopeDTO) {
+  public ScopeDTO updateScope(long id, CreateTagDTO scopeDTO) {
     Scope scope = scopeRepository.findById(id)
         .orElseThrow(() -> new ScopeNotFoundException(id));
     scope.setName(scopeDTO.name());
-    return ScopeDTO.fromScope(scopeRepository.save(scope));
+
+    try {
+      scopeRepository.save(scope);
+    } catch (Exception _) {
+      throw new FailedToSaveEntityException("Failed to update scope with ID " + id);
+    }
+
+    return ScopeDTO.fromScope(scope);
   }
 
   /**

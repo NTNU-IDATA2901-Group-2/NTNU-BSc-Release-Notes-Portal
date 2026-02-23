@@ -1,0 +1,22 @@
+meta {
+  name: get_scopes_by_id
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseurl}}/scopes/{{scope_create_scope}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.body: isJson
+  res.body.id: eq {{scope_create_scope}}
+  res.body.name: eq testScope
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

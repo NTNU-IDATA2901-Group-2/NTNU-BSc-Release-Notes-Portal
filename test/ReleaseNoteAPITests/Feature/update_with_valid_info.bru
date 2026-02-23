@@ -1,0 +1,26 @@
+meta {
+  name: update_with_valid_info
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{baseurl}}/features/{{feature_create_feature}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name" : "ChangedTest"
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
