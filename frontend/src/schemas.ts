@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const EditReleaseNoteSchema = z.object({
-  tag: z.string().min(1),
+  tag: z.string().optional(),
   summary: z.string().optional(),
   changeNoteIds: z.array(z.number()).optional(),
   published: z.boolean(),

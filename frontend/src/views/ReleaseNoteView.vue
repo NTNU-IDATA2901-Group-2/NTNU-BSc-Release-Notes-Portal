@@ -33,6 +33,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
   const id = route.params.id as string;
 
   const { isPending, isFetching, isError, data: releaseNote } = useReleaseNote(id);
+
   const { mutate: archiveReleaseNote } = useArchiveReleaseNote(id,
     {
       onSettled: () => {
@@ -72,7 +73,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
     changeNotes.value = [...releaseNote.value.changeNotes]
 
     form.setValues({
-      tag: releaseNote.value.tag,
+      tag: releaseNote.value.tag ?? '',
       summary: releaseNote.value.summary ?? '',
       changeNoteIds: releaseNote.value.changeNotes.map(c => c.id),
       published: releaseNote.value.published,
@@ -146,7 +147,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
                     </DropdownMenuItem>
                     <DropdownMenuItem @click="deletePromptOpen = true">
                       <div class="w-full flex gap-2">
-                          <p class="ml-auto text-text-dark-static">Archive</p>
+                          <p class="ml-auto text-text-dark-static">Delete</p>
                           <Trash2 class="text-text-dark-static"/>
                       </div>
                     </DropdownMenuItem>
