@@ -15,7 +15,8 @@ import { TagsInput, TagsInputInput, TagsInputItem, TagsInputItemDelete } from '@
 import type { ChangeNote } from '@/types'
 import { useGetChangeNotes } from '@/api/change-note-api'
 
-const { data: changeNotes } = useGetChangeNotes()
+const params = new URLSearchParams({ hasReleaseNote: 'false' })
+const { data: changeNotes } = useGetChangeNotes(params)
 
 const model = defineModel<ChangeNote[]>({ required: true })
 
