@@ -72,7 +72,7 @@ jobs:
         run: java -jar target/*.jar --spring.profiles.active=ci &
 
       - name: Run Bruno API Tests
-        run: bru run
+        run: bru run --env Local
         working-directory: test/ReleaseNoteAPITests
 
       - name: Upload spring-boot artifact
