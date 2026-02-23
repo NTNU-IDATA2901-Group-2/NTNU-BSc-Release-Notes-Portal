@@ -8,7 +8,6 @@ import Separator from '@/components/ui/separator/Separator.vue';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 import { TagsInput, TagsInputItemText } from '@/components/ui/tags-input';
 import TagsInputItem from '@/components/ui/tags-input/TagsInputItem.vue';
-import type { ChangeNote, ReleaseNote } from '@/types';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { Eye, FilePlus, LayersPlus, ListFilterPlus, Search } from 'lucide-vue-next';
 import { ref } from 'vue';
@@ -41,7 +40,7 @@ const queryClient = useQueryClient();
 
 const publishChangeNoteMutation = useMutation({
     mutationFn: (changeNoteId: number) => publishChangeNote(changeNoteId, true),
-    onSuccess: (_) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
     }
 });;
@@ -145,9 +144,10 @@ const handleCreateReleaseNote = () => {
           </TagsInput>
         </div>
 
-        <div v-for="changeNote in data" class="flex flex-col gap-4">
-          <ChangeNoteCard :key="changeNote.id" :selected="selectedItems.includes(changeNote.id)"
-            :changeNote="changeNote" @update:selected="toggleSelection(changeNote.id)" />
+        <div v-for="changeNote in data" :key="changeNote.id" class="flex flex-col gap-4">
+          <ChangeNoteCard
+:key="changeNote.id" :selected="selectedItems.includes(changeNote.id)"
+            :change-note="changeNote" @update:selected="toggleSelection(changeNote.id)" />
           <Separator />
         </div>
       </div>

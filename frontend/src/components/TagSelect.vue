@@ -33,7 +33,7 @@ const hookMap = {
     customer: useCustomers
 } as const
 
-const { isLoading, isError, data: tags } = hookMap[props.mode]()
+const { data: tags } = hookMap[props.mode]()
 
 const getTagFromId = (id?: number) => {
     if (id === undefined || id === -1) return 'None'
@@ -49,14 +49,14 @@ const currentValue = () => (props.modelValue ?? props.selectedId ?? -1).toString
     <Select :model-value="currentValue()" @update:model-value="(val) => emit('update:modelValue', val ? parseInt(val as string) : -1)">
     <SelectTrigger class="w-[180px]">
         <SelectValue 
-        :textValue="getTagFromId(parseInt(currentValue()))"/>
+        :text-value="getTagFromId(parseInt(currentValue()))"/>
     </SelectTrigger>
     <SelectContent>
         <SelectGroup>
         <SelectItem value="-1" class="text-text-primary/50">
             None
         </SelectItem>
-        <SelectItem v-for="tag in tags" :value="tag.id.toString()">
+        <SelectItem v-for="tag in tags" :key="tag.id" :value="tag.id.toString()">
             {{ tag.name }}
         </SelectItem>
         </SelectGroup>

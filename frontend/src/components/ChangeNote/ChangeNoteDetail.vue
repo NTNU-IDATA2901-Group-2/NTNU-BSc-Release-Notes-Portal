@@ -12,7 +12,7 @@ import {
 import { EllipsisVertical, Eye, FileDown, Pencil, Trash2 } from 'lucide-vue-next';
 import DeletePrompt from '../DeletePrompt.vue';
 import { ref } from 'vue';
-import { QueryClient, useMutation, useQueryClient } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { archiveChangeNote, publishChangeNote } from '@/api/change-note-api';
 import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';
@@ -73,7 +73,8 @@ const onPublishToggle = () => {
           <div class="flex items-center gap-4">
             <h1 class="text-2xl max-w-60 whitespace-nowrap overflow-hidden">{{
               changeNote.reference }}</h1>
-            <Badge class="h-6"
+            <Badge
+class="h-6"
               :variant="changeNote.published ? 'success' : 'destructive'">{{ changeNote.published ?
                 'Published' : 'Private' }}</Badge>
           </div>

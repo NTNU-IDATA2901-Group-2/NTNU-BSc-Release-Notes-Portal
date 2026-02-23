@@ -114,7 +114,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 <template>
   <div class="flex flex-col w-full items-center px-4 mb-20">
-  <DeletePrompt v-model:open="deletePromptOpen" :onConfirm="() =>archiveReleaseNote()" />
+  <DeletePrompt v-model:open="deletePromptOpen" :on-confirm="() =>archiveReleaseNote()" />
     <form class="w-full flex flex-col items-center" @submit="onSubmit">
       <Button variant="outline" class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10" @click="$router.back()"><ArrowLeft />Previous</Button>
       <div class="md:hidden flex w-full mt-4 justify-end gap-2">
@@ -177,8 +177,8 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
         <div class="flex flex-col w-full text-xl gap-10">
           <h2>Change Notes</h2>
           <MultiselectChangeNotes v-if="isEditing" v-model="changeNotes"/>
-          <div
-              v-if="!isEditing"
+          <div v-if="!isEditing">
+            <div
               v-for="change in releaseNote.changeNotes"
               :key="change.id" 
               class="flex flex-col gap-4"
@@ -196,6 +196,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
               <h3 class="text-lg">Upgrade Notes</h3>
               <p class="text-sm">{{ change.upgradeNotes }}</p>
             </div>
+          </div>
           </div>
         </div>
         </div>
