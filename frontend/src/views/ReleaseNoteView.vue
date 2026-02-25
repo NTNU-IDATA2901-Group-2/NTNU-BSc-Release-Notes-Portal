@@ -147,7 +147,8 @@ const publishReleaseNoteMutation = useMutation({
       <Spinner v-if="isPending || isFetching" />
       <h1 v-if="isError">Error retreiving release note</h1>
 
-      <div v-if="!isPending && !isFetching && !isError && releaseNote"
+      <div 
+        v-if="!isPending && !isFetching && !isError && releaseNote"
         class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
         <div class="flex flex-col gap-4 w-full">
           <div class="flex flex-row items-center justify-between w-full">
@@ -155,7 +156,8 @@ const publishReleaseNoteMutation = useMutation({
               <h1 v-if="!isEditing" class="text-2xl max-w-60 whitespace-nowrap overflow-hidden">{{
                 releaseNote.tag }}</h1>
               <Input v-if="isEditing" class="w-full" v-model="tag" />
-              <Badge v-if="!isEditing" class="h-6"
+              <Badge 
+                v-if="!isEditing" class="h-6"
                 :variant="releaseNote.published ? 'success' : 'destructive'">{{
                   releaseNote.published ? 'Published' : 'Private' }}</Badge>
             </div>
@@ -182,7 +184,8 @@ const publishReleaseNoteMutation = useMutation({
                     <div class="w-full flex gap-2">
                       <p class="ml-auto text-text-dark-static">{{ !releaseNote.published ? 'Publish'
                         : 'Unpublish' }}</p>
-                      <component :is="!releaseNote.published ? Eye : EyeOff"
+                      <component 
+                        :is="!releaseNote.published ? Eye : EyeOff"
                         class="text-text-dark-static" />
                     </div>
                   </DropdownMenuItem>
@@ -194,7 +197,8 @@ const publishReleaseNoteMutation = useMutation({
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Button class="hidden md:flex" v-if="isEditing" variant="outline"
+              <Button 
+                class="hidden md:flex" v-if="isEditing" variant="outline"
                 @click="isEditing = false">Cancel
                 <Ban />
               </Button>
@@ -213,7 +217,8 @@ const publishReleaseNoteMutation = useMutation({
             <h2>Change Notes</h2>
             <MultiselectChangeNotes v-if="isEditing" v-model="changeNotes" />
             <div v-if="!isEditing">
-              <div v-for="change in releaseNote.changeNotes" :key="change.id"
+              <div 
+                v-for="change in releaseNote.changeNotes" :key="change.id"
                 class="flex flex-col gap-4">
                 <h3 class="text-lg">{{ change.reference }}</h3>
                 <div>
