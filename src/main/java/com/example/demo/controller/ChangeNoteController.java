@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.dto.CreateChangeNoteDTO;
 import com.example.demo.dto.ChangeNoteDTO;
+import com.example.demo.dto.CreateChangeNoteDTO;
 import com.example.demo.service.ChangeNoteService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -70,9 +70,15 @@ public class ChangeNoteController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @GetMapping("")
-  public ResponseEntity<List<ChangeNoteDTO>> getAllChangeNotes() {
-    List<ChangeNoteDTO> changeNotes = changeNoteService.getAllChangeNotes();
-    logger.info("Retrieved {} change notes", changeNotes.size());
+  public ResponseEntity<List<ChangeNoteDTO>> getAllChangeNotes(
+    @RequestParam(required = false) Boolean published,
+    @RequestParam(required = false) Long customerId,
+    @RequestParam(required = false) Long featureId,
+    @RequestParam(required = false) Long scopeId,
+    @RequestParam(required = false) Long productId
+    ) {
+    List<ChangeNoteDTO> changeNotes = changeNoteService.getAllChangeNotes(published, customerId, featureId, scopeId, productId);
+    logger.info("Retrieved {} change notes with filters - published: {}, customerId: {}, featureId: {}, scopeId: {}, productId: {}", changeNotes.size(), published, customerId, featureId, scopeId, productId);
     return ResponseEntity.ok(changeNotes);
   }
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useReleaseNotes } from '@/api/release-note-api';
+import { useGetReleaseNotes } from '@/api/release-note-api';
 import ReleaseNoteCard from '@/components/ReleaseNoteCard.vue';
 import Button from '@/components/ui/button/Button.vue';
 import { InputGroup, InputGroupInput } from '@/components/ui/input-group';
@@ -8,7 +8,7 @@ import Spinner from '@/components/ui/spinner/Spinner.vue';
 import { ListFilterPlus, Search } from 'lucide-vue-next';
 import { ref } from 'vue';
 
-const { isLoading, isFetching, isError, data } = useReleaseNotes();
+const { isLoading, isFetching, isError, data } = useGetReleaseNotes();
 
 const selectedItems = ref<number[]>([]);
 

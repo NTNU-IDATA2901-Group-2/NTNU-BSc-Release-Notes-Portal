@@ -1,0 +1,26 @@
+meta {
+  name: get_all_multiple_filters
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseurl}}/changenotes?customerId=1&productId=2
+  body: none
+  auth: inherit
+}
+
+params:query {
+  customerId: 1
+  productId: 2
+}
+
+assert {
+  res.body: length 0
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

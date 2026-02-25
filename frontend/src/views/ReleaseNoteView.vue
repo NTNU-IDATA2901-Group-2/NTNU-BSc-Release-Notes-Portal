@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useReleaseNote, useArchiveReleaseNote, updateReleaseNote, publishReleaseNote } from '@/api/release-note-api';
+import { useGetReleaseNote, useArchiveReleaseNote, updateReleaseNote, publishReleaseNote } from '@/api/release-note-api';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 
 import { Pencil, Trash2, Eye, EyeOff, FileDown, Ban, Save, ArrowLeft, EllipsisVertical } from "lucide-vue-next"
@@ -32,7 +32,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
   const id = route.params.id as string;
 
-  const { isPending, isFetching, isError, data: releaseNote } = useReleaseNote(id);
+  const { isPending, isFetching, isError, data: releaseNote } = useGetReleaseNote(id);
 
   const { mutate: archiveReleaseNote } = useArchiveReleaseNote(id,
     {

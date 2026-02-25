@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 
@@ -49,6 +50,10 @@ public class ChangeNoteService {
       changeNote.setDeveloperNotes(changeNoteDTO.developerNotes());
       changeNote.setUpgradeNotes(changeNoteDTO.upgradeNotes());
       changeNote.setChangeSource(changeNoteDTO.changeSource());
+      
+      if (changeNoteDTO.published() != null) {
+        changeNote.setPublished(changeNoteDTO.published());
+      }
 
       if (changeNoteDTO.productId() != null) {
         changeNote.setProduct(productRepository.findById(changeNoteDTO.productId())
@@ -93,10 +98,30 @@ public class ChangeNoteService {
    * 
    * @return a list of all change notes
    */
-  public List<ChangeNoteDTO> getAllChangeNotes() {
-    return changeNoteRepository.findByArchivedFalse().stream()
-        .map(ChangeNoteDTO::fromChangeNote)
-        .toList();
+  public List<ChangeNoteDTO> getAllChangeNotes(Boolean published, Long customerId, Long featureId, Long scopeId, Long productId) {
+    Stream<ChangeNote> changeNoteStream = changeNoteRepository.findByArchivedFalse().stream();
+
+    if (published != null) {
+      changeNoteStream = changeNoteStream.filter(cn -> published.equals(cn.isPublished()));
+    }
+
+    if (customerId != null) {
+      changeNoteStream = changeNoteStream.filter(cn -> cn.getCustomer() != null && customerId.equals(cn.getCustomer().getId()));
+    }
+
+    if (featureId != null) {
+      changeNoteStream = changeNoteStream.filter(cn -> cn.getFeature() != null && featureId.equals(cn.getFeature().getId()));
+    }
+
+    if (scopeId != null) {
+      changeNoteStream = changeNoteStream.filter(cn -> cn.getScope() != null && scopeId.equals(cn.getScope().getId()));
+    }
+
+    if (productId != null) {
+      changeNoteStream = changeNoteStream.filter(cn -> cn.getProduct() != null && productId.equals(cn.getProduct().getId()));
+    }
+
+    return changeNoteStream.map(ChangeNoteDTO::fromChangeNote).toList();
   }
 
   /**
