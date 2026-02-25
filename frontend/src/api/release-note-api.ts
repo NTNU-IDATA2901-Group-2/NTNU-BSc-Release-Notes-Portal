@@ -22,7 +22,7 @@ export const createReleaseNote = async (selectedItems: number[]) => {
  * @throws An error if the API request to retrieve the release note fails or if the provided ID is invalid.
  * @returns A promise that resolves to the release note data retrieved from the API.
  */
-export const useReleaseNote = (id: string) => useQuery<ReleaseNote>({
+export const useGetReleaseNote = (id: string) => useQuery<ReleaseNote>({
   queryKey: ['releaseNote', id],
   queryFn: () => getReleaseNote(id),
 });
@@ -50,7 +50,7 @@ const getReleaseNote = async (id: string): Promise<ReleaseNote> => {
  * @throws An error if the API request to retrieve the release notes fails.
  * @returns A promise that resolves to an array of release note data retrieved from the API.
  */
-export const useReleaseNotes = () => useQuery<ReleaseNote[]>({
+export const useGetReleaseNotes = () => useQuery<ReleaseNote[]>({
   queryKey: ['releaseNotes'],
   queryFn: () => getReleaseNotes(),
 });

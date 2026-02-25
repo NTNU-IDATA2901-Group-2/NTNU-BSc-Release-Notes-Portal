@@ -1,0 +1,26 @@
+meta {
+  name: get_all_filter_scopeId
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseurl}}/changenotes?scopeId=2
+  body: none
+  auth: inherit
+}
+
+params:query {
+  scopeId: 2
+}
+
+assert {
+  res.body[0].id: eq {{change_id_2}}
+  res.body: length 1
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
