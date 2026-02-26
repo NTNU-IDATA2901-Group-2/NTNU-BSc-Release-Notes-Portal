@@ -94,15 +94,18 @@ public class ReleaseNoteController {
    *
    * @return a ResponseEntity with a 200 status and a list of ReleaseNoteDTOs in the body
    */
-  @Operation(summary = "Get all release notes", description = "Retrieves a list of all release notes")
+  @Operation(summary = "Get all release notes, with optional filters", description = "Retrieves a list of all release notes with optional filters")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Release notes retrieved successfully"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @GetMapping("")
-  public ResponseEntity<List<ReleaseNoteDTO>> getAllReleaseNotes() {
-      List<ReleaseNoteDTO> releaseNotes = releaseNoteService.getAllReleaseNotes();
-      logger.info("Retrieved {} release notes", releaseNotes.size());
+  public ResponseEntity<List<ReleaseNoteDTO>> getAllReleaseNotes(
+    @RequestParam(required = false) String query,
+    @RequestParam(required = false) Boolean published
+  ) {
+      List<ReleaseNoteDTO> releaseNotes = releaseNoteService.getAllReleaseNotes(query, published);
+      logger.info("Retrieved {} release notes with filters - query: {}, published: {}", releaseNotes.size(), query, published);
       return ResponseEntity.ok(releaseNotes);
   }
 

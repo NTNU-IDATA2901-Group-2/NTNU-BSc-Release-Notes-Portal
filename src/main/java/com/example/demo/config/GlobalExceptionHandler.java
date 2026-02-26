@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -67,6 +68,18 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleScopeNotFoundException(ScopeNotFoundException e) {
     logger.warn("Scope not found: {}", e.getScopeId());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Scope with ID %d not found", e.getScopeId()));
+  }
+
+
+  /**
+   * Handles the case where a message is not readable. Logs the event and returns a 400 response with a message indicating the message is not readable.
+   * @param e the exception containing details about the unreadable message
+   * @return a ResponseEntity with a 400 status and a message indicating that the message is not readable
+   */
+  @ExceptionHandler(value = {HttpMessageNotReadableException.class})
+  public ResponseEntity<String> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+    logger.warn("Message not readable: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Message not readable");
   }
 
   /**
