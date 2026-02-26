@@ -76,7 +76,8 @@ jobs:
           for i in {1..60}
           do
             if curl http://localhost:8080/actuator/health | grep "\"status\":\"UP\"" then
-            echo "Spring boot has started"
+              echo "Spring boot has started"
+              break
             fi
             echo "Waiting for spring boot..."
           done
