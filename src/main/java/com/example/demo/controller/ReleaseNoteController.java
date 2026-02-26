@@ -101,12 +101,11 @@ public class ReleaseNoteController {
   })
   @GetMapping("")
   public ResponseEntity<List<ReleaseNoteDTO>> getAllReleaseNotes(
-    @RequestParam(required = false) String tag,
-    @RequestParam(required = false) String summary,
+    @RequestParam(required = false) String query,
     @RequestParam(required = false) Boolean published
   ) {
-      List<ReleaseNoteDTO> releaseNotes = releaseNoteService.getAllReleaseNotes(tag, summary, published);
-      logger.info("Retrieved {} release notes with filters - tag: {}, summary: {}, published: {}", releaseNotes.size(), tag, summary, published);
+      List<ReleaseNoteDTO> releaseNotes = releaseNoteService.getAllReleaseNotes(query, published);
+      logger.info("Retrieved {} release notes with filters - query: {}, published: {}", releaseNotes.size(), query, published);
       return ResponseEntity.ok(releaseNotes);
   }
 

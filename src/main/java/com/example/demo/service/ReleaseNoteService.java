@@ -81,32 +81,15 @@ public class ReleaseNoteService {
   }
 
   /**
-   * Retrieves a list of all non-archived release notes with optional filters for tag, summary, and published status.
+   * Retrieves a list of all non-archived release notes with optional filters for query and published status.
    *
-   * @param tag optional filter for release note tag
-   * @param summary optional filter for release note summary
+   * @param query optional filter for release note tag or summary containing the query string (case-insensitive)
    * @param published optional filter for release note published status
    *
    * @return a list of ReleaseNoteDTOs representing all non-archived release notes that match the provided filters
    */
-  public List<ReleaseNoteDTO> getAllReleaseNotes(String tag, String summary, Boolean published) {
-    List<ReleaseNote> releaseNotes = releaseNoteRepository.findAll();
-
-    Stream<ReleaseNote> releaseNoteStream = releaseNotes.stream().filter(releaseNote -> !releaseNote.getArchived());
-
-    if (tag != null) {
-      releaseNoteStream = releaseNoteStream.filter(rn -> rn.getTag() != null && rn.getTag().toLowerCase().contains(tag.toLowerCase()));
-    }
-
-    if (summary != null) {
-      releaseNoteStream = releaseNoteStream.filter(rn -> rn.getSummary() != null && rn.getSummary().toLowerCase().contains(summary.toLowerCase()));
-    }
-
-    if (published != null) {
-      releaseNoteStream = releaseNoteStream.filter(rn -> published.equals(rn.getPublished()));
-    }
-
-    return releaseNoteStream.map(ReleaseNoteDTO::fromReleaseNote).toList();
+  public List<ReleaseNoteDTO> getAllReleaseNotes(String query, Boolean published) {
+    return releaseNoteRepository.findByArchivedFalseAndContainingQuery(query).stream().map(ReleaseNoteDTO::fromReleaseNote).toList();
   }
 
   /**
