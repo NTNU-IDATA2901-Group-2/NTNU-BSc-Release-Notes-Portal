@@ -1,21 +1,21 @@
 meta {
-  name: get_all_filter_featureId
+  name: get_all_filter_description
   type: http
-  seq: 13
+  seq: 7
 }
 
 get {
-  url: {{baseurl}}/changenotes?featureId=1
+  url: {{baseurl}}/changenotes?query=what changed for
   body: none
   auth: inherit
 }
 
 params:query {
-  featureId: 1
+  query: what changed for
 }
 
 assert {
-  res.body[0].id: eq {{change_id_1}}
+  res.body[0].id: eq {{change_id_2}}
   res.body: length 1
   res.status: eq 200
 }

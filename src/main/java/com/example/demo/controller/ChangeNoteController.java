@@ -64,21 +64,22 @@ public class ChangeNoteController {
   }
 
 
-  @Operation(summary = "Get all change notes, with optional filters", description = "Retrieves a list of all change notes with optional filters for published status, customer, feature, scope, and product")
+  @Operation(summary = "Get all change notes, with optional filters", description = "Retrieves a list of all change notes with optional filters for query, published status, customer, feature, scope, and product")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "Change notes retrieved successfully"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @GetMapping("")
   public ResponseEntity<List<ChangeNoteDTO>> getAllChangeNotes(
+    @RequestParam(required = false) String query,
     @RequestParam(required = false) Boolean published,
     @RequestParam(required = false) Long customerId,
     @RequestParam(required = false) Long featureId,
     @RequestParam(required = false) Long scopeId,
     @RequestParam(required = false) Long productId
     ) {
-    List<ChangeNoteDTO> changeNotes = changeNoteService.getAllChangeNotes(published, customerId, featureId, scopeId, productId);
-    logger.info("Retrieved {} change notes with filters - published: {}, customerId: {}, featureId: {}, scopeId: {}, productId: {}", changeNotes.size(), published, customerId, featureId, scopeId, productId);
+    List<ChangeNoteDTO> changeNotes = changeNoteService.getAllChangeNotes(query, published, customerId, featureId, scopeId, productId);
+    logger.info("Retrieved {} change notes with filters - query: {}, published: {}, customerId: {}, featureId: {}, scopeId: {}, productId: {}", changeNotes.size(), query, published, customerId, featureId, scopeId, productId);
     return ResponseEntity.ok(changeNotes);
   }
 

@@ -1,7 +1,6 @@
 package com.example.demo.service;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 
@@ -94,8 +93,9 @@ public class ChangeNoteService {
   }
 
   /**
-   * Retrieves all change notes from the repository, with optional filtering based on published status, customer ID, feature ID, scope ID, and product ID.
+   * Retrieves all change notes from the repository, with optional filtering based on query, published status, customer ID, feature ID, scope ID, and product ID.
    * 
+   * @param query        optional filter for searching change notes by reference, description, developer notes, upgrade notes, or change source
    * @param published    optional filter for published status
    * @param customerId   optional filter for customer ID
    * @param featureId    optional filter for feature ID
@@ -104,30 +104,10 @@ public class ChangeNoteService {
    * 
    * @return a list of all change notes that match the provided filters, mapped to ChangeNoteDTOs
    */
-  public List<ChangeNoteDTO> getAllChangeNotes(Boolean published, Long customerId, Long featureId, Long scopeId, Long productId) {
-    Stream<ChangeNote> changeNoteStream = changeNoteRepository.findByArchivedFalse().stream();
-
-    if (published != null) {
-      changeNoteStream = changeNoteStream.filter(cn -> published.equals(cn.isPublished()));
-    }
-
-    if (customerId != null) {
-      changeNoteStream = changeNoteStream.filter(cn -> cn.getCustomer() != null && customerId.equals(cn.getCustomer().getId()));
-    }
-
-    if (featureId != null) {
-      changeNoteStream = changeNoteStream.filter(cn -> cn.getFeature() != null && featureId.equals(cn.getFeature().getId()));
-    }
-
-    if (scopeId != null) {
-      changeNoteStream = changeNoteStream.filter(cn -> cn.getScope() != null && scopeId.equals(cn.getScope().getId()));
-    }
-
-    if (productId != null) {
-      changeNoteStream = changeNoteStream.filter(cn -> cn.getProduct() != null && productId.equals(cn.getProduct().getId()));
-    }
-
-    return changeNoteStream.map(ChangeNoteDTO::fromChangeNote).toList();
+  public List<ChangeNoteDTO> getAllChangeNotes(String query, Boolean published, Long customerId, Long featureId, Long scopeId, Long productId) {
+    return changeNoteRepository
+        .findByArchivedFalseAndMatchingFilterParameters(query, published, customerId, featureId, scopeId, productId)
+        .stream().map(ChangeNoteDTO::fromChangeNote).toList();
   }
 
   /**

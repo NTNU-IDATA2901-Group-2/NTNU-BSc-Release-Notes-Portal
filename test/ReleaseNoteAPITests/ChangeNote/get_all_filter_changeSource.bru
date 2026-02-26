@@ -1,17 +1,17 @@
 meta {
-  name: get_all_filter_featureId
+  name: get_all_filter_changeSource
   type: http
-  seq: 13
+  seq: 10
 }
 
 get {
-  url: {{baseurl}}/changenotes?featureId=1
+  url: {{baseurl}}/changenotes?query=source of
   body: none
   auth: inherit
 }
 
 params:query {
-  featureId: 1
+  query: source of
 }
 
 assert {

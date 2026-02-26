@@ -1,4 +1,4 @@
-name: GitHub Actions Demo
+name: CI Frontend & Backend
 on:
   push:
     branches:
@@ -70,6 +70,18 @@ jobs:
 
       - name: Run spring-boot application
         run: java -jar target/*.jar --spring.profiles.active=ci &
+
+      - name: Wait for spring-boot
+        run: |
+          for i in {1..60}
+          do
+            if curl -s http://localhost:8080/actuator/health | grep '"status":"UP"'; then
+              echo "Spring boot has started"
+              break
+            fi
+            echo "Waiting for spring boot..."
+            sleep 1s
+          done
 
       - name: Run Bruno API Tests
         run: bru run --env Local
