@@ -1,7 +1,6 @@
-import { config } from "@/constants";
 import type { Feature } from "@/types";
 import { useQuery } from "@tanstack/vue-query";
-import axios from "axios";
+import api from "./api";
 
 /**
  * Retrieves a list of all features.
@@ -22,6 +21,6 @@ export const useFeatures = () => useQuery({
  * @returns A promise that resolves to an array of feature data retrieved from the API.
  */
 const getFeatures = async () => {
-  const response = await axios.get(`${config.API_URL}features`)
+  const response = await api.get(`features`)
   return response.data as Feature[];
 }

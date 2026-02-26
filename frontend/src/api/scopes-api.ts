@@ -1,7 +1,6 @@
-import { config } from "@/constants";
 import type { Scope } from "@/types";
 import { useQuery } from "@tanstack/vue-query";
-import axios from "axios";
+import api from "./api";
 
 /**
  * Retrieves a list of all scopes.
@@ -22,6 +21,6 @@ export const useScopes = () => useQuery({
  * @returns A promise that resolves to an array of scope data retrieved from the API.
  */
 const getScopes = async () => {
-  const response = await axios.get(`${config.API_URL}scopes`)
+  const response = await api.get(`scopes`)
   return response.data as Scope[];
 }
