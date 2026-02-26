@@ -1,0 +1,26 @@
+meta {
+  name: get_all_filter_tag
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseurl}}/releasenotes?tag=1.
+  body: none
+  auth: inherit
+}
+
+params:query {
+  tag: 1.
+}
+
+assert {
+  res.status: eq 200
+  res.body.length: eq 1
+  res.body[0].id: eq {{release_id_1}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

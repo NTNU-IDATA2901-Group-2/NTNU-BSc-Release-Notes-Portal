@@ -94,9 +94,15 @@ public class ChangeNoteService {
   }
 
   /**
-   * Retrieves all change notes from the repository.
+   * Retrieves all change notes from the repository, with optional filtering based on published status, customer ID, feature ID, scope ID, and product ID.
    * 
-   * @return a list of all change notes
+   * @param published    optional filter for published status
+   * @param customerId   optional filter for customer ID
+   * @param featureId    optional filter for feature ID
+   * @param scopeId      optional filter for scope ID
+   * @param productId    optional filter for product ID
+   * 
+   * @return a list of all change notes that match the provided filters, mapped to ChangeNoteDTOs
    */
   public List<ChangeNoteDTO> getAllChangeNotes(Boolean published, Long customerId, Long featureId, Long scopeId, Long productId) {
     Stream<ChangeNote> changeNoteStream = changeNoteRepository.findByArchivedFalse().stream();

@@ -64,7 +64,7 @@ public class ChangeNoteController {
   }
 
 
-  @Operation(summary = "Get all change notes", description = "Retrieves a list of all change notes")
+  @Operation(summary = "Get all change notes, with optional filters", description = "Retrieves a list of all change notes with optional filters for published status, customer, feature, scope, and product")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "Change notes retrieved successfully"),
     @ApiResponse(responseCode = "500", description = "Internal server error")

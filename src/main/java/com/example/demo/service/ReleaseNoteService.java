@@ -3,6 +3,7 @@ package com.example.demo.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import com.example.demo.dto.ReleaseNoteDTO;
 import com.example.demo.exception.ChangeNoteNotFoundException;
 import com.example.demo.exception.ReleaseNoteNotFoundException;
 import com.example.demo.exception.ChangeNoteAlreadyHasReleaseNoteException;
+
 import lombok.AllArgsConstructor;
 
 /**
@@ -79,16 +81,32 @@ public class ReleaseNoteService {
   }
 
   /**
-   * Retrieves a list of all non-archived release notes.
+   * Retrieves a list of all non-archived release notes with optional filters for tag, summary, and published status.
    *
-   * @return a list of ReleaseNoteDTOs representing all non-archived release notes
+   * @param tag optional filter for release note tag
+   * @param summary optional filter for release note summary
+   * @param published optional filter for release note published status
+   *
+   * @return a list of ReleaseNoteDTOs representing all non-archived release notes that match the provided filters
    */
-  public List<ReleaseNoteDTO> getAllReleaseNotes() {
+  public List<ReleaseNoteDTO> getAllReleaseNotes(String tag, String summary, Boolean published) {
     List<ReleaseNote> releaseNotes = releaseNoteRepository.findAll();
-    return releaseNotes.stream()
-        .filter(releaseNote -> !releaseNote.getArchived())
-        .map(ReleaseNoteDTO::fromReleaseNote)
-        .toList();
+
+    Stream<ReleaseNote> releaseNoteStream = releaseNotes.stream().filter(releaseNote -> !releaseNote.getArchived());
+
+    if (tag != null) {
+      releaseNoteStream = releaseNoteStream.filter(rn -> rn.getTag() != null && rn.getTag().toLowerCase().contains(tag.toLowerCase()));
+    }
+
+    if (summary != null) {
+      releaseNoteStream = releaseNoteStream.filter(rn -> rn.getSummary() != null && rn.getSummary().toLowerCase().contains(summary.toLowerCase()));
+    }
+
+    if (published != null) {
+      releaseNoteStream = releaseNoteStream.filter(rn -> published.equals(rn.getPublished()));
+    }
+
+    return releaseNoteStream.map(ReleaseNoteDTO::fromReleaseNote).toList();
   }
 
   /**
