@@ -1,17 +1,17 @@
 meta {
-  name: get_all_filter_featureId
+  name: get_all_filter_developerNotes
   type: http
-  seq: 13
+  seq: 8
 }
 
 get {
-  url: {{baseurl}}/changenotes?featureId=1
+  url: {{baseurl}}/changenotes?query=hello de
   body: none
   auth: inherit
 }
 
 params:query {
-  featureId: 1
+  query: hello de
 }
 
 assert {
