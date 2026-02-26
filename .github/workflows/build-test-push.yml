@@ -71,6 +71,16 @@ jobs:
       - name: Run spring-boot application
         run: java -jar target/*.jar --spring.profiles.active=ci &
 
+      - name: Wait for spring-boot
+        run: |
+          for i in {1..60}
+          do
+            if curl http://localhost:8080/actuator/health | grep "\"status\":\"UP\"" then
+            echo "Spring boot has started"
+            fi
+            echo "Waiting for spring boot..."
+          done
+
       - name: Run Bruno API Tests
         run: bru run --env Local
         working-directory: test/ReleaseNoteAPITests
