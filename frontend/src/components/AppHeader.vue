@@ -14,8 +14,18 @@ import {
 import { SunMoon } from "lucide-vue-next"
 import { LogOut } from "lucide-vue-next"
 import { useTheme } from '@/utils/theme';
+import keycloak, { isAuthenticated } from '@/utils/keycloak';
 
 const { theme } = useTheme()
+
+const handleLogOut = () => {
+	keycloak.logout({
+		redirectUri: `${window.location.origin}${routeNames.signIn}`
+	}).then(() => {
+	}).catch(err => {
+		console.error('Keycloak logout error:', err);
+	});
+}
 
 </script>
 
@@ -24,10 +34,10 @@ const { theme } = useTheme()
 	<div class="flex items-center h-20 px-8 gap-12">
 	    <img :src="logoSvg" alt="Logo" class="w-50 h-7.5" />
 	    <nav class="hidden md:flex flex-row gap-12 ">
-		<RouterLink class="text-xl text-text-dark-static" :to="routeNames.releaseNotes">Release Notes</RouterLink>
-		<RouterLink class="text-xl text-text-dark-static" :to="routeNames.changeNotes">Change Notes</RouterLink>
+		<RouterLink v-if="isAuthenticated" class="text-md text-text-dark-static hover:underline" :to="routeNames.releaseNotes">Release Notes</RouterLink>
+		<RouterLink v-if="isAuthenticated" class="text-md text-text-dark-static hover:underline" :to="routeNames.changeNotes">Change Notes</RouterLink>
 	    </nav>
-	    <DropdownMenu >
+	    <DropdownMenu v-if="isAuthenticated">
 		<DropdownMenuTrigger class="ml-auto cursor-pointer">
 		    <Avatar class=" w-10 h-10 items-center justify-center">
 			<p class="text-sm font-bold text-text-light-static">LL</p>
@@ -40,7 +50,7 @@ const { theme } = useTheme()
 			    <SunMoon class="text-text-dark-static"/>
 			</div>
 		    </DropdownMenuItem>
-		    <DropdownMenuItem disabled>
+		    <DropdownMenuItem @click="handleLogOut">
 			<div class="w-full flex gap-2">
 			    <p class="ml-auto text-text-dark-static">Sign out</p>
 			    <LogOut class="text-text-dark-static"/>
