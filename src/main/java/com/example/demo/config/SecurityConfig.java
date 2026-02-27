@@ -10,6 +10,10 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * Security configuration for the application. This configuration is applied only for 'dev' and 'prod' profiles.
+ * Responsible for setting up JWT authentication and defining access rules for endpoints.  
+ */
 @Configuration
 @Profile({"dev", "prod"}) // Apply this security configuration only for 'dev' and 'prod' profiles
 @EnableWebSecurity
@@ -20,7 +24,7 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .cors(cors -> {})
-            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // REST API
+            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/public/**").permitAll()
                 .anyRequest().authenticated()
