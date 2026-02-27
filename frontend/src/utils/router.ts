@@ -32,7 +32,7 @@ export const router = createRouter({
 })
 
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, _from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (keycloak.authenticated) {
       next();
