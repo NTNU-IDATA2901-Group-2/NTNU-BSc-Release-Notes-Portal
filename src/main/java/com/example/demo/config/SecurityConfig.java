@@ -4,7 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
@@ -15,8 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
  * Responsible for setting up JWT authentication and defining access rules for endpoints.  
  */
 @Configuration
-@Profile({"dev", "prod"}) // Apply this security configuration only for 'dev' and 'prod' profiles
-@EnableWebSecurity
+@Profile({"dev", "prod"}) // Only load this configuration for 'dev' and 'prod' profiles
 public class SecurityConfig {
 
     @Bean
