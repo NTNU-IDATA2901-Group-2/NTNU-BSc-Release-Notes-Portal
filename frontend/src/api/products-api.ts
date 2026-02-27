@@ -1,4 +1,4 @@
-import type { Product } from "@/types";
+import type { Product } from "@/utils/types";
 import { useQuery } from "@tanstack/vue-query";
 import api from "./api";
 

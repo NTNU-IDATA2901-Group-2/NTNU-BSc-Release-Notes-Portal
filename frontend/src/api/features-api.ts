@@ -1,4 +1,4 @@
-import type { Feature } from "@/types";
+import type { Feature } from "@/utils/types";
 import { useQuery } from "@tanstack/vue-query";
 import api from "./api";
 

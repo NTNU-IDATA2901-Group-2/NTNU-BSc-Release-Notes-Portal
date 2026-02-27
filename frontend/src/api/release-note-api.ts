@@ -1,4 +1,4 @@
-import type { OnApiCallFinished, PersistReleaseNoteDTO, ReleaseNote } from "@/types"
+import type { OnApiCallFinished, PersistReleaseNoteDTO, ReleaseNote } from "@/utils/types"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import api from "./api";
 

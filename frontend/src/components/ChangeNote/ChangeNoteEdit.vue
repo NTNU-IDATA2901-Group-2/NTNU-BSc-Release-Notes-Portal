@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ChangeNote, PersistChangeNoteDTO } from '@/types';
+import type { ChangeNote, PersistChangeNoteDTO } from '@/utils/types';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { Ban, Save } from 'lucide-vue-next';

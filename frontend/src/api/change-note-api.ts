@@ -1,5 +1,4 @@
-import { config } from "@/constants";
-import type { ChangeNote, PersistChangeNoteDTO } from "@/types";
+import type { ChangeNote, PersistChangeNoteDTO } from "@/utils/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import api from "./api";
 

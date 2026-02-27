@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PrimitiveProps } from 'reka-ui';
 import Badge from './ui/badge/Badge.vue';
-import type { ChangeNote } from '@/types';
+import type { ChangeNote } from '@/utils/types';
 import { Checkbox } from './ui/checkbox';
 
 const props = defineProps<PrimitiveProps & {

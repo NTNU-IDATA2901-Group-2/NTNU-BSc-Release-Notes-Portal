@@ -1,4 +1,4 @@
-import type { Scope } from "@/types";
+import type { Scope } from "@/utils/types";
 import { useQuery } from "@tanstack/vue-query";
 import api from "./api";
 
