@@ -14,7 +14,8 @@ import {
 import { SunMoon } from "lucide-vue-next"
 import { LogOut } from "lucide-vue-next"
 import { useTheme } from '@/utils/theme';
-import keycloak, { isAuthenticated } from '@/utils/keycloak';
+import keycloak, { isAuthenticated, jwtTokenDecoded } from '@/utils/keycloak';
+import { computed } from 'vue';
 
 const { theme } = useTheme()
 
@@ -26,6 +27,15 @@ const handleLogOut = () => {
 		console.error('Keycloak logout error:', err);
 	});
 }
+
+const firstLetters = computed(() => {
+	if (!isAuthenticated.value) return '';
+	if (!jwtTokenDecoded.value) return '';
+
+	const firstName = jwtTokenDecoded.value.family_name || '';
+	const lastName = jwtTokenDecoded.value.given_name || '';
+	return firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase();
+})
 
 </script>
 
@@ -40,7 +50,7 @@ const handleLogOut = () => {
 	    <DropdownMenu v-if="isAuthenticated">
 		<DropdownMenuTrigger class="ml-auto cursor-pointer">
 		    <Avatar class=" w-10 h-10 items-center justify-center">
-			<p class="text-sm font-bold text-text-light-static">LL</p>
+			<p class="text-sm font-bold text-text-light-static">{{ firstLetters }}</p>
 		    </Avatar>
 		</DropdownMenuTrigger>
 		<DropdownMenuContent class="mr-8 mt-2">

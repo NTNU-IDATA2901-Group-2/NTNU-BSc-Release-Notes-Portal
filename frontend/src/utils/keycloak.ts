@@ -1,6 +1,12 @@
 import Keycloak from "keycloak-js";
 import { config } from "./constants";
 import { ref } from "vue";
+import { jwtDecode } from "jwt-decode"
+
+type DecodedJwtToken = {
+  given_name?: string;
+  family_name?: string;
+};
 
 const keycloak = new Keycloak({
   url: config.KC_URL,
@@ -8,14 +14,25 @@ const keycloak = new Keycloak({
   clientId: config.KC_CLIENT_ID,
 });
 
-export const isAuthenticated = ref(keycloak.authenticated);
+export const isAuthenticated = ref<boolean>(keycloak.authenticated);
+export const jwtToken = ref<string | undefined>(undefined);
+export const jwtTokenDecoded = ref<DecodedJwtToken | undefined>(undefined);
 
 keycloak.onAuthSuccess = () => {
   isAuthenticated.value = true;
+  jwtToken.value = keycloak.token;
+  jwtTokenDecoded.value = keycloak.token
+    ? jwtDecode<DecodedJwtToken>(keycloak.token)
+    : undefined;
+
+  console.log('Authenticated: ', jwtToken.value);
+  console.log('Decoded Token: ', jwtTokenDecoded.value);
 };
 
 keycloak.onAuthLogout = () => {
   isAuthenticated.value = false;
+  jwtToken.value = undefined;
+  jwtTokenDecoded.value = undefined;
 };
 
 keycloak.onTokenExpired = () => {
