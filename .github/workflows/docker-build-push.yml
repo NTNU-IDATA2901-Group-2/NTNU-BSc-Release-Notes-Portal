@@ -1,18 +1,14 @@
 name: Docker build & Push
 on:
-  push:
-    branches:
-      - main
-      - dev
-  pull_request:
-    branches:
-      - main
-      - dev
   workflow_run:
     workflows: ["CI Frontend & Backend"]
     types: [completed]
+    branches:
+      - main
+      - dev
 jobs:
   docker-build-push:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
