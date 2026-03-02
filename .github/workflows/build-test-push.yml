@@ -93,6 +93,7 @@ jobs:
           name: spring-boot-artifact
           path: target/*.jar
   docker-build-push:
+    needs: [compile-backend, build-frontend]
     if: |
       (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')) ||
       (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'dev'))
