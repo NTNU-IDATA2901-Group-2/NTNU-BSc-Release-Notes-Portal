@@ -155,7 +155,10 @@ const publishReleaseNoteMutation = useMutation({
             <div class="flex items-center gap-4">
               <h1 v-if="!isEditing" class="text-2xl max-w-60 whitespace-nowrap overflow-hidden">{{
                 releaseNote.tag }}</h1>
-              <Input v-if="isEditing" class="w-full" v-model="tag" />
+              <div v-if="isEditing" class="flex flex-col gap-1">
+                <h4 class="text-md">Title</h4>
+                <Input class="w-full" v-model="tag" />
+              </div>
               <Badge 
                 v-if="!isEditing" class="h-6"
                 :variant="releaseNote.published ? 'success' : 'destructive'">{{
@@ -209,17 +212,21 @@ const publishReleaseNoteMutation = useMutation({
           </div>
 
           <p v-if="!isEditing" class="">{{ releaseNote.summary }}</p>
-          <Textarea v-if="isEditing" class="w-full" v-model="summary" />
+          <div class="flex flex-col gap-1" v-if="isEditing">
+            <h4 class="text-md">Description</h4>
+            <Textarea class="w-full" v-model="summary" />
+          </div>
         </div>
         <Separator class="w-full h-2" />
-        <div class="flex flex-col w-full text-xl gap-10">
-          <div class="flex flex-col w-full text-xl gap-10">
-            <h2>Change Notes</h2>
+        <div class="flex flex-col w-full gap-10">
+          <div class="flex flex-col w-full gap-10">
+            <h2 class="text-xl">Change Notes</h2>
             <MultiselectChangeNotes v-if="isEditing" v-model="changeNotes" />
             <div v-if="!isEditing">
               <div 
                 v-for="change in releaseNote.changeNotes" :key="change.id"
                 class="flex flex-col gap-4">
+                
                 <h3 class="text-lg">{{ change.reference }}</h3>
                 <div>
                   <h3 class="text-lg">Description</h3>
