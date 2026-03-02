@@ -88,7 +88,8 @@ const onCancel = () => {
     <div class="flex flex-col gap-16 flex-1 w-full items-center mt-16 lg:w-4xl md:mt-42">
     <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-row items-center justify-between w-full">
-        <div class="flex items-center gap-4">
+        <div class="flex flex-col gap-1">
+            <h4 class="text-md">Title</h4>
             <Input class="w-full" v-model="reference" placeholder="Reference" />
         </div>
         <div class="flex gap-4">
@@ -102,7 +103,10 @@ const onCancel = () => {
         </div>
         </div>
 
-        <Textarea placeholder="Description of change" class="w-full" v-model="description"></Textarea>
+        <div class="flex flex-col gap-1">
+            <h4 class="text-md">Description</h4>
+            <Textarea placeholder="Description of change" class="w-full" v-model="description"></Textarea>
+        </div>
 
         <div class="flex flex-wrap justify-between gap-4">
         <div class="flex flex-col gap-1">
@@ -126,13 +130,13 @@ const onCancel = () => {
 
     <Separator class="w-full h-2" />
 
-    <div class="flex flex-col w-full text-xl gap-10">
-        <div>
-        <h3 class="text-lg">Developer Notes</h3>
+    <div class="flex flex-col w-full gap-10">
+        <div class="flex flex-col gap-1">
+        <h4 class="text-md">Developer Notes</h4>
         <Textarea placeholder="Developer notes" class="w-full" v-model="developerNotes"></Textarea>
         </div>
-        <div>
-        <h3 class="text-lg">Upgrade Notes</h3>
+        <div class="flex flex-col gap-1">
+        <h4 class="text-md">Upgrade Notes</h4>
         <Textarea placeholder="Upgrade notes" class="w-full" v-model="upgradeNotes"></Textarea>
         </div>
     </div>
