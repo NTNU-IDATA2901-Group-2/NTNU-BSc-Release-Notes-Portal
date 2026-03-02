@@ -53,41 +53,38 @@ The `.env` file is used by both Docker Compose and the Spring Boot backend. The 
 
 ## Running in Development Mode
 
-Development mode starts the backend with hot-reload via Spring Boot DevTools and the frontend with the Vite dev server (HMR).
+Development mode uses the `dev` Spring profile. The backend automatically starts the Docker Compose services (PostgreSQL + Keycloak) on launch via the `spring-boot-docker-compose` integration, so no manual `docker compose` command is needed.
 
-### 1. Start infrastructure (PostgreSQL + Keycloak)
-
-```bash
-docker compose up -d
-```
-
-### 2. Start the backend
+### Backend
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-The backend defaults to the `dev` profile (see `application.properties`). It connects to PostgreSQL and Keycloak using the values from `.env`, and seeds the database with `data.sql` + `data-dev.sql`.
+- The `dev` profile is active by default (see `application.properties`).
+- Docker Compose (`docker-compose.yml`) is started automatically, bringing up PostgreSQL and Keycloak.
+- The database is seeded with `data.sql` and `data-dev.sql`.
+- The API is available at `http://localhost:8080`.
 
-The API is available at `http://localhost:8080`.
-
-### 3. Start the frontend
+### Frontend
 
 ```bash
 cd frontend
 pnpm install
-pnpm dev
+pnpm run dev
 ```
 
-The frontend dev server runs at `http://localhost:5173` and proxies API requests to the backend.
+The Vite dev server starts at `http://localhost:5173` with hot module replacement (HMR) and proxies API requests to the backend.
 
 ---
 
 ## Running in Production Mode
 
-Production mode runs the fully-built frontend as static files served by the Spring Boot backend.
+In production mode the Spring Boot backend serves the frontend as static content. The frontend must be **compiled and copied into the backend's static resources folder** before packaging, so that a single JAR file contains and serves the entire application.
 
-### 1. Build the frontend
+### Frontend
+
+Build the optimized static files:
 
 ```bash
 cd frontend
@@ -95,35 +92,24 @@ pnpm install
 pnpm build
 ```
 
-This generates optimised static files in `frontend/dist/`.
-
-### 2. Copy the static files into the backend
+Copy the compiled output into the backend's static resources folder so the backend can serve it:
 
 ```bash
 cp -r frontend/dist/* src/main/resources/static/
 ```
 
-### 3. Package the backend
+### Backend
+
+Package and run the application:
 
 ```bash
 ./mvnw clean package -DskipTests
-```
-
-### 4. Start infrastructure
-
-```bash
-docker compose up -d
-```
-
-### 5. Run the application
-
-```bash
 java -jar target/*.jar --spring.profiles.active=prod
 ```
 
-The application is available at `http://localhost:8080`.
+The application is available at `http://localhost:8080`. The backend serves both the API and the compiled frontend from the same port.
 
-The `prod` profile (`application-prod.properties`) connects to the PostgreSQL database specified in `.env` and never seeds test data.
+> **Note:** The `prod` profile (`application-prod.properties`) reads database credentials from `.env` and never seeds test data. Make sure your `.env` is configured with the correct production values before starting.
 
 ---
 
@@ -135,7 +121,9 @@ The full CI pipeline (lint → build → test) is defined in `.github/workflows/
 
 To replicate the CI steps locally:
 
-### 1. Build and lint the frontend
+### Frontend
+
+Lint and build the frontend:
 
 ```bash
 cd frontend
@@ -144,22 +132,24 @@ pnpm eslint
 pnpm build
 ```
 
-### 2. Copy the static files and package the backend
+Copy the compiled output into the backend's static resources folder:
 
 ```bash
 cp -r frontend/dist/* src/main/resources/static/
-./mvnw clean package
 ```
 
-### 3. Start the application with the CI profile
+### Backend
+
+Package and start the application with the CI profile:
 
 ```bash
+./mvnw clean package
 java -jar target/*.jar --spring.profiles.active=ci
 ```
 
 The CI profile (`application-ci.properties`) disables Docker Compose integration and uses an in-memory H2 database, so no external services are needed.
 
-### 4. Run the API tests
+### API Tests
 
 Install [Bruno CLI](https://docs.usebruno.com/bru-cli/overview) if not already installed:
 
