@@ -6,6 +6,8 @@ on:
     branches:
       - main
       - dev
+      - ci-99/docker-build-push
+    
 jobs:
   docker-build-push:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
