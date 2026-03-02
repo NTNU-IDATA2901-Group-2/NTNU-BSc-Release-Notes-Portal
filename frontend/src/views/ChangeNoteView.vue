@@ -8,10 +8,13 @@ import { useGetChangeNote } from '@/api/change-note-api';
 import ChangeNoteEdit from '@/components/ChangeNote/ChangeNoteEdit.vue';
 import ChangeNoteDetail from '@/components/ChangeNote/ChangeNoteDetail.vue';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../components/ui/breadcrumb';
+import { useI18n } from 'vue-i18n';
 
 const route = useRoute();
 
 const isEditing = ref(route.query.edit === 'true');
+
+const { t } = useI18n();
 
 const id = route.params.id as string;
 const { isPending, isFetching, isError, data: changeNote } = useGetChangeNote(id);
@@ -22,7 +25,7 @@ const { isPending, isFetching, isError, data: changeNote } = useGetChangeNote(id
   <div class="flex flex-col items-center px-4 mb-20">
     <div class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10 flex items-center gap-4">
       <Button variant="outline" class="" @click="$router.back()">
-        <ArrowLeft />Previous
+        <ArrowLeft />{{ t('button.previous') }}
       </Button>
       <Breadcrumb class="text-text-primary">
         <BreadcrumbList>
@@ -46,7 +49,7 @@ const { isPending, isFetching, isError, data: changeNote } = useGetChangeNote(id
     <div v-else-if="isPending || isFetching">
       <Spinner />
     </div>
-    <h1 v-else-if="isError">Error retreiving change note</h1>
+    <h1 v-else-if="isError">{{ t('loadingError.changeNote') }}</h1>
 
   </div>
 </template>

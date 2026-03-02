@@ -16,8 +16,10 @@ import { LogOut } from "lucide-vue-next"
 import { useTheme } from '@/utils/theme';
 import keycloak, { isAuthenticated, jwtTokenDecoded } from '@/utils/keycloak';
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const { theme } = useTheme()
+const { t } = useI18n()
 
 const handleLogOut = () => {
 	keycloak.logout({
@@ -44,8 +46,8 @@ const firstLetters = computed(() => {
 	<div class="flex items-center h-20 px-8 gap-12">
 	    <img :src="logoSvg" alt="Logo" class="w-50 h-7.5" />
 	    <nav class="hidden md:flex flex-row gap-12 ">
-		<RouterLink v-if="isAuthenticated" class="text-md text-text-dark-static hover:underline" :to="routeNames.releaseNotes">Release Notes</RouterLink>
-		<RouterLink v-if="isAuthenticated" class="text-md text-text-dark-static hover:underline" :to="routeNames.changeNotes">Change Notes</RouterLink>
+		<RouterLink v-if="isAuthenticated" class="text-md text-text-dark-static hover:underline" :to="routeNames.releaseNotes">{{ t('header.releaseNotesLink') }}</RouterLink>
+		<RouterLink v-if="isAuthenticated" class="text-md text-text-dark-static hover:underline" :to="routeNames.changeNotes">{{ t('header.changeNotesLink') }}</RouterLink>
 	    </nav>
 	    <DropdownMenu v-if="isAuthenticated">
 		<DropdownMenuTrigger class="ml-auto cursor-pointer">
@@ -56,13 +58,13 @@ const firstLetters = computed(() => {
 		<DropdownMenuContent class="mr-8 mt-2">
 		    <DropdownMenuItem @click="theme = theme === 'dark' ? 'light' : 'dark'">
 			<div class="w-full flex gap-2">
-			    <p class="text-text-dark-static ml-auto">Toggle theme</p>
+			    <p class="text-text-dark-static ml-auto">{{ t('header.toggleTheme') }}</p>
 			    <SunMoon class="text-text-dark-static"/>
 			</div>
 		    </DropdownMenuItem>
 		    <DropdownMenuItem @click="handleLogOut">
 			<div class="w-full flex gap-2">
-			    <p class="ml-auto text-text-dark-static">Sign out</p>
+			    <p class="ml-auto text-text-dark-static">{{ t('header.signOut') }}</p>
 			    <LogOut class="text-text-dark-static"/>
 			</div>
 		    </DropdownMenuItem>
@@ -73,8 +75,8 @@ const firstLetters = computed(() => {
 	<Separator/>
 	<div class="md:hidden">
 	    <nav class="flex items-center justify-between px-12 h-12">
-		<RouterLink class="text-lg text-text-dark-static" :to="routeNames.releaseNotes">Release Notes</RouterLink>
-		<RouterLink class="text-lg text-text-dark-static" :to="routeNames.changeNotes">Change Notes</RouterLink>
+		<RouterLink class="text-lg text-text-dark-static" :to="routeNames.releaseNotes">{{ t('header.releaseNotesLink') }}</RouterLink>
+		<RouterLink class="text-lg text-text-dark-static" :to="routeNames.changeNotes">{{ t('header.changeNotesLink') }}</RouterLink>
 	    </nav>
 	    <Separator/>
 	</div>

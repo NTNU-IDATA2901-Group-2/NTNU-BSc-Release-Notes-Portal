@@ -1,0 +1,71 @@
+{
+    "header": {
+        "releaseNotesLink": "Release Notes",
+        "changeNotesLink": "Change Notes",
+        "toggleTheme": "Bytt tema",
+        "signOut": "Logg ut"
+    },
+    "button": {
+        "previous": "Forrige",
+        "edit": "Rediger",
+        "save": "Lagre",
+        "cancel": "Avbryt",
+        "delete": "Slett",
+        "export": "Eksporter",
+        "publish": "Publiser",
+        "unpublish": "Avpubliser",
+        "none": "Ingen",
+        "createChangeNote": "Opprett Change Note",
+        "createReleaseNote": "Opprett Release Note",
+        "filter": "Filtrer",
+        "search": "Søk",
+        "signIn": "Logg inn"
+    },
+    "title": {
+        "title": "Tittel",
+        "description": "Beskrivelse",
+        "product": "Produkt",
+        "scope": "Omfang",
+        "feature": "Funksjon",
+        "customer": "Kunde",
+        "developerNotes": "Utviklernotater",
+        "upgradeRequirements": "Oppgraderingskrav",
+        "search": "Søk"
+    },
+    "toast": {
+        "changeNoteDeleted": "Endringsnotat slettet",
+        "changeNoteDeleteError": "Det oppsto en feil under sletting av endringsnotat",
+        "changeNotePublished": "Endringsnotat publisert",
+        "changeNoteUnpublished": "Endringsnotat avpublisert",
+        "changeNotePublishError": "Det oppsto en feil under publisering av endringsnotat",
+        "changeNoteUnpublishError": "Det oppsto en feil under avpublisering av endringsnotat",
+        "changeNoteUpdatedSuccess": "Endringsnotat oppdatert",
+        "selectedChangeNotesPublished": "Valgte endringsnotater publisert",
+        "releaseNoteDeletedSuccess": "Utgivelsesnotat slettet",
+        "releaseNoteDeleteError": "Det oppsto en feil under sletting av utgivelsesnotat",
+        "releaseNotePublished": "Utgivelsesnotat publisert",
+        "releaseNoteUnpublished": "Utgivelsesnotat avpublisert",
+        "releaseNotePublishError": "Det oppsto en feil under publisering av utgivelsesnotat",
+        "releaseNoteUnpublishError": "Det oppsto en feil under avpublisering av utgivelsesnotat",
+        "releaseNoteUpdatedSuccess": "Utgivelsesnotat oppdatert"
+    },
+    "deletePrompt": {
+        "title": "Er du sikker på at du vil slette?",
+        "description": "Denne handlingen kan ikke angres."
+    },
+    "card": {
+        "published": "Publisert",
+        "private": "Privat"
+    },
+    "loadingError": {
+        "changeNotes": "Det oppsto en feil under innlastning av endringsnotater",
+        "releaseNotes": "Det oppsto en feil under innlastning av utgivelsesnotater"
+    },
+    "notFound": {
+        "resourceNotFound": "Ressursen du prøver å få tilgang til har enten blitt flyttet, eller eksisterer ikke.",
+        "404": "404 - Not Found"
+    },
+    "signIn": {
+        "pleaseSignIn": "Vennligst logg inn"
+    }
+}
