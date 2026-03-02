@@ -1,7 +1,6 @@
-import { config } from "@/constants";
-import type { Product } from "@/types";
+import type { Product } from "@/utils/types";
 import { useQuery } from "@tanstack/vue-query";
-import axios from "axios";
+import api from "./api";
 
 /**
  * Retrieves a list of all products.
@@ -22,6 +21,6 @@ export const useProducts = () => useQuery({
  * @returns A promise that resolves to an array of product data retrieved from the API.
  */
 const getProducts = async () => {
-  const response = await axios.get(`${config.API_URL}products`)
+  const response = await api.get(`products`)
   return response.data as Product[];
 }

@@ -12,7 +12,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { TagsInput, TagsInputInput, TagsInputItem, TagsInputItemDelete } from '@/components/ui/tags-input'
-import type { ChangeNote } from '@/types'
+import type { ChangeNote } from '@/utils/types'
 import { useGetChangeNotes } from '@/api/change-note-api'
 
 const params = new URLSearchParams({ hasReleaseNote: 'false' })

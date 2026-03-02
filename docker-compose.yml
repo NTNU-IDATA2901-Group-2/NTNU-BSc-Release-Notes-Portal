@@ -21,7 +21,6 @@ services:
     volumes:
       - keycloak_data:/opt/keycloak/release-notes-data
 
-
 volumes:
   db_data:
   keycloak_data:

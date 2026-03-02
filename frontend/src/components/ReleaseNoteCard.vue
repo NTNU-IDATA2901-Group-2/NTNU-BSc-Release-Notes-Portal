@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PrimitiveProps } from 'reka-ui';
 import Badge from './ui/badge/Badge.vue';
-import type { ReleaseNote } from '@/types';
+import type { ReleaseNote } from '@/utils/types';
 import { RouterLink } from 'vue-router';
 
 const props = defineProps<PrimitiveProps & {

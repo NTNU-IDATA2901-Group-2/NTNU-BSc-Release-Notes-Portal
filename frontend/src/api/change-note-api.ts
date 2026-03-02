@@ -1,7 +1,6 @@
-import { config } from "@/constants";
-import type { ChangeNote, PersistChangeNoteDTO } from "@/types";
+import type { ChangeNote, PersistChangeNoteDTO } from "@/utils/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
-import axios from "axios";
+import api from "./api";
 
 
 /**
@@ -15,7 +14,7 @@ import axios from "axios";
 export const publishChangeNote = async (changeNoteId: number, publish: boolean): Promise<boolean> => {
   const params = new URLSearchParams({ publish: publish.toString() });
 
-  await axios.patch(`${config.API_URL}changenotes/${changeNoteId}/publish?${params.toString()}`);
+  await api.patch(`changenotes/${changeNoteId}/publish?${params.toString()}`);
   return true;
 }
 
@@ -42,7 +41,7 @@ export const useCreateChangeNote = (onSuccesss: (changeId: number) => void) => u
  * @throws An error if the API request to create the change note fails.
  */
 export const createChangeNote = async (): Promise<number> => {
-  const response = await axios.post(`${config.API_URL}changenotes`);
+  const response = await api.post(`changenotes`);
   return response.data as number;
 }
 
@@ -54,7 +53,7 @@ export const createChangeNote = async (): Promise<number> => {
  * @throws An error if the API request to archive the change note fails.
  */
 export const archiveChangeNote = async (changeNoteId: number) => {
-  await axios.patch(`${config.API_URL}changenotes/${changeNoteId}/archive`);
+  await api.patch(`changenotes/${changeNoteId}/archive`);
   return true;
 }
 
@@ -67,7 +66,7 @@ export const archiveChangeNote = async (changeNoteId: number) => {
  * @throws An error if the API request to update the change note fails.
  */
 export const updateChangeNote = async (changeNoteId: number, changeNoteData: PersistChangeNoteDTO): Promise<void> => {
-  await axios.put(`${config.API_URL}changenotes/${changeNoteId}`, changeNoteData);
+  await api.put(`changenotes/${changeNoteId}`, changeNoteData);
 }
 
 /**
@@ -90,7 +89,7 @@ export const useGetChangeNote = (id: string) => useQuery<ChangeNote>({
  * @throws An error if the API request to retrieve the change note fails.
  */
 export const getChangeNote = async (id: string): Promise<ChangeNote> => {
-  const response = await axios.get(`${config.API_URL}changenotes/${id}`)
+  const response = await api.get(`changenotes/${id}`)
   return response.data as ChangeNote;
 }
 
@@ -114,6 +113,6 @@ export const useGetChangeNotes = (params?: URLSearchParams) => useQuery<ChangeNo
  * @throws An error if the API request to retrieve the change notes fails.
  */
 const getChangeNotes = async (params?: URLSearchParams) => {
-  const response = await axios.get(`${config.API_URL}changenotes`, { params });
+  const response = await api.get(`changenotes`, { params });
   return response.data as ChangeNote[];
 }

@@ -1,7 +1,6 @@
-import { config } from "@/constants";
-import type { Customer } from "@/types";
+import type { Customer } from "@/utils/types";
 import { useQuery } from "@tanstack/vue-query";
-import axios from "axios";
+import api from "./api";
 
 /**
  * Retrieves a list of all customers.
@@ -22,6 +21,6 @@ export const useCustomers = () => useQuery({
  * @returns A promise that resolves to an array of customer data retrieved from the API.
  */
 const getCustomers = async () => {
-  const response = await axios.get(`${config.API_URL}customers`)
+  const response = await api.get(`customers`)
   return response.data as Customer[];
 }

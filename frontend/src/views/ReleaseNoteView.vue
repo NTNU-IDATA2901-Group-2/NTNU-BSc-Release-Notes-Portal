@@ -22,7 +22,7 @@ import { routeNames, router } from '@/utils/router';
 import { toast } from 'vue-sonner';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
-import type { ChangeNote, PersistReleaseNoteDTO } from '@/types';
+import type { ChangeNote, PersistReleaseNoteDTO } from '@/utils/types';
 import { EditReleaseNoteSchema } from '@/schemas';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../components/ui/breadcrumb';

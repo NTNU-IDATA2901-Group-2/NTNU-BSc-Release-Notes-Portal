@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { ChangeNote } from '@/types';
+import type { ChangeNote } from '@/utils/types';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 

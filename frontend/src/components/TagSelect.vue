@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import type { Tag } from '@/types';
+import type { Tag } from '@/utils/types';
 import type { PrimitiveProps } from 'reka-ui';
 
 const props = defineProps<PrimitiveProps & {

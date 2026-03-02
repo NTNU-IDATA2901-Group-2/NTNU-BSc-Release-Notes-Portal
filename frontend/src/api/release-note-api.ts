@@ -1,7 +1,6 @@
-import { config } from "@/constants";
-import type { OnApiCallFinished, PersistReleaseNoteDTO, ReleaseNote } from "@/types"
+import type { OnApiCallFinished, PersistReleaseNoteDTO, ReleaseNote } from "@/utils/types"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
-import axios from 'axios';
+import api from "./api";
 
 /**
  * Creates a new release note.
@@ -11,7 +10,7 @@ import axios from 'axios';
  * @throws An error if the API request to create the release note fails.
  */
 export const createReleaseNote = async (selectedItems: number[]) => {
-  const response = await axios.post(`${config.API_URL}releasenotes`, { changeNoteIds: selectedItems })
+  const response = await api.post(`releasenotes`, { changeNoteIds: selectedItems })
   return response.data as number;
 }
 
@@ -40,7 +39,7 @@ const getReleaseNote = async (id: string): Promise<ReleaseNote> => {
     throw new TypeError("Invalid release note ID")
   }
 
-  const response = await axios.get(`${config.API_URL}releasenotes/${id}`)
+  const response = await api.get(`releasenotes/${id}`)
   return response.data as ReleaseNote;
 }
 
@@ -62,7 +61,7 @@ export const useGetReleaseNotes = () => useQuery<ReleaseNote[]>({
  * @returns A promise that resolves to an array of release note data retrieved from the API.
  */
 const getReleaseNotes = async (): Promise<ReleaseNote[]> => {
-  const response = await axios.get(`${config.API_URL}releasenotes`)
+  const response = await api.get(`releasenotes`)
   return response.data as ReleaseNote[];
 }
 
@@ -99,7 +98,7 @@ export const useArchiveReleaseNote = (id: string, onFinished: OnApiCallFinished)
  * @param releaseNoteData The updated release note data to be sent in the API request.
  */
 export const updateReleaseNote = async (id: string, releaseNoteData: PersistReleaseNoteDTO): Promise<void> => {
-  await axios.put(`${config.API_URL}releasenotes/${id}`, releaseNoteData);
+  await api.put(`releasenotes/${id}`, releaseNoteData);
 }
 
 /**
@@ -115,7 +114,7 @@ const archiveReleaseNote = async (id: string): Promise<number> => {
     throw new TypeError("Invalid release note ID")
   }
   
-  const response = await axios.patch(`${config.API_URL}releasenotes/${id}/archive`)
+  const response = await api.patch(`releasenotes/${id}/archive`)
   return response.data as number;
 }
 
@@ -127,5 +126,5 @@ const archiveReleaseNote = async (id: string): Promise<number> => {
  * @throws An error if the API request to publish or unpublish the release note fails or if the provided ID is invalid.
  */
 export const publishReleaseNote = async (id: string, publish: boolean): Promise<void> => {
-  await axios.patch(`${config.API_URL}releasenotes/${id}/publish?publish=${publish}`);
+  await api.patch(`releasenotes/${id}/publish?publish=${publish}`);
 }
