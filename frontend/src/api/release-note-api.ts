@@ -60,8 +60,8 @@ export const useGetReleaseNotes = () => useQuery<ReleaseNote[]>({
  * @throws An error if the API request to retrieve the release notes fails.
  * @returns A promise that resolves to an array of release note data retrieved from the API.
  */
-const getReleaseNotes = async (): Promise<ReleaseNote[]> => {
-  const response = await api.get(`releasenotes`)
+export const getReleaseNotes = async (params?: Record<string, string>): Promise<ReleaseNote[]> => {
+  const response = await api.get(`releasenotes`, { params: params})
   return response.data as ReleaseNote[];
 }
 

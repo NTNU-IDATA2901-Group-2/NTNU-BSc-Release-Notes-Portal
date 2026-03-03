@@ -1,39 +1,55 @@
 <script setup lang="ts">
-import { createChangeNote, publishChangeNote, useGetChangeNotes } from '@/api/change-note-api';
+import { createChangeNote, getChangeNotes, publishChangeNote } from '@/api/change-note-api';
 import { createReleaseNote } from '@/api/release-note-api';
 import ChangeNoteCard from '@/components/ChangeNoteCard.vue';
+import CustomerFilter from '@/components/filters/CustomerFilter.vue';
+import FeatureFilter from '@/components/filters/FeatureFilter.vue';
+import ProductFilter from '@/components/filters/ProductFilter.vue';
+import ScopeFilter from '@/components/filters/ScopeFilter.vue';
+import MultiselectChangeNotes from '@/components/MultiselectChangeNotes.vue';
 import Button from '@/components/ui/button/Button.vue';
 import { InputGroup, InputGroupInput } from '@/components/ui/input-group';
 import Separator from '@/components/ui/separator/Separator.vue';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
-import { TagsInput, TagsInputItemText } from '@/components/ui/tags-input';
-import TagsInputItem from '@/components/ui/tags-input/TagsInputItem.vue';
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import type { ChangeNote } from '@/utils/types';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { Eye, FilePlus, LayersPlus, ListFilterPlus, Search } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { computed, provide, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue-sonner';
 
 const router = useRouter();
-const { isLoading, isFetching, isError, data } = useGetChangeNotes();
+const searchParams = ref({});
+const urlSearchParams = computed(() => new URLSearchParams(searchParams.value));
+const queryKey = computed(() => ['changeNotes', urlSearchParams.value.toString()]);
+const { isLoading, isFetching, isError, data } = useQuery({
+  queryKey,
+  queryFn: () => getChangeNotes(urlSearchParams.value)
+});
 
-const selectedItems = ref<number[]>([]);
+watch(searchParams, () => {
+  console.log('Search parameters updated:', searchParams.value.toString());
+}, { deep: true });
 
-console.log('Fetched change notes:', data);
+provide('searchParams', searchParams);
 
-const getTitleById = (id: number): string => {
-  const changeNote = data.value?.find(note => note.id === id);
-  return changeNote ? changeNote.reference : `Item-${id}`;
+const clearFilters = () => {
+  searchParams.value = {};
 }
 
+const selectedItems = ref<ChangeNote[]>([]);
 const { t } = useI18n();
 
-const toggleSelection = (id: number) => {
-  if (selectedItems.value.includes(id)) {
-    selectedItems.value = selectedItems.value.filter(itemId => itemId !== id);
+const isChangeNoteSelected = (changeNote: ChangeNote) => {
+  return selectedItems.value.some(selected => selected.id === changeNote.id);
+}
+
+const toggleSelection = (changeNote: ChangeNote) => {
+  if (isChangeNoteSelected(changeNote)) {
+    selectedItems.value = selectedItems.value.filter(note => note.id !== changeNote.id);
   } else {
-    selectedItems.value.push(id);
+    selectedItems.value.push(changeNote);
   }
 }
 
@@ -51,8 +67,8 @@ const publishChangeNoteMutation = useMutation({
 
 const handlePublish = () => {
   console.log('Publish button clicked. Selected change note IDs:', selectedItems.value);
-  for (const id of selectedItems.value) {
-    publishChangeNoteMutation.mutate(id);
+  for (const changeNote of selectedItems.value) {
+    publishChangeNoteMutation.mutate(changeNote.id);
   }
   selectedItems.value = [];
 }
@@ -76,7 +92,7 @@ const handleCreateChangeNote = () => {
 // Creation of release note
 
 const createReleaseNoteMutation = useMutation({
-    mutationFn: () => createReleaseNote(selectedItems.value),
+    mutationFn: () => createReleaseNote(selectedItems.value.map(cn => cn.id)),
       onSuccess: (data) => {
       router.push(`/release-notes/${data}?edit=true`);
       console.log('Release Note created with ID:', data);
@@ -106,6 +122,11 @@ const handleCreateReleaseNote = () => {
     <div v-else class="flex gap-8 flex-col h-min w-full md:flex-row justify-center p-4">
       <div class="h-min hidden md:block">
         <h1 class="text-2xl text-nowrap">Change Notes</h1>
+        <ProductFilter />
+        <ScopeFilter />
+        <FeatureFilter />
+        <CustomerFilter />
+        <Button class="mt-4" variant="outline" @click="clearFilters">{{ t('button.clearFilters') }}</Button>
       </div>
 
       <div class="flex flex-col w-full gap-4 max-w-4xl">
@@ -140,21 +161,13 @@ const handleCreateReleaseNote = () => {
         </div>
 
         <div>
-          <TagsInput disabled>
-            <TagsInputItem v-for="id in selectedItems" :key="id" :value="getTitleById(id)" readonly>
-              <TagsInputItemText />
-            </TagsInputItem>
-
-            <TagsInputItem v-if="selectedItems.length === 0" value="No items selected" readonly class="end">
-              <TagsInputItemText />
-            </TagsInputItem>
-          </TagsInput>
+          <MultiselectChangeNotes v-model="selectedItems"/>
         </div>
 
         <div v-for="changeNote in data" :key="changeNote.id" class="flex flex-col gap-4">
           <ChangeNoteCard
-:key="changeNote.id" :selected="selectedItems.includes(changeNote.id)"
-            :change-note="changeNote" @update:selected="toggleSelection(changeNote.id)" />
+:key="changeNote.id" :model-value="isChangeNoteSelected(changeNote)"
+            :change-note="changeNote" @update:model-value="toggleSelection(changeNote)" />
           <Separator />
         </div>
       </div>

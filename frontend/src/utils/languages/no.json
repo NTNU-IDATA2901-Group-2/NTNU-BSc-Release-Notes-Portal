@@ -1,7 +1,7 @@
 {
     "header": {
-        "releaseNotesLink": "Release Notes",
-        "changeNotesLink": "Change Notes",
+        "releaseNotesLink": "Utgivelsesnotater",
+        "changeNotesLink": "Endringsnotater",
         "toggleTheme": "Bytt tema",
         "signOut": "Logg ut",
         "language": "Språk",
@@ -18,11 +18,12 @@
         "publish": "Publiser",
         "unpublish": "Avpubliser",
         "none": "Ingen",
-        "createChangeNote": "Opprett Change Note",
-        "createReleaseNote": "Opprett Release Note",
+        "createChangeNote": "Opprett Endringsnotat",
+        "createReleaseNote": "Opprett Utgivelsesnotat",
         "filter": "Filtrer",
         "search": "Søk",
-        "signIn": "Logg inn"
+        "signIn": "Logg inn",
+        "clearFilters": "Fjern filtre"
     },
     "title": {
         "title": "Tittel",
@@ -60,9 +61,19 @@
         "published": "Publisert",
         "private": "Privat"
     },
+      "input": {
+        "addChangeNotes": "Legg til endringsnotater"
+    },
     "loadingError": {
         "changeNotes": "Det oppsto en feil under innlastning av endringsnotater",
-        "releaseNotes": "Det oppsto en feil under innlastning av utgivelsesnotater"
+        "releaseNotes": "Det oppsto en feil under innlastning av utgivelsesnotater",
+        "products": "Det oppsto en feil under innlastning av produkter",
+        "scopes": "Det oppsto en feil under innlastning av omfang",
+        "features": "Det oppsto en feil under innlastning av funksjoner",
+        "customers": "Det oppsto en feil under innlastning av kunder"
+    },
+    "loading": {
+        "filter": "Laster inn filter..."
     },
     "notFound": {
         "resourceNotFound": "Ressursen du prøver å få tilgang til har enten blitt flyttet, eller eksisterer ikke.",

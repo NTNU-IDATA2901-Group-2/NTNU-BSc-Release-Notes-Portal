@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useGetReleaseNotes } from '@/api/release-note-api';
+import { getReleaseNotes } from '@/api/release-note-api';
 import ReleaseNoteCard from '@/components/ReleaseNoteCard.vue';
 import Button from '@/components/ui/button/Button.vue';
 import { InputGroup, InputGroupInput } from '@/components/ui/input-group';
@@ -7,13 +7,18 @@ import Separator from '@/components/ui/separator/Separator.vue';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 import { ListFilterPlus, Search } from 'lucide-vue-next';
 import { ref } from 'vue';
+import { useQuery } from "@tanstack/vue-query";
+import type { ReleaseNote } from '@/utils/types';
 import { useI18n } from 'vue-i18n';
-
-const { isLoading, isFetching, isError, data } = useGetReleaseNotes();
 
 const { t } = useI18n();
 
 const selectedItems = ref<number[]>([]);
+
+const {data, isLoading, isFetching, isError} = useQuery<ReleaseNote[]>({
+  queryKey : ['releaseNotes'],
+  queryFn: () => getReleaseNotes(),
+});
 
 </script>
 

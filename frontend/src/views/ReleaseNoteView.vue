@@ -231,7 +231,7 @@ const publishReleaseNoteMutation = useMutation({
             <div v-if="!isEditing">
               <div 
                 v-for="change in releaseNote.changeNotes" :key="change.id"
-                class="flex flex-col gap-4">
+                class="flex flex-col gap-4 mb-6">
                 
                 <h3 class="text-lg">{{ change.reference }}</h3>
                 <div>

@@ -112,7 +112,7 @@ export const useGetChangeNotes = (params?: URLSearchParams) => useQuery<ChangeNo
  * @returns An array of change note data that matches the provided search parameters.
  * @throws An error if the API request to retrieve the change notes fails.
  */
-const getChangeNotes = async (params?: URLSearchParams) => {
+export const getChangeNotes = async (params?: URLSearchParams) => {
   const response = await api.get(`changenotes`, { params });
   return response.data as ChangeNote[];
 }

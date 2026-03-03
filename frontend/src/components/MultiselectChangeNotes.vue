@@ -14,6 +14,9 @@ import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/compon
 import { TagsInput, TagsInputInput, TagsInputItem, TagsInputItemDelete } from '@/components/ui/tags-input'
 import type { ChangeNote } from '@/utils/types'
 import { useGetChangeNotes } from '@/api/change-note-api'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n();
 
 const params = new URLSearchParams({ hasReleaseNote: 'false' })
 const { data: changeNotes } = useGetChangeNotes(params)
@@ -96,7 +99,7 @@ onUnmounted(() => {
 
           <ListboxFilter v-model="searchTerm" as-child>
             <TagsInputInput
-              placeholder="Change Notes..."
+              :placeholder="t('input.addChangeNotes')"
               @keydown.enter.prevent
               @keydown.down="open = true"
             />
