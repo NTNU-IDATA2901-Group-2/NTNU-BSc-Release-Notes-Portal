@@ -1,18 +1,18 @@
 meta {
   name: get_all_multiple_filters
   type: http
-  seq: 16
+  seq: 19
 }
 
 get {
-  url: {{baseurl}}/changenotes?customerId=1&productId=2
+  url: {{baseurl}}/changenotes?customerIds=1&productIds=2
   body: none
   auth: inherit
 }
 
 params:query {
-  customerId: 1
-  productId: 2
+  customerIds: 1
+  productIds: 2
 }
 
 assert {

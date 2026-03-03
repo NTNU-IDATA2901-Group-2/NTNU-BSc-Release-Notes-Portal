@@ -1,17 +1,17 @@
 meta {
-  name: get_all_multiple_query_matches
+  name: get_all_filter_customerIds
   type: http
-  seq: 20
+  seq: 16
 }
 
 get {
-  url: {{baseurl}}/changenotes?query=what
+  url: {{baseurl}}/changenotes?customerIds=1,2
   body: none
   auth: inherit
 }
 
 params:query {
-  query: what
+  customerIds: 1,2
 }
 
 assert {

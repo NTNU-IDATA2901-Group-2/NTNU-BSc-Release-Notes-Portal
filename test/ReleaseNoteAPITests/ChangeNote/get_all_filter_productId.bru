@@ -1,17 +1,17 @@
 meta {
   name: get_all_filter_productId
   type: http
-  seq: 11
+  seq: 12
 }
 
 get {
-  url: {{baseurl}}/changenotes?productId=1
+  url: {{baseurl}}/changenotes?productIds=1
   body: none
   auth: inherit
 }
 
 params:query {
-  productId: 1
+  productIds: 1
 }
 
 assert {

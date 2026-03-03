@@ -1,17 +1,17 @@
 meta {
   name: get_all_filter_scopeId
   type: http
-  seq: 12
+  seq: 13
 }
 
 get {
-  url: {{baseurl}}/changenotes?scopeId=2
+  url: {{baseurl}}/changenotes?scopeIds=2
   body: none
   auth: inherit
 }
 
 params:query {
-  scopeId: 2
+  scopeIds: 2
 }
 
 assert {

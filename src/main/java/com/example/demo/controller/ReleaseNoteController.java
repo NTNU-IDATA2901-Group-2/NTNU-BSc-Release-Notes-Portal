@@ -90,7 +90,7 @@ public class ReleaseNoteController {
   }
 
   /**
-   * Retrieves a list of all non-archived release notes.
+   * Retrieves a list of all non-archived release notes, with optional filters for query, published status, and product.
    *
    * @return a ResponseEntity with a 200 status and a list of ReleaseNoteDTOs in the body
    */
@@ -102,10 +102,11 @@ public class ReleaseNoteController {
   @GetMapping("")
   public ResponseEntity<List<ReleaseNoteDTO>> getAllReleaseNotes(
     @RequestParam(required = false) String query,
-    @RequestParam(required = false) Boolean published
+    @RequestParam(required = false) Boolean published,
+    @RequestParam(required = false) List<Long> productIds
   ) {
-      List<ReleaseNoteDTO> releaseNotes = releaseNoteService.getAllReleaseNotes(query, published);
-      logger.info("Retrieved {} release notes with filters - query: {}, published: {}", releaseNotes.size(), query, published);
+      List<ReleaseNoteDTO> releaseNotes = releaseNoteService.getAllReleaseNotes(query, published, productIds);
+      logger.info("Retrieved {} release notes with filters - query: {}, published: {}, productIds: {}", releaseNotes.size(), query, published, productIds);
       return ResponseEntity.ok(releaseNotes);
   }
 
