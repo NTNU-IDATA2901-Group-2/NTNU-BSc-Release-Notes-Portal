@@ -126,7 +126,7 @@ const handleCreateReleaseNote = () => {
         <ScopeFilter />
         <FeatureFilter />
         <CustomerFilter />
-        <Button class="mt-4" variant="outline" @click="clearFilters">Clear filters</Button>
+        <Button class="mt-4" variant="outline" @click="clearFilters">{{ t('button.clearFilters') }}</Button>
       </div>
 
       <div class="flex flex-col w-full gap-4 max-w-4xl">

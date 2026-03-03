@@ -22,7 +22,8 @@
         "createReleaseNote": "Créer une note de version",
         "search": "Rechercher",
         "filter": "Filtrer",
-        "signIn": "Se connecter"
+        "signIn": "Se connecter",
+        "clearFilters": "Effacer les filtres"
     },
     "title": {
         "title": "Titre",
@@ -59,9 +60,19 @@
         "published": "Publié",
         "private": "Privé"
     },
+      "input": {
+        "addChangeNotes": "Ajouter des notes de modification"
+    },
     "loadingError": {
         "changeNotes": "Une erreur est survenue lors du chargement des notes de modification",
-        "releaseNotes": "Une erreur est survenue lors du chargement des notes de version"
+        "releaseNotes": "Une erreur est survenue lors du chargement des notes de version",
+        "products": "Une erreur est survenue lors du chargement des produits",
+        "scopes": "Une erreur est survenue lors du chargement des portées",
+        "features": "Une erreur est survenue lors du chargement des fonctionnalités",
+        "customers": "Une erreur est survenue lors du chargement des clients"
+    },
+    "loading": {
+        "filter": "Chargement du filtre..."
     },
     "notFound": {
         "resourceNotFound": "La ressource que vous essayez d’accéder a été déplacée ou n’existe pas.",

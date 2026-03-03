@@ -22,8 +22,8 @@
         "createReleaseNote": "Create Release Note",
         "search": "Search",
         "filter": "Filter",
-        "signIn": "Sign In"
-        
+        "signIn": "Sign In",
+        "clearFilters": "Clear Filters"
     },
     "title": {
         "title": "Title",
@@ -60,9 +60,19 @@
         "published": "Published",
         "private": "Private"
     },
+    "input": {
+        "addChangeNotes": "Add change notes"
+    },
     "loadingError": {
         "changeNotes": "An error occurred while loading change notes",
-        "releaseNotes": "An error occurred while loading release notes"
+        "releaseNotes": "An error occurred while loading release notes",
+        "products": "An error occurred while loading products",
+        "scopes": "An error occurred while loading scopes",
+        "features": "An error occurred while loading features",
+        "customers": "An error occurred while loading customers"
+    },
+    "loading": {
+        "filter": "Loading filter..."
     },
     "notFound": {
         "resourceNotFound": "The resource you are trying to access has either been moved, or does not exist.",
