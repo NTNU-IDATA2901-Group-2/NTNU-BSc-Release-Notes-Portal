@@ -3,11 +3,14 @@ import type { PrimitiveProps } from 'reka-ui';
 import Badge from './ui/badge/Badge.vue';
 import type { ChangeNote } from '@/utils/types';
 import { Checkbox } from './ui/checkbox';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps<PrimitiveProps & {
   changeNote: ChangeNote,
   selected: boolean
 }>()
+
+const { t } = useI18n();
 
 const changeNote = props.changeNote;
 
@@ -43,7 +46,7 @@ const handleCheckboxClick = (event: Event) => {
         </div>
         <div>
           <Badge :variant="changeNote.published ? 'success' : 'destructive'">{{ changeNote.published
-            ? 'Published' : 'Private' }}</Badge>
+            ? t('card.published') : t('card.private') }}</Badge>
         </div>
       </div>
 

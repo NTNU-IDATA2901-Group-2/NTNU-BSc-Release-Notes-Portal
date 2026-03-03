@@ -13,6 +13,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { updateChangeNote } from '@/api/change-note-api';
 import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps<{
   changeNote: ChangeNote;
@@ -47,11 +48,13 @@ const [customerId] = defineField('customerId');
 const [developerNotes] = defineField('developerNotes');
 const [upgradeNotes] = defineField('upgradeNotes');
 
+const { t } = useI18n();
+
 const queryClient = useQueryClient();
 const updateChangeNoteMutation = useMutation({
     mutationFn: (values: PersistChangeNoteDTO) => updateChangeNote(props.changeNote.id, values),
     onSuccess: () => {
-        toast.success('Change note updated successfully');
+        toast.success(t('toast.changeNoteUpdatedSuccess'));
         emit('update:modelValue', false);
         router.push(`/change-notes/${props.changeNote.id}`);
         queryClient.invalidateQueries({ queryKey: ['changeNote', `${props.changeNote.id}`] });
@@ -77,10 +80,10 @@ const onCancel = () => {
 
 <form @submit="onSubmit">
     <div class="md:hidden flex w-full mt-4 justify-end gap-2">
-    <Button type="button" @click="onCancel" variant="outline">Cancel
+    <Button type="button" @click="onCancel" variant="outline">{{ t('button.cancel') }}
         <Ban />
     </Button>
-    <Button type="submit" variant="outline">Save
+    <Button type="submit" variant="outline">{{ t('button.save') }}
         <Save />
     </Button>
     </div>
@@ -89,40 +92,40 @@ const onCancel = () => {
     <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-row items-center justify-between w-full">
         <div class="flex flex-col gap-1">
-            <h4 class="text-md">Title</h4>
-            <Input class="w-full" v-model="reference" placeholder="Reference" />
+            <h4 class="text-md">{{ t('title.title') }}</h4>
+            <Input class="w-full" v-model="reference" :placeholder="t('placeholder.title')" />
         </div>
         <div class="flex gap-4">
             <Button type="button" @click="onCancel" class="hidden md:flex" variant="outline">
-                Cancel
+                {{ t('button.cancel') }}
             <Ban />
             </Button>
-            <Button class="hidden md:flex" type="submit" variant="outline">Save
+            <Button class="hidden md:flex" type="submit" variant="outline">{{ t('button.save') }}
             <Save />
             </Button>
         </div>
         </div>
 
         <div class="flex flex-col gap-1">
-            <h4 class="text-md">Description</h4>
-            <Textarea placeholder="Description of change" class="w-full" v-model="description"></Textarea>
+            <h4 class="text-md">{{ t('title.description') }}</h4>
+            <Textarea :placeholder="t('placeholder.description')" class="w-full" v-model="description"></Textarea>
         </div>
 
         <div class="flex flex-wrap justify-between gap-4">
         <div class="flex flex-col gap-1">
-            <h4 class="text-md">Product</h4>
+            <h4 class="text-md">{{ t('title.product') }}</h4>
             <TagSelect mode="product" v-model="productId"/>
         </div>
         <div class="flex flex-col gap-1">
-            <h4 class="text-md">Scope</h4>
+            <h4 class="text-md">{{ t('title.scope') }}</h4>
             <TagSelect mode="scope" v-model="scopeId"/>
         </div>
         <div class="flex flex-col gap-1">
-            <h4 class="text-md">Feature</h4>
+            <h4 class="text-md">{{ t('title.feature') }}</h4>
             <TagSelect mode="feature" v-model="featureId"/>
         </div>
         <div class="flex flex-col gap-1">
-            <h4 class="text-md">Customer</h4>
+            <h4 class="text-md">{{ t('title.customer') }}</h4>
             <TagSelect mode="customer" v-model="customerId"/>
         </div>
         </div>
@@ -132,11 +135,11 @@ const onCancel = () => {
 
     <div class="flex flex-col w-full gap-10">
         <div class="flex flex-col gap-1">
-        <h4 class="text-md">Developer Notes</h4>
+        <h4 class="text-md">{{ t('title.developerNotes') }}</h4>
         <Textarea placeholder="Developer notes" class="w-full" v-model="developerNotes"></Textarea>
         </div>
         <div class="flex flex-col gap-1">
-        <h4 class="text-md">Upgrade Notes</h4>
+        <h4 class="text-md">{{ t('title.upgradeRequirements') }}</h4>
         <Textarea placeholder="Upgrade notes" class="w-full" v-model="upgradeNotes"></Textarea>
         </div>
     </div>

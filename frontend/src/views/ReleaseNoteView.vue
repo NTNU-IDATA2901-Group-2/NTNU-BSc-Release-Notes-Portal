@@ -26,6 +26,7 @@ import type { ChangeNote, PersistReleaseNoteDTO } from '@/utils/types';
 import { EditReleaseNoteSchema } from '@/schemas';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../components/ui/breadcrumb';
+import { useI18n } from 'vue-i18n';
 
 const isEditing = ref(false)
 
@@ -42,15 +43,17 @@ const { mutate: archiveReleaseNote } = useArchiveReleaseNote(id,
     },
     onSuccess: () => {
       router.push(routeNames.releaseNotes);
-      toast.success(`Release note ${releaseNote?.value?.tag ?? ""} successfully deleted`);
+      toast.success(t('toast.releaseNoteDeletedSuccess'));
     },
     onError: () => {
-      toast.error(`Failed to delete release note ${releaseNote?.value?.tag ?? ""}`);
+      toast.error(t('toast.releaseNoteDeleteError'));
     }
   }
 );
 
 const deletePromptOpen = ref(false);
+
+const { t } = useI18n();
 
 const changeNotes = ref<ChangeNote[]>(releaseNote?.value?.changeNotes || [])
 
@@ -96,7 +99,7 @@ const queryClient = useQueryClient();
 const updateReleaseNoteMutation = useMutation({
   mutationFn: (values: PersistReleaseNoteDTO) => updateReleaseNote(id, values),
   onSuccess: () => {
-    toast.success('Release note updated successfully');
+    toast.success(t('toast.releaseNoteUpdatedSuccess'));
     queryClient.invalidateQueries({ queryKey: ['releaseNote', id] });
   }
 })
@@ -108,8 +111,11 @@ const handlePublish = () => {
 const publishReleaseNoteMutation = useMutation({
   mutationFn: () => publishReleaseNote(id, !releaseNote.value?.published),
   onSuccess: () => {
-    toast.success(`Release note ${releaseNote.value?.published ? 'privated' : 'published'} successfully`);
+    toast.success(!releaseNote.value?.published ? t('toast.releaseNotePublishedSuccess') : t('toast.releaseNoteUnpublishedSuccess'));
     queryClient.invalidateQueries({ queryKey: ['releaseNote', id] });
+  },
+  onError: () => {
+    toast.error(t('toast.releaseNotePublishError'));
   }
 })
 </script>
@@ -120,7 +126,7 @@ const publishReleaseNoteMutation = useMutation({
     <DeletePrompt v-model:open="deletePromptOpen" :on-confirm="() => archiveReleaseNote()" />
       <div class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10 flex items-center gap-4">
         <Button variant="outline" class="" @click="$router.back()">
-          <ArrowLeft />Previous
+          <ArrowLeft />{{ t('button.previous') }}
         </Button>
         <Breadcrumb class="text-text-primary">
           <BreadcrumbList>
@@ -137,15 +143,15 @@ const publishReleaseNoteMutation = useMutation({
 
     <form class="w-full flex flex-col items-center" @submit="onSubmit">
       <div class="md:hidden flex w-full mt-4 justify-end gap-2">
-        <Button v-if="isEditing" variant="outline" @click="isEditing = false">Cancel
+        <Button v-if="isEditing" variant="outline" @click="isEditing = false">{{ t('button.cancel') }}
           <Ban />
         </Button>
-        <Button v-if="isEditing" variant="outline" type="submit">Save
+        <Button v-if="isEditing" variant="outline" type="submit">{{ t('button.save') }}
           <Save />
         </Button>
       </div>
       <Spinner v-if="isPending || isFetching" />
-      <h1 v-if="isError">Error retreiving release note</h1>
+      <h1 v-if="isError">{{ t('loadingError.releaseNotes') }}</h1>
 
       <div 
         v-if="!isPending && !isFetching && !isError && releaseNote"
@@ -156,8 +162,8 @@ const publishReleaseNoteMutation = useMutation({
               <h1 v-if="!isEditing" class="text-2xl max-w-60 whitespace-nowrap overflow-hidden">{{
                 releaseNote.tag }}</h1>
               <div v-if="isEditing" class="flex flex-col gap-1">
-                <h4 class="text-md">Title</h4>
-                <Input class="w-full" v-model="tag" />
+                <h4 class="text-md">{{ t('title.title') }}</h4>
+                <Input class="w-full" v-model="tag" :placeholder="t('placeholder.title')" />
               </div>
               <Badge 
                 v-if="!isEditing" class="h-6"
@@ -173,20 +179,20 @@ const publishReleaseNoteMutation = useMutation({
                 <DropdownMenuContent class="mr-6 lg:mr-20 mt-2">
                   <DropdownMenuItem @click="startEditing">
                     <div class="w-full flex gap-2">
-                      <p class="text-text-dark-static ml-auto">Edit</p>
+                      <p class="text-text-dark-static ml-auto">{{ t('button.edit') }}</p>
                       <Pencil class="text-text-dark-static" />
                     </div>
                   </DropdownMenuItem>
                   <DropdownMenuItem @click="deletePromptOpen = true">
                     <div class="w-full flex gap-2">
-                      <p class="ml-auto text-text-dark-static">Delete</p>
+                      <p class="ml-auto text-text-dark-static">{{ t('button.delete') }}</p>
                       <Trash2 class="text-text-dark-static" />
                     </div>
                   </DropdownMenuItem>
                   <DropdownMenuItem @click="handlePublish">
                     <div class="w-full flex gap-2">
-                      <p class="ml-auto text-text-dark-static">{{ !releaseNote.published ? 'Publish'
-                        : 'Unpublish' }}</p>
+                      <p class="ml-auto text-text-dark-static">{{ !releaseNote.published ? t('button.publish')
+                        : t('button.unpublish') }}</p>
                       <component 
                         :is="!releaseNote.published ? Eye : EyeOff"
                         class="text-text-dark-static" />
@@ -194,7 +200,7 @@ const publishReleaseNoteMutation = useMutation({
                   </DropdownMenuItem>
                   <DropdownMenuItem disabled>
                     <div class="w-full flex gap-2">
-                      <p class="ml-auto text-text-dark-static">Export</p>
+                      <p class="ml-auto text-text-dark-static">{{ t('button.export') }}</p>
                       <FileDown class="text-text-dark-static" />
                     </div>
                   </DropdownMenuItem>
@@ -202,10 +208,10 @@ const publishReleaseNoteMutation = useMutation({
               </DropdownMenu>
               <Button 
                 class="hidden md:flex" v-if="isEditing" variant="outline"
-                @click="isEditing = false">Cancel
+                @click="isEditing = false">{{ t('button.cancel') }}
                 <Ban />
               </Button>
-              <Button class="hidden md:flex" v-if="isEditing" variant="outline" type="submit">Save
+              <Button class="hidden md:flex" v-if="isEditing" variant="outline" type="submit">{{ t('button.save') }}
                 <Save />
               </Button>
             </div>
@@ -213,8 +219,8 @@ const publishReleaseNoteMutation = useMutation({
 
           <p v-if="!isEditing" class="">{{ releaseNote.summary }}</p>
           <div class="flex flex-col gap-1" v-if="isEditing">
-            <h4 class="text-md">Description</h4>
-            <Textarea class="w-full" v-model="summary" />
+            <h4 class="text-md">{{ t('title.description') }}</h4>
+            <Textarea class="w-full" v-model="summary" :placeholder="t('placeholder.description')" />
           </div>
         </div>
         <Separator class="w-full h-2" />
@@ -229,15 +235,15 @@ const publishReleaseNoteMutation = useMutation({
                 
                 <h3 class="text-lg">{{ change.reference }}</h3>
                 <div>
-                  <h3 class="text-lg">Description</h3>
+                  <h3 class="text-lg">{{ t('title.description') }}</h3>
                   <p class="text-sm">{{ change.description }}</p>
                 </div>
                 <div>
-                  <h3 class="text-lg">Developer Notes</h3>
+                  <h3 class="text-lg">{{ t('title.developerNotes') }}</h3>
                   <p class="text-sm">{{ change.developerNotes }}</p>
                 </div>
                 <div>
-                  <h3 class="text-lg">Upgrade Notes</h3>
+                  <h3 class="text-lg">{{ t('title.upgradeRequirements') }}</h3>
                   <p class="text-sm">{{ change.upgradeNotes }}</p>
                 </div>
               </div>

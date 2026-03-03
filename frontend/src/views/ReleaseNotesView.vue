@@ -7,8 +7,11 @@ import Separator from '@/components/ui/separator/Separator.vue';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 import { ListFilterPlus, Search } from 'lucide-vue-next';
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const { isLoading, isFetching, isError, data } = useGetReleaseNotes();
+
+const { t } = useI18n();
 
 const selectedItems = ref<number[]>([]);
 
@@ -20,7 +23,7 @@ const selectedItems = ref<number[]>([]);
       <Spinner />
     </div>
 
-    <p v-else-if="isError">Failed to load change notes. Please try again later.</p>
+    <p v-else-if="isError">{{ t('loadingError.releaseNotes') }}</p>
 
     <div v-else class="flex gap-8 flex-col h-min w-full md:flex-row justify-center p-4">
       <div class="h-min hidden md:block">
@@ -32,13 +35,13 @@ const selectedItems = ref<number[]>([]);
 
           <div class="flex gap-2 w-full">
             <InputGroup>
-              <InputGroupInput placeholder="Search" disabled/>
+              <InputGroupInput :placeholder="t('button.search')" disabled/>
               <Button class="ml-2" disabled>
                 <Search />
               </Button>
             </InputGroup>
             <Button variant="outline" class="flex md:hidden" disabled>
-              <p>Filter</p>
+              <p>{{ t('button.filter') }}</p>
               <ListFilterPlus />
             </Button>
           </div>

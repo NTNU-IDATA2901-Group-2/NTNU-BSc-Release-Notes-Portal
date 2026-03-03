@@ -5,9 +5,11 @@ import { router } from './utils/router'
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import 'vue-sonner/style.css'
 import keycloak from './utils/keycloak';
+import { i18n } from './utils/i18n';
 
 const app = createApp(App)
   app.use(VueQueryPlugin)
+  app.use(i18n)
 
 keycloak.init({
   onLoad: "check-sso",
@@ -18,4 +20,3 @@ keycloak.init({
   app.use(router)
   app.mount("#app");
 });
-
