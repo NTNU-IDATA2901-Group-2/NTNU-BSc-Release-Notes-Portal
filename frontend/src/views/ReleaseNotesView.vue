@@ -1,44 +1,20 @@
 <script setup lang="ts">
 import { getReleaseNotes } from '@/api/release-note-api';
-import ProductFilter from '@/components/ProductFilter.vue';
 import ReleaseNoteCard from '@/components/ReleaseNoteCard.vue';
 import Button from '@/components/ui/button/Button.vue';
 import { InputGroup, InputGroupInput } from '@/components/ui/input-group';
 import Separator from '@/components/ui/separator/Separator.vue';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 import { ListFilterPlus, Search } from 'lucide-vue-next';
-import { computed, ref, watch } from 'vue';
+import { ref } from 'vue';
 import { useQuery } from "@tanstack/vue-query";
 import type { ReleaseNote } from '@/utils/types';
 
 const selectedItems = ref<number[]>([]);
-const filterProducts = ref<string[]>([]);
-
-const productParam = computed(() => filterProducts.value.join(','));
-
-watch(productParam, (newVal) => {
-  console.log('Selected products:', newVal);
-});
-
-const queryKey = computed(() => {
-  if (productParam.value.trim() !== '') {
-    return ['releaseNotes', { query: productParam.value }];
-  }
-
-  return ['releaseNotes'];
-} );
-
-
 
 const {data, isLoading, isFetching, isError} = useQuery<ReleaseNote[]>({
-  queryKey,
-  queryFn: () => {
-    if (productParam.value.trim() !== '') {
-      return getReleaseNotes({ products: productParam.value });
-    }
-
-    return getReleaseNotes();
-  },
+  queryKey : ['releaseNotes'],
+  queryFn: () => getReleaseNotes(),
 });
 
 </script>
@@ -54,9 +30,6 @@ const {data, isLoading, isFetching, isError} = useQuery<ReleaseNote[]>({
     <div v-else class="flex gap-8 flex-col h-min w-full md:flex-row justify-center p-4">
       <div class="h-min hidden md:block">
         <h1 class="text-2xl text-nowrap">Release Notes</h1>
-        
-        <ProductFilter :selectable="['1', '2', '3', '4']" v-model="filterProducts"/>
-
       </div>
 
       <div class="flex flex-col w-full gap-4 max-w-4xl">

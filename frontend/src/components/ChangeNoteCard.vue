@@ -5,21 +5,16 @@ import type { ChangeNote } from '@/utils/types';
 import { Checkbox } from './ui/checkbox';
 
 const props = defineProps<PrimitiveProps & {
-  changeNote: ChangeNote,
-  selected: boolean
+  changeNote: ChangeNote
 }>()
+
+const selected = defineModel<boolean>({ required: true })
 
 const changeNote = props.changeNote;
-
-// Hack for making checkbox work inside a RouterLink. Prevents the click event from propagating to the RouterLink, allowing the checkbox to be toggled without navigating to the change note details page. Also emits an update:selected event to the parent component to update the selected state of the change note card.
-const emit = defineEmits<{
-  'update:selected': [value: boolean]
-}>()
 
 const handleCheckboxClick = (event: Event) => {
   event.preventDefault();
   event.stopPropagation();
-  emit('update:selected', !props.selected);
 }
 
 </script>
@@ -32,8 +27,8 @@ const handleCheckboxClick = (event: Event) => {
       <div class="flex justify-between">
         <div class="flex gap-4 items-center">
 
-          <div @click="handleCheckboxClick" @keydown.enter="handleCheckboxClick" class="flex items-center">
-            <Checkbox :checked="$props.selected" :value="$props.changeNote.id" :disabled="false" />
+          <div @click="handleCheckboxClick" class="flex items-center">
+            <Checkbox v-model="selected" :disabled="false" />
           </div>
 
           <h3 class="text-xl">{{ changeNote.reference }}</h3>
