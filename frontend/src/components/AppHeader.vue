@@ -60,7 +60,7 @@ const firstLetters = computed(() => {
 				<MenubarContent>
 					<MenubarItem @click="theme = theme === 'dark' ? 'light' : 'dark'">
 						<div class="w-full flex gap-2">
-			    			<p class="text-text-dark-static ml-auto">{{ t('header.toggleTheme') }}</p>
+			    			<p class="ml-auto">{{ t('header.toggleTheme') }}</p>
 			    			<SunMoon class="text-text-dark-static"/>
 						</div>
 					</MenubarItem>
@@ -84,7 +84,7 @@ const firstLetters = computed(() => {
 					<MenubarSeparator/>
 					<MenubarItem @click="handleLogOut">
 						<div class="w-full flex gap-2">
-			    			<p class="text-text-dark-static ml-auto">{{ t('header.signOut') }}</p>
+			    			<p class="ml-auto">{{ t('header.signOut') }}</p>
 			    			<LogOut class="text-text-dark-static"/>
 						</div>
 					</MenubarItem>
