@@ -8,6 +8,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.example.demo.exception.ChangeNoteAlreadyHasReleaseNoteException;
 import com.example.demo.exception.ChangeNoteNotFoundException;
@@ -164,5 +165,16 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleChangeNoteAlreadyHasReleaseNoteException(ChangeNoteAlreadyHasReleaseNoteException e) {
     logger.warn("Change note already has a release note: {}", e.getMessage());
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Change note with ID " + e.getChangeNoteId() + " already has a release note with ID " + e.getExistingReleaseNoteId());
+  }
+
+  /**
+   * Handles the case where a requested resource is not found. Logs the event and returns a 404 response with a message.
+   * @param e the exception containing details about the missing resource
+   * @return a ResponseEntity with a 404 status and a message indicating the resource was not found
+   */
+  @ExceptionHandler(value = {NoResourceFoundException.class})
+  public ResponseEntity<String> handleResourceNotFoundException(NoResourceFoundException e) {
+    logger.warn("Resource not found: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
   }
 }

@@ -15,6 +15,7 @@ import type { ChangeNote } from '@/utils/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { Eye, FilePlus, LayersPlus, ListFilterPlus, Search } from 'lucide-vue-next';
 import { computed, provide, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue-sonner';
 
@@ -38,6 +39,7 @@ const clearFilters = () => {
 }
 
 const selectedItems = ref<ChangeNote[]>([]);
+const { t } = useI18n();
 
 const isChangeNoteSelected = (changeNote: ChangeNote) => {
   return selectedItems.value.some(selected => selected.id === changeNote.id);
@@ -59,7 +61,7 @@ const publishChangeNoteMutation = useMutation({
     mutationFn: (changeNoteId: number) => publishChangeNote(changeNoteId, true),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
-      toast.success(`Selected changenote published successfully!`);
+      toast.success(t('toast.selectedChangeNotesPublished'));
     }
 });;
 
@@ -115,7 +117,7 @@ const handleCreateReleaseNote = () => {
       <Spinner />
     </div>
 
-    <p v-else-if="isError">Failed to load change notes. Please try again later.</p>
+    <p v-else-if="isError">{{ t('loadingError.changeNotes') }}</p>
 
     <div v-else class="flex gap-8 flex-col h-min w-full md:flex-row justify-center p-4">
       <div class="h-min hidden md:block">
@@ -130,26 +132,29 @@ const handleCreateReleaseNote = () => {
       <div class="flex flex-col w-full gap-4 max-w-4xl">
         <div class="w-full flex flex-col md:flex-row-reverse justify-center md:justify-end gap-2">
           <div class="flex justify-center gap-2 flex-wrap md:flex-nowrap">
-            <Button variant="outline" @click="handlePublish">Publish
+            <Button variant="outline" @click="handlePublish">
+              {{ t('button.publish') }}
               <Eye />
             </Button>
-            <Button variant="outline" @click="handleCreateChangeNote">Create Change Note
+            <Button variant="outline" @click="handleCreateChangeNote">
+              {{ t('button.createChangeNote') }}
               <LayersPlus />
             </Button>
-            <Button variant="solidaccent" @click="handleCreateReleaseNote">Create Release Note
+            <Button variant="solidaccent" @click="handleCreateReleaseNote">
+              {{ t('button.createReleaseNote') }}
               <FilePlus />
             </Button>
           </div>
 
           <div class="flex gap-2 w-full">
             <InputGroup>
-              <InputGroupInput placeholder="Search" disabled/>
+              <InputGroupInput :placeholder="t('button.search')" disabled/>
               <Button class="ml-2" disabled>
                 <Search />
               </Button>
             </InputGroup>
             <Button variant="outline" class="flex md:hidden" disabled>
-              <p>Filter</p>
+              <p>{{ t('button.filter') }}</p>
               <ListFilterPlus />
             </Button>
           </div>

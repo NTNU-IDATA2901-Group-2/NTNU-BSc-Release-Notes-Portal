@@ -9,6 +9,9 @@ import { ListFilterPlus, Search } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { useQuery } from "@tanstack/vue-query";
 import type { ReleaseNote } from '@/utils/types';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const selectedItems = ref<number[]>([]);
 
@@ -25,7 +28,7 @@ const {data, isLoading, isFetching, isError} = useQuery<ReleaseNote[]>({
       <Spinner />
     </div>
 
-    <p v-else-if="isError">Failed to load change notes. Please try again later.</p>
+    <p v-else-if="isError">{{ t('loadingError.releaseNotes') }}</p>
 
     <div v-else class="flex gap-8 flex-col h-min w-full md:flex-row justify-center p-4">
       <div class="h-min hidden md:block">
@@ -37,13 +40,13 @@ const {data, isLoading, isFetching, isError} = useQuery<ReleaseNote[]>({
 
           <div class="flex gap-2 w-full">
             <InputGroup>
-              <InputGroupInput placeholder="Search" disabled/>
+              <InputGroupInput :placeholder="t('button.search')" disabled/>
               <Button class="ml-2" disabled>
                 <Search />
               </Button>
             </InputGroup>
             <Button variant="outline" class="flex md:hidden" disabled>
-              <p>Filter</p>
+              <p>{{ t('button.filter') }}</p>
               <ListFilterPlus />
             </Button>
           </div>

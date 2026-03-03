@@ -1,0 +1,74 @@
+{
+    "header": {
+        "releaseNotesLink": "Release Notes",
+        "changeNotesLink": "Change Notes",
+        "toggleTheme": "Toggle Theme",
+        "signOut": "Sign Out",
+        "language": "Language",
+        "english": "English",
+        "norwegian": "Norwegian"
+    },
+    "button": {
+        "previous": "Previous",
+        "edit": "Edit",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "export": "Export",
+        "publish": "Publish",
+        "unpublish": "Unpublish",
+        "none": "None",
+        "createChangeNote": "Create Change Note",
+        "createReleaseNote": "Create Release Note",
+        "search": "Search",
+        "filter": "Filter",
+        "signIn": "Sign In"
+        
+    },
+    "title": {
+        "title": "Title",
+        "description": "Description",
+        "product": "Product",
+        "scope": "Scope",
+        "feature": "Feature",
+        "customer": "Customer",
+        "developerNotes": "Developer Notes",
+        "upgradeRequirements": "Upgrade Requirements"
+    },
+    "toast": {
+        "changeNoteDeleted": "Change note deleted successfully",
+        "changeNoteDeleteError": "An error occurred while deleting the change note",
+        "changeNotePublished": "Change note published successfully",
+        "changeNoteUnpublished": "Change note unpublished successfully",
+        "changeNotePublishError": "An error occurred while publishing change note",
+        "changeNoteUnpublishError": "An error occurred while unpublishing change note",
+        "changeNoteUpdatedSuccess": "Change note updated successfully",
+        "selectedChangeNotesPublished": "Selected change notes published successfully",
+        "releaseNoteDeletedSuccess": "Release note deleted successfully",
+        "releaseNoteDeleteError": "An error occurred while deleting the release note",
+        "releaseNotePublished": "Release note published successfully",
+        "releaseNoteUnpublished": "Release note unpublished successfully",
+        "releaseNotePublishError": "An error occurred while publishing release note",
+        "releaseNoteUnpublishError": "An error occurred while unpublishing release note",
+        "releaseNoteUpdatedSuccess": "Release note updated successfully"
+    },
+    "deletePrompt": {
+        "title": "Are you sure you want to delete?",
+        "description": "This action cannot be undone."
+    },
+    "card": {
+        "published": "Published",
+        "private": "Private"
+    },
+    "loadingError": {
+        "changeNotes": "An error occurred while loading change notes",
+        "releaseNotes": "An error occurred while loading release notes"
+    },
+    "notFound": {
+        "resourceNotFound": "The resource you are trying to access has either been moved, or does not exist.",
+        "404": "404 - Not Found"
+    },
+    "signIn": {
+        "pleaseSignIn": "Please sign in ..."
+    }
+}

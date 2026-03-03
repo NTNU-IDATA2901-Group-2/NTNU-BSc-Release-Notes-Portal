@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select'
 import type { Tag } from '@/utils/types';
 import type { PrimitiveProps } from 'reka-ui';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps<PrimitiveProps & {
     mode: SelectMode,
@@ -41,6 +42,8 @@ const getTagFromId = (id?: number) => {
     return tag ? tag.name : 'None'
 }
 
+const { t } = useI18n();
+
 const currentValue = () => (props.modelValue ?? props.selectedId ?? -1).toString()
 
 </script>
@@ -54,7 +57,7 @@ const currentValue = () => (props.modelValue ?? props.selectedId ?? -1).toString
     <SelectContent>
         <SelectGroup>
         <SelectItem value="-1" class="text-text-primary/50">
-            None
+            {{ t('button.none') }}
         </SelectItem>
         <SelectItem v-for="tag in tags" :key="tag.id" :value="tag.id.toString()">
             {{ tag.name }}
