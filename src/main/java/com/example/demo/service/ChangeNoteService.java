@@ -95,18 +95,19 @@ public class ChangeNoteService {
   /**
    * Retrieves all change notes from the repository, with optional filtering based on query, published status, customer ID, feature ID, scope ID, and product ID.
    * 
-   * @param query        optional filter for searching change notes by reference, description, developer notes, upgrade notes, or change source
-   * @param published    optional filter for published status
-   * @param customerId   optional filter for customer ID
-   * @param featureId    optional filter for feature ID
-   * @param scopeId      optional filter for scope ID
-   * @param productId    optional filter for product ID
+   * @param query          optional filter for searching change notes by reference, description, developer notes, upgrade notes, or change source
+   * @param published      optional filter for published status
+   * @param hasReleaseNote optional filter for change notes that have an associated release note
+   * @param customerIds    optional filter for customer ID
+   * @param featureIds     optional filter for feature ID
+   * @param scopeIds       optional filter for scope ID
+   * @param productIds     optional filter for product ID
    * 
    * @return a list of all change notes that match the provided filters, mapped to ChangeNoteDTOs
    */
-  public List<ChangeNoteDTO> getAllChangeNotes(String query, Boolean published, List<Long> customerIds, List<Long> featureIds, List<Long> scopeIds, List<Long> productIds) {
+  public List<ChangeNoteDTO> getAllChangeNotes(String query, Boolean published, Boolean hasReleaseNote, List<Long> customerIds, List<Long> featureIds, List<Long> scopeIds, List<Long> productIds) {
     return changeNoteRepository
-        .findByArchivedFalseAndMatchingFilterParameters(query, published, customerIds, featureIds, scopeIds, productIds)
+        .findByArchivedFalseAndMatchingFilterParameters(query, published, hasReleaseNote, customerIds, featureIds, scopeIds, productIds)
         .stream().map(ChangeNoteDTO::fromChangeNote).toList();
   }
 

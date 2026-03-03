@@ -64,7 +64,7 @@ public class ChangeNoteController {
   }
 
 
-  @Operation(summary = "Get all change notes, with optional filters", description = "Retrieves a list of all change notes with optional filters for query, published status, customer, feature, scope, and product")
+  @Operation(summary = "Get all change notes, with optional filters", description = "Retrieves a list of all change notes with optional filters for query, published status, has release note, customer, feature, scope, and product")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "Change notes retrieved successfully"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -73,13 +73,14 @@ public class ChangeNoteController {
   public ResponseEntity<List<ChangeNoteDTO>> getAllChangeNotes(
     @RequestParam(required = false) String query,
     @RequestParam(required = false) Boolean published,
+    @RequestParam(required = false) Boolean hasReleaseNote,
     @RequestParam(required = false) List<Long> customerIds,
     @RequestParam(required = false) List<Long> featureIds,
     @RequestParam(required = false) List<Long> scopeIds,
     @RequestParam(required = false) List<Long> productIds
     ) {
-    List<ChangeNoteDTO> changeNotes = changeNoteService.getAllChangeNotes(query, published, customerIds, featureIds, scopeIds, productIds);
-    logger.info("Retrieved {} change notes with filters - query: {}, published: {}, customerIds: {}, featureIds: {}, scopeIds: {}, productIds: {}", changeNotes.size(), query, published, customerIds, featureIds, scopeIds, productIds);
+    List<ChangeNoteDTO> changeNotes = changeNoteService.getAllChangeNotes(query, published, hasReleaseNote, customerIds, featureIds, scopeIds, productIds);
+    logger.info("Retrieved {} change notes with filters - query: {}, published: {}, hasReleaseNote: {}, customerIds: {}, featureIds: {}, scopeIds: {}, productIds: {}", changeNotes.size(), query, published, hasReleaseNote, customerIds, featureIds, scopeIds, productIds);
     return ResponseEntity.ok(changeNotes);
   }
 

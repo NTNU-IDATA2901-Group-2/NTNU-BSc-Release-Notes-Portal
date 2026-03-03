@@ -81,15 +81,16 @@ public class ReleaseNoteService {
   }
 
   /**
-   * Retrieves a list of all non-archived release notes with optional filters for query and published status.
+   * Retrieves a list of all non-archived release notes with optional filters for query, published status, and product.
    *
    * @param query optional filter for release note tag or summary containing the query string (case-insensitive)
    * @param published optional filter for release note published status
+   * @param productIds optional filter for release note associated product IDs
    *
    * @return a list of ReleaseNoteDTOs representing all non-archived release notes that match the provided filters
    */
-  public List<ReleaseNoteDTO> getAllReleaseNotes(String query, Boolean published) {
-    return releaseNoteRepository.findByArchivedFalseAndContainingQuery(query).stream().map(ReleaseNoteDTO::fromReleaseNote).toList();
+  public List<ReleaseNoteDTO> getAllReleaseNotes(String query, Boolean published, List<Long> productIds) {
+    return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParameters(query, published, productIds).stream().map(ReleaseNoteDTO::fromReleaseNote).toList();
   }
 
   /**
