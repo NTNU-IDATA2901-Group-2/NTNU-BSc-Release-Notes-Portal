@@ -1,0 +1,73 @@
+{
+    "header": {
+        "releaseNotesLink": "Notes de version",
+        "changeNotesLink": "Notes de modification",
+        "toggleTheme": "Changer le thème",
+        "signOut": "Se déconnecter",
+        "language": "Langue",
+        "english": "Anglais",
+        "norwegian": "Norvégien"
+    },
+    "button": {
+        "previous": "Précédent",
+        "edit": "Modifier",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "delete": "Supprimer",
+        "export": "Exporter",
+        "publish": "Publier",
+        "unpublish": "Dépublier",
+        "none": "Aucun",
+        "createChangeNote": "Créer une note de modification",
+        "createReleaseNote": "Créer une note de version",
+        "search": "Rechercher",
+        "filter": "Filtrer",
+        "signIn": "Se connecter"
+    },
+    "title": {
+        "title": "Titre",
+        "description": "Description",
+        "product": "Produit",
+        "scope": "Portée",
+        "feature": "Fonctionnalité",
+        "customer": "Client",
+        "developerNotes": "Notes du développeur",
+        "upgradeRequirements": "Exigences de mise à niveau"
+    },
+    "toast": {
+        "changeNoteDeleted": "Note de modification supprimée avec succès",
+        "changeNoteDeleteError": "Une erreur est survenue lors de la suppression de la note de modification",
+        "changeNotePublished": "Note de modification publiée avec succès",
+        "changeNoteUnpublished": "Note de modification dépubliée avec succès",
+        "changeNotePublishError": "Une erreur est survenue lors de la publication de la note de modification",
+        "changeNoteUnpublishError": "Une erreur est survenue lors de la dépublication de la note de modification",
+        "changeNoteUpdatedSuccess": "Note de modification mise à jour avec succès",
+        "selectedChangeNotesPublished": "Notes de modification sélectionnées publiées avec succès",
+        "releaseNoteDeletedSuccess": "Note de version supprimée avec succès",
+        "releaseNoteDeleteError": "Une erreur est survenue lors de la suppression de la note de version",
+        "releaseNotePublished": "Note de version publiée avec succès",
+        "releaseNoteUnpublished": "Note de version dépubliée avec succès",
+        "releaseNotePublishError": "Une erreur est survenue lors de la publication de la note de version",
+        "releaseNoteUnpublishError": "Une erreur est survenue lors de la dépublication de la note de version",
+        "releaseNoteUpdatedSuccess": "Note de version mise à jour avec succès"
+    },
+    "deletePrompt": {
+        "title": "Êtes-vous sûr de vouloir supprimer ?",
+        "description": "Cette action est irréversible."
+    },
+    "card": {
+        "published": "Publié",
+        "private": "Privé"
+    },
+    "loadingError": {
+        "changeNotes": "Une erreur est survenue lors du chargement des notes de modification",
+        "releaseNotes": "Une erreur est survenue lors du chargement des notes de version"
+    },
+    "notFound": {
+        "resourceNotFound": "La ressource que vous essayez d’accéder a été déplacée ou n’existe pas.",
+        "404": "404 - Non trouvé"
+    },
+    "signIn": {
+        "pleaseSignIn": "Veuillez vous connecter..."
+    }
+}

@@ -1,9 +1,12 @@
 {
     "header": {
-        "releaseNotes": "Release Notes",
-        "changeNotes": "Change Notes",
+        "releaseNotesLink": "Release Notes",
+        "changeNotesLink": "Change Notes",
         "toggleTheme": "Toggle Theme",
-        "signOut": "Sign Out"
+        "signOut": "Sign Out",
+        "language": "Language",
+        "english": "English",
+        "norwegian": "Norwegian"
     },
     "button": {
         "previous": "Previous",

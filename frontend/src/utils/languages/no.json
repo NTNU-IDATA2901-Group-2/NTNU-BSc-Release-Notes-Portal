@@ -3,7 +3,10 @@
         "releaseNotesLink": "Release Notes",
         "changeNotesLink": "Change Notes",
         "toggleTheme": "Bytt tema",
-        "signOut": "Logg ut"
+        "signOut": "Logg ut",
+        "language": "Språk",
+        "english": "Engelsk",
+        "norwegian": "Norsk"
     },
     "button": {
         "previous": "Forrige",
