@@ -18,11 +18,11 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
       FROM ChangeNote c
 
       WHERE c.archived = false AND
-        (:published IS NULL OR :published = c.published) AND
-        (:customerId IS NULL OR :customerId = c.customer.id) AND
-        (:featureId IS NULL OR :featureId = c.feature.id) AND
-        (:scopeId IS NULL OR :scopeId = c.scope.id) AND
-        (:productId IS NULL OR :productId = c.product.id) AND
+        (:published IS NULL OR c.published = :published) AND
+        (:customerIds IS NULL OR c.customer.id IN :customerIds) AND
+        (:featureIds IS NULL OR c.feature.id IN :featureIds) AND
+        (:scopeIds IS NULL OR c.scope.id IN :scopeIds) AND
+        (:productIds IS NULL OR c.product.id IN :productIds) AND
         ((:query IS NULL OR :query = '') OR
         LOWER(c.reference) LIKE LOWER('%' || :query || '%') OR
         LOWER(c.description) LIKE LOWER('%' || :query || '%') OR
@@ -31,5 +31,5 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
         LOWER(c.changeSource) LIKE LOWER('%' || :query || '%'))
       
       """)
-    public List<ChangeNote> findByArchivedFalseAndMatchingFilterParameters(String query, Boolean published, Long customerId, Long featureId, Long scopeId, Long productId);
+    public List<ChangeNote> findByArchivedFalseAndMatchingFilterParameters(String query, Boolean published, List<Long> customerIds, List<Long> featureIds, List<Long> scopeIds, List<Long> productIds);
 }

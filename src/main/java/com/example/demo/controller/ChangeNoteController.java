@@ -73,13 +73,13 @@ public class ChangeNoteController {
   public ResponseEntity<List<ChangeNoteDTO>> getAllChangeNotes(
     @RequestParam(required = false) String query,
     @RequestParam(required = false) Boolean published,
-    @RequestParam(required = false) Long customerId,
-    @RequestParam(required = false) Long featureId,
-    @RequestParam(required = false) Long scopeId,
-    @RequestParam(required = false) Long productId
+    @RequestParam(required = false) List<Long> customerIds,
+    @RequestParam(required = false) List<Long> featureIds,
+    @RequestParam(required = false) List<Long> scopeIds,
+    @RequestParam(required = false) List<Long> productIds
     ) {
-    List<ChangeNoteDTO> changeNotes = changeNoteService.getAllChangeNotes(query, published, customerId, featureId, scopeId, productId);
-    logger.info("Retrieved {} change notes with filters - query: {}, published: {}, customerId: {}, featureId: {}, scopeId: {}, productId: {}", changeNotes.size(), query, published, customerId, featureId, scopeId, productId);
+    List<ChangeNoteDTO> changeNotes = changeNoteService.getAllChangeNotes(query, published, customerIds, featureIds, scopeIds, productIds);
+    logger.info("Retrieved {} change notes with filters - query: {}, published: {}, customerIds: {}, featureIds: {}, scopeIds: {}, productIds: {}", changeNotes.size(), query, published, customerIds, featureIds, scopeIds, productIds);
     return ResponseEntity.ok(changeNotes);
   }
 

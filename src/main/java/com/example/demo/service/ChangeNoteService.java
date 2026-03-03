@@ -104,9 +104,9 @@ public class ChangeNoteService {
    * 
    * @return a list of all change notes that match the provided filters, mapped to ChangeNoteDTOs
    */
-  public List<ChangeNoteDTO> getAllChangeNotes(String query, Boolean published, Long customerId, Long featureId, Long scopeId, Long productId) {
+  public List<ChangeNoteDTO> getAllChangeNotes(String query, Boolean published, List<Long> customerIds, List<Long> featureIds, List<Long> scopeIds, List<Long> productIds) {
     return changeNoteRepository
-        .findByArchivedFalseAndMatchingFilterParameters(query, published, customerId, featureId, scopeId, productId)
+        .findByArchivedFalseAndMatchingFilterParameters(query, published, customerIds, featureIds, scopeIds, productIds)
         .stream().map(ChangeNoteDTO::fromChangeNote).toList();
   }
 
