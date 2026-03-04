@@ -13,6 +13,6 @@ const { t } = useI18n();
       <h4 class="text-lg">{{ t('title.customer') }}</h4>
       <p v-if="isLoading">{{ t('loading.filter') }}</p>
       <p v-else-if="isError">{{ t('loadingError.customers') }}</p>
-      <FilterListItem v-else v-for="product in products" :key="product.id" :query-key="'customerId'" :value="product.id.toString()" :label="product.name"/>
+      <FilterListItem v-else v-for="product in products" :key="product.id" :query-key="'customerIds'" :value="product.id.toString()" :label="product.name"/>
     </div>
 </template>

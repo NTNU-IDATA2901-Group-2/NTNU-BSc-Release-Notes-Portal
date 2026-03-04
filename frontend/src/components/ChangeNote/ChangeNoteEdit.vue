@@ -135,11 +135,11 @@ const onCancel = () => {
     <div class="flex flex-col w-full gap-10">
         <div class="flex flex-col gap-1">
         <h4 class="text-md">{{ t('title.developerNotes') }}</h4>
-        <Textarea placeholder="Developer notes" class="w-full" v-model="developerNotes"></Textarea>
+        <Textarea :placeholder="t('placeholder.developerNotes')" class="w-full" v-model="developerNotes"></Textarea>
         </div>
         <div class="flex flex-col gap-1">
         <h4 class="text-md">{{ t('title.upgradeRequirements') }}</h4>
-        <Textarea placeholder="Upgrade notes" class="w-full" v-model="upgradeNotes"></Textarea>
+        <Textarea :placeholder="t('placeholder.upgradeRequirements')" class="w-full" v-model="upgradeNotes"></Textarea>
         </div>
     </div>
     </div>

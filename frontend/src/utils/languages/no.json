@@ -34,7 +34,8 @@
         "customer": "Kunde",
         "developerNotes": "Utviklernotater",
         "upgradeRequirements": "Oppgraderingskrav",
-        "search": "Søk"
+        "search": "Søk",
+        "status": "Status"
     },
     "toast": {
         "changeNoteDeleted": "Endringsnotat slettet",
@@ -88,5 +89,11 @@
     },
     "signIn": {
         "pleaseSignIn": "Vennligst logg inn"
+    },
+    "placeholder": {
+        "title": "Tittel",
+        "description": "Beskrivelse",
+        "developerNotes": "Utviklernotater",
+        "upgradeRequirements": "Oppgraderingskrav"
     }
 }

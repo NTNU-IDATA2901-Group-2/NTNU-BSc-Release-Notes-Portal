@@ -46,7 +46,6 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
         LOWER(c.developerNotes) LIKE LOWER('%' || :query || '%') OR
         LOWER(c.upgradeNotes) LIKE LOWER('%' || :query || '%') OR
         LOWER(c.changeSource) LIKE LOWER('%' || :query || '%'))
-      
       """)
     public List<ChangeNote> findByArchivedFalseAndMatchingFilterParameters(String query, Boolean published, Boolean hasReleaseNote, List<Long> customerIds, List<Long> featureIds, List<Long> scopeIds, List<Long> productIds);
 }

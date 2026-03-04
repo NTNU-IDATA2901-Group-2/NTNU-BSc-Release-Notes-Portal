@@ -33,7 +33,8 @@
         "feature": "Feature",
         "customer": "Customer",
         "developerNotes": "Developer Notes",
-        "upgradeRequirements": "Upgrade Requirements"
+        "upgradeRequirements": "Upgrade Requirements",
+        "status": "Status"
     },
     "toast": {
         "changeNoteDeleted": "Change note deleted successfully",
@@ -87,5 +88,11 @@
     },
     "signIn": {
         "pleaseSignIn": "Please sign in ..."
+    },
+    "placeholder": {
+        "title": "Title",
+        "description": "Description",
+        "developerNotes": "Developer Notes",
+        "upgradeRequirements": "Upgrade Requirements"
     }
 }
