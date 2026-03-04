@@ -32,12 +32,10 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
       LEFT JOIN c.releaseNote r ON (r.archived = false)
       WHERE c.archived = false AND
         (:published IS NULL OR c.published = :published) AND
-        (:hasReleaseNote IS NULL OR (
-          r.archived = FALSE AND (
-            (:hasReleaseNote = TRUE AND c.releaseNote IS NOT NULL) OR
-            (:hasReleaseNote = FALSE AND c.releaseNote IS NULL)
-          )
-        )) AND
+        (:hasReleaseNote IS NULL OR
+          (:hasReleaseNote = TRUE AND c.releaseNote IS NOT NULL) OR
+          (:hasReleaseNote = FALSE AND c.releaseNote IS NULL)
+        ) AND
         (:customerIds IS NULL OR c.customer.id IN :customerIds) AND
         (:featureIds IS NULL OR c.feature.id IN :featureIds) AND
         (:scopeIds IS NULL OR c.scope.id IN :scopeIds) AND
@@ -48,7 +46,6 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
         LOWER(c.developerNotes) LIKE LOWER('%' || :query || '%') OR
         LOWER(c.upgradeNotes) LIKE LOWER('%' || :query || '%') OR
         LOWER(c.changeSource) LIKE LOWER('%' || :query || '%'))
-      
       """)
     public List<ChangeNote> findByArchivedFalseAndMatchingFilterParameters(String query, Boolean published, Boolean hasReleaseNote, List<Long> customerIds, List<Long> featureIds, List<Long> scopeIds, List<Long> productIds);
 }

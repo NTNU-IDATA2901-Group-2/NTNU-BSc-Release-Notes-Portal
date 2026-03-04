@@ -5,10 +5,12 @@ import ChangeNoteCard from '@/components/ChangeNoteCard.vue';
 import CustomerFilter from '@/components/filters/CustomerFilter.vue';
 import FeatureFilter from '@/components/filters/FeatureFilter.vue';
 import ProductFilter from '@/components/filters/ProductFilter.vue';
+import PublicPrivateFilter from '@/components/filters/PublicPrivateFilter..vue';
 import ScopeFilter from '@/components/filters/ScopeFilter.vue';
 import MultiselectChangeNotes from '@/components/MultiselectChangeNotes.vue';
 import Button from '@/components/ui/button/Button.vue';
 import { InputGroup, InputGroupInput } from '@/components/ui/input-group';
+import ScrollArea from '@/components/ui/scroll-area/ScrollArea.vue';
 import Separator from '@/components/ui/separator/Separator.vue';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 import type { ChangeNote } from '@/utils/types';
@@ -112,16 +114,11 @@ const handleCreateReleaseNote = () => {
 </script>
 
 <template>
-  <div class="min-h-screen flex justify-center align-bottom">
-    <div v-if="isLoading || isFetching">
-      <Spinner />
-    </div>
-
-    <p v-else-if="isError">{{ t('loadingError.changeNotes') }}</p>
-
-    <div v-else class="flex gap-8 flex-col h-min w-full md:flex-row justify-center p-4">
+  <div class="min-h-screen flex justify-center align-bottom mt-6">
+    <div class="flex gap-8 flex-col h-min w-full md:flex-row justify-center p-4">
       <div class="h-min hidden md:block">
-        <h1 class="text-2xl text-nowrap">Change Notes</h1>
+        <h1 class="text-2xl text-nowrap">Change Notes</h1>@
+        <PublicPrivateFilter />
         <ProductFilter />
         <ScopeFilter />
         <FeatureFilter />
@@ -160,16 +157,20 @@ const handleCreateReleaseNote = () => {
           </div>
         </div>
 
-        <div>
-          <MultiselectChangeNotes v-model="selectedItems"/>
-        </div>
+        <MultiselectChangeNotes v-model="selectedItems"/>
 
-        <div v-for="changeNote in data" :key="changeNote.id" class="flex flex-col gap-4">
-          <ChangeNoteCard
-:key="changeNote.id" :model-value="isChangeNoteSelected(changeNote)"
+        <Spinner v-if="isLoading || isFetching"/>
+        <p v-else-if="isError">{{ t('loadingError.releaseNotes') }}</p>
+
+        <ScrollArea class="h-[75vh] w-full" v-else>
+        <div v-for="changeNote in data" :key="changeNote.id" class="flex flex-col">
+          <ChangeNoteCard 
+            class="my-4"
+            :key="changeNote.id" :model-value="isChangeNoteSelected(changeNote)"
             :change-note="changeNote" @update:model-value="toggleSelection(changeNote)" />
           <Separator />
         </div>
+        </ScrollArea>
       </div>
     </div>
   </div>
