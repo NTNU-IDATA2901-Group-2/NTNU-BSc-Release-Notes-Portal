@@ -50,6 +50,7 @@ const getReleaseNote = async (id: string): Promise<ReleaseNote> => {
  * @returns A promise that resolves to an array of release note data retrieved from the API.
  */
 export const getReleaseNotes = async (params?: URLSearchParams): Promise<ReleaseNote[]> => {
+  console.log("Fetching release notes with params:", params?.toString());
   const response = await api.get(`releasenotes`, { params})
   return response.data as ReleaseNote[];
 }

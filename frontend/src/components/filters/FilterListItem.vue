@@ -9,14 +9,28 @@ const props = defineProps<{
 }>()
 
 const searchParams = inject('searchParams') as Ref<{ [key: string]: string }>;
-const isInParams = computed(() => searchParams.value[props.queryKey] === props.value);
+const isInParams = computed(() => {
+  const params = searchParams.value[props.queryKey]?.split(',') || [];
+  return params.includes(props.value);
+});
 
 const update = (value: string | boolean) => {
+  const params = searchParams.value[props.queryKey]?.split(',') || [];
   if (typeof value === 'boolean') {
     if (value) {
-      searchParams.value[props.queryKey] = props.value;
+      if (!params.includes(props.value)) {
+        params.push(props.value);
+        searchParams.value[props.queryKey] = params.join(',');
+      }
     } else {
-      delete searchParams.value[props.queryKey];
+      if (params.includes(props.value)) {
+        const newParams = params.filter(param => param !== props.value);
+        if (newParams.length > 0) {
+          searchParams.value[props.queryKey] = newParams.join(',');
+        } else {
+          delete searchParams.value[props.queryKey];
+        }
+      }
     }
   }
 }

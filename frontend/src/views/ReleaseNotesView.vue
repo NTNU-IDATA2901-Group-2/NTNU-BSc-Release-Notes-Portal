@@ -21,9 +21,11 @@ const searchParams = ref({});
 const urlSearchParams = computed(() => new URLSearchParams(searchParams.value));
 const queryKey = computed(() => ['releaseNotes', urlSearchParams.value.toString()]);
 
-const {data, isLoading, isFetching, isError} = useQuery<ReleaseNote[]>({
+const {data, isLoading, isFetching, isError} = useQuery<ReleaseNote[]>(  
+{
   queryKey,
-  queryFn: () => getReleaseNotes(urlSearchParams.value),
+  queryFn: () => getReleaseNotes(urlSearchParams.value)
+  
 });
 
 watch(searchParams, () => {
@@ -68,7 +70,7 @@ const clearFilters = () => {
         <ScrollArea class="h-[80vh] w-full" v-else>
         <div v-for="releaseNote in data" :key="releaseNote.id" class="flex flex-col">
           <ReleaseNoteCard
-            class="my-4"
+            class=""
             :key="releaseNote.id" :selected="selectedItems.includes(releaseNote.id)"
             :release-note="releaseNote" />
           <Separator />
