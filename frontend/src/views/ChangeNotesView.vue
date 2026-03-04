@@ -29,6 +29,7 @@ const { isLoading, isFetching, isError, data } = useQuery({
   queryKey,
   queryFn: () => getChangeNotes(urlSearchParams.value)
 });
+const search = ref('');
 
 watch(searchParams, () => {
   console.log('Search parameters updated:', searchParams.value.toString());
@@ -111,13 +112,17 @@ const handleCreateReleaseNote = () => {
   createReleaseNoteMutation.mutate();
 }
 
+const onSearch = () => {
+  searchParams.value = { ...searchParams.value, query: search.value };
+}
+
 </script>
 
 <template>
   <div class="min-h-screen flex justify-center align-bottom mt-6">
     <div class="flex gap-8 flex-col h-min w-full md:flex-row justify-center p-4">
       <div class="h-min hidden md:block">
-        <h1 class="text-2xl text-nowrap">Change Notes</h1>@
+        <h1 class="text-2xl text-nowrap">Change Notes</h1>
         <PublicPrivateFilter />
         <ProductFilter />
         <ScopeFilter />
@@ -145,12 +150,12 @@ const handleCreateReleaseNote = () => {
 
           <div class="flex gap-2 w-full">
             <InputGroup>
-              <InputGroupInput :placeholder="t('button.search')" disabled/>
-              <Button class="ml-2" disabled>
+              <InputGroupInput :placeholder="t('button.search')" @keyup.enter="onSearch" v-model="search"/>
+              <Button class="ml-2">
                 <Search />
               </Button>
             </InputGroup>
-            <Button variant="outline" class="flex md:hidden" disabled>
+            <Button variant="outline" class="flex md:hidden">
               <p>{{ t('button.filter') }}</p>
               <ListFilterPlus />
             </Button>
