@@ -38,19 +38,26 @@
     "toast": {
         "changeNoteDeleted": "Change note deleted successfully",
         "changeNoteDeleteError": "An error occurred while deleting the change note",
+        "changeNoteCreated": "Change note created successfully",
+        "changeNoteCreateError": "An error occurred while creating the change note",
         "changeNotePublished": "Change note published successfully",
         "changeNoteUnpublished": "Change note unpublished successfully",
         "changeNotePublishError": "An error occurred while publishing change note",
         "changeNoteUnpublishError": "An error occurred while unpublishing change note",
         "changeNoteUpdatedSuccess": "Change note updated successfully",
+        "changeNoteUpdateError": "An error occurred while updating the change note",
         "selectedChangeNotesPublished": "Selected change notes published successfully",
+        "selectedChangeNotesPublishError": "Selected change notes could not be published",
+        "releaseNoteCreated": "Release note created successfully",
+        "releaseNoteCreateError": "An error occurred while creating the release note",
         "releaseNoteDeletedSuccess": "Release note deleted successfully",
         "releaseNoteDeleteError": "An error occurred while deleting the release note",
         "releaseNotePublished": "Release note published successfully",
         "releaseNoteUnpublished": "Release note unpublished successfully",
         "releaseNotePublishError": "An error occurred while publishing release note",
         "releaseNoteUnpublishError": "An error occurred while unpublishing release note",
-        "releaseNoteUpdatedSuccess": "Release note updated successfully"
+        "releaseNoteUpdatedSuccess": "Release note updated successfully",
+        "releaseNoteUpdateError": "An error occurred while updating the release note"
     },
     "deletePrompt": {
         "title": "Are you sure you want to delete?",

@@ -1,9 +1,9 @@
 <script lang="tsx" setup>
-import { useScopes } from '@/api/scopes-api';
+import { useGetScopes } from '@/api/scopes-api';
 import FilterListItem from './FilterListItem.vue';
 import { useI18n } from 'vue-i18n';
 
-const { data: scopes, isLoading, isError } = useScopes();
+const { data: scopes, isLoading, isError } = useGetScopes();
 const { t } = useI18n();
 
 </script>

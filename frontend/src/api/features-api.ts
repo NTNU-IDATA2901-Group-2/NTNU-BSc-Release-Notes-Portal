@@ -8,7 +8,7 @@ import api from "./api";
  * @returns An array of feature data retrieved from the API.
  * @throws An error if the API request to retrieve the features fails.
  */
-export const useFeatures = () => useQuery({
+export const useGetFeatures = () => useQuery({
   queryKey: ['features'],
   queryFn: () => getFeatures(),
 });

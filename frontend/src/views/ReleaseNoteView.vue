@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useGetReleaseNote, useArchiveReleaseNote, updateReleaseNote, publishReleaseNote } from '@/api/release-note-api';
+import { useGetReleaseNote, useArchiveReleaseNote, useUpdateReleaseNote, usePublishReleaseNote } from '@/api/release-note-api';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 
 import { Pencil, Trash2, Eye, EyeOff, FileDown, Ban, Save, ArrowLeft, EllipsisVertical } from "lucide-vue-next"
@@ -22,9 +22,9 @@ import { routeNames, router } from '@/utils/router';
 import { toast } from 'vue-sonner';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
-import type { ChangeNote, PersistReleaseNoteDTO } from '@/utils/types';
+import type { ChangeNote } from '@/utils/types';
 import { EditReleaseNoteSchema } from '@/schemas';
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import { useQueryClient } from '@tanstack/vue-query';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../components/ui/breadcrumb';
 import { useI18n } from 'vue-i18n';
 
@@ -87,31 +87,36 @@ const startEditing = () => {
 }
 
 const onSubmit = form.handleSubmit((values) => {
-  const payload = {
+  if (releaseNote.value !== undefined) {
+    const payload = {
     ...values,
     changeNoteIds: changeNotes.value.map(c => c.id),
   }
-  updateReleaseNoteMutation.mutate(payload);
+  updateReleaseNoteMutation.mutate({id: releaseNote.value.id, dto: payload });
   isEditing.value = false;
+  }
 })
 
 const queryClient = useQueryClient();
-const updateReleaseNoteMutation = useMutation({
-  mutationFn: (values: PersistReleaseNoteDTO) => updateReleaseNote(id, values),
+const updateReleaseNoteMutation = useUpdateReleaseNote({
   onSuccess: () => {
     toast.success(t('toast.releaseNoteUpdatedSuccess'));
     queryClient.invalidateQueries({ queryKey: ['releaseNote', id] });
+  },
+  onError: () => {
+    toast.error(t('toast.releaseNoteUpdateError'));
   }
 })
 
 const handlePublish = () => {
-  publishReleaseNoteMutation.mutate();
+  if (releaseNote.value !== undefined) {
+    publishReleaseNoteMutation.mutate({ id: releaseNote.value.id, publish: !releaseNote.value?.published });
+  }
 }
 
-const publishReleaseNoteMutation = useMutation({
-  mutationFn: () => publishReleaseNote(id, !releaseNote.value?.published),
+const publishReleaseNoteMutation = usePublishReleaseNote({
   onSuccess: () => {
-    toast.success(!releaseNote.value?.published ? t('toast.releaseNotePublishedSuccess') : t('toast.releaseNoteUnpublishedSuccess'));
+    toast.success(!releaseNote.value?.published ? t('toast.releaseNotePublished') : t('toast.releaseNoteUnpublished'));
     queryClient.invalidateQueries({ queryKey: ['releaseNote', id] });
   },
   onError: () => {

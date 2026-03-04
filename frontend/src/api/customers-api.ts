@@ -8,7 +8,7 @@ import api from "./api";
  * @returns An array of customer data retrieved from the API.
  * @throws An error if the API request to retrieve the customers fails.
  */
-export const useCustomers = () => useQuery({
+export const useGetCustomers = () => useQuery({
   queryKey: ['customers'],
   queryFn: () => getCustomers(),
 });

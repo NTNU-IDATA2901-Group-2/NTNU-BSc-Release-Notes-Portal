@@ -8,7 +8,7 @@ import api from "./api";
  * @returns An array of product data retrieved from the API.
  * @throws An error if the API request to retrieve the products fails.
  */
-export const useProducts = () => useQuery({
+export const useGetProducts = () => useQuery({
   queryKey: ['products'],
   queryFn: () => getProducts(),
 });

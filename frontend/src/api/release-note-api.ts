@@ -1,17 +1,34 @@
-import type { OnApiCallFinished, PersistReleaseNoteDTO, ReleaseNote } from "@/utils/types"
+import type { OnMutationApiCallFinished, PersistReleaseNoteDTO, ReleaseNote } from "@/utils/types"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import api from "./api";
 
 /**
  * Creates a new release note.
  * 
- * @param selectedItems An array of selected change note IDs to be included in the new release note.
+ * @param changeNoteIds An array of change note IDs to be included in the new release note.
  * @returns The ID of the newly created release note.
  * @throws An error if the API request to create the release note fails.
  */
-export const createReleaseNote = async (selectedItems: number[]) => {
-  const response = await api.post(`releasenotes`, { changeNoteIds: selectedItems })
+const createReleaseNote = async (changeNoteIds: number[]) => {
+  const response = await api.post(`releasenotes`, { changeNoteIds: changeNoteIds })
   return response.data as number;
+}
+
+export const useCreateReleaseNote = (onFinished: OnMutationApiCallFinished) => {
+  const queryClient = useQueryClient();
+  return useMutation<number, unknown, number[]>({
+    mutationFn: (changeNoteIds: number[]) => createReleaseNote(changeNoteIds),
+    onSettled: () => onFinished.onSettled?.(),
+    onSuccess: (data) => {
+      console.log("Release note created with ID:", data);
+      queryClient.invalidateQueries({ queryKey: ['releaseNotes'] });
+      onFinished.onSuccess(data.toString());
+    },
+    onError: () => {
+      console.error("Failed to create release note");
+      onFinished.onError();
+    },
+  })
 }
 
 /**
@@ -73,7 +90,7 @@ export const getReleaseNotes = async (params?: Record<string, string>): Promise<
  * @returns A promise that resolves to true if the release note was successfully archived.
  * @throws An error if the API request to archive the release note fails.
  */
-export const useArchiveReleaseNote = (id: string, onFinished: OnApiCallFinished) => {
+export const useArchiveReleaseNote = (id: string, onFinished: OnMutationApiCallFinished) => {
   const queryClient = useQueryClient()
 
   return useMutation<number, void>({
@@ -97,8 +114,35 @@ export const useArchiveReleaseNote = (id: string, onFinished: OnApiCallFinished)
  * @param id The ID of the release note to be updated.
  * @param releaseNoteData The updated release note data to be sent in the API request.
  */
-export const updateReleaseNote = async (id: string, releaseNoteData: PersistReleaseNoteDTO): Promise<void> => {
+const updateReleaseNote = async (id: number, releaseNoteData: PersistReleaseNoteDTO): Promise<void> => {
   await api.put(`releasenotes/${id}`, releaseNoteData);
+}
+
+export const useUpdateReleaseNote = (onFinished: OnMutationApiCallFinished) => {
+  const queryClient = useQueryClient();
+  interface MutationVariables {
+    id: number;
+    dto: PersistReleaseNoteDTO;
+  }
+  
+  let updateId: number | undefined;
+
+  return useMutation<void, unknown, MutationVariables>({
+    mutationFn: ({ id, dto }: MutationVariables) => {
+      updateId = id;
+      return updateReleaseNote(id, dto)
+    },
+    onSettled: () => onFinished.onSettled?.(),
+    onSuccess: () => {
+      console.log("Release note updated with ID:", updateId);
+      queryClient.invalidateQueries({ queryKey: ['releaseNote', `${updateId}`] });
+      onFinished.onSuccess();
+    },
+    onError: () => {
+      console.error("Failed to update release note with ID:", updateId);
+      onFinished.onError();
+    },
+  })
 }
 
 /**
@@ -125,6 +169,35 @@ const archiveReleaseNote = async (id: string): Promise<number> => {
  * @return A promise that resolves when the release note is successfully published or unpublished.
  * @throws An error if the API request to publish or unpublish the release note fails or if the provided ID is invalid.
  */
-export const publishReleaseNote = async (id: string, publish: boolean): Promise<void> => {
+const publishReleaseNote = async (id: number, publish: boolean): Promise<void> => {
   await api.patch(`releasenotes/${id}/publish?publish=${publish}`);
+}
+
+export const usePublishReleaseNote = (onFinished: OnMutationApiCallFinished) => {
+  const queryClient = useQueryClient();
+
+  interface MutationVariables {
+    id: number;
+    publish: boolean;
+  }
+
+  let publishId: number | undefined;
+  let publishValue: boolean | undefined;
+  return useMutation<void, unknown, MutationVariables>({
+    mutationFn: ({ id, publish }: MutationVariables) => {
+      publishId = id;
+      publishValue = publish;
+      return publishReleaseNote(id, publish);
+    },
+    onSettled: () => onFinished.onSettled?.(),
+    onSuccess: () => {
+      console.log(`Release note with ID ${publishId} has been ${publishValue ? 'published' : 'unpublished'}.`);
+      queryClient.invalidateQueries({ queryKey: ['releaseNote', publishId] });
+      onFinished.onSuccess();
+    },
+    onError: () => {
+      console.error(`Failed to ${publishValue ? 'publish' : 'unpublish'} release note with ID:`, publishId);
+      onFinished.onError();
+    },
+  })
 }

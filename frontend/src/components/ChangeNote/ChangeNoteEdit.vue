@@ -9,8 +9,7 @@ import { Separator } from '../ui/separator';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { EditChangeNoteSchema } from '@/schemas';
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import { updateChangeNote } from '@/api/change-note-api';
+import { useUpdateChangeNote } from '@/api/change-note-api';
 import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';
 import { useI18n } from 'vue-i18n';
@@ -50,14 +49,14 @@ const [upgradeNotes] = defineField('upgradeNotes');
 
 const { t } = useI18n();
 
-const queryClient = useQueryClient();
-const updateChangeNoteMutation = useMutation({
-    mutationFn: (values: PersistChangeNoteDTO) => updateChangeNote(props.changeNote.id, values),
+const updateChangeNoteMutation = useUpdateChangeNote({
     onSuccess: () => {
         toast.success(t('toast.changeNoteUpdatedSuccess'));
         emit('update:modelValue', false);
-        router.push(`/change-notes/${props.changeNote.id}`);
-        queryClient.invalidateQueries({ queryKey: ['changeNote', `${props.changeNote.id}`] });
+        router.push(`/change-notes/${props.changeNote.id}`);   
+    },
+    onError: () => {
+        toast.error(t('toast.changeNoteUpdateError'));
     }
 })
 
@@ -66,7 +65,7 @@ const onSubmit = handleSubmit((values : PersistChangeNoteDTO) => {
     values.scopeId = values.scopeId === -1 ? undefined : values.scopeId;
     values.featureId = values.featureId === -1 ? undefined : values.featureId;
     values.customerId = values.customerId === -1 ? undefined : values.customerId;
-  updateChangeNoteMutation.mutate(values);
+  updateChangeNoteMutation.mutate({ id: props.changeNote.id, dto: values });
 });
 
 const onCancel = () => {

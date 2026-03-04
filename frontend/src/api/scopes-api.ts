@@ -8,7 +8,7 @@ import api from "./api";
  * @returns An array of scope data retrieved from the API.
  * @throws An error if the API request to retrieve the scopes fails.
  */
-export const useScopes = () => useQuery({
+export const useGetScopes = () => useQuery({
   queryKey: ['scopes'],
   queryFn: () => getScopes(),
 });

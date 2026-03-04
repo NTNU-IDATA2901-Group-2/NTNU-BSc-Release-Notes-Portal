@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useCustomers } from '@/api/customers-api';
-import { useFeatures } from '@/api/features-api';
-import { useProducts } from '@/api/products-api';
-import { useScopes } from '@/api/scopes-api';
+import { useGetCustomers } from '@/api/customers-api';
+import { useGetFeatures } from '@/api/features-api';
+import { useGetProducts } from '@/api/products-api';
+import { useGetScopes } from '@/api/scopes-api';
 import {
   Select,
   SelectContent,
@@ -28,10 +28,10 @@ const emit = defineEmits<{
 type SelectMode = 'product' | 'scope' | 'feature' | 'customer'
 
 const hookMap = {
-    product: useProducts,
-    scope: useScopes,
-    feature: useFeatures,
-    customer: useCustomers
+    product: useGetProducts,
+    scope: useGetScopes,
+    feature: useGetFeatures,
+    customer: useGetCustomers
 } as const
 
 const { data: tags } = hookMap[props.mode]()

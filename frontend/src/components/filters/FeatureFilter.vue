@@ -1,9 +1,9 @@
 <script lang="tsx" setup>
 import FilterListItem from './FilterListItem.vue';
 import { useI18n } from 'vue-i18n';
-import { useFeatures } from '@/api/features-api';
+import { useGetFeatures } from '@/api/features-api';
 
-const { data: features, isLoading, isError } = useFeatures();
+const { data: features, isLoading, isError } = useGetFeatures();
 const { t } = useI18n();
 
 </script>
