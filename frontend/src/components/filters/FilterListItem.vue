@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Checkbox } from '@/components/ui/checkbox';
-import { inject, type Ref } from 'vue';
+import { computed, inject, type Ref } from 'vue';
 
 const props = defineProps<{
     label: string,
@@ -9,7 +9,7 @@ const props = defineProps<{
 }>()
 
 const searchParams = inject('searchParams') as Ref<{ [key: string]: string }>;
-const isInParams = searchParams.value[props.queryKey] === props.value;
+const isInParams = computed(() => searchParams.value[props.queryKey] === props.value);
 
 const update = (value: string | boolean) => {
   if (typeof value === 'boolean') {
@@ -25,7 +25,7 @@ const update = (value: string | boolean) => {
 
 <template>
   <div class="flex items-center gap-3">
-    <Checkbox :model-value="isInParams" @update:model-value="update"/>
+    <Checkbox :model-value="isInParams" @update:model-value="update" class="cursor-pointer"/>
     <p class="text-sm">{{ props.label }}</p>
   </div>
 </template>

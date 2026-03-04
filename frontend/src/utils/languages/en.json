@@ -80,5 +80,11 @@
     },
     "signIn": {
         "pleaseSignIn": "Please sign in ..."
+    },
+    "placeholder": {
+        "title": "Title",
+        "description": "Description",
+        "developerNotes": "Developer Notes",
+        "upgradeRequirements": "Upgrade Requirements"
     }
 }

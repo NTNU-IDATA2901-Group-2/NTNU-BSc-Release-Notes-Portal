@@ -81,5 +81,11 @@
     },
     "signIn": {
         "pleaseSignIn": "Vennligst logg inn"
+    },
+    "placeholder": {
+        "title": "Tittel",
+        "description": "Beskrivelse",
+        "developerNotes": "Utviklernotater",
+        "upgradeRequirements": "Oppgraderingskrav"
     }
 }
