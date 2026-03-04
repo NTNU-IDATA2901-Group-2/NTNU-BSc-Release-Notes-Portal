@@ -22,13 +22,13 @@ const url = new URL(window.location.href);
 const searchParams = ref({ ...Object.fromEntries(url.searchParams.entries()) });
 const urlSearchParams = computed(() => new URLSearchParams(searchParams.value));
 const queryKey = computed(() => ['releaseNotes', urlSearchParams.value.toString()]);
-
 const {data, isLoading, isFetching, isError} = useQuery<ReleaseNote[]>(  
 {
   queryKey,
   queryFn: () => getReleaseNotes(urlSearchParams.value)
   
 });
+const search = ref('');
 
 watch(searchParams, () => {
   const url = new URL(window.location.href);
@@ -40,6 +40,10 @@ provide('searchParams', searchParams);
 
 const clearFilters = () => {
   searchParams.value = {};
+}
+
+const onSearch = () => {
+  searchParams.value = { ...searchParams.value, query: search.value };
 }
 
 </script>
@@ -59,12 +63,12 @@ const clearFilters = () => {
 
           <div class="flex gap-2 w-full">
             <InputGroup>
-              <InputGroupInput :placeholder="t('button.search')" disabled/>
-              <Button class="ml-2" disabled>
+              <InputGroupInput :placeholder="t('button.search')" @keyup.enter="onSearch" v-model="search"/>
+              <Button class="ml-2">
                 <Search />
               </Button>
             </InputGroup>
-            <Button variant="outline" class="flex md:hidden" disabled>
+            <Button variant="outline" class="flex md:hidden">
               <p>{{ t('button.filter') }}</p>
               <ListFilterPlus />
             </Button>
@@ -75,7 +79,7 @@ const clearFilters = () => {
         <ScrollArea class="h-[80vh] w-full" v-else>
         <div v-for="releaseNote in data" :key="releaseNote.id" class="flex flex-col">
           <ReleaseNoteCard
-            class=""
+            class="my-4"
             :key="releaseNote.id" :selected="selectedItems.includes(releaseNote.id)"
             :release-note="releaseNote" />
           <Separator />
