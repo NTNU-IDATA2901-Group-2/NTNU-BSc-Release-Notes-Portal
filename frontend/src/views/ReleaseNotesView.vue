@@ -17,7 +17,8 @@ const { t } = useI18n();
 
 const selectedItems = ref<number[]>([]);
 
-const searchParams = ref({});
+const url = new URL(window.location.href);
+const searchParams = ref({ ...Object.fromEntries(url.searchParams.entries()) });
 const urlSearchParams = computed(() => new URLSearchParams(searchParams.value));
 const queryKey = computed(() => ['releaseNotes', urlSearchParams.value.toString()]);
 
@@ -29,7 +30,9 @@ const {data, isLoading, isFetching, isError} = useQuery<ReleaseNote[]>(
 });
 
 watch(searchParams, () => {
-  console.log('Search parameters updated:', searchParams.value);
+  const url = new URL(window.location.href);
+  url.search = urlSearchParams.value.toString();
+  window.history.pushState({}, '', url);
 }, { deep: true });
 
 provide('searchParams', searchParams);
