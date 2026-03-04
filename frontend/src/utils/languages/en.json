@@ -33,7 +33,8 @@
         "feature": "Feature",
         "customer": "Customer",
         "developerNotes": "Developer Notes",
-        "upgradeRequirements": "Upgrade Requirements"
+        "upgradeRequirements": "Upgrade Requirements",
+        "status": "Status"
     },
     "toast": {
         "changeNoteDeleted": "Change note deleted successfully",

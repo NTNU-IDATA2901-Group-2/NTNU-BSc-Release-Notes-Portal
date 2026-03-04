@@ -12,6 +12,7 @@ import type { ReleaseNote } from '@/utils/types';
 import { useI18n } from 'vue-i18n';
 import ScrollArea from '@/components/ui/scroll-area/ScrollArea.vue';
 import ProductFilter from '@/components/filters/ProductFilter.vue';
+import PublicPrivateFilter from '@/components/filters/PublicPrivateFilter..vue';
 
 const { t } = useI18n();
 
@@ -49,6 +50,7 @@ const clearFilters = () => {
       <div class="h-min hidden md:block">
         <h1 class="text-2xl text-nowrap">Release Notes</h1>
         <ProductFilter />
+        <PublicPrivateFilter />
         <Button class="mt-4" variant="outline" @click="clearFilters">{{ t('button.clearFilters') }}</Button>
       </div>
 

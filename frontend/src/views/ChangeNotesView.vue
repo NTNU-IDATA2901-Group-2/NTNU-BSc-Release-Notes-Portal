@@ -5,6 +5,7 @@ import ChangeNoteCard from '@/components/ChangeNoteCard.vue';
 import CustomerFilter from '@/components/filters/CustomerFilter.vue';
 import FeatureFilter from '@/components/filters/FeatureFilter.vue';
 import ProductFilter from '@/components/filters/ProductFilter.vue';
+import PublicPrivateFilter from '@/components/filters/PublicPrivateFilter..vue';
 import ScopeFilter from '@/components/filters/ScopeFilter.vue';
 import MultiselectChangeNotes from '@/components/MultiselectChangeNotes.vue';
 import Button from '@/components/ui/button/Button.vue';
@@ -116,7 +117,8 @@ const handleCreateReleaseNote = () => {
   <div class="min-h-screen flex justify-center align-bottom mt-6">
     <div class="flex gap-8 flex-col h-min w-full md:flex-row justify-center p-4">
       <div class="h-min hidden md:block">
-        <h1 class="text-2xl text-nowrap">Change Notes</h1>
+        <h1 class="text-2xl text-nowrap">Change Notes</h1>@
+        <PublicPrivateFilter />
         <ProductFilter />
         <ScopeFilter />
         <FeatureFilter />
