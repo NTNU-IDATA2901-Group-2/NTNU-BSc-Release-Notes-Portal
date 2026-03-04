@@ -1,0 +1,26 @@
+meta {
+  name: get_all_filter_noReleaseNote
+  type: http
+  seq: 18
+}
+
+get {
+  url: {{baseurl}}/changenotes?hasReleaseNote=false
+  body: none
+  auth: inherit
+}
+
+params:query {
+  hasReleaseNote: false
+}
+
+assert {
+  res.body: length 1
+  res.status: eq 200
+  res.body[0].id: eq {{change_id_2}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
