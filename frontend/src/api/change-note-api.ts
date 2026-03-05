@@ -1,6 +1,7 @@
 import type { ChangeNote, OnMutationApiCallFinished, PersistChangeNoteDTO } from "@/utils/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import api from "./api";
+import type { Ref } from "vue";
 
 
 /**
@@ -207,10 +208,11 @@ const getChangeNote = async (id: string): Promise<ChangeNote> => {
  * @returns An array of change note data that matches the provided search parameters.
  * @throws An error if the API request to retrieve the change notes fails.
  */
-export const useGetChangeNotes = (params?: URLSearchParams) => useQuery<ChangeNote[]>({
-  queryKey: ['changeNotes', params?.toString()],
-  queryFn: () => getChangeNotes(params),
+export const useGetChangeNotes = (searchParams: Ref<Record<string, string>>) => useQuery<ChangeNote[]>({  
+  queryKey: ['changeNotes', searchParams],
+  queryFn: () => getChangeNotes(new URLSearchParams(searchParams.value)),
 });
+
 
 /**
  * Retrieves a list of change notes. Supports optional URL search params for filtering. Returns an array of change note data that matches the provided search parameters.

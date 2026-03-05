@@ -1,6 +1,7 @@
 import type { OnMutationApiCallFinished, PersistReleaseNoteDTO, ReleaseNote } from "@/utils/types"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import api from "./api";
+import type { Ref } from "vue";
 
 /**
  * Creates a new release note.
@@ -66,11 +67,23 @@ const getReleaseNote = async (id: string): Promise<ReleaseNote> => {
  * @throws An error if the API request to retrieve the release notes fails.
  * @returns A promise that resolves to an array of release note data retrieved from the API.
  */
-export const getReleaseNotes = async (params?: URLSearchParams): Promise<ReleaseNote[]> => {
+const getReleaseNotes = async (params?: URLSearchParams): Promise<ReleaseNote[]> => {
   console.log("Fetching release notes with params:", params?.toString());
   const response = await api.get(`releasenotes`, { params})
   return response.data as ReleaseNote[];
 }
+
+/**
+ * Retrieves a list of all release notes.
+ * 
+ * @throws An error if the API request to retrieve the release notes fails.
+ * @returns A promise that resolves to an array of release note data retrieved from the API.
+ */
+export const useGetReleaseNotes = (searchParams: Ref<Record<string, string>>) => useQuery<ReleaseNote[]>({
+  queryKey: ['releaseNotes', searchParams],
+  queryFn: () => getReleaseNotes(new URLSearchParams(searchParams.value)),
+});
+
 
 /**
  * Archives a release note by its ID. Returns a promise that resolves to true if the release note was successfully archived.

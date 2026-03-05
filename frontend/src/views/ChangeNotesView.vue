@@ -21,14 +21,18 @@ import { useRouter } from 'vue-router';
 import { toast } from 'vue-sonner';
 
 const router = useRouter();
-const searchParams = ref({});
+const url = new URL(window.location.href);
+const searchParams = ref({ ...Object.fromEntries(url.searchParams.entries()) });
 const urlSearchParams = computed(() => new URLSearchParams(searchParams.value));
 
-const { isLoading, isFetching, isError, data } = useGetChangeNotes(urlSearchParams.value);
-const search = ref('');
+const { isLoading, isFetching, isError, data } = useGetChangeNotes(searchParams);
+
+const search = ref<string>(urlSearchParams.value.get('query') || '');
 
 watch(searchParams, () => {
-  console.log('Search parameters updated:', searchParams.value.toString());
+  const url = new URL(window.location.href);
+  url.search = urlSearchParams.value.toString();
+  router.replace({ query: searchParams.value });
 }, { deep: true });
 
 provide('searchParams', searchParams);
