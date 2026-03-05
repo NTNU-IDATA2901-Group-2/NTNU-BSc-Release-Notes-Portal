@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getReleaseNotes } from '@/api/release-note-api';
+import { useGetReleaseNotes } from '@/api/release-note-api';
 import ReleaseNoteCard from '@/components/ReleaseNoteCard.vue';
 import Button from '@/components/ui/button/Button.vue';
 import { InputGroup, InputGroupInput } from '@/components/ui/input-group';
@@ -7,33 +7,27 @@ import Separator from '@/components/ui/separator/Separator.vue';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 import { ListFilterPlus, Search } from 'lucide-vue-next';
 import { computed, provide, ref, watch } from 'vue';
-import { useQuery } from "@tanstack/vue-query";
-import type { ReleaseNote } from '@/utils/types';
 import { useI18n } from 'vue-i18n';
 import ScrollArea from '@/components/ui/scroll-area/ScrollArea.vue';
 import ProductFilter from '@/components/filters/ProductFilter.vue';
 import PublicPrivateFilter from '@/components/filters/PublicPrivateFilter..vue';
+import { useRouter } from 'vue-router';
 
 const { t } = useI18n();
 
 const selectedItems = ref<number[]>([]);
 
+const router = useRouter();
 const url = new URL(window.location.href);
 const searchParams = ref({ ...Object.fromEntries(url.searchParams.entries()) });
 const urlSearchParams = computed(() => new URLSearchParams(searchParams.value));
-const queryKey = computed(() => ['releaseNotes', urlSearchParams.value.toString()]);
-const {data, isLoading, isFetching, isError} = useQuery<ReleaseNote[]>(  
-{
-  queryKey,
-  queryFn: () => getReleaseNotes(urlSearchParams.value)
-  
-});
-const search = ref('');
 
+const {data, isLoading, isFetching, isError} = useGetReleaseNotes(searchParams)
+const search = ref(urlSearchParams.value.get('query') || '');
 watch(searchParams, () => {
   const url = new URL(window.location.href);
   url.search = urlSearchParams.value.toString();
-  window.history.pushState({}, '', url);
+  router.replace({ query: searchParams.value });
 }, { deep: true });
 
 provide('searchParams', searchParams);

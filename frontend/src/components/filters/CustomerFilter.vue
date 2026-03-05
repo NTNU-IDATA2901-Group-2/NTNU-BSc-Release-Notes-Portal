@@ -1,9 +1,9 @@
 <script lang="tsx" setup>
 import FilterListItem from './FilterListItem.vue';
 import { useI18n } from 'vue-i18n';
-import { useCustomers } from '@/api/customers-api';
+import { useGetCustomers } from '@/api/customers-api';
 
-const { data: products, isLoading, isError } = useCustomers();
+const { data: products, isLoading, isError } = useGetCustomers();
 const { t } = useI18n();
 
 </script>

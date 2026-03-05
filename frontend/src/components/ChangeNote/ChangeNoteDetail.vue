@@ -12,8 +12,7 @@ import {
 import { EllipsisVertical, Eye, FileDown, Pencil, Trash2 } from 'lucide-vue-next';
 import DeletePrompt from '../DeletePrompt.vue';
 import { ref } from 'vue';
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import { archiveChangeNote, publishChangeNote } from '@/api/change-note-api';
+import { useArchiveChangeNote, usePublishChangeNote } from '@/api/change-note-api';
 import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';
 import { useI18n } from 'vue-i18n';
@@ -25,16 +24,13 @@ const props = defineProps<{
     modelValue?: boolean;
 }>();
 
-const queryClient = useQueryClient();
-
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
 }>();
 
 const showDeletePrompt = ref(false);
 
-const deleteChangeNoteMutation = useMutation({
-  mutationFn: () => archiveChangeNote(props.changeNote.id),
+const deleteChangeNoteMutation = useArchiveChangeNote(props.changeNote.id, {
   onSuccess: () => {
     toast.success(t('toast.changeNoteDeleted'));
     router.push("/change-notes");
@@ -50,11 +46,9 @@ const onDelete = () => {
 }
 
 
-const publishChangeNoteMutation = useMutation({
-  mutationFn: (publish: boolean) => publishChangeNote(props.changeNote.id, publish),
+const { mutate: publishChangeNoteMutation } = usePublishChangeNote(props.changeNote.id, !props.changeNote.published, {
   onSuccess: () => {
     toast.success(`${props.changeNote.published ? t('toast.changeNoteUnpublished') : t('toast.changeNotePublished')}`);
-    queryClient.invalidateQueries({ queryKey: ['changeNote', `${props.changeNote.id}`] });
   },
   onError: () => {
     toast.error(`${props.changeNote.published ? t('toast.changeNoteUnpublishError') : t('toast.changeNotePublishError')}`);
@@ -62,7 +56,7 @@ const publishChangeNoteMutation = useMutation({
 });
 
 const onPublishToggle = () => {
-  publishChangeNoteMutation.mutate(!props.changeNote.published);
+  publishChangeNoteMutation(!props.changeNote.published);
   
 } 
 

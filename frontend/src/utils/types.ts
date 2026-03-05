@@ -78,8 +78,8 @@ export interface Tag {
     name: string
 }
 
-export interface OnApiCallFinished {
+export interface OnMutationApiCallFinished {
     onSettled?: () => void,
-    onSuccess: () => void,
+    onSuccess: (data?: string) => void,
     onError: () => void
 }

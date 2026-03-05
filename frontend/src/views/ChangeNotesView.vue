@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { createChangeNote, getChangeNotes, publishChangeNote } from '@/api/change-note-api';
-import { createReleaseNote } from '@/api/release-note-api';
+import { useGetChangeNotes, useCreateChangeNote, usePublishChangeNotes } from '@/api/change-note-api';
+import { useCreateReleaseNote } from '@/api/release-note-api';
 import ChangeNoteCard from '@/components/ChangeNoteCard.vue';
 import CustomerFilter from '@/components/filters/CustomerFilter.vue';
 import FeatureFilter from '@/components/filters/FeatureFilter.vue';
@@ -14,7 +14,6 @@ import ScrollArea from '@/components/ui/scroll-area/ScrollArea.vue';
 import Separator from '@/components/ui/separator/Separator.vue';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 import type { ChangeNote } from '@/utils/types';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { Eye, FilePlus, LayersPlus, ListFilterPlus, Search } from 'lucide-vue-next';
 import { computed, provide, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -22,17 +21,18 @@ import { useRouter } from 'vue-router';
 import { toast } from 'vue-sonner';
 
 const router = useRouter();
-const searchParams = ref({});
+const url = new URL(window.location.href);
+const searchParams = ref({ ...Object.fromEntries(url.searchParams.entries()) });
 const urlSearchParams = computed(() => new URLSearchParams(searchParams.value));
-const queryKey = computed(() => ['changeNotes', urlSearchParams.value.toString()]);
-const { isLoading, isFetching, isError, data } = useQuery({
-  queryKey,
-  queryFn: () => getChangeNotes(urlSearchParams.value)
-});
-const search = ref('');
+
+const { isLoading, isFetching, isError, data } = useGetChangeNotes(searchParams);
+
+const search = ref<string>(urlSearchParams.value.get('query') || '');
 
 watch(searchParams, () => {
-  console.log('Search parameters updated:', searchParams.value.toString());
+  const url = new URL(window.location.href);
+  url.search = urlSearchParams.value.toString();
+  router.replace({ query: searchParams.value });
 }, { deep: true });
 
 provide('searchParams', searchParams);
@@ -41,80 +41,68 @@ const clearFilters = () => {
   searchParams.value = {};
 }
 
-const selectedItems = ref<ChangeNote[]>([]);
+const selectedChangeNotes = ref<ChangeNote[]>([]);
 const { t } = useI18n();
 
 const isChangeNoteSelected = (changeNote: ChangeNote) => {
-  return selectedItems.value.some(selected => selected.id === changeNote.id);
+  return selectedChangeNotes.value.some(selected => selected.id === changeNote.id);
 }
 
 const toggleSelection = (changeNote: ChangeNote) => {
   if (isChangeNoteSelected(changeNote)) {
-    selectedItems.value = selectedItems.value.filter(note => note.id !== changeNote.id);
+    selectedChangeNotes.value = selectedChangeNotes.value.filter(note => note.id !== changeNote.id);
   } else {
-    selectedItems.value.push(changeNote);
+    selectedChangeNotes.value.push(changeNote);
   }
 }
 
-const queryClient = useQueryClient();
 
 // Publish selected changenotes
+const { mutate: publishChangeNoteMutation } = usePublishChangeNotes([], true, {
+  onSuccess: () => {
+    toast.success(t('toast.selectedChangeNotesPublished'));
+  },
+  onError: () => {
+    toast.error(t('toast.selectedChangeNotesPublishError'));
+  },
 
-const publishChangeNoteMutation = useMutation({
-    mutationFn: (changeNoteId: number) => publishChangeNote(changeNoteId, true),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
-      toast.success(t('toast.selectedChangeNotesPublished'));
-    }
-});;
+})
 
 const handlePublish = () => {
-  console.log('Publish button clicked. Selected change note IDs:', selectedItems.value);
-  for (const changeNote of selectedItems.value) {
-    publishChangeNoteMutation.mutate(changeNote.id);
-  }
-  selectedItems.value = [];
+  console.log('Publish button clicked. Selected change note IDs:', selectedChangeNotes.value);
+  publishChangeNoteMutation({ ids: selectedChangeNotes.value.map(cn => cn.id), publish: true });
+  selectedChangeNotes.value = [];
 }
 
 // Create change note
-
-const createChangeNoteMutation = useMutation({
-    mutationFn: () => createChangeNote(),
-    onSuccess: (data) => {
+const createChangeNoteMutation = useCreateChangeNote({
+    onSuccess: (data?: string) => {
       router.push(`/change-notes/${data}?edit=true`);
-      console.log('Change Note created with ID:', data);
-      queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
-    }
-});;
-
-const handleCreateChangeNote = () => {
-  console.log('Create Change Note button clicked');
-  createChangeNoteMutation.mutate()
-}
-
-// Creation of release note
-
-const createReleaseNoteMutation = useMutation({
-    mutationFn: () => createReleaseNote(selectedItems.value.map(cn => cn.id)),
-      onSuccess: (data) => {
-      router.push(`/release-notes/${data}?edit=true`);
-      console.log('Release Note created with ID:', data);
-      queryClient.invalidateQueries({ queryKey: ['releaseNotes'] });
+      toast.success(t('toast.changeNoteCreated'));
     },
-    onError: (error) => {
-      console.error('Error creating release note:', error);
-      toast.error(error.name)
+    onError: () => {
+      toast.error(t('toast.changeNoteCreateError'));
     }
 })
 
-const handleCreateReleaseNote = () => {
-  console.log('Creating a Release Note with selected change notes. Selected change note IDs:', selectedItems.value);
-  createReleaseNoteMutation.mutate();
-}
+// Creation of release note
+const createReleaseNoteMutation = useCreateReleaseNote({
+  onSuccess: (data?: string) => {
+    router.push(`/release-notes/${data}?edit=true`);
+    toast.success(t('toast.releaseNoteCreated'));
+  },
+  onError: () => {
+    toast.error(t('toast.releaseNoteCreateError'))
+  }
+})
 
 const onSearch = () => {
   searchParams.value = { ...searchParams.value, query: search.value };
 }
+
+const selectedChangeNoteIds = computed<number[]>(() => 
+  selectedChangeNotes.value.map((cn: ChangeNote) => cn.id)
+);
 
 </script>
 
@@ -138,11 +126,11 @@ const onSearch = () => {
               {{ t('button.publish') }}
               <Eye />
             </Button>
-            <Button variant="outline" @click="handleCreateChangeNote">
+            <Button variant="outline" @click="createChangeNoteMutation.mutate">
               {{ t('button.createChangeNote') }}
               <LayersPlus />
             </Button>
-            <Button variant="solidaccent" @click="handleCreateReleaseNote">
+            <Button variant="solidaccent" @click="createReleaseNoteMutation.mutate(selectedChangeNoteIds)">
               {{ t('button.createReleaseNote') }}
               <FilePlus />
             </Button>
@@ -162,7 +150,9 @@ const onSearch = () => {
           </div>
         </div>
 
-        <MultiselectChangeNotes v-model="selectedItems"/>
+        <div>
+          <MultiselectChangeNotes v-model="selectedChangeNotes"/>
+        </div>
 
         <Spinner v-if="isLoading || isFetching"/>
         <p v-else-if="isError">{{ t('loadingError.releaseNotes') }}</p>
