@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.example</groupId>
 	<artifactId>release-notes-portal</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>Release Notes Portal</name>
 	<description>Portal for viewing, creating, edting and publishing release notes</description>
 	<url/>
