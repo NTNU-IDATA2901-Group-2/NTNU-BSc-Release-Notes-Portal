@@ -114,7 +114,6 @@ const handlePublish = () => {
 const publishReleaseNoteMutation = usePublishReleaseNote({
   onSuccess: () => {
     toast.success(!releaseNote.value?.published ? t('toast.releaseNotePublished') : t('toast.releaseNoteUnpublished'));
-    queryClient.invalidateQueries({ queryKey: ['releaseNote', id] });
   },
   onError: () => {
     toast.error(t('toast.releaseNotePublishError'));
