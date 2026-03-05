@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.dto.CreateChangeNoteDTO;
 import com.example.demo.dto.ChangeNoteDTO;
+import com.example.demo.dto.CreateChangeNoteDTO;
 import com.example.demo.service.ChangeNoteService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -64,15 +64,23 @@ public class ChangeNoteController {
   }
 
 
-  @Operation(summary = "Get all change notes", description = "Retrieves a list of all change notes")
+  @Operation(summary = "Get all change notes, with optional filters", description = "Retrieves a list of all change notes with optional filters for query, published status, has release note, customer, feature, scope, and product")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "Change notes retrieved successfully"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @GetMapping("")
-  public ResponseEntity<List<ChangeNoteDTO>> getAllChangeNotes() {
-    List<ChangeNoteDTO> changeNotes = changeNoteService.getAllChangeNotes();
-    logger.info("Retrieved {} change notes", changeNotes.size());
+  public ResponseEntity<List<ChangeNoteDTO>> getAllChangeNotes(
+    @RequestParam(required = false) String query,
+    @RequestParam(required = false) Boolean published,
+    @RequestParam(required = false) Boolean hasReleaseNote,
+    @RequestParam(required = false) List<Long> customerIds,
+    @RequestParam(required = false) List<Long> featureIds,
+    @RequestParam(required = false) List<Long> scopeIds,
+    @RequestParam(required = false) List<Long> productIds
+    ) {
+    List<ChangeNoteDTO> changeNotes = changeNoteService.getAllChangeNotes(query, published, hasReleaseNote, customerIds, featureIds, scopeIds, productIds);
+    logger.info("Retrieved {} change notes with filters - query: {}, published: {}, hasReleaseNote: {}, customerIds: {}, featureIds: {}, scopeIds: {}, productIds: {}", changeNotes.size(), query, published, hasReleaseNote, customerIds, featureIds, scopeIds, productIds);
     return ResponseEntity.ok(changeNotes);
   }
 

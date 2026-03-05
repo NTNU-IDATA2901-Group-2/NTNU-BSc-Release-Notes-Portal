@@ -7,11 +7,14 @@ import { ref } from 'vue';
 import { useGetChangeNote } from '@/api/change-note-api';
 import ChangeNoteEdit from '@/components/ChangeNote/ChangeNoteEdit.vue';
 import ChangeNoteDetail from '@/components/ChangeNote/ChangeNoteDetail.vue';
-import { router } from '@/utils/router';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../components/ui/breadcrumb';
+import { useI18n } from 'vue-i18n';
 
 const route = useRoute();
 
 const isEditing = ref(route.query.edit === 'true');
+
+const { t } = useI18n();
 
 const id = route.params.id as string;
 const { isPending, isFetching, isError, data: changeNote } = useGetChangeNote(id);
@@ -20,15 +23,33 @@ const { isPending, isFetching, isError, data: changeNote } = useGetChangeNote(id
 
 <template>
   <div class="flex flex-col items-center px-4 mb-20">
-    <Button variant="outline" class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10"
-      @click="$router.back()">
-      <ArrowLeft/>Previous
-    </Button>
+    <div class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10 flex items-center gap-4">
+      <Button variant="outline" class="" @click="$router.back()">
+        <ArrowLeft />{{ t('button.previous') }}
+      </Button>
+      <Breadcrumb class="text-text-primary">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/change-notes">Change Notes</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            {{ changeNote?.reference }}
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+    </div>
 
-    <ChangeNoteEdit v-if="!isPending && !isFetching && !isError && changeNote !== undefined && isEditing" :changeNote="changeNote" v-model="isEditing"/>
-    <ChangeNoteDetail v-if="!isPending && !isFetching && !isError && changeNote !== undefined && !isEditing" :changeNote="changeNote" v-model="isEditing"/>
-    <div v-else-if="isPending || isFetching"><Spinner/></div>
-    <h1 v-else-if="isError">Error retreiving change note</h1>
+    <ChangeNoteEdit
+      v-if="!isPending && !isFetching && !isError && changeNote !== undefined && isEditing"
+      :change-note="changeNote" v-model="isEditing" />
+    <ChangeNoteDetail
+      v-if="!isPending && !isFetching && !isError && changeNote !== undefined && !isEditing"
+      :change-note="changeNote" v-model="isEditing" />
+    <div v-else-if="isPending || isFetching">
+      <Spinner />
+    </div>
+    <h1 v-else-if="isError">{{ t('loadingError.changeNote') }}</h1>
 
   </div>
 </template>

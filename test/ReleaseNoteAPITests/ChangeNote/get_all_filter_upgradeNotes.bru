@@ -1,0 +1,26 @@
+meta {
+  name: get_all_filter_upgradeNotes
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseurl}}/changenotes?query=what needs to be
+  body: none
+  auth: inherit
+}
+
+params:query {
+  query: what needs to be
+}
+
+assert {
+  res.body[0].id: eq {{change_id_2}}
+  res.body: length 1
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

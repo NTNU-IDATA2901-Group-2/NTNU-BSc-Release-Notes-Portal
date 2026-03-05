@@ -15,6 +15,7 @@ import com.example.demo.dto.ReleaseNoteDTO;
 import com.example.demo.exception.ChangeNoteNotFoundException;
 import com.example.demo.exception.ReleaseNoteNotFoundException;
 import com.example.demo.exception.ChangeNoteAlreadyHasReleaseNoteException;
+
 import lombok.AllArgsConstructor;
 
 /**
@@ -79,16 +80,16 @@ public class ReleaseNoteService {
   }
 
   /**
-   * Retrieves a list of all non-archived release notes.
+   * Retrieves a list of all non-archived release notes with optional filters for query, published status, and product.
    *
-   * @return a list of ReleaseNoteDTOs representing all non-archived release notes
+   * @param query optional filter for release note tag or summary containing the query string (case-insensitive)
+   * @param published optional filter for release note published status
+   * @param productIds optional filter for release note associated product IDs
+   *
+   * @return a list of ReleaseNoteDTOs representing all non-archived release notes that match the provided filters
    */
-  public List<ReleaseNoteDTO> getAllReleaseNotes() {
-    List<ReleaseNote> releaseNotes = releaseNoteRepository.findAll();
-    return releaseNotes.stream()
-        .filter(releaseNote -> !releaseNote.getArchived())
-        .map(ReleaseNoteDTO::fromReleaseNote)
-        .toList();
+  public List<ReleaseNoteDTO> getAllReleaseNotes(String query, Boolean published, List<Long> productIds) {
+    return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParameters(query, published, productIds).stream().map(ReleaseNoteDTO::fromReleaseNote).toList();
   }
 
   /**

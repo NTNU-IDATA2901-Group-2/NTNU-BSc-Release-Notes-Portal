@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { ChangeNote } from '@/types';
+import type { ChangeNote } from '@/utils/types';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 
@@ -12,17 +12,17 @@ import {
 import { EllipsisVertical, Eye, FileDown, Pencil, Trash2 } from 'lucide-vue-next';
 import DeletePrompt from '../DeletePrompt.vue';
 import { ref } from 'vue';
-import { QueryClient, useMutation, useQueryClient } from '@tanstack/vue-query';
-import { archiveChangeNote, publishChangeNote } from '@/api/change-note-api';
+import { useArchiveChangeNote, usePublishChangeNote } from '@/api/change-note-api';
 import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps<{
     changeNote: ChangeNote;
     modelValue?: boolean;
 }>();
-
-const queryClient = useQueryClient();
 
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
@@ -30,14 +30,13 @@ const emit = defineEmits<{
 
 const showDeletePrompt = ref(false);
 
-const deleteChangeNoteMutation = useMutation({
-  mutationFn: () => archiveChangeNote(props.changeNote.id),
+const deleteChangeNoteMutation = useArchiveChangeNote(props.changeNote.id, {
   onSuccess: () => {
-    toast.success('Change note deleted successfully');
+    toast.success(t('toast.changeNoteDeleted'));
     router.push("/change-notes");
   },
   onError: () => {
-    toast.error('Failed to delete change note');
+    toast.error(t('toast.changeNoteDeleteError'));
   },
 });
 
@@ -47,19 +46,17 @@ const onDelete = () => {
 }
 
 
-const publishChangeNoteMutation = useMutation({
-  mutationFn: (publish: boolean) => publishChangeNote(props.changeNote.id, publish),
+const { mutate: publishChangeNoteMutation } = usePublishChangeNote(props.changeNote.id, !props.changeNote.published, {
   onSuccess: () => {
-    toast.success(`Change note ${props.changeNote.published ? 'unpublished' : 'published'} successfully`);
-    queryClient.invalidateQueries({ queryKey: ['changeNote', `${props.changeNote.id}`] });
+    toast.success(`${props.changeNote.published ? t('toast.changeNoteUnpublished') : t('toast.changeNotePublished')}`);
   },
   onError: () => {
-    toast.error(`Failed to ${props.changeNote.published ? 'unpublish' : 'publish'} change note`);
+    toast.error(`${props.changeNote.published ? t('toast.changeNoteUnpublishError') : t('toast.changeNotePublishError')}`);
   },
 });
 
 const onPublishToggle = () => {
-  publishChangeNoteMutation.mutate(!props.changeNote.published);
+  publishChangeNoteMutation(!props.changeNote.published);
   
 } 
 
@@ -73,7 +70,8 @@ const onPublishToggle = () => {
           <div class="flex items-center gap-4">
             <h1 class="text-2xl max-w-60 whitespace-nowrap overflow-hidden">{{
               changeNote.reference }}</h1>
-            <Badge class="h-6"
+            <Badge
+class="h-6"
               :variant="changeNote.published ? 'success' : 'destructive'">{{ changeNote.published ?
                 'Published' : 'Private' }}</Badge>
           </div>
@@ -86,26 +84,25 @@ const onPublishToggle = () => {
               <DropdownMenuContent class="mr-6 lg:mr-20 mt-2">
                 <DropdownMenuItem @click="emit('update:modelValue', true)">
                   <div class="w-full flex gap-2">
-                    <p class="text-text-dark-static ml-auto">Edit</p>
+                    <p class="text-text-dark-static ml-auto">{{ t('button.edit') }}</p>
                     <Pencil class="text-text-dark-static" />
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem @click="showDeletePrompt = true">
                   <div class="w-full flex gap-2">
-                    <p class="ml-auto text-text-dark-static">Delete</p>
+                    <p class="ml-auto text-text-dark-static">{{ t('button.delete') }}</p>
                     <Trash2 class="text-text-dark-static" />
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem @click="onPublishToggle">
                   <div class="w-full flex gap-2">
-                    <p class="ml-auto text-text-dark-static">{{ changeNote.published ? 'Unpublish' :
-                      'Publish' }}</p>
+                    <p class="ml-auto text-text-dark-static">{{ changeNote.published ? t('button.unpublish') : t('button.publish') }}</p>
                     <Eye class="text-text-dark-static" />
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem disabled>
                   <div class="w-full flex gap-2">
-                    <p class="ml-auto text-text-dark-static">Export</p>
+                    <p class="ml-auto text-text-dark-static">{{ t('button.export') }}</p>
                     <FileDown class="text-text-dark-static" />
                   </div>
                 </DropdownMenuItem>
@@ -125,12 +122,12 @@ const onPublishToggle = () => {
       <Separator class="w-full h-2" />
       <div class="flex flex-col w-full text-xl gap-10">
         <div>
-          <h3 class="text-lg">Developer Notes</h3>
+          <h3 class="text-lg">{{ t('title.developerNotes') }}</h3>
           <p class="text-sm">{{ changeNote.developerNotes }}</p>
           
         </div>
         <div>
-          <h3 class="text-lg">Upgrade Notes</h3>
+          <h3 class="text-lg">{{ t('title.upgradeRequirements') }}</h3>
           <p class="text-sm">{{ changeNote.upgradeNotes }}</p>
         </div>
       </div>

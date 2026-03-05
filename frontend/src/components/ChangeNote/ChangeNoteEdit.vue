@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ChangeNote, PersistChangeNoteDTO } from '@/types';
+import type { ChangeNote, PersistChangeNoteDTO } from '@/utils/types';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { Ban, Save } from 'lucide-vue-next';
@@ -9,10 +9,10 @@ import { Separator } from '../ui/separator';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { EditChangeNoteSchema } from '@/schemas';
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import { updateChangeNote } from '@/api/change-note-api';
+import { useUpdateChangeNote } from '@/api/change-note-api';
 import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps<{
   changeNote: ChangeNote;
@@ -47,14 +47,16 @@ const [customerId] = defineField('customerId');
 const [developerNotes] = defineField('developerNotes');
 const [upgradeNotes] = defineField('upgradeNotes');
 
-const queryClient = useQueryClient();
-const updateChangeNoteMutation = useMutation({
-    mutationFn: (values: PersistChangeNoteDTO) => updateChangeNote(props.changeNote.id, values),
+const { t } = useI18n();
+
+const updateChangeNoteMutation = useUpdateChangeNote({
     onSuccess: () => {
-        toast.success('Change note updated successfully');
+        toast.success(t('toast.changeNoteUpdatedSuccess'));
         emit('update:modelValue', false);
-        router.push(`/change-notes/${props.changeNote.id}`);
-        queryClient.invalidateQueries({ queryKey: ['changeNote', `${props.changeNote.id}`] });
+        router.push(`/change-notes/${props.changeNote.id}`);   
+    },
+    onError: () => {
+        toast.error(t('toast.changeNoteUpdateError'));
     }
 })
 
@@ -63,7 +65,7 @@ const onSubmit = handleSubmit((values : PersistChangeNoteDTO) => {
     values.scopeId = values.scopeId === -1 ? undefined : values.scopeId;
     values.featureId = values.featureId === -1 ? undefined : values.featureId;
     values.customerId = values.customerId === -1 ? undefined : values.customerId;
-  updateChangeNoteMutation.mutate(values);
+  updateChangeNoteMutation.mutate({ id: props.changeNote.id, dto: values });
 });
 
 const onCancel = () => {
@@ -77,10 +79,10 @@ const onCancel = () => {
 
 <form @submit="onSubmit">
     <div class="md:hidden flex w-full mt-4 justify-end gap-2">
-    <Button type="button" @click="onCancel" variant="outline">Cancel
+    <Button type="button" @click="onCancel" variant="outline">{{ t('button.cancel') }}
         <Ban />
     </Button>
-    <Button type="submit" variant="outline">Save
+    <Button type="submit" variant="outline">{{ t('button.save') }}
         <Save />
     </Button>
     </div>
@@ -88,37 +90,41 @@ const onCancel = () => {
     <div class="flex flex-col gap-16 flex-1 w-full items-center mt-16 lg:w-4xl md:mt-42">
     <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-row items-center justify-between w-full">
-        <div class="flex items-center gap-4">
-            <Input class="w-full" v-model="reference" placeholder="Reference" />
+        <div class="flex flex-col gap-1">
+            <h4 class="text-md">{{ t('title.title') }}</h4>
+            <Input class="w-full" v-model="reference" :placeholder="t('placeholder.title')" />
         </div>
         <div class="flex gap-4">
             <Button type="button" @click="onCancel" class="hidden md:flex" variant="outline">
-                Cancel
+                {{ t('button.cancel') }}
             <Ban />
             </Button>
-            <Button class="hidden md:flex" type="submit" variant="outline">Save
+            <Button class="hidden md:flex" type="submit" variant="outline">{{ t('button.save') }}
             <Save />
             </Button>
         </div>
         </div>
 
-        <Textarea placeholder="Description of change" class="w-full" v-model="description"></Textarea>
+        <div class="flex flex-col gap-1">
+            <h4 class="text-md">{{ t('title.description') }}</h4>
+            <Textarea :placeholder="t('placeholder.description')" class="w-full" v-model="description"></Textarea>
+        </div>
 
         <div class="flex flex-wrap justify-between gap-4">
         <div class="flex flex-col gap-1">
-            <h4 class="text-md">Product</h4>
+            <h4 class="text-md">{{ t('title.product') }}</h4>
             <TagSelect mode="product" v-model="productId"/>
         </div>
         <div class="flex flex-col gap-1">
-            <h4 class="text-md">Scope</h4>
+            <h4 class="text-md">{{ t('title.scope') }}</h4>
             <TagSelect mode="scope" v-model="scopeId"/>
         </div>
         <div class="flex flex-col gap-1">
-            <h4 class="text-md">Feature</h4>
+            <h4 class="text-md">{{ t('title.feature') }}</h4>
             <TagSelect mode="feature" v-model="featureId"/>
         </div>
         <div class="flex flex-col gap-1">
-            <h4 class="text-md">Customer</h4>
+            <h4 class="text-md">{{ t('title.customer') }}</h4>
             <TagSelect mode="customer" v-model="customerId"/>
         </div>
         </div>
@@ -126,14 +132,14 @@ const onCancel = () => {
 
     <Separator class="w-full h-2" />
 
-    <div class="flex flex-col w-full text-xl gap-10">
-        <div>
-        <h3 class="text-lg">Developer Notes</h3>
-        <Textarea placeholder="Developer notes" class="w-full" v-model="developerNotes"></Textarea>
+    <div class="flex flex-col w-full gap-10">
+        <div class="flex flex-col gap-1">
+        <h4 class="text-md">{{ t('title.developerNotes') }}</h4>
+        <Textarea :placeholder="t('placeholder.developerNotes')" class="w-full" v-model="developerNotes"></Textarea>
         </div>
-        <div>
-        <h3 class="text-lg">Upgrade Notes</h3>
-        <Textarea placeholder="Upgrade notes" class="w-full" v-model="upgradeNotes"></Textarea>
+        <div class="flex flex-col gap-1">
+        <h4 class="text-md">{{ t('title.upgradeRequirements') }}</h4>
+        <Textarea :placeholder="t('placeholder.upgradeRequirements')" class="w-full" v-model="upgradeNotes"></Textarea>
         </div>
     </div>
     </div>

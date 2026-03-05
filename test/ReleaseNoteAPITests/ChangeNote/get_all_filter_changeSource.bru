@@ -1,0 +1,26 @@
+meta {
+  name: get_all_filter_changeSource
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseurl}}/changenotes?query=source of
+  body: none
+  auth: inherit
+}
+
+params:query {
+  query: source of
+}
+
+assert {
+  res.body[0].id: eq {{change_id_1}}
+  res.body: length 1
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

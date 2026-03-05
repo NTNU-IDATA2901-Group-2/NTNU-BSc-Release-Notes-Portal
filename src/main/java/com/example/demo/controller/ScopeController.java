@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.CreateTagDTO;
 import com.example.demo.dto.ScopeDTO;
 import com.example.demo.service.ScopeService;
 
@@ -21,6 +22,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 @Tag(name = "Scopes", description = "Endpoints for managing scopes")
@@ -61,7 +63,7 @@ public class ScopeController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PostMapping("")
-  public ResponseEntity<Long> createScope(ScopeDTO scopeDetails) {
+  public ResponseEntity<Long> createScope(@Valid @RequestBody CreateTagDTO scopeDetails) {
     logger.info("Created scope with details: {}", scopeDetails);
     long createdScope = scopeService.createScope(scopeDetails);
     return ResponseEntity.ok(createdScope);
@@ -74,7 +76,7 @@ public class ScopeController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PutMapping("/{id}")
-  public ResponseEntity<String> updateScope(@PathVariable Long id, @RequestBody ScopeDTO scopeDetails) {
+  public ResponseEntity<String> updateScope(@PathVariable Long id, @RequestBody @Valid CreateTagDTO scopeDetails) {
     ScopeDTO updatedScope = scopeService.updateScope(id, scopeDetails);
     logger.info("Updated scope with id: {} and details: {}", id, updatedScope);
     return ResponseEntity.ok("Updated scope with ID: " + id);

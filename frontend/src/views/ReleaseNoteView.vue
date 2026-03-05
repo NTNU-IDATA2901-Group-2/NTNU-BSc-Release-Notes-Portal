@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useReleaseNote, useArchiveReleaseNote, updateReleaseNote, publishReleaseNote } from '@/api/release-note-api';
+import { useGetReleaseNote, useArchiveReleaseNote, useUpdateReleaseNote, usePublishReleaseNote } from '@/api/release-note-api';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 
 import { Pencil, Trash2, Eye, EyeOff, FileDown, Ban, Save, ArrowLeft, EllipsisVertical } from "lucide-vue-next"
@@ -22,182 +22,234 @@ import { routeNames, router } from '@/utils/router';
 import { toast } from 'vue-sonner';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
-import type { ChangeNote, PersistReleaseNoteDTO } from '@/types';
+import type { ChangeNote } from '@/utils/types';
 import { EditReleaseNoteSchema } from '@/schemas';
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../components/ui/breadcrumb';
+import { useI18n } from 'vue-i18n';
 
-  const isEditing = ref(false)
+const isEditing = ref(false)
 
-  const route = useRoute();
+const route = useRoute();
 
-  const id = route.params.id as string;
+const id = route.params.id as string;
 
-  const { isPending, isFetching, isError, data: releaseNote } = useReleaseNote(id);
-  const { mutate: archiveReleaseNote } = useArchiveReleaseNote(id,
-    {
-      onSettled: () => {
-        deletePromptOpen.value = false;
-      },
-      onSuccess: () => {
-        router.push(routeNames.releaseNotes);
-        toast.success(`Release note ${releaseNote?.value?.tag ?? ""} successfully deleted`);
-      },
-      onError: () => {
-        toast.error(`Failed to delete release note ${releaseNote?.value?.tag ?? ""}`);
-      }
-    }
-  );
+const { isPending, isFetching, isError, data: releaseNote } = useGetReleaseNote(id);
 
-  const deletePromptOpen = ref(false);
-
-  const changeNotes = ref<ChangeNote[]>(releaseNote?.value?.changeNotes || [])
-
-
-  const form = useForm({
-    validationSchema: toTypedSchema(EditReleaseNoteSchema),
-    initialValues: {
-      tag: '',
-      summary: '',
-      changeNoteIds: [],
-      published: false,
-    }
-  })
-
-  const [tag] = form.defineField('tag');
-  const [summary] = form.defineField('summary');
-
-  const startEditing = () => {
-    if (!releaseNote.value) return
-
-    changeNotes.value = [...releaseNote.value.changeNotes]
-
-    form.setValues({
-      tag: releaseNote.value.tag,
-      summary: releaseNote.value.summary ?? '',
-      changeNoteIds: releaseNote.value.changeNotes.map(c => c.id),
-      published: releaseNote.value.published,
-    })
-
-    isEditing.value = true
-  }
-
-  const onSubmit = form.handleSubmit((values) => {
-    const payload = {
-      ...values,
-      changeNoteIds: changeNotes.value.map(c => c.id),
-    }
-    updateReleaseNoteMutation.mutate(payload);
-    isEditing.value = false;
-  })
-
-  const queryClient = useQueryClient();
-  const updateReleaseNoteMutation = useMutation({
-      mutationFn: (values: PersistReleaseNoteDTO) => updateReleaseNote(id, values),
-      onSuccess: () => {
-          toast.success('Release note updated successfully');
-          queryClient.invalidateQueries({ queryKey: ['releaseNote', id] });
-      }
-  })
-
-  const handlePublish = () => {
-    publishReleaseNoteMutation.mutate();
-  }
-
-  const publishReleaseNoteMutation = useMutation({
-    mutationFn: () => publishReleaseNote(id, !releaseNote.value?.published),
+const { mutate: archiveReleaseNote } = useArchiveReleaseNote(id,
+  {
+    onSettled: () => {
+      deletePromptOpen.value = false;
+    },
     onSuccess: () => {
-      toast.success(`Release note ${releaseNote.value?.published ? 'privated' : 'published'} successfully`);
-      queryClient.invalidateQueries({ queryKey: ['releaseNote', id] });
+      router.push(routeNames.releaseNotes);
+      toast.success(t('toast.releaseNoteDeletedSuccess'));
+    },
+    onError: () => {
+      toast.error(t('toast.releaseNoteDeleteError'));
     }
+  }
+);
+
+const deletePromptOpen = ref(false);
+
+const { t } = useI18n();
+
+const changeNotes = ref<ChangeNote[]>(releaseNote?.value?.changeNotes || [])
+
+
+const form = useForm({
+  validationSchema: toTypedSchema(EditReleaseNoteSchema),
+  initialValues: {
+    tag: '',
+    summary: '',
+    changeNoteIds: [],
+    published: false,
+  }
+})
+
+const [tag] = form.defineField('tag');
+const [summary] = form.defineField('summary');
+
+const startEditing = () => {
+  if (!releaseNote.value) return
+
+  changeNotes.value = [...releaseNote.value.changeNotes]
+
+  form.setValues({
+    tag: releaseNote.value.tag ?? '',
+    summary: releaseNote.value.summary ?? '',
+    changeNoteIds: releaseNote.value.changeNotes.map(c => c.id),
+    published: releaseNote.value.published,
   })
+
+  isEditing.value = true
+}
+
+const onSubmit = form.handleSubmit((values) => {
+  if (releaseNote.value !== undefined) {
+    const payload = {
+    ...values,
+    changeNoteIds: changeNotes.value.map(c => c.id),
+  }
+  updateReleaseNoteMutation.mutate({id: releaseNote.value.id, dto: payload });
+  isEditing.value = false;
+  }
+})
+
+const updateReleaseNoteMutation = useUpdateReleaseNote({
+  onSuccess: () => {
+    toast.success(t('toast.releaseNoteUpdatedSuccess'));
+  },
+  onError: () => {
+    toast.error(t('toast.releaseNoteUpdateError'));
+  }
+})
+
+const handlePublish = () => {
+  if (releaseNote.value !== undefined) {
+    publishReleaseNoteMutation.mutate({ id: releaseNote.value.id, publish: !releaseNote.value?.published });
+  }
+}
+
+const publishReleaseNoteMutation = usePublishReleaseNote({
+  onSuccess: () => {
+    toast.success(!releaseNote.value?.published ? t('toast.releaseNotePublished') : t('toast.releaseNoteUnpublished'));
+  },
+  onError: () => {
+    toast.error(t('toast.releaseNotePublishError'));
+  }
+})
 </script>
 
 <template>
+
   <div class="flex flex-col w-full items-center px-4 mb-20">
-  <DeletePrompt v-model:open="deletePromptOpen" :onConfirm="() =>archiveReleaseNote()" />
+    <DeletePrompt v-model:open="deletePromptOpen" :on-confirm="() => archiveReleaseNote()" />
+      <div class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10 flex items-center gap-4">
+        <Button variant="outline" class="" @click="$router.back()">
+          <ArrowLeft />{{ t('button.previous') }}
+        </Button>
+        <Breadcrumb class="text-text-primary">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Release Notes</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              {{ releaseNote?.tag }}
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
+
     <form class="w-full flex flex-col items-center" @submit="onSubmit">
-      <Button variant="outline" class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10" @click="$router.back()"><ArrowLeft />Previous</Button>
       <div class="md:hidden flex w-full mt-4 justify-end gap-2">
-        <Button v-if="isEditing" variant="outline" @click="isEditing = false">Cancel <Ban /></Button>
-        <Button v-if="isEditing" variant="outline" type="submit">Save <Save /></Button>
+        <Button v-if="isEditing" variant="outline" @click="isEditing = false">{{ t('button.cancel') }}
+          <Ban />
+        </Button>
+        <Button v-if="isEditing" variant="outline" type="submit">{{ t('button.save') }}
+          <Save />
+        </Button>
       </div>
       <Spinner v-if="isPending || isFetching" />
-      <h1 v-if="isError">Error retreiving release note</h1>
+      <h1 v-if="isError">{{ t('loadingError.releaseNotes') }}</h1>
 
-      <div v-if="!isPending && !isFetching && !isError && releaseNote" class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
+      <div 
+        v-if="!isPending && !isFetching && !isError && releaseNote"
+        class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
         <div class="flex flex-col gap-4 w-full">
           <div class="flex flex-row items-center justify-between w-full">
             <div class="flex items-center gap-4">
-              <h1 v-if="!isEditing" class="text-2xl max-w-60 whitespace-nowrap overflow-hidden">{{ releaseNote.tag }}</h1>
-              <Input v-if="isEditing" class="w-full" v-model="tag"/>
-              <Badge v-if="!isEditing" class="h-6" :variant="releaseNote.published ? 'success' : 'destructive'">{{ releaseNote.published ? 'Published' : 'Private' }}</Badge>
+              <h1 v-if="!isEditing" class="text-2xl max-w-60 whitespace-nowrap overflow-hidden">{{
+                releaseNote.tag }}</h1>
+              <div v-if="isEditing" class="flex flex-col gap-1">
+                <h4 class="text-md">{{ t('title.title') }}</h4>
+                <Input class="w-full" v-model="tag" :placeholder="t('placeholder.title')" />
+              </div>
+              <Badge 
+                v-if="!isEditing" class="h-6"
+                :variant="releaseNote.published ? 'success' : 'destructive'">{{
+                  releaseNote.published ? 'Published' : 'Private' }}</Badge>
             </div>
             <div class="flex gap-4">
               <DropdownMenu v-if="!isEditing">
-                <DropdownMenuTrigger class="cursor-pointer hover:bg-border/50 rounded-md p-2 transition-colors">
-                  <EllipsisVertical class="text-text-primary"/>
+                <DropdownMenuTrigger
+                  class="cursor-pointer hover:bg-border/50 rounded-md p-2 transition-colors">
+                  <EllipsisVertical class="text-text-primary" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent class="mr-6 lg:mr-20 mt-2">
-                    <DropdownMenuItem @click="startEditing">
-                      <div class="w-full flex gap-2">
-                          <p class="text-text-dark-static ml-auto">Edit</p>
-                          <Pencil class="text-text-dark-static"/>
-                      </div>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem @click="deletePromptOpen = true">
-                      <div class="w-full flex gap-2">
-                          <p class="ml-auto text-text-dark-static">Archive</p>
-                          <Trash2 class="text-text-dark-static"/>
-                      </div>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem @click="handlePublish">
-                      <div class="w-full flex gap-2">
-                          <p class="ml-auto text-text-dark-static">{{ !releaseNote.published ? 'Publish' : 'Unpublish' }}</p>
-                          <component :is="!releaseNote.published ? Eye : EyeOff" class="text-text-dark-static"/>
-                      </div>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem disabled>
-                      <div class="w-full flex gap-2">
-                          <p class="ml-auto text-text-dark-static">Export</p>
-                          <FileDown class="text-text-dark-static"/>
-                      </div>
-                    </DropdownMenuItem>
+                  <DropdownMenuItem @click="startEditing">
+                    <div class="w-full flex gap-2">
+                      <p class="text-text-dark-static ml-auto">{{ t('button.edit') }}</p>
+                      <Pencil class="text-text-dark-static" />
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem @click="deletePromptOpen = true">
+                    <div class="w-full flex gap-2">
+                      <p class="ml-auto text-text-dark-static">{{ t('button.delete') }}</p>
+                      <Trash2 class="text-text-dark-static" />
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem @click="handlePublish">
+                    <div class="w-full flex gap-2">
+                      <p class="ml-auto text-text-dark-static">{{ !releaseNote.published ? t('button.publish')
+                        : t('button.unpublish') }}</p>
+                      <component 
+                        :is="!releaseNote.published ? Eye : EyeOff"
+                        class="text-text-dark-static" />
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem disabled>
+                    <div class="w-full flex gap-2">
+                      <p class="ml-auto text-text-dark-static">{{ t('button.export') }}</p>
+                      <FileDown class="text-text-dark-static" />
+                    </div>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Button class="hidden md:flex" v-if="isEditing" variant="outline" @click="isEditing = false">Cancel <Ban /></Button>
-              <Button class="hidden md:flex" v-if="isEditing" variant="outline" type="submit">Save <Save /></Button>
-            </div>
-            </div>
-
-            <p v-if="!isEditing" class="">{{ releaseNote.summary }}</p>
-            <Textarea v-if="isEditing" class="w-full" v-model="summary"/>
-        </div>
-        <Separator class="w-full h-2"/>
-        <div class="flex flex-col w-full text-xl gap-10">
-        <div class="flex flex-col w-full text-xl gap-10">
-          <h2>Change Notes</h2>
-          <MultiselectChangeNotes v-if="isEditing" v-model="changeNotes"/>
-          <div
-              v-if="!isEditing"
-              v-for="change in releaseNote.changeNotes"
-              :key="change.id" 
-              class="flex flex-col gap-4"
-              >
-            <h3 class="text-lg">{{ change.reference }}</h3>
-            <div>
-              <h3 class="text-lg">Description</h3>
-              <p class="text-sm">{{ change.description }}</p>
-            </div>
-            <div>
-              <h3 class="text-lg">Developer Notes</h3>
-              <p class="text-sm">{{ change.developerNotes }}</p>
-            </div>
-            <div>
-              <h3 class="text-lg">Upgrade Notes</h3>
-              <p class="text-sm">{{ change.upgradeNotes }}</p>
+              <Button 
+                class="hidden md:flex" v-if="isEditing" variant="outline"
+                @click="isEditing = false">{{ t('button.cancel') }}
+                <Ban />
+              </Button>
+              <Button class="hidden md:flex" v-if="isEditing" variant="outline" type="submit">{{ t('button.save') }}
+                <Save />
+              </Button>
             </div>
           </div>
+
+          <p v-if="!isEditing" class="">{{ releaseNote.summary }}</p>
+          <div class="flex flex-col gap-1" v-if="isEditing">
+            <h4 class="text-md">{{ t('title.description') }}</h4>
+            <Textarea class="w-full" v-model="summary" :placeholder="t('placeholder.description')" />
+          </div>
         </div>
+        <Separator class="w-full h-2" />
+        <div class="flex flex-col w-full gap-10">
+          <div class="flex flex-col w-full gap-10">
+            <h2 class="text-xl">Change Notes</h2>
+            <MultiselectChangeNotes v-if="isEditing" v-model="changeNotes" />
+            <div v-if="!isEditing">
+              <div 
+                v-for="change in releaseNote.changeNotes" :key="change.id"
+                class="flex flex-col gap-4 mb-6">
+                
+                <h3 class="text-lg">{{ change.reference }}</h3>
+                <div>
+                  <h3 class="text-lg">{{ t('title.description') }}</h3>
+                  <p class="text-sm">{{ change.description }}</p>
+                </div>
+                <div>
+                  <h3 class="text-lg">{{ t('title.developerNotes') }}</h3>
+                  <p class="text-sm">{{ change.developerNotes }}</p>
+                </div>
+                <div>
+                  <h3 class="text-lg">{{ t('title.upgradeRequirements') }}</h3>
+                  <p class="text-sm">{{ change.upgradeNotes }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </form>

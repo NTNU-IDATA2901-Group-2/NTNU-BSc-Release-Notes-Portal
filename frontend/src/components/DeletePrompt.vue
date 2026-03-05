@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from './ui/dialog';
 
@@ -20,15 +21,17 @@ const handleConfirm = () => {
   emit('update:open', false);
 }
 
+const { t } = useI18n();
+
 </script>
 
 <template>
   <Dialog :open="open" @update:open="handleClose">
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Are you sure you want to delete this change note?</DialogTitle>
+        <DialogTitle>{{ t('deletePrompt.title') }}</DialogTitle>
         <DialogDescription>
-          This action cannot be undone.
+          {{ t('deletePrompt.description') }}
         </DialogDescription>
       </DialogHeader>
       <DialogFooter>

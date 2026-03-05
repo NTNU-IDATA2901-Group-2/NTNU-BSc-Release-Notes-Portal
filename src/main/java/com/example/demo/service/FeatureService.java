@@ -6,8 +6,10 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.domain.entity.Feature;
 import com.example.demo.domain.repository.FeatureRepository;
+import com.example.demo.dto.CreateTagDTO;
 import com.example.demo.dto.FeatureDTO;
 import com.example.demo.exception.FeatureNotFoundException;
+import com.example.demo.exception.FailedToSaveEntityException;
 
 import lombok.AllArgsConstructor;
 
@@ -22,10 +24,14 @@ public class FeatureService {
    * @param featureDTO the DTO containing details for the new feature
    * @return the ID of the created feature
    */
-  public long createFeature(FeatureDTO featureDTO) {
+  public long createFeature(CreateTagDTO featureDTO) {
     Feature feature = new Feature();
     feature.setName(featureDTO.name());
-    return featureRepository.save(feature).getId();
+    try {
+      return featureRepository.save(feature).getId();
+    } catch (Exception _) {
+      throw new FailedToSaveEntityException("Failed to create feature");
+    }
   }
 
   /**
@@ -60,11 +66,15 @@ public class FeatureService {
    * @return a DTO representing the updated feature
    * @throws FeatureNotFoundException if no feature with the given ID exists
    */
-  public FeatureDTO updateFeature(long id, FeatureDTO featureDTO) {
+  public FeatureDTO updateFeature(long id, CreateTagDTO featureDTO) {
     Feature feature = featureRepository.findById(id)
         .orElseThrow(() -> new FeatureNotFoundException(id));
     feature.setName(featureDTO.name());
-    return FeatureDTO.fromFeature(featureRepository.save(feature));
+    try {
+      return FeatureDTO.fromFeature(featureRepository.save(feature));
+    } catch (Exception _) {
+      throw new FailedToSaveEntityException("Failed to update feature with ID " + id);
+    }
   }
 
   /**

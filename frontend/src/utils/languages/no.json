@@ -1,0 +1,99 @@
+{
+    "header": {
+        "releaseNotesLink": "Utgivelsesnotater",
+        "changeNotesLink": "Endringsnotater",
+        "toggleTheme": "Bytt tema",
+        "signOut": "Logg ut",
+        "language": "Språk",
+        "english": "Engelsk",
+        "norwegian": "Norsk"
+    },
+    "button": {
+        "previous": "Forrige",
+        "edit": "Rediger",
+        "save": "Lagre",
+        "cancel": "Avbryt",
+        "delete": "Slett",
+        "export": "Eksporter",
+        "publish": "Publiser",
+        "unpublish": "Avpubliser",
+        "none": "Ingen",
+        "createChangeNote": "Opprett Endringsnotat",
+        "createReleaseNote": "Opprett Utgivelsesnotat",
+        "filter": "Filtrer",
+        "search": "Søk",
+        "signIn": "Logg inn",
+        "clearFilters": "Fjern filtre"
+    },
+    "title": {
+        "title": "Tittel",
+        "description": "Beskrivelse",
+        "product": "Produkt",
+        "scope": "Omfang",
+        "feature": "Funksjon",
+        "customer": "Kunde",
+        "developerNotes": "Utviklernotater",
+        "upgradeRequirements": "Oppgraderingskrav",
+        "search": "Søk",
+        "status": "Status"
+    },
+    "toast": {
+        "changeNoteDeleted": "Endringsnotat slettet",
+        "changeNoteDeleteError": "Det oppsto en feil under sletting av endringsnotat",
+        "changeNoteCreated": "Endringsnotat opprettet",
+        "changeNoteCreateError": "Det oppsto en feil under oppretting av endringsnotat",
+        "changeNotePublished": "Endringsnotat publisert",
+        "changeNoteUnpublished": "Endringsnotat avpublisert",
+        "changeNotePublishError": "Det oppsto en feil under publisering av endringsnotat",
+        "changeNoteUnpublishError": "Det oppsto en feil under avpublisering av endringsnotat",
+        "changeNoteUpdatedSuccess": "Endringsnotat oppdatert",
+        "changeNoteUpdateError": "Det oppsto en feil under oppdatering av endringsnotat",
+        "selectedChangeNotesPublished": "Valgte endringsnotater publisert",
+        "selectedChangeNotesPublishError": "Kunne ikke publisere valgte endringsnotater",
+        "releaseNoteCreated": "Utgivelsesnotat opprettet",
+        "releaseNoteCreateError": "Det oppsto en feil under oppretting av utgivelsesnotat",
+        "releaseNoteDeletedSuccess": "Utgivelsesnotat slettet",
+        "releaseNoteDeleteError": "Det oppsto en feil under sletting av utgivelsesnotat",
+        "releaseNotePublished": "Utgivelsesnotat publisert",
+        "releaseNoteUnpublished": "Utgivelsesnotat avpublisert",
+        "releaseNotePublishError": "Det oppsto en feil under publisering av utgivelsesnotat",
+        "releaseNoteUnpublishError": "Det oppsto en feil under avpublisering av utgivelsesnotat",
+        "releaseNoteUpdatedSuccess": "Utgivelsesnotat oppdatert",
+        "releaseNoteUpdateError": "Det oppsto en feil under oppdatering av utgivelsesnotat"
+    },
+    "deletePrompt": {
+        "title": "Er du sikker på at du vil slette?",
+        "description": "Denne handlingen kan ikke angres."
+    },
+    "card": {
+        "published": "Publisert",
+        "private": "Privat"
+    },
+      "input": {
+        "addChangeNotes": "Legg til endringsnotater"
+    },
+    "loadingError": {
+        "changeNotes": "Det oppsto en feil under innlastning av endringsnotater",
+        "releaseNotes": "Det oppsto en feil under innlastning av utgivelsesnotater",
+        "products": "Det oppsto en feil under innlastning av produkter",
+        "scopes": "Det oppsto en feil under innlastning av omfang",
+        "features": "Det oppsto en feil under innlastning av funksjoner",
+        "customers": "Det oppsto en feil under innlastning av kunder"
+    },
+    "loading": {
+        "filter": "Laster inn filter..."
+    },
+    "notFound": {
+        "resourceNotFound": "Ressursen du prøver å få tilgang til har enten blitt flyttet, eller eksisterer ikke.",
+        "404": "404 - Not Found"
+    },
+    "signIn": {
+        "pleaseSignIn": "Vennligst logg inn"
+    },
+    "placeholder": {
+        "title": "Tittel",
+        "description": "Beskrivelse",
+        "developerNotes": "Utviklernotater",
+        "upgradeRequirements": "Oppgraderingskrav"
+    }
+}

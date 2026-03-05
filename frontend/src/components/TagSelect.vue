@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { useCustomers, useFeatures, useProducts, useScopes } from '@/api/change-note-api';
+import { useGetCustomers } from '@/api/customers-api';
+import { useGetFeatures } from '@/api/features-api';
+import { useGetProducts } from '@/api/products-api';
+import { useGetScopes } from '@/api/scopes-api';
 import {
   Select,
   SelectContent,
@@ -8,7 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import type { Tag } from '@/utils/types';
 import type { PrimitiveProps } from 'reka-ui';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps<PrimitiveProps & {
     mode: SelectMode,
@@ -23,19 +28,21 @@ const emit = defineEmits<{
 type SelectMode = 'product' | 'scope' | 'feature' | 'customer'
 
 const hookMap = {
-    product: useProducts,
-    scope: useScopes,
-    feature: useFeatures,
-    customer: useCustomers
+    product: useGetProducts,
+    scope: useGetScopes,
+    feature: useGetFeatures,
+    customer: useGetCustomers
 } as const
 
-const { isLoading, isError, data: tags } = hookMap[props.mode]()
+const { data: tags } = hookMap[props.mode]()
 
 const getTagFromId = (id?: number) => {
     if (id === undefined || id === -1) return 'None'
-    const tag = tags.value?.find(t => t.id === id)
+    const tag: Tag | undefined = tags.value?.find(t => t.id === id)
     return tag ? tag.name : 'None'
 }
+
+const { t } = useI18n();
 
 const currentValue = () => (props.modelValue ?? props.selectedId ?? -1).toString()
 
@@ -45,14 +52,14 @@ const currentValue = () => (props.modelValue ?? props.selectedId ?? -1).toString
     <Select :model-value="currentValue()" @update:model-value="(val) => emit('update:modelValue', val ? parseInt(val as string) : -1)">
     <SelectTrigger class="w-[180px]">
         <SelectValue 
-        :textValue="getTagFromId(parseInt(currentValue()))"/>
+        :text-value="getTagFromId(parseInt(currentValue()))"/>
     </SelectTrigger>
     <SelectContent>
         <SelectGroup>
         <SelectItem value="-1" class="text-text-primary/50">
-            None
+            {{ t('button.none') }}
         </SelectItem>
-        <SelectItem v-for="tag in tags" :value="tag.id.toString()">
+        <SelectItem v-for="tag in tags" :key="tag.id" :value="tag.id.toString()">
             {{ tag.name }}
         </SelectItem>
         </SelectGroup>

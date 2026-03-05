@@ -1,0 +1,20 @@
+meta {
+  name: get_all_customers
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseurl}}/customers
+  body: none
+  auth: inherit
+}
+
+script:post-response {
+  bru.setEnvVar("customer_count", res.body.length)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

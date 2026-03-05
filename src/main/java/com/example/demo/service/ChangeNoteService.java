@@ -49,6 +49,10 @@ public class ChangeNoteService {
       changeNote.setDeveloperNotes(changeNoteDTO.developerNotes());
       changeNote.setUpgradeNotes(changeNoteDTO.upgradeNotes());
       changeNote.setChangeSource(changeNoteDTO.changeSource());
+      
+      if (changeNoteDTO.published() != null) {
+        changeNote.setPublished(changeNoteDTO.published());
+      }
 
       if (changeNoteDTO.productId() != null) {
         changeNote.setProduct(productRepository.findById(changeNoteDTO.productId())
@@ -89,14 +93,22 @@ public class ChangeNoteService {
   }
 
   /**
-   * Retrieves all change notes from the repository.
+   * Retrieves all change notes from the repository, with optional filtering based on query, published status, customer ID, feature ID, scope ID, and product ID.
    * 
-   * @return a list of all change notes
+   * @param query          optional filter for searching change notes by reference, description, developer notes, upgrade notes, or change source
+   * @param published      optional filter for published status
+   * @param hasReleaseNote optional filter for change notes that have an associated release note
+   * @param customerIds    optional filter for customer ID
+   * @param featureIds     optional filter for feature ID
+   * @param scopeIds       optional filter for scope ID
+   * @param productIds     optional filter for product ID
+   * 
+   * @return a list of all change notes that match the provided filters, mapped to ChangeNoteDTOs
    */
-  public List<ChangeNoteDTO> getAllChangeNotes() {
-    return changeNoteRepository.findByArchivedFalse().stream()
-        .map(ChangeNoteDTO::fromChangeNote)
-        .toList();
+  public List<ChangeNoteDTO> getAllChangeNotes(String query, Boolean published, Boolean hasReleaseNote, List<Long> customerIds, List<Long> featureIds, List<Long> scopeIds, List<Long> productIds) {
+    return changeNoteRepository
+        .findByArchivedFalseAndMatchingFilterParameters(query, published, hasReleaseNote, customerIds, featureIds, scopeIds, productIds)
+        .stream().map(ChangeNoteDTO::fromChangeNote).toList();
   }
 
   /**

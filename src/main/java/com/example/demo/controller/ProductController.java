@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.CreateTagDTO;
 import com.example.demo.dto.ProductDTO;
 import com.example.demo.service.ProductService;
 
@@ -22,6 +23,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 @Tag(name = "Products", description = "Endpoints for managing products")
@@ -40,7 +42,7 @@ public class ProductController {
 		@ApiResponse(responseCode = "500", description = "Internal server error")
 	})
 	@PostMapping("")
-	public ResponseEntity<String> createProduct(@RequestBody ProductDTO productDTO) {
+	public ResponseEntity<String> createProduct(@Valid @RequestBody CreateTagDTO productDTO) {
 		long id = productService.createProduct(productDTO);
 		logger.info("Product created with id: {}", id);
 		return ResponseEntity.status(HttpStatus.CREATED).body(String.valueOf(id));
@@ -78,7 +80,7 @@ public class ProductController {
 		@ApiResponse(responseCode = "500", description = "Internal server error")
 	})
 	@PutMapping("/{id}")
-	public ResponseEntity<ProductDTO> updateProduct(@PathVariable long id, @RequestBody ProductDTO productDTO) {
+	public ResponseEntity<ProductDTO> updateProduct(@PathVariable long id, @Valid @RequestBody CreateTagDTO productDTO) {
 		ProductDTO product = productService.updateProduct(id, productDTO);
 		logger.info("Updated product with id: {}", id);
 		return ResponseEntity.ok(product);

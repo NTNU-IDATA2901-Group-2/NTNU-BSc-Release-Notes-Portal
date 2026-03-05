@@ -1,0 +1,26 @@
+meta {
+  name: post_product_without_body
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseurl}}/products
+  body: none
+  auth: inherit
+}
+
+body:json {
+  {
+    "name" : "testProduct"
+  }
+}
+
+assert {
+  res.status: eq 400
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import type { PrimitiveProps } from 'reka-ui';
 import Badge from './ui/badge/Badge.vue';
-import type { ReleaseNote } from '@/types';
+import type { ReleaseNote } from '@/utils/types';
 import { RouterLink } from 'vue-router';
-
+import { useI18n } from 'vue-i18n';
 const props = defineProps<PrimitiveProps & {
   releaseNote: ReleaseNote,
 }>()
 
 const releaseNote = props.releaseNote;
+const { t } = useI18n();
 </script>
 
 <template>
@@ -18,7 +19,7 @@ const releaseNote = props.releaseNote;
       <div class="flex flex-row justify-between">
         <h3 class="text-xl">{{ releaseNote.tag }}</h3>
         <Badge :variant="releaseNote.published ? 'success' : 'destructive'">{{ releaseNote.published
-          ? 'Published' : 'Private' }}</Badge>
+          ? t('card.published') : t('card.private') }}</Badge>
       </div>
       <p>{{ releaseNote.summary }}</p>
     </div>

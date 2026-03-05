@@ -1,0 +1,20 @@
+meta {
+  name: get_all_count_increase
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseurl}}/products
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.body.length: gt {{product_count}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

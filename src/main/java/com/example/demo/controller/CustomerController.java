@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.CreateTagDTO;
 import com.example.demo.dto.CustomerDTO;
 import com.example.demo.service.CustomerService;
 
@@ -22,6 +23,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 @Tag(name = "Customers", description = "Endpoints for managing customers")
@@ -40,7 +42,7 @@ public class CustomerController {
 		@ApiResponse(responseCode = "500", description = "Internal server error")
 	})
 	@PostMapping("")
-	public ResponseEntity<String> createCustomer(@RequestBody CustomerDTO customerDTO) {
+	public ResponseEntity<String> createCustomer(@Valid @RequestBody CreateTagDTO customerDTO) {
 		long id = customerService.createCustomer(customerDTO);
 		logger.info("Customer created with id: {}", id);
 		return ResponseEntity.status(HttpStatus.CREATED).body(String.valueOf(id));
@@ -78,7 +80,7 @@ public class CustomerController {
 		@ApiResponse(responseCode = "500", description = "Internal server error")
 	})
 	@PutMapping("/{id}")
-	public ResponseEntity<CustomerDTO> updateCustomer(@PathVariable long id, @RequestBody CustomerDTO customerDTO) {
+	public ResponseEntity<CustomerDTO> updateCustomer(@PathVariable long id, @Valid @RequestBody CreateTagDTO customerDTO) {
 		CustomerDTO customer = customerService.updateCustomer(id, customerDTO);
 		logger.info("Updated customer with id: {}", id);
 		return ResponseEntity.ok(customer);
