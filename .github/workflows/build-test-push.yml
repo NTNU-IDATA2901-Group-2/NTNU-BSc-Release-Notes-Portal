@@ -95,8 +95,7 @@ jobs:
   docker-build-push:
     needs: [compile-backend, build-frontend]
     if: |
-      (github.event_name == 'push' && (github.ref == 'refs/heads/main')) ||
-      (github.event_name == 'pull_request' && (github.base_ref == 'main'))
+      ((github.event_name == 'push' || github.event_name == 'pull_request') && (github.ref == 'refs/heads/main'))
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
