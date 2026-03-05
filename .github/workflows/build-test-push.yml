@@ -1,9 +1,5 @@
 name: CI Frontend & Backend
 on:
-  push:
-    branches:
-      - main
-      - dev
   pull_request:
     branches:
       - main
@@ -95,7 +91,6 @@ jobs:
   docker-build-push:
     needs: [compile-backend, build-frontend]
     if: |
-      (github.event_name == 'push' && (github.ref == 'refs/heads/main')) ||
       (github.event_name == 'pull_request' && (github.base_ref == 'main'))
     runs-on: ubuntu-latest
     steps:
