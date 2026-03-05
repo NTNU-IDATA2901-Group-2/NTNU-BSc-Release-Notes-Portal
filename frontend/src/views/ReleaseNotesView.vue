@@ -6,7 +6,7 @@ import { InputGroup, InputGroupInput } from '@/components/ui/input-group';
 import Separator from '@/components/ui/separator/Separator.vue';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 import { ListFilterPlus, Search } from 'lucide-vue-next';
-import { computed, provide, ref, watch } from 'vue';
+import { computed, onMounted, provide, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ScrollArea from '@/components/ui/scroll-area/ScrollArea.vue';
 import ProductFilter from '@/components/filters/ProductFilter.vue';
@@ -29,6 +29,16 @@ watch(searchParams, () => {
   url.search = urlSearchParams.value.toString();
   router.replace({ query: searchParams.value });
 }, { deep: true });
+
+onMounted(() => {
+  if (window.location.hash.includes("state=")) {
+    window.history.replaceState(
+      {},
+      document.title,
+      window.location.pathname + window.location.search
+    );
+  }
+});
 
 provide('searchParams', searchParams);
 
