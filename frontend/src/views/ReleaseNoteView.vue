@@ -24,7 +24,6 @@ import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import type { ChangeNote } from '@/utils/types';
 import { EditReleaseNoteSchema } from '@/schemas';
-import { useQueryClient } from '@tanstack/vue-query';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../components/ui/breadcrumb';
 import { useI18n } from 'vue-i18n';
 
@@ -97,11 +96,9 @@ const onSubmit = form.handleSubmit((values) => {
   }
 })
 
-const queryClient = useQueryClient();
 const updateReleaseNoteMutation = useUpdateReleaseNote({
   onSuccess: () => {
     toast.success(t('toast.releaseNoteUpdatedSuccess'));
-    queryClient.invalidateQueries({ queryKey: ['releaseNote', id] });
   },
   onError: () => {
     toast.error(t('toast.releaseNoteUpdateError'));
