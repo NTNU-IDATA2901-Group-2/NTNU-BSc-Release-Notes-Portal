@@ -180,29 +180,29 @@ const publishReleaseNoteMutation = usePublishReleaseNote({
                 <DropdownMenuContent class="mr-6 lg:mr-20 mt-2">
                   <DropdownMenuItem @click="startEditing">
                     <div class="w-full flex gap-2">
-                      <p class="text-text-dark-static ml-auto">{{ t('button.edit') }}</p>
-                      <Pencil class="text-text-dark-static" />
+                      <p class="text-text-primary ml-auto">{{ t('button.edit') }}</p>
+                      <Pencil class="text-text-primary" />
                     </div>
                   </DropdownMenuItem>
                   <DropdownMenuItem @click="deletePromptOpen = true">
                     <div class="w-full flex gap-2">
-                      <p class="ml-auto text-text-dark-static">{{ t('button.delete') }}</p>
-                      <Trash2 class="text-text-dark-static" />
+                      <p class="ml-auto text-text-primary">{{ t('button.delete') }}</p>
+                      <Trash2 class="text-text-primary" />
                     </div>
                   </DropdownMenuItem>
                   <DropdownMenuItem @click="handlePublish">
                     <div class="w-full flex gap-2">
-                      <p class="ml-auto text-text-dark-static">{{ !releaseNote.published ? t('button.publish')
+                      <p class="ml-auto text-text-primary">{{ !releaseNote.published ? t('button.publish')
                         : t('button.unpublish') }}</p>
                       <component 
                         :is="!releaseNote.published ? Eye : EyeOff"
-                        class="text-text-dark-static" />
+                        class="text-text-primary" />
                     </div>
                   </DropdownMenuItem>
                   <DropdownMenuItem disabled>
                     <div class="w-full flex gap-2">
-                      <p class="ml-auto text-text-dark-static">{{ t('button.export') }}</p>
-                      <FileDown class="text-text-dark-static" />
+                      <p class="ml-auto text-text-primary">{{ t('button.export') }}</p>
+                      <FileDown class="text-text-primary" />
                     </div>
                   </DropdownMenuItem>
                 </DropdownMenuContent>

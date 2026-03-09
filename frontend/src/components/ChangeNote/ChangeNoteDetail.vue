@@ -84,26 +84,26 @@ class="h-6"
               <DropdownMenuContent class="mr-6 lg:mr-20 mt-2">
                 <DropdownMenuItem @click="emit('update:modelValue', true)">
                   <div class="w-full flex gap-2">
-                    <p class="text-text-dark-static ml-auto">{{ t('button.edit') }}</p>
-                    <Pencil class="text-text-dark-static" />
+                    <p class="text-text-primary ml-auto">{{ t('button.edit') }}</p>
+                    <Pencil class="text-text-primary" />
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem @click="showDeletePrompt = true">
                   <div class="w-full flex gap-2">
-                    <p class="ml-auto text-text-dark-static">{{ t('button.delete') }}</p>
-                    <Trash2 class="text-text-dark-static" />
+                    <p class="ml-auto text-text-primary">{{ t('button.delete') }}</p>
+                    <Trash2 class="text-text-primary" />
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem @click="onPublishToggle">
                   <div class="w-full flex gap-2">
-                    <p class="ml-auto text-text-dark-static">{{ changeNote.published ? t('button.unpublish') : t('button.publish') }}</p>
-                    <Eye class="text-text-dark-static" />
+                    <p class="ml-auto text-text-primary">{{ changeNote.published ? t('button.unpublish') : t('button.publish') }}</p>
+                    <Eye class="text-text-primary" />
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem disabled>
                   <div class="w-full flex gap-2">
-                    <p class="ml-auto text-text-dark-static">{{ t('button.export') }}</p>
-                    <FileDown class="text-text-dark-static" />
+                    <p class="ml-auto text-text-primary">{{ t('button.export') }}</p>
+                    <FileDown class="text-text-primary" />
                   </div>
                 </DropdownMenuItem>
               </DropdownMenuContent>
