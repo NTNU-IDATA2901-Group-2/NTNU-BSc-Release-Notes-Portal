@@ -8,8 +8,8 @@ import keycloak from './utils/keycloak';
 import { i18n } from './utils/i18n';
 
 const app = createApp(App)
-  app.use(VueQueryPlugin)
-  app.use(i18n)
+app.use(VueQueryPlugin)
+app.use(i18n)
 
 keycloak.init({
   onLoad: "check-sso",
@@ -20,4 +20,12 @@ keycloak.init({
   // Idk if this is the best way to do this, but it ensures router is not used before keycloak is initialized to prevent sync issues with auth state.
   app.use(router)
   app.mount("#app");
+
+  router.isReady().then(() => {
+    if (window.location.hash) {
+      const url = new URL(window.location.href);
+      url.hash = '';
+      window.history.replaceState({}, document.title, url.toString());
+    }
+  });
 });
