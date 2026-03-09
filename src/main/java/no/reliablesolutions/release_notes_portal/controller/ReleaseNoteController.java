@@ -1,0 +1,170 @@
+package no.reliablesolutions.release_notes_portal.controller;
+
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import no.reliablesolutions.release_notes_portal.dto.CreateReleaseNoteDTO;
+import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteDTO;
+import no.reliablesolutions.release_notes_portal.service.ReleaseNoteService;
+
+/**
+ * Controller for managing release notes. Provides endpoints for creating, archiving, retrieving, and updating release notes.
+ */
+@Tag(name = "Release Notes", description = "Endpoints for managing release notes")
+@RestController
+@RequestMapping("/api/releasenotes")
+@AllArgsConstructor
+public class ReleaseNoteController {
+
+  private final ReleaseNoteService releaseNoteService;
+
+  private final Logger logger = LoggerFactory.getLogger(ReleaseNoteController.class);
+
+
+  /**
+   * Creates a new release note with the provided details.
+   *
+   * @param createReleaseNoteDTO the DTO containing details for the new release note
+   * @return a ResponseEntity with a 201 status and the ID of the created release note in the body
+   */
+  @Operation(summary = "Create release note", description = "Creates a new release note with provided details")
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "201", description = "Release note created successfully"),
+    @ApiResponse(responseCode = "404", description = "Related entity not found"),
+    @ApiResponse(responseCode = "400", description = "Bad request"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
+  @PostMapping("")
+  public ResponseEntity<String> createReleaseNote(
+    @Parameter(name = "createReleaseNoteDTO",
+        description = "Details of the release note to be created",
+        required = true)
+    @RequestBody CreateReleaseNoteDTO createReleaseNoteDTO) {
+      long id = releaseNoteService.createReleaseNote(createReleaseNoteDTO);
+      logger.info("Release note created with id: {}", id);
+      return ResponseEntity.status(HttpStatus.CREATED).body(String.valueOf(id));
+  }
+
+  /**
+   * Archives an existing release note by its ID.
+   *
+   * @param id the ID of the release note to be archived
+   * @return a ResponseEntity with a 200 status and a message indicating that the release note was archived successfully
+   */
+  @Operation(summary = "Archive release note", description = "Archives an existing release note")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Release note archived successfully"),
+      @ApiResponse(responseCode = "404", description = "Release note not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
+  @PatchMapping("/{id}/archive")
+  public ResponseEntity<String> archiveReleaseNote(
+    @Parameter(name = "id",
+    description = "ID of the release note to be archived",
+    required = true)
+    @PathVariable long id) {
+    releaseNoteService.archiveReleaseNote(id);
+    logger.info("Release note archived with id: {}", id);
+    return ResponseEntity.ok().body("Release note archived successfully");
+  }
+
+  /**
+   * Retrieves a list of all non-archived release notes, with optional filters for query, published status, and product.
+   *
+   * @return a ResponseEntity with a 200 status and a list of ReleaseNoteDTOs in the body
+   */
+  @Operation(summary = "Get all release notes, with optional filters", description = "Retrieves a list of all release notes with optional filters")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Release notes retrieved successfully"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
+  @GetMapping("")
+  public ResponseEntity<List<ReleaseNoteDTO>> getAllReleaseNotes(
+    @RequestParam(required = false) String query,
+    @RequestParam(required = false) Boolean published,
+    @RequestParam(required = false) List<Long> productIds
+  ) {
+      List<ReleaseNoteDTO> releaseNotes = releaseNoteService.getAllReleaseNotes(query, published, productIds);
+      logger.info("Retrieved {} release notes with filters - query: {}, published: {}, productIds: {}", releaseNotes.size(), query, published, productIds);
+      return ResponseEntity.ok(releaseNotes);
+  }
+
+  /**
+   * Retrieves details of a specific non-archived release note by its ID.
+   *
+   * @param id the ID of the release note to be retrieved
+   * @return a ResponseEntity with a 200 status and a ReleaseNoteDTO in the body if found
+   */
+  @Operation(summary = "Get release note by ID", description = "Retrieves details of a specific release note by its ID")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Release note retrieved successfully"),
+      @ApiResponse(responseCode = "404", description = "Release note not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
+  @GetMapping("/{id}")
+  public ResponseEntity<ReleaseNoteDTO> getReleaseNoteById(
+    @Parameter(name = "id",
+    description = "ID of the release note to be retrieved",
+    required = true)
+    @PathVariable long id) {
+      ReleaseNoteDTO releaseNote = releaseNoteService.getReleaseNoteById(id);
+      logger.info("Retrieved release note with id: {}", id);
+      return ResponseEntity.ok(releaseNote);
+  }
+
+  /**
+   * Updates an existing release note with new details.
+   *
+   * @param id the ID of the release note to be updated
+   * @param createReleaseNoteDTO the DTO containing updated details for the release note
+   * @return a ResponseEntity with a 200 status and a ReleaseNoteDTO in the body representing the updated release note
+   */
+  @Operation(summary = "Update release note", description = "Updates an existing release note with new details")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Release note updated successfully"),
+      @ApiResponse(responseCode = "404", description = "Release note not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
+  @PutMapping("/{id}")
+  public ResponseEntity<ReleaseNoteDTO> updateReleaseNote(@PathVariable long id, @RequestBody CreateReleaseNoteDTO createReleaseNoteDTO) {
+    ReleaseNoteDTO releaseNote = releaseNoteService.updateReleaseNote(id, createReleaseNoteDTO);
+    logger.info("Updated release note with id: {}", id);
+    return ResponseEntity.ok(releaseNote);
+  }
+
+  /**
+   * Publishes an existing release note by its ID. Privates release note if publish is false.
+   */
+  @Operation(summary = "Publish release note", description = "Publishes an existing release note by its ID. Privates release note if publish is false.")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Release note published successfully"),
+      @ApiResponse(responseCode = "404", description = "Release note not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
+  @PatchMapping("/{id}/publish")
+  public ResponseEntity<Long> publishReleaseNote(@PathVariable long id, @Valid @RequestParam(required = true) boolean publish) {
+    releaseNoteService.publishReleaseNote(id, publish);
+    logger.info("Release note with id {} published: {}", id, publish);
+    return ResponseEntity.ok(id);
+  }
+}
