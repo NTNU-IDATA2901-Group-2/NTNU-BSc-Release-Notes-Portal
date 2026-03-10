@@ -4,6 +4,11 @@ import no from './languages/no.json';
 import fr from './languages/fr.json';
 
 const detectUserLanguage = () => {
+  const storedLocale = localStorage.getItem('locale');
+    if (storedLocale) {
+      return storedLocale;
+    }
+
     const userLang = navigator.language
     if (userLang.startsWith('no') || userLang.startsWith('nb') || userLang.startsWith('nn')) {
         return 'no';
