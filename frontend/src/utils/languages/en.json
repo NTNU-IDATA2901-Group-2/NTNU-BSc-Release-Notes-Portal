@@ -34,7 +34,9 @@
         "customer": "Customer",
         "developerNotes": "Developer Notes",
         "upgradeRequirements": "Upgrade Requirements",
-        "status": "Status"
+        "status": "Status",
+        "changeNotes": "Change Notes",
+        "releaseNotes": "Release Notes"
     },
     "toast": {
         "changeNoteDeleted": "Change note deleted successfully",
@@ -66,7 +68,8 @@
     },
     "card": {
         "published": "Published",
-        "private": "Private"
+        "private": "Private",
+        "containsChangeNotes": "no change notes | 1 change note | {count} change notes"
     },
     "input": {
         "addChangeNotes": "Add change notes"

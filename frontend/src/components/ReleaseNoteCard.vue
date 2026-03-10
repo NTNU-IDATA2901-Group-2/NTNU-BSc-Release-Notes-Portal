@@ -4,6 +4,7 @@ import Badge from './ui/badge/Badge.vue';
 import type { ReleaseNote } from '@/utils/types';
 import { RouterLink } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+
 const props = defineProps<PrimitiveProps & {
   releaseNote: ReleaseNote,
 }>()
@@ -21,7 +22,7 @@ const { t } = useI18n();
         <Badge :variant="releaseNote.published ? 'success' : 'destructive'">{{ releaseNote.published
           ? t('card.published') : t('card.private') }}</Badge>
       </div>
-      <p>{{ releaseNote.summary }}</p>
+      <p>{{ t('card.containsChangeNotes', { count: releaseNote.changeNotes.length }) }}</p>
     </div>
   </RouterLink>
 </template>

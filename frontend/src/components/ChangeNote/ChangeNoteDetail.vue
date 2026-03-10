@@ -19,6 +19,8 @@ import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
+import md from '@/utils/markdown-it';
+
 const props = defineProps<{
     changeNote: ChangeNote;
     modelValue?: boolean;
@@ -68,7 +70,7 @@ const onPublishToggle = () => {
       <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-row items-center justify-between w-full">
           <div class="flex items-center gap-4">
-            <h1 class="text-2xl max-w-60 whitespace-nowrap overflow-hidden">{{
+            <h1 class="text-3xl max-w-60 whitespace-nowrap overflow-hidden">{{
               changeNote.reference }}</h1>
             <Badge
 class="h-6"
@@ -111,7 +113,7 @@ class="h-6"
           </div>
         </div>
 
-        <p class="">{{ changeNote.description }}</p>
+        <p v-html="md.render(changeNote.description)"></p>
         <div class="flex flex-wrap gap-4">
           <Badge v-if="changeNote.product" class="h-6">{{ changeNote.product.name }}</Badge>
           <Badge v-if="changeNote.scope" class="h-6">{{ changeNote.scope.name }}</Badge>
@@ -122,13 +124,12 @@ class="h-6"
       <Separator class="w-full h-2" />
       <div class="flex flex-col w-full text-xl gap-10">
         <div>
-          <h3 class="text-lg">{{ t('title.developerNotes') }}</h3>
-          <p class="text-sm">{{ changeNote.developerNotes }}</p>
-          
+          <h3 class="text-2xl">{{ t('title.developerNotes') }}</h3>
+          <div class="text-text-primary" v-html="md.render(changeNote.developerNotes)"></div>
         </div>
         <div>
-          <h3 class="text-lg">{{ t('title.upgradeRequirements') }}</h3>
-          <p class="text-sm">{{ changeNote.upgradeNotes }}</p>
+          <h3 class="text-2xl">{{ t('title.upgradeRequirements') }}</h3>
+          <p v-html="md.render(changeNote.upgradeNotes)"></p>
         </div>
       </div>
     </div>

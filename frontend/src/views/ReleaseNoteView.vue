@@ -25,6 +25,7 @@ import { toTypedSchema } from '@vee-validate/zod';
 import { EditReleaseNoteSchema } from '@/schemas';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../components/ui/breadcrumb';
 import { useI18n } from 'vue-i18n';
+import md from '@/utils/markdown-it';
 
 const isEditing = ref(false)
 
@@ -157,7 +158,7 @@ const publishReleaseNoteMutation = usePublishReleaseNote({
         <div class="flex flex-col gap-4 w-full">
           <div class="flex flex-row items-center justify-between w-full">
             <div class="flex items-center gap-4">
-              <h1 v-if="!isEditing" class="text-2xl max-w-60 whitespace-nowrap overflow-hidden">{{
+              <h1 v-if="!isEditing" class="text-4xl max-w-60 whitespace-nowrap overflow-hidden">{{
                 releaseNote.tag }}</h1>
               <div v-if="isEditing" class="flex flex-col gap-1">
                 <h4 class="text-md">{{ t('title.title') }}</h4>
@@ -215,39 +216,41 @@ const publishReleaseNoteMutation = usePublishReleaseNote({
             </div>
           </div>
 
-          <p v-if="!isEditing" class="">{{ releaseNote.summary }}</p>
+          <p v-if="!isEditing" v-html="md.render(releaseNote.summary)"></p>
           <div class="flex flex-col gap-1" v-if="isEditing">
             <h4 class="text-md">{{ t('title.description') }}</h4>
             <Textarea class="w-full" v-model="summary" :placeholder="t('placeholder.description')" />
           </div>
         </div>
-        <Separator class="w-full h-2" />
+        <Separator v-if="!isEditing" class="w-full h-2" />
         <div class="flex flex-col w-full gap-10">
-          <div class="flex flex-col w-full gap-10">
-            <h2 class="text-xl">Change Notes</h2>
-            <MultiselectChangeNotes v-if="isEditing" v-model="changeNotes" />
-            <div v-if="!isEditing">
+            <div v-if="isEditing" class="flex flex-col gap-1">
+              <h4 class="text-md">{{ t('title.changeNotes') }}</h4>
+              <MultiselectChangeNotes v-model="changeNotes" />
+            </div>
+            <h2 v-else class="text-3xl">{{ t('title.changeNotes') }}</h2>
+            
+            <div v-if="!isEditing" class="flex flex-col gap-16">
               <div 
                 v-for="change in releaseNote.changeNotes" :key="change.id"
-                class="flex flex-col gap-4 mb-6">
+                class="flex flex-col gap-2">
                 
-                <h3 class="text-lg">{{ change.reference }}</h3>
+                <h3 class="text-2xl">{{ change.reference }}</h3>
                 <div>
-                  <h3 class="text-lg">{{ t('title.description') }}</h3>
-                  <p class="text-sm">{{ change.description }}</p>
+                  <h3 class="text-xl">{{ t('title.description') }}</h3>
+                  <p class="ml-4" v-html="md.render(change.description)"></p>
                 </div>
                 <div>
-                  <h3 class="text-lg">{{ t('title.developerNotes') }}</h3>
-                  <p class="text-sm">{{ change.developerNotes }}</p>
+                  <h3 class="text-xl">{{ t('title.developerNotes') }}</h3>
+                  <p class="ml-4" v-html="md.render(change.developerNotes)"></p>
                 </div>
                 <div>
-                  <h3 class="text-lg">{{ t('title.upgradeRequirements') }}</h3>
-                  <p class="text-sm">{{ change.upgradeNotes }}</p>
+                  <h3 class="text-xl">{{ t('title.upgradeRequirements') }}</h3>
+                  <p class="ml-4" v-html="md.render(change.upgradeNotes)"></p>
                 </div>
               </div>
             </div>
           </div>
-        </div>
       </div>
     </form>
   </div>
