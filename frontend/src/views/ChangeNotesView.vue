@@ -20,6 +20,7 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue-sonner';
 
+const router = useRouter();
 const { t } = useI18n();
 
 const getInitialSelections = () => {
@@ -28,30 +29,25 @@ const getInitialSelections = () => {
 }
 
 const initialSelections = getInitialSelections();
-const initialSelection = initialSelections.selection ? initialSelections.selection : '';  
-delete initialSelections.selection; // Remove selection from search params to avoid confusion with actual filters
-const searchParams = ref<Record<string, string>>(initialSelections);
+const { selection, ...initialSearchParams } = initialSelections;
+const searchParams = ref(initialSearchParams);
+
+console.log('Initial search parameters:', searchParams.value);
 
 const { isLoading, isFetching, isError, data } = useGetChangeNotes(searchParams);
 
-const router = useRouter();
-const selectedChangeNotes = ref<ChangeNote[]>([]);
-const selectionString = computed(() => selectedChangeNotes.value.map(cn => cn.id).join(','));
-
-const setSelectedChangeNotesFromInitialSelection = () => {
-  if (!isLoading.value && data.value) {
-    const selectedIds = new Set(initialSelection.split(',').map(id => Number.parseInt(id)).filter(id => !Number.isNaN(id)));
-    selectedChangeNotes.value = data.value.filter((cn: ChangeNote) => selectedIds.has(cn.id));
-  }
-}
-
-setSelectedChangeNotesFromInitialSelection();
-watch(isLoading, () => {
-  setSelectedChangeNotesFromInitialSelection();
-});
+const initialSelection = selection ?? '';
+const selectedChangeNotes = ref<number[]>(initialSelection.split(',').map(id => Number.parseInt(id)).filter(id => !Number.isNaN(id)));
+const selectionString = computed(() => selectedChangeNotes.value.join(','));
 
 watch([searchParams, selectionString], () => {
-  router.replace({ query: { ...searchParams.value, selection: selectionString.value }});
+  let queryParams = { ...searchParams.value };
+
+  if (selectedChangeNotes.value.length > 0) {
+    queryParams.selection = selectionString.value;
+  }
+
+  router.replace({ query: queryParams});
 }, { deep: true });
 
 provide('searchParams', searchParams);
@@ -62,15 +58,15 @@ const search = ref<string>(searchParams.value.query || '');
     searchParams.value = {};
   }
 
-const isChangeNoteSelected = (changeNote: ChangeNote) => {
-  return selectedChangeNotes.value.some(selected => selected.id === changeNote.id);
+const isChangeNoteSelected = (changeNoteId: number) => {
+  return selectedChangeNotes.value.includes(changeNoteId);
 }
 
 const toggleSelection = (changeNote: ChangeNote) => {
-  if (isChangeNoteSelected(changeNote)) {
-    selectedChangeNotes.value = selectedChangeNotes.value.filter(note => note.id !== changeNote.id);
+  if (isChangeNoteSelected(changeNote.id)) {
+    selectedChangeNotes.value = selectedChangeNotes.value.filter(id => id !== changeNote.id);
   } else {
-    selectedChangeNotes.value.push(changeNote);
+    selectedChangeNotes.value.push(changeNote.id);
   }
 }
 
@@ -87,7 +83,7 @@ const { mutate: publishChangeNoteMutation } = usePublishChangeNotes([], true, {
 
 const handlePublish = () => {
   console.log('Publish button clicked. Selected change note IDs:', selectedChangeNotes.value);
-  publishChangeNoteMutation({ ids: selectedChangeNotes.value.map(cn => cn.id), publish: true });
+  publishChangeNoteMutation({ ids: selectedChangeNotes.value, publish: true });
   selectedChangeNotes.value = [];
 }
 
@@ -116,10 +112,6 @@ const createReleaseNoteMutation = useCreateReleaseNote({
 const onSearch = () => {
   searchParams.value = { ...searchParams.value, query: search.value };
 }
-
-const selectedChangeNoteIds = computed<number[]>(() =>
-  selectedChangeNotes.value.map((cn: ChangeNote) => cn.id)
-);
 
 </script>
 
@@ -150,7 +142,7 @@ const selectedChangeNoteIds = computed<number[]>(() =>
             </Button>
             <Button 
               variant="solidaccent"
-              @click="createReleaseNoteMutation.mutate(selectedChangeNoteIds)">
+              @click="createReleaseNoteMutation.mutate(selectedChangeNotes)">
               {{ t('button.createReleaseNote') }}
               <FilePlus />
             </Button>
@@ -183,7 +175,7 @@ const selectedChangeNoteIds = computed<number[]>(() =>
           <div v-for="changeNote in data" :key="changeNote.id" class="flex flex-col">
             <ChangeNoteCard 
               class="my-4" :key="changeNote.id"
-              :model-value="isChangeNoteSelected(changeNote)" :change-note="changeNote"
+              :model-value="isChangeNoteSelected(changeNote.id)" :change-note="changeNote"
               @update:model-value="toggleSelection(changeNote)" />
             <Separator />
           </div>

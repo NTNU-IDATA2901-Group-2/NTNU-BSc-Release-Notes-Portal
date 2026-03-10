@@ -22,7 +22,6 @@ import { routeNames, router } from '@/utils/router';
 import { toast } from 'vue-sonner';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
-import type { ChangeNote } from '@/utils/types';
 import { EditReleaseNoteSchema } from '@/schemas';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../components/ui/breadcrumb';
 import { useI18n } from 'vue-i18n';
@@ -30,6 +29,7 @@ import { useI18n } from 'vue-i18n';
 const isEditing = ref(false)
 
 const route = useRoute();
+const { t } = useI18n();
 
 const id = route.params.id as string;
 
@@ -52,10 +52,7 @@ const { mutate: archiveReleaseNote } = useArchiveReleaseNote(id,
 
 const deletePromptOpen = ref(false);
 
-const { t } = useI18n();
-
-const changeNotes = ref<ChangeNote[]>(releaseNote?.value?.changeNotes || [])
-
+const changeNotes = ref<number[]>(releaseNote.value?.changeNotes?.map(cn => cn.id) || [])
 
 const form = useForm({
   validationSchema: toTypedSchema(EditReleaseNoteSchema),
@@ -73,7 +70,7 @@ const [summary] = form.defineField('summary');
 const startEditing = () => {
   if (!releaseNote.value) return
 
-  changeNotes.value = [...releaseNote.value.changeNotes]
+  changeNotes.value = releaseNote.value.changeNotes.map(c => c.id);
 
   form.setValues({
     tag: releaseNote.value.tag ?? '',
@@ -89,7 +86,7 @@ const onSubmit = form.handleSubmit((values) => {
   if (releaseNote.value !== undefined) {
     const payload = {
     ...values,
-    changeNoteIds: changeNotes.value.map(c => c.id),
+    changeNoteIds: changeNotes.value,
   }
   updateReleaseNoteMutation.mutate({id: releaseNote.value.id, dto: payload });
   isEditing.value = false;
@@ -113,7 +110,7 @@ const handlePublish = () => {
 
 const publishReleaseNoteMutation = usePublishReleaseNote({
   onSuccess: () => {
-    toast.success(!releaseNote.value?.published ? t('toast.releaseNotePublished') : t('toast.releaseNoteUnpublished'));
+    toast.success(releaseNote.value?.published ? t('toast.releaseNoteUnpublished') : t('toast.releaseNotePublished'));
   },
   onError: () => {
     toast.error(t('toast.releaseNotePublishError'));
