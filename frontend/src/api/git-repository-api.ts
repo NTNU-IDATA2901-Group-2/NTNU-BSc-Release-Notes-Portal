@@ -33,7 +33,7 @@ const getGitRepositories = async () => {
  * @throws An error if the API request to create the git repository fails.
  */
 const createGitRepository = async (dto: PersistGitRepositoryDTO) => {
-  const response = await api.post(`git-repositories/create`, dto);
+  const response = await api.post(`git-repositories`, dto);
   return response.data;
 }
 
@@ -70,7 +70,7 @@ export const usePersistGitRepository = (onFinished: OnMutationApiCallFinished) =
  */
 const deleteGitRepository = async (id: number) => {
     const params = new URLSearchParams({ id: id.toString() });
-    const response = await api.delete(`git-repositories/delete`, { params });
+    const response = await api.delete(`git-repositories`, { params });
     return response.data;
 }
 

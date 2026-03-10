@@ -39,7 +39,7 @@ public class GitRepositoryController {
         @ApiResponse(responseCode = "400", description = "Invalid request payload"),
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @PostMapping("/create")
+    @PostMapping("")
     public ResponseEntity<Long> postMethodName(@RequestBody CreateGitRepositoryDTO entity) {
         long id = gitRepositoryService.createGitRepository(entity);
         logger.info("Git repository created with id: {}", id);
@@ -52,7 +52,7 @@ public class GitRepositoryController {
         @ApiResponse(responseCode = "404", description = "Git repository not found"),
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @DeleteMapping("/delete")
+    @DeleteMapping("")
     public ResponseEntity<String> deleteGitRepository(@RequestParam long id) {
         gitRepositoryService.deleteGitRepository(id);
         logger.info("Git repository deleted with id: {}", id);
