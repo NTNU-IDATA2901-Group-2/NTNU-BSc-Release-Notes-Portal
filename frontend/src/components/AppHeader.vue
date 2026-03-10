@@ -4,8 +4,7 @@ import { routeNames } from '../utils/router';
 import logoSvg from '../assets/solwr_logo.svg';
 import Avatar from './ui/avatar/Avatar.vue';
 import Separator from './ui/separator/Separator.vue';
-import { SunMoon } from "lucide-vue-next"
-import { LogOut } from "lucide-vue-next"
+import { SunMoon, LogOut } from "lucide-vue-next";
 import { useTheme } from '@/utils/theme';
 import keycloak, { isAuthenticated, jwtTokenDecoded } from '@/utils/keycloak';
 import { computed } from 'vue';
@@ -19,6 +18,7 @@ import MenubarMenu from './ui/menubar/MenubarMenu.vue';
 import MenubarTrigger from './ui/menubar/MenubarTrigger.vue';
 import MenubarContent from './ui/menubar/MenubarContent.vue';
 import MenubarSeparator from './ui/menubar/MenubarSeparator.vue';
+import { i18n } from '@/utils/i18n';
 
 const { theme } = useTheme()
 const { t } = useI18n()
@@ -40,6 +40,12 @@ const firstLetters = computed(() => {
 	const lastName = jwtTokenDecoded.value.given_name || '';
 	return firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase();
 })
+
+const handleLocalChange = (locale : "en" | "no" | "fr") => {
+	i18n.global.locale = locale;
+  localStorage.setItem('locale', locale);
+}
+
 </script>
 
 <template>
@@ -70,13 +76,13 @@ const firstLetters = computed(() => {
 							{{ t('header.language') }}
 						</MenubarSubTrigger>
 						<MenubarSubContent>
-							<MenubarItem @click="$i18n.locale = 'en'">
+							<MenubarItem @click="handleLocalChange('en')">
 								English
 							</MenubarItem>
-							<MenubarItem @click="$i18n.locale = 'no'">
+							<MenubarItem @click="handleLocalChange('no')">
 								Norsk
 							</MenubarItem>
-							<MenubarItem @click="$i18n.locale = 'fr'">
+							<MenubarItem @click="handleLocalChange('fr')">
 								Français
 							</MenubarItem>
 						</MenubarSubContent>
