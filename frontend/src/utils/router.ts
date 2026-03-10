@@ -7,6 +7,7 @@ import ChangeNoteView from '@/views/ChangeNoteView.vue'
 import SignInView from '@/views/SignInView.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
 import keycloak from './keycloak'
+import GitRepositoriesView from '@/views/GitRepositoriesView.vue'
 
 export const routeNames = {
   releaseNotes: '/',
@@ -15,6 +16,7 @@ export const routeNames = {
   changeNote: '/change-notes/:id',
   signIn: '/sign-in',
   notFound: '/:pathMatch(.*)*',
+  gitRepositories: '/git-repositories',
 }
 
 const routes = [
@@ -24,6 +26,7 @@ const routes = [
   { path: routeNames.changeNote, component: ChangeNoteView, meta: { requiresAuth: true } },
   { path: routeNames.signIn, component: SignInView },
   { path: routeNames.notFound, component: NotFoundView },
+  { path: routeNames.gitRepositories, component: GitRepositoriesView, meta: { requiresAuth: true } },
 ]
 
 export const router = createRouter({

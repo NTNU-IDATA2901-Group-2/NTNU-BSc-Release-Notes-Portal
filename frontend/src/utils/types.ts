@@ -26,6 +26,17 @@ export interface PersistChangeNoteDTO {
     customerId?: number
 }
 
+export interface GitRepository {
+    id: number,
+    name: string,
+    url: string
+}
+
+export interface PersistGitRepositoryDTO {
+    name: string,
+    url: string
+}
+
 export interface Customer {
     id: number,
     name: string

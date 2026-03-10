@@ -6,7 +6,8 @@
         "signOut": "Sign Out",
         "language": "Language",
         "english": "English",
-        "norwegian": "Norwegian"
+        "norwegian": "Norwegian",
+        "repositories": "Repositories"
     },
     "button": {
         "previous": "Previous",
@@ -97,5 +98,22 @@
         "description": "Description",
         "developerNotes": "Developer Notes",
         "upgradeRequirements": "Upgrade Requirements"
+    },
+    "repositories": {
+        "title": "Git Repositories",
+        "addRepository": "Add Repository",
+        "url": "Url",
+        "name": "Name",
+        "remove": "Remove",
+        "id": "Id",
+        "namePlaceholder": "Repository name",
+        "urlPlaceholder": "Git clone url",
+        "deleteSuccess": "Repository removed successfully",
+        "deleteError": "An error occurred while removing the repository",
+        "createSuccess": "Repository added successfully",
+        "createError": "An error occurred while adding the repository",
+        "nameRequired": "Name is required",
+        "urlRequired": "URL is required",
+        "error": "An error occurred while loading repositories"
     }
 }

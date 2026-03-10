@@ -89,7 +89,7 @@ export const useCreateChangeNote = (onFinished: OnMutationApiCallFinished) => {
   },
   onSettled: () => onFinished.onSettled?.(),
 })
-} 
+}
 
 /**
  * Creates a new change note. The function returns the ID of the newly created change note.
