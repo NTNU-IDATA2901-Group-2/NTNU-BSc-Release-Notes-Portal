@@ -125,7 +125,7 @@ class="h-6"
       <div class="flex flex-col w-full text-xl gap-10">
         <div>
           <h3 class="text-2xl">{{ t('title.developerNotes') }}</h3>
-          <div class="[&>ul]:list-[-] text-text-primary" v-html="md.render(changeNote.developerNotes)"></div>
+          <div class="text-text-primary" v-html="md.render(changeNote.developerNotes)"></div>
         </div>
         <div>
           <h3 class="text-2xl">{{ t('title.upgradeRequirements') }}</h3>
