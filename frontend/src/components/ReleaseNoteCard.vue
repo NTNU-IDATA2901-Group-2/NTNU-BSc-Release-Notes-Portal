@@ -4,7 +4,7 @@ import Badge from './ui/badge/Badge.vue';
 import type { ReleaseNote } from '@/utils/types';
 import { RouterLink } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import md from '@/utils/markdown-it';
+
 const props = defineProps<PrimitiveProps & {
   releaseNote: ReleaseNote,
 }>()

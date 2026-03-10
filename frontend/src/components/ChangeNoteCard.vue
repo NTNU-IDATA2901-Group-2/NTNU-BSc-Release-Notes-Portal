@@ -4,7 +4,6 @@ import Badge from './ui/badge/Badge.vue';
 import type { ChangeNote } from '@/utils/types';
 import { Checkbox } from './ui/checkbox';
 import { useI18n } from 'vue-i18n';
-import md from '@/utils/markdown-it';
 
 const props = defineProps<PrimitiveProps & {
   changeNote: ChangeNote
