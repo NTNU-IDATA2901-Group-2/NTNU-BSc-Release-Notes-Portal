@@ -20,6 +20,7 @@
     "jwt-decode": "^4.0.0",
     "keycloak-js": "^26.2.3",
     "lucide-vue-next": "^0.562.0",
+    "markdown-it": "^14.1.1",
     "reka-ui": "^2.7.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",
@@ -32,6 +33,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/markdown-it": "^14.1.2",
     "@types/node": "^24.10.1",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/tsconfig": "^0.8.1",

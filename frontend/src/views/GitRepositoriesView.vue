@@ -73,7 +73,8 @@ const onDeleteRepository = (id: number) => {
                 </FormField>
                 <Button class="self-end" type="submit" variant="outline">{{ t('repositories.addRepository') }}</Button>
             </form>
-            <Table v-if="gitRepositories && !isPending">
+            <p v-if="isError">{{ t('repositories.error') }}</p>
+            <Table v-if="gitRepositories && !isPending && !isError">
                 <TableHeader>
                 <TableRow>
                     <TableHead>

@@ -19,6 +19,8 @@ import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
+import md from '@/utils/markdown-it';
+
 const props = defineProps<{
     changeNote: ChangeNote;
     modelValue?: boolean;
@@ -68,7 +70,7 @@ const onPublishToggle = () => {
       <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-row items-center justify-between w-full">
           <div class="flex items-center gap-4">
-            <h1 class="text-2xl max-w-60 whitespace-nowrap overflow-hidden">{{
+            <h1 class="text-3xl max-w-60 whitespace-nowrap overflow-hidden">{{
               changeNote.reference }}</h1>
             <Badge
 class="h-6"
@@ -84,26 +86,26 @@ class="h-6"
               <DropdownMenuContent class="mr-6 lg:mr-20 mt-2">
                 <DropdownMenuItem @click="emit('update:modelValue', true)">
                   <div class="w-full flex gap-2">
-                    <p class="text-text-dark-static ml-auto">{{ t('button.edit') }}</p>
-                    <Pencil class="text-text-dark-static" />
+                    <p class="text-text-primary ml-auto">{{ t('button.edit') }}</p>
+                    <Pencil class="text-text-primary" />
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem @click="showDeletePrompt = true">
                   <div class="w-full flex gap-2">
-                    <p class="ml-auto text-text-dark-static">{{ t('button.delete') }}</p>
-                    <Trash2 class="text-text-dark-static" />
+                    <p class="ml-auto text-text-primary">{{ t('button.delete') }}</p>
+                    <Trash2 class="text-text-primary" />
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem @click="onPublishToggle">
                   <div class="w-full flex gap-2">
-                    <p class="ml-auto text-text-dark-static">{{ changeNote.published ? t('button.unpublish') : t('button.publish') }}</p>
-                    <Eye class="text-text-dark-static" />
+                    <p class="ml-auto text-text-primary">{{ changeNote.published ? t('button.unpublish') : t('button.publish') }}</p>
+                    <Eye class="text-text-primary" />
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem disabled>
                   <div class="w-full flex gap-2">
-                    <p class="ml-auto text-text-dark-static">{{ t('button.export') }}</p>
-                    <FileDown class="text-text-dark-static" />
+                    <p class="ml-auto text-text-primary">{{ t('button.export') }}</p>
+                    <FileDown class="text-text-primary" />
                   </div>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -111,7 +113,7 @@ class="h-6"
           </div>
         </div>
 
-        <p class="">{{ changeNote.description }}</p>
+        <p v-html="md.render(changeNote.description)"></p>
         <div class="flex flex-wrap gap-4">
           <Badge v-if="changeNote.product" class="h-6">{{ changeNote.product.name }}</Badge>
           <Badge v-if="changeNote.scope" class="h-6">{{ changeNote.scope.name }}</Badge>
@@ -122,13 +124,12 @@ class="h-6"
       <Separator class="w-full h-2" />
       <div class="flex flex-col w-full text-xl gap-10">
         <div>
-          <h3 class="text-lg">{{ t('title.developerNotes') }}</h3>
-          <p class="text-sm">{{ changeNote.developerNotes }}</p>
-          
+          <h3 class="text-2xl">{{ t('title.developerNotes') }}</h3>
+          <div class="text-text-primary" v-html="md.render(changeNote.developerNotes)"></div>
         </div>
         <div>
-          <h3 class="text-lg">{{ t('title.upgradeRequirements') }}</h3>
-          <p class="text-sm">{{ changeNote.upgradeNotes }}</p>
+          <h3 class="text-2xl">{{ t('title.upgradeRequirements') }}</h3>
+          <p v-html="md.render(changeNote.upgradeNotes)"></p>
         </div>
       </div>
     </div>

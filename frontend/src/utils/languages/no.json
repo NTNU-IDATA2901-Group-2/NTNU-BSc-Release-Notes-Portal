@@ -36,7 +36,9 @@
         "developerNotes": "Utviklernotater",
         "upgradeRequirements": "Oppgraderingskrav",
         "search": "Søk",
-        "status": "Status"
+        "status": "Status",
+        "changeNotes": "Endringsnotater",
+        "releaseNotes": "Utgivelsesnotater"
     },
     "toast": {
         "changeNoteDeleted": "Endringsnotat slettet",
@@ -68,7 +70,8 @@
     },
     "card": {
         "published": "Publisert",
-        "private": "Privat"
+        "private": "Privat",
+        "containsChangeNotes": "ingen endringsnotater | 1 endringsnotat | {count} endringsnotater"
     },
       "input": {
         "addChangeNotes": "Legg til endringsnotater"
@@ -111,6 +114,7 @@
         "createSuccess": "Repository lagt til",
         "createError": "Det oppsto en feil under tillegg av repository",
         "nameRequired": "Navn er påkrevd",
-        "urlRequired": "URL er påkrevd"
+        "urlRequired": "URL er påkrevd",
+        "error": "Det oppsto en feil under innlastning av repositoryer"
     }
 }

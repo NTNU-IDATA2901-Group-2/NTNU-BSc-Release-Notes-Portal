@@ -1,4 +1,4 @@
-import type { Feature, GitRepository, OnMutationApiCallFinished, PersistGitRepositoryDTO } from "@/utils/types";
+import type { GitRepository, OnMutationApiCallFinished, PersistGitRepositoryDTO } from "@/utils/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import api from "./api";
 

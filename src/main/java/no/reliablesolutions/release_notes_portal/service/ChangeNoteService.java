@@ -12,6 +12,7 @@ import no.reliablesolutions.release_notes_portal.domain.repository.FeatureReposi
 import no.reliablesolutions.release_notes_portal.domain.repository.ProductRepository;
 import no.reliablesolutions.release_notes_portal.domain.repository.ScopeRepository;
 import no.reliablesolutions.release_notes_portal.dto.ChangeNoteDTO;
+import no.reliablesolutions.release_notes_portal.dto.ChangeNoteFilterOptionsDTO;
 import no.reliablesolutions.release_notes_portal.dto.CreateChangeNoteDTO;
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.CustomerNotFoundException;
@@ -104,10 +105,16 @@ public class ChangeNoteService {
    * 
    * @return a list of all change notes that match the provided filters, mapped to ChangeNoteDTOs
    */
-  public List<ChangeNoteDTO> getAllChangeNotes(String query, Boolean published, Boolean hasReleaseNote, List<Long> customerIds, List<Long> featureIds, List<Long> scopeIds, List<Long> productIds) {
-    return changeNoteRepository
-        .findByArchivedFalseAndMatchingFilterParameters(query, published, hasReleaseNote, customerIds, featureIds, scopeIds, productIds)
-        .stream().map(ChangeNoteDTO::fromChangeNote).toList();
+  public List<ChangeNoteDTO> getAllChangeNotes(ChangeNoteFilterOptionsDTO filterOptions) {
+    if (filterOptions == null) {
+      return changeNoteRepository.findByArchivedFalse().stream().map(ChangeNoteDTO::fromChangeNote).toList();
+    } else {
+      return changeNoteRepository
+          .findByArchivedFalseAndMatchingFilterParameters(filterOptions)
+          .stream().map(ChangeNoteDTO::fromChangeNote).toList();
+    }
+
+
   }
 
   /**

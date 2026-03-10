@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -98,6 +99,22 @@ public class GlobalExceptionHandler {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument type: " + e.getName() + " has an invalid value");
     }
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument type: " + e.getName() + " should be of type " + requiredType.getSimpleName());
+  }
+
+
+  /**
+   * Handles the case where method argument validation fails. Logs the event and returns a 400 response with a message indicating the validation error.
+   * @param e the exception containing details about the method argument validation failure
+   * @return a ResponseEntity with a 400 status and a message indicating the validation error
+   */
+  @ExceptionHandler(value = {MethodArgumentNotValidException.class})
+  public ResponseEntity<String> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+    logger.warn("Validation failed: {}", e.getMessage());
+    String errorMessage = e.getBindingResult().getFieldErrors().stream()
+        .map(error -> String.format("Field '%s' %s", error.getField(), error.getDefaultMessage()))
+        .findFirst()
+        .orElse("Validation failed");
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
   }
 
   /**

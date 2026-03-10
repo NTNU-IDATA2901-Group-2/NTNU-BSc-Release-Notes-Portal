@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import no.reliablesolutions.release_notes_portal.dto.ChangeNoteDTO;
+import no.reliablesolutions.release_notes_portal.dto.ChangeNoteFilterOptionsDTO;
 import no.reliablesolutions.release_notes_portal.dto.CreateChangeNoteDTO;
 import no.reliablesolutions.release_notes_portal.service.ChangeNoteService;
 
@@ -70,16 +72,9 @@ public class ChangeNoteController {
   })
   @GetMapping("")
   public ResponseEntity<List<ChangeNoteDTO>> getAllChangeNotes(
-    @RequestParam(required = false) String query,
-    @RequestParam(required = false) Boolean published,
-    @RequestParam(required = false) Boolean hasReleaseNote,
-    @RequestParam(required = false) List<Long> customerIds,
-    @RequestParam(required = false) List<Long> featureIds,
-    @RequestParam(required = false) List<Long> scopeIds,
-    @RequestParam(required = false) List<Long> productIds
+    @ModelAttribute ChangeNoteFilterOptionsDTO filterOptions
     ) {
-    List<ChangeNoteDTO> changeNotes = changeNoteService.getAllChangeNotes(query, published, hasReleaseNote, customerIds, featureIds, scopeIds, productIds);
-    logger.info("Retrieved {} change notes with filters - query: {}, published: {}, hasReleaseNote: {}, customerIds: {}, featureIds: {}, scopeIds: {}, productIds: {}", changeNotes.size(), query, published, hasReleaseNote, customerIds, featureIds, scopeIds, productIds);
+    List<ChangeNoteDTO> changeNotes = changeNoteService.getAllChangeNotes(filterOptions);
     return ResponseEntity.ok(changeNotes);
   }
 

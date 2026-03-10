@@ -18,6 +18,7 @@ import MenubarMenu from './ui/menubar/MenubarMenu.vue';
 import MenubarTrigger from './ui/menubar/MenubarTrigger.vue';
 import MenubarContent from './ui/menubar/MenubarContent.vue';
 import MenubarSeparator from './ui/menubar/MenubarSeparator.vue';
+import { i18n } from '@/utils/i18n';
 
 const { theme } = useTheme()
 const { t } = useI18n()
@@ -39,6 +40,12 @@ const firstLetters = computed(() => {
 	const lastName = jwtTokenDecoded.value.given_name || '';
 	return firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase();
 })
+
+const handleLocalChange = (locale : "en" | "no" | "fr") => {
+	i18n.global.locale = locale;
+  localStorage.setItem('locale', locale);
+}
+
 </script>
 
 <template>
@@ -60,7 +67,7 @@ const firstLetters = computed(() => {
 					<MenubarItem @click="theme = theme === 'dark' ? 'light' : 'dark'">
 						<div class="w-full flex gap-2">
 			    			<p class="ml-auto">{{ t('header.toggleTheme') }}</p>
-			    			<SunMoon class="text-text-dark-static"/>
+			    			<SunMoon class="text-text-primary"/>
 						</div>
 					</MenubarItem>
 					<MenubarSeparator/>
@@ -69,13 +76,13 @@ const firstLetters = computed(() => {
 							{{ t('header.language') }}
 						</MenubarSubTrigger>
 						<MenubarSubContent>
-							<MenubarItem @click="$i18n.locale = 'en'">
+							<MenubarItem @click="handleLocalChange('en')">
 								English
 							</MenubarItem>
-							<MenubarItem @click="$i18n.locale = 'no'">
+							<MenubarItem @click="handleLocalChange('no')">
 								Norsk
 							</MenubarItem>
-							<MenubarItem @click="$i18n.locale = 'fr'">
+							<MenubarItem @click="handleLocalChange('fr')">
 								Français
 							</MenubarItem>
 						</MenubarSubContent>
@@ -91,7 +98,7 @@ const firstLetters = computed(() => {
 					<MenubarItem @click="handleLogOut">
 						<div class="w-full flex gap-2">
 			    			<p class="ml-auto">{{ t('header.signOut') }}</p>
-			    			<LogOut class="text-text-dark-static"/>
+			    			<LogOut class="text-text-primary"/>
 						</div>
 					</MenubarItem>
 				</MenubarContent>
