@@ -16,7 +16,7 @@ const { t } = useI18n();
 
 <template>
     <div class="flex gap-3 flex-col mt-4">
-      <h4 class="text-lg">{{ t('title.status') }}</h4>
+      <h4 class="text-xl">{{ t('title.status') }}</h4>
         <SingleFilterListItem v-for="option in data.published" :key="option.val" :query-key="'published'" :value="option.val" :label="option.name"/>
         <SingleFilterListItem v-for="option in data.private" :key="option.val" :query-key="'published'" :value="option.val" :label="option.name"/>
     </div>

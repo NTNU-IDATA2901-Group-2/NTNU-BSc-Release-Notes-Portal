@@ -35,7 +35,9 @@
         "developerNotes": "Utviklernotater",
         "upgradeRequirements": "Oppgraderingskrav",
         "search": "Søk",
-        "status": "Status"
+        "status": "Status",
+        "changeNotes": "Endringsnotater",
+        "releaseNotes": "Utgivelsesnotater"
     },
     "toast": {
         "changeNoteDeleted": "Endringsnotat slettet",

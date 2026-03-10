@@ -4,6 +4,7 @@ import Badge from './ui/badge/Badge.vue';
 import type { ChangeNote } from '@/utils/types';
 import { Checkbox } from './ui/checkbox';
 import { useI18n } from 'vue-i18n';
+import md from '@/utils/markdown-it';
 
 const props = defineProps<PrimitiveProps & {
   changeNote: ChangeNote
@@ -44,9 +45,8 @@ const handleCheckboxClick = (event: Event) => {
         </div>
       </div>
 
-      <p>{{ changeNote.description }}</p>
 
-      <div class="flex flex-row gap-2">
+      <div class="flex flex-row gap-2 mt-auto">
         <Badge v-if="changeNote.scope" :variant="'default'">{{ changeNote.scope.name }}</Badge>
         <Badge v-if="changeNote.feature" :variant="'default'">{{ changeNote.feature.name }}</Badge>
         <Badge v-if="changeNote.product" :variant="'default'">{{ changeNote.product.name }}</Badge>

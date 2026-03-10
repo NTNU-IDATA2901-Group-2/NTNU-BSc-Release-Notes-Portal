@@ -110,7 +110,7 @@ const selectedChangeNoteIds = computed<number[]>(() =>
   <div class="min-h-screen flex justify-center align-bottom mt-6">
     <div class="flex gap-8 flex-col h-min w-full md:flex-row justify-center p-4">
       <div class="h-min hidden md:block">
-        <h1 class="text-2xl text-nowrap">Change Notes</h1>
+        <h1 class="text-3xl text-nowrap">Change Notes</h1>
         <PublicPrivateFilter />
         <ProductFilter />
         <ScopeFilter />
