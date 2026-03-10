@@ -29,33 +29,37 @@ const getInitialSelections = () => {
 
 const initialSelections = getInitialSelections();
 const initialSelection = initialSelections.selection ? initialSelections.selection : '';  
-const searchParams = ref({});
+delete initialSelections.selection; // Remove selection from search params to avoid confusion with actual filters
+const searchParams = ref<Record<string, string>>(initialSelections);
 
 const { isLoading, isFetching, isError, data } = useGetChangeNotes(searchParams);
 
 const router = useRouter();
 const selectedChangeNotes = ref<ChangeNote[]>([]);
 const selectionString = computed(() => selectedChangeNotes.value.map(cn => cn.id).join(','));
-const selections = ref(getInitialSelections());
 
-watch(isLoading, (newValue) => {
-  if (!newValue && data.value) {
+const setSelectedChangeNotesFromInitialSelection = () => {
+  if (!isLoading.value && data.value) {
     const selectedIds = new Set(initialSelection.split(',').map(id => Number.parseInt(id)).filter(id => !Number.isNaN(id)));
     selectedChangeNotes.value = data.value.filter((cn: ChangeNote) => selectedIds.has(cn.id));
   }
+}
+
+setSelectedChangeNotesFromInitialSelection();
+watch(isLoading, () => {
+  setSelectedChangeNotesFromInitialSelection();
 });
 
-watch([selections, selectionString], () => {
-  console.log('Selections changed:', selections.value);
-  router.replace({ query: { ...selections.value, selection: selectionString.value }});
+watch([searchParams, selectionString], () => {
+  router.replace({ query: { ...searchParams.value, selection: selectionString.value }});
 }, { deep: true });
 
 provide('searchParams', searchParams);
 
-const search = ref<string>(selections.value.query || '');
-  
+const search = ref<string>(searchParams.value.query || '');
+
   const clearFilters = () => {
-    selections.value = {};
+    searchParams.value = {};
   }
 
 const isChangeNoteSelected = (changeNote: ChangeNote) => {
@@ -110,7 +114,7 @@ const createReleaseNoteMutation = useCreateReleaseNote({
 })
 
 const onSearch = () => {
-  selections.value = { ...selections.value, query: search.value };
+  searchParams.value = { ...searchParams.value, query: search.value };
 }
 
 const selectedChangeNoteIds = computed<number[]>(() =>
