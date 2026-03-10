@@ -6,7 +6,8 @@
         "signOut": "Logg ut",
         "language": "Språk",
         "english": "Engelsk",
-        "norwegian": "Norsk"
+        "norwegian": "Norsk",
+        "repositories": "Repositorier"
     },
     "button": {
         "previous": "Forrige",
@@ -95,5 +96,21 @@
         "description": "Beskrivelse",
         "developerNotes": "Utviklernotater",
         "upgradeRequirements": "Oppgraderingskrav"
+    },
+    "repositories": {
+        "title": "Git Repositorier",
+        "addRepository": "Legg til",
+        "url": "Url",
+        "name": "Navn",
+        "remove": "Fjern",
+        "id": "Id",
+        "namePlaceholder": "Repository navn",
+        "urlPlaceholder": "Git klone url",
+        "deleteSuccess": "Repository fjernet",
+        "deleteError": "Det oppsto en feil under fjerning av repository",
+        "createSuccess": "Repository lagt til",
+        "createError": "Det oppsto en feil under tillegg av repository",
+        "nameRequired": "Navn er påkrevd",
+        "urlRequired": "URL er påkrevd"
     }
 }

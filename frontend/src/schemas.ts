@@ -18,3 +18,8 @@ export const EditChangeNoteSchema = z.object({
   featureId: z.number().optional(),
   customerId: z.number().optional(),
 })
+
+export const CreateGitRepositorySchema = z.object({
+  name: z.string().min(1, { message: "Required" }),
+  url: z.string().min(1, { message: "Required" }),
+})

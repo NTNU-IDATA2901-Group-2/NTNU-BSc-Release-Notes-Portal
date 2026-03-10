@@ -4,8 +4,7 @@ import { routeNames } from '../utils/router';
 import logoSvg from '../assets/solwr_logo.svg';
 import Avatar from './ui/avatar/Avatar.vue';
 import Separator from './ui/separator/Separator.vue';
-import { SunMoon } from "lucide-vue-next"
-import { LogOut } from "lucide-vue-next"
+import { GitBranch, SunMoon, LogOut } from "lucide-vue-next"
 import { useTheme } from '@/utils/theme';
 import keycloak, { isAuthenticated, jwtTokenDecoded } from '@/utils/keycloak';
 import { computed } from 'vue';
@@ -82,6 +81,13 @@ const firstLetters = computed(() => {
 						</MenubarSubContent>
 					</MenubarSub>
 					<MenubarSeparator/>
+					<MenubarItem>
+						<div class="w-full flex justify-end gap-2">
+							<RouterLink class="text-md" :to="routeNames.gitRepositories">{{ t('header.repositories') }}</RouterLink>
+							<GitBranch class="text-text-primary"/>
+						</div>
+					</MenubarItem>
+					<MenubarSeparator />
 					<MenubarItem @click="handleLogOut">
 						<div class="w-full flex gap-2">
 			    			<p class="ml-auto">{{ t('header.signOut') }}</p>
