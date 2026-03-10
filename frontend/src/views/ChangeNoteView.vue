@@ -23,7 +23,7 @@ const { isPending, isFetching, isError, data: changeNote } = useGetChangeNote(id
 
 <template>
   <div class="flex flex-col items-center px-4 mb-20">
-    <div class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10 flex items-center gap-4">
+    <div class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10 flex  items-center gap-4">
       <Button variant="outline" class="" @click="$router.back()">
         <ArrowLeft />{{ t('button.previous') }}
       </Button>
