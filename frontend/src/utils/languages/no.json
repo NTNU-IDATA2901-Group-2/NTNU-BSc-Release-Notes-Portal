@@ -69,7 +69,8 @@
     },
     "card": {
         "published": "Publisert",
-        "private": "Privat"
+        "private": "Privat",
+        "containsChangeNotes": "ingen endringsnotater | 1 endringsnotat | {count} endringsnotater"
     },
       "input": {
         "addChangeNotes": "Legg til endringsnotater"
