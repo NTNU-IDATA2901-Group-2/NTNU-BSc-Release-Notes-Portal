@@ -5,8 +5,10 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import no.reliablesolutions.release_notes_portal.domain.entity.ChangeNote;
+import no.reliablesolutions.release_notes_portal.dto.ChangeNoteFilterOptionsDTO;
 
 
 
@@ -21,6 +23,7 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
    * @param query          optional filter for searching change notes by reference, description, developer notes, upgrade notes, or change source
    * @param published      optional filter for published status
    * @param hasReleaseNote optional filter for change notes that have an associated release note
+   * @param filteredIds    optional filter for specific change note IDs
    * @param customerIds    optional filter for customer ID
    * @param featureIds     optional filter for feature ID
    * @param scopeIds       optional filter for scope ID
@@ -33,21 +36,22 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
       FROM ChangeNote c
       LEFT JOIN c.releaseNote r ON (r.archived = false)
       WHERE c.archived = false AND
-        (:published IS NULL OR c.published = :published) AND
-        (:hasReleaseNote IS NULL OR
-          (:hasReleaseNote = TRUE AND c.releaseNote IS NOT NULL) OR
-          (:hasReleaseNote = FALSE AND c.releaseNote IS NULL)
+        (:#{#filterOptions.published} IS NULL OR c.published = :#{#filterOptions.published}) AND
+        (:#{#filterOptions.hasReleaseNote} IS NULL OR
+          (:#{#filterOptions.hasReleaseNote} = TRUE AND c.releaseNote IS NOT NULL) OR
+          (:#{#filterOptions.hasReleaseNote} = FALSE AND c.releaseNote IS NULL)
         ) AND
-        (:customerIds IS NULL OR c.customer.id IN :customerIds) AND
-        (:featureIds IS NULL OR c.feature.id IN :featureIds) AND
-        (:scopeIds IS NULL OR c.scope.id IN :scopeIds) AND
-        (:productIds IS NULL OR c.product.id IN :productIds) AND
-        ((:query IS NULL OR :query = '') OR
-        LOWER(c.reference) LIKE LOWER('%' || :query || '%') OR
-        LOWER(c.description) LIKE LOWER('%' || :query || '%') OR
-        LOWER(c.developerNotes) LIKE LOWER('%' || :query || '%') OR
-        LOWER(c.upgradeNotes) LIKE LOWER('%' || :query || '%') OR
-        LOWER(c.changeSource) LIKE LOWER('%' || :query || '%'))
+        (:#{#filterOptions.filteredIds} IS NULL OR c.id IN :#{#filterOptions.filteredIds}) AND
+        (:#{#filterOptions.customerIds} IS NULL OR c.customer.id IN :#{#filterOptions.customerIds}) AND
+        (:#{#filterOptions.featureIds} IS NULL OR c.feature.id IN :#{#filterOptions.featureIds}) AND
+        (:#{#filterOptions.scopeIds} IS NULL OR c.scope.id IN :#{#filterOptions.scopeIds}) AND
+        (:#{#filterOptions.productIds} IS NULL OR c.product.id IN :#{#filterOptions.productIds}) AND
+        ((:#{#filterOptions.query} IS NULL OR :#{#filterOptions.query} = '') OR
+        LOWER(c.reference) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
+        LOWER(c.description) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
+        LOWER(c.developerNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
+        LOWER(c.upgradeNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
+        LOWER(c.changeSource) LIKE LOWER('%' || :#{#filterOptions.query} || '%'))
       """)
-    public List<ChangeNote> findByArchivedFalseAndMatchingFilterParameters(String query, Boolean published, Boolean hasReleaseNote, List<Long> customerIds, List<Long> featureIds, List<Long> scopeIds, List<Long> productIds);
+    public List<ChangeNote> findByArchivedFalseAndMatchingFilterParameters(@Param("filterOptions") ChangeNoteFilterOptionsDTO filterOptions);
 }
