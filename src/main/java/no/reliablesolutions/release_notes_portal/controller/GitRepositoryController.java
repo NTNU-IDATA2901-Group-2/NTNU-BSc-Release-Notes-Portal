@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,6 +20,7 @@ import no.reliablesolutions.release_notes_portal.service.GitRepositoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
 
@@ -50,8 +52,8 @@ public class GitRepositoryController {
         @ApiResponse(responseCode = "404", description = "Git repository not found"),
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @PostMapping("/delete")
-    public ResponseEntity<String> deleteGitRepository(@RequestBody long id) {
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteGitRepository(@RequestParam long id) {
         gitRepositoryService.deleteGitRepository(id);
         logger.info("Git repository deleted with id: {}", id);
         return ResponseEntity.ok("Git repository deleted successfully"); 

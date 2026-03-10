@@ -28,11 +28,8 @@ public class GitRepositoryService {
     }
 
     public void deleteGitRepository(long id) {
-        try {
-            gitRepositoryRepository.deleteById(id);
-        } catch (Exception _) {
-            throw new GitRepositoryNotFoundException(id);
-        }
+        gitRepositoryRepository.findById(id).orElseThrow(() -> new GitRepositoryNotFoundException(id));
+        gitRepositoryRepository.deleteById(id);
     }
 
     public List<GitRepository> getAllGitRepositories() {

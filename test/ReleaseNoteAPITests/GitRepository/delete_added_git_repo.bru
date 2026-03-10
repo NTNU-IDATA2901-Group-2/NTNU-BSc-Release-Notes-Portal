@@ -1,0 +1,24 @@
+meta {
+  name: delete_added_git_repo
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseurl}}/git-repositories/delete?id={{createdGitRepositoryId}}
+  body: none
+  auth: inherit
+}
+
+params:query {
+  id: {{createdGitRepositoryId}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

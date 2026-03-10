@@ -1,0 +1,20 @@
+meta {
+  name: post_git-repository_without_body
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseurl}}/git-repositories/create
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 400
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

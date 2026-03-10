@@ -1,0 +1,21 @@
+meta {
+  name: get_all_git-repositories_after_addition
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseurl}}/git-repositories
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.body.length: eq {{gitRepositoryCountPlusOne}}
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

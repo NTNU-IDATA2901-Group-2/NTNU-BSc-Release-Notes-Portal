@@ -10,6 +10,16 @@ get {
   auth: inherit
 }
 
+assert {
+  res.status: eq 200
+}
+
+script:post-response {
+  bru.setEnvVar("gitRepositoryCountPlusOne", res.body.length + 1)
+  bru.setEnvVar("gitRepositoryCount", res.body.length)
+  
+}
+
 settings {
   encodeUrl: true
   timeout: 0

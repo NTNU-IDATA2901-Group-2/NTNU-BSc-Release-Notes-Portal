@@ -178,4 +178,15 @@ public class GlobalExceptionHandler {
     logger.warn("Resource not found: {}", e.getMessage());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
   }
+
+  /**
+   * Handles the case where a Git repository is not found. Logs the event and returns a 404 response with a message.
+   * @param e the exception containing details about the missing Git repository
+   * @return a ResponseEntity with a 404 status and a message indicating the Git repository
+   */
+  @ExceptionHandler(value = {no.reliablesolutions.release_notes_portal.exception.GitRepositoryNotFoundException.class})
+  public ResponseEntity<String> handleGitRepositoryNotFoundException(no.reliablesolutions.release_notes_portal.exception.GitRepositoryNotFoundException e) {
+    logger.warn("Git repository not found: {}", e.getGitRepositoryId());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Git repository with ID %d not found", e.getGitRepositoryId()));
+  }
 }
