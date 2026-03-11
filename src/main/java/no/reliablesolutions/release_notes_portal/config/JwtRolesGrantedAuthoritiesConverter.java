@@ -12,9 +12,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 
-
 /**
- * Custom converter to extract Keycloak realm roles from the JWT and convert them to Spring Security authorities
+ * Custom converter to extract Keycloak realm roles from the JWT and convert
+ * them to Spring Security authorities
  */
 public class JwtRolesGrantedAuthoritiesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
 
@@ -40,6 +40,16 @@ public class JwtRolesGrantedAuthoritiesConverter implements Converter<Jwt, Colle
       }
     } else {
       logger.warn("Unexpected type for 'roles' claim: {}", rolesObj.getClass().getName());
+    }
+
+    List<String> groups = jwt.getClaimAsStringList("groups");
+
+    List<String> customerGroups = groups != null
+        ? groups.stream().filter(group -> group.startsWith("/Customers/")).map(group -> group.substring(11)).toList()
+        : List.of();
+
+    for (String customerGroup : customerGroups) {
+      roles.add("CUSTOMER_" + customerGroup);
     }
 
     return roles.stream()

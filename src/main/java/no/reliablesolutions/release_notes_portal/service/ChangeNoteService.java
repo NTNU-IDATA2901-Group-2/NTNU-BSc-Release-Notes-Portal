@@ -19,6 +19,7 @@ import no.reliablesolutions.release_notes_portal.exception.CustomerNotFoundExcep
 import no.reliablesolutions.release_notes_portal.exception.FeatureNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ProductNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ScopeNotFoundException;
+import no.reliablesolutions.release_notes_portal.util.AuthenticationUtil;
 
 @Service
 @AllArgsConstructor
@@ -49,7 +50,7 @@ public class ChangeNoteService {
       changeNote.setDeveloperNotes(changeNoteDTO.developerNotes());
       changeNote.setUpgradeNotes(changeNoteDTO.upgradeNotes());
       changeNote.setChangeSource(changeNoteDTO.changeSource());
-      
+
       if (changeNoteDTO.published() != null) {
         changeNote.setPublished(changeNoteDTO.published());
       }
@@ -93,28 +94,58 @@ public class ChangeNoteService {
   }
 
   /**
-   * Retrieves all change notes from the repository, with optional filtering based on query, published status, customer ID, feature ID, scope ID, and product ID.
+   * Retrieves all change notes from the repository, with optional filtering based
+   * on query, published status, customer ID, feature ID, scope ID, and product
+   * ID.
    * 
-   * @param query          optional filter for searching change notes by reference, description, developer notes, upgrade notes, or change source
+   * @param query          optional filter for searching change notes by
+   *                       reference, description, developer notes, upgrade notes,
+   *                       or change source
    * @param published      optional filter for published status
-   * @param hasReleaseNote optional filter for change notes that have an associated release note
+   * @param hasReleaseNote optional filter for change notes that have an
+   *                       associated release note
    * @param customerIds    optional filter for customer ID
    * @param featureIds     optional filter for feature ID
    * @param scopeIds       optional filter for scope ID
    * @param productIds     optional filter for product ID
    * 
-   * @return a list of all change notes that match the provided filters, mapped to ChangeNoteDTOs
+   * @return a list of all change notes that match the provided filters, mapped to
+   *         ChangeNoteDTOs
    */
   public List<ChangeNoteDTO> getAllChangeNotes(ChangeNoteFilterOptionsDTO filterOptions) {
-    if (filterOptions == null) {
-      return changeNoteRepository.findByArchivedFalse().stream().map(ChangeNoteDTO::fromChangeNote).toList();
+    boolean isAdmin = AuthenticationUtil.isAdmin();
+
+    if (isAdmin) {
+      if (filterOptions == null) {
+        return changeNoteRepository.findAll().stream().map(ChangeNoteDTO::fromChangeNote).toList();
+      } else {
+        return changeNoteRepository.findByArchivedFalseAndMatchingFilterParameters(filterOptions).stream()
+            .map(ChangeNoteDTO::fromChangeNote)
+            .toList();
+      }
     } else {
+      List<Long> customerIds = AuthenticationUtil.getCustomerGroups().stream()
+          .map(customerName -> customerRepository.findByName(customerName).get().getId())
+          .toList();
+
+      if (filterOptions == null) {
+        filterOptions = new ChangeNoteFilterOptionsDTO();
+      }
+
+      filterOptions = new ChangeNoteFilterOptionsDTO(
+          filterOptions.query(),
+          filterOptions.published(),
+          filterOptions.hasReleaseNote(),
+          filterOptions.filteredIds(),
+          customerIds,
+          filterOptions.featureIds(),
+          filterOptions.scopeIds(),
+          filterOptions.productIds());
+
       return changeNoteRepository
           .findByArchivedFalseAndMatchingFilterParameters(filterOptions)
           .stream().map(ChangeNoteDTO::fromChangeNote).toList();
     }
-
-
   }
 
   /**
