@@ -87,11 +87,11 @@ const startEditing = () => {
 const onSubmit = form.handleSubmit((values) => {
   if (releaseNote.value !== undefined) {
     const payload = {
-    ...values,
-    changeNoteIds: changeNotes.value,
-  }
-  updateReleaseNoteMutation.mutate({id: releaseNote.value.id, dto: payload });
-  isEditing.value = false;
+      ...values,
+      changeNoteIds: changeNotes.value,
+    }
+    updateReleaseNoteMutation.mutate({ id: releaseNote.value.id, dto: payload });
+    isEditing.value = false;
   }
 })
 
@@ -136,26 +136,27 @@ const handleExport = () => {
 
   <div class="flex flex-col w-full items-center px-4 mb-20">
     <DeletePrompt v-model:open="deletePromptOpen" :on-confirm="() => archiveReleaseNote()" />
-      <div class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10 flex items-center gap-4">
-        <Button variant="outline" class="" @click="$router.back()">
-          <ArrowLeft />{{ t('button.previous') }}
-        </Button>
-        <Breadcrumb class="text-text-primary">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">Release Notes</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              {{ releaseNote?.tag }}
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-      </div>
+    <div class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10 flex items-center gap-4">
+      <Button variant="outline" class="" @click="$router.back()">
+        <ArrowLeft />{{ t('button.previous') }}
+      </Button>
+      <Breadcrumb class="text-text-primary">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">Release Notes</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            {{ releaseNote?.tag }}
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+    </div>
 
     <form class="w-full flex flex-col items-center" @submit="onSubmit">
       <div class="md:hidden flex w-full mt-4 justify-end gap-2">
-        <Button v-if="isEditing" variant="outline" @click="isEditing = false">{{ t('button.cancel') }}
+        <Button v-if="isEditing" variant="outline" @click="isEditing = false">{{ t('button.cancel')
+          }}
           <Ban />
         </Button>
         <Button v-if="isEditing" variant="outline" type="submit">{{ t('button.save') }}
@@ -205,7 +206,8 @@ const handleExport = () => {
                   </DropdownMenuItem>
                   <DropdownMenuItem @click="handlePublish">
                     <div class="w-full flex gap-2">
-                      <p class="ml-auto text-text-primary">{{ !releaseNote.published ? t('button.publish')
+                      <p class="ml-auto text-text-primary">{{ !releaseNote.published ?
+                        t('button.publish')
                         : t('button.unpublish') }}</p>
                       <component 
                         :is="!releaseNote.published ? Eye : EyeOff"
@@ -225,7 +227,8 @@ const handleExport = () => {
                 @click="isEditing = false">{{ t('button.cancel') }}
                 <Ban />
               </Button>
-              <Button class="hidden md:flex" v-if="isEditing" variant="outline" type="submit">{{ t('button.save') }}
+              <Button class="hidden md:flex" v-if="isEditing" variant="outline" type="submit">{{
+                t('button.save') }}
                 <Save />
               </Button>
             </div>
@@ -234,7 +237,9 @@ const handleExport = () => {
           <p v-if="!isEditing" v-html="md.render(releaseNote.summary)"></p>
           <div class="flex flex-col gap-1" v-if="isEditing">
             <h4 class="text-md">{{ t('title.description') }}</h4>
-            <Textarea class="w-full" v-model="summary" :placeholder="t('placeholder.description')" />
+            <Textarea 
+              class="w-full" v-model="summary"
+              :placeholder="t('placeholder.description')" />
           </div>
         </div>
         <Separator v-if="!isEditing" class="w-full h-2" />

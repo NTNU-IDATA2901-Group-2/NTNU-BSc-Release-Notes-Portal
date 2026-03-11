@@ -11,7 +11,7 @@ const { t } = useI18n();
   <div class="flex flex-col min-h-full justify-center items-center relative">
     <Button variant="outline" class="w-30 absolute top-4 left-4" @click="$router.back()"><ArrowLeft />{{ t('button.previous') }}</Button>
     <div class="flex flex-col md:flex-row items-center gap-8">
-      <img class="w-60 md:w-80 lg:w-100" src="../assets/not_found.svg"/>
+      <img class="w-60 md:w-80 lg:w-100" src="../assets/not_found.svg" alt="Content not found"/>
       <div class="w-60 md:w-80 lg:w-100 flex flex-col gap-4">
         <h1 class="text-2xl self-center">{{ t('notFound.404') }}</h1>
         <p>{{ t('notFound.resourceNotFound') }}</p>
