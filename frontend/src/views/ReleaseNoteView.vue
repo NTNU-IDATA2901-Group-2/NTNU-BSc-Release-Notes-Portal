@@ -26,6 +26,7 @@ import { EditReleaseNoteSchema } from '@/schemas';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../components/ui/breadcrumb';
 import { useI18n } from 'vue-i18n';
 import md from '@/utils/markdown-it';
+import { exportToPdf } from '@/utils/pdf';
 
 const isEditing = ref(false)
 
@@ -117,6 +118,18 @@ const publishReleaseNoteMutation = usePublishReleaseNote({
     toast.error(t('toast.releaseNotePublishError'));
   }
 })
+
+const releaseNoteRef = ref<HTMLDivElement>();
+
+const handleExport = () => {
+  if (!releaseNote.value) return;
+  try {
+    exportToPdf(releaseNote.value.tag, releaseNoteRef);
+  } catch (error) {
+    console.error('Error exporting to PDF:', error);
+    toast.error(t('toast.exportPdfError'));
+  }
+}
 </script>
 
 <template>
@@ -154,6 +167,7 @@ const publishReleaseNoteMutation = usePublishReleaseNote({
       <h1 v-if="isError">{{ t('loadingError.releaseNotes') }}</h1>
 
       <div 
+        ref="releaseNoteRef"
         v-if="!isPending && !isFetching && !isError && releaseNote"
         class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
         <div class="flex flex-col gap-4 w-full">
@@ -166,11 +180,12 @@ const publishReleaseNoteMutation = usePublishReleaseNote({
                 <Input class="w-full" v-model="tag" :placeholder="t('placeholder.title')" />
               </div>
               <Badge 
+                data-pdf-exclude
                 v-if="!isEditing" class="h-6"
                 :variant="releaseNote.published ? 'success' : 'destructive'">{{
                   releaseNote.published ? 'Published' : 'Private' }}</Badge>
             </div>
-            <div class="flex gap-4">
+            <div data-pdf-exclude class="flex gap-4">
               <DropdownMenu v-if="!isEditing">
                 <DropdownMenuTrigger
                   class="cursor-pointer hover:bg-border/50 rounded-md p-2 transition-colors">
@@ -199,7 +214,7 @@ const publishReleaseNoteMutation = usePublishReleaseNote({
                         class="text-text-primary" />
                     </div>
                   </DropdownMenuItem>
-                  <DropdownMenuItem disabled>
+                  <DropdownMenuItem @click="handleExport">
                     <div class="w-full flex gap-2">
                       <p class="ml-auto text-text-primary">{{ t('button.export') }}</p>
                       <FileDown class="text-text-primary" />
@@ -229,33 +244,33 @@ const publishReleaseNoteMutation = usePublishReleaseNote({
         </div>
         <Separator v-if="!isEditing" class="w-full h-2" />
         <div class="flex flex-col w-full gap-10">
-          <div v-if="isEditing" class="flex flex-col gap-1">
-            <h4 class="text-md">{{ t('title.changeNotes') }}</h4>
-            <MultiselectChangeNotes v-model="changeNotes" />
-          </div>
-          <h2 v-else class="text-3xl">{{ t('title.changeNotes') }}</h2>
-
-          <div v-if="!isEditing" class="flex flex-col gap-16">
-            <div 
-              v-for="change in releaseNote.changeNotes" :key="change.id"
-              class="flex flex-col gap-2">
-
-              <h3 class="text-2xl">{{ change.reference }}</h3>
-              <div>
-                <h3 class="text-xl">{{ t('title.description') }}</h3>
-                <p class="ml-4" v-html="md.render(change.description)"></p>
-              </div>
-              <div>
-                <h3 class="text-xl">{{ t('title.developerNotes') }}</h3>
-                <p class="ml-4" v-html="md.render(change.developerNotes)"></p>
-              </div>
-              <div>
-                <h3 class="text-xl">{{ t('title.upgradeRequirements') }}</h3>
-                <p class="ml-4" v-html="md.render(change.upgradeNotes)"></p>
+            <div v-if="isEditing" class="flex flex-col gap-1">
+              <h4 class="text-md">{{ t('title.changeNotes') }}</h4>
+              <MultiselectChangeNotes v-model="changeNotes" />
+            </div>
+            <h2 v-else class="text-3xl">{{ t('title.changeNotes') }}</h2>
+            
+            <div v-if="!isEditing" class="flex flex-col gap-16">
+              <div 
+                v-for="change in releaseNote.changeNotes" :key="change.id"
+                class="flex flex-col gap-2">
+                
+                <h3 class="text-2xl">{{ change.reference }}</h3>
+                <div>
+                  <h3 data-pdf-exclude class="text-xl">{{ t('title.description') }}</h3>
+                  <p class="ml-4" v-html="md.render(change.description)"></p>
+                </div>
+                <div data-pdf-exclude>
+                  <h3 class="text-xl">{{ t('title.developerNotes') }}</h3>
+                  <p class="ml-4" v-html="md.render(change.developerNotes)"></p>
+                </div>
+                <div data-pdf-exclude>
+                  <h3 class="text-xl">{{ t('title.upgradeRequirements') }}</h3>
+                  <p class="ml-4" v-html="md.render(change.upgradeNotes)"></p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
       </div>
     </form>
   </div>

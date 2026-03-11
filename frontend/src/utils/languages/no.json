@@ -62,7 +62,8 @@
         "releaseNotePublishError": "Det oppsto en feil under publisering av utgivelsesnotat",
         "releaseNoteUnpublishError": "Det oppsto en feil under avpublisering av utgivelsesnotat",
         "releaseNoteUpdatedSuccess": "Utgivelsesnotat oppdatert",
-        "releaseNoteUpdateError": "Det oppsto en feil under oppdatering av utgivelsesnotat"
+        "releaseNoteUpdateError": "Det oppsto en feil under oppdatering av utgivelsesnotat",
+        "exportPdfError": "Det oppsto en feil under eksportering til PDF"
     },
     "deletePrompt": {
         "title": "Er du sikker på at du vil slette?",

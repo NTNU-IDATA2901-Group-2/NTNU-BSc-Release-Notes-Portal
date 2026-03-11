@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { EllipsisVertical, Eye, FileDown, Pencil, Trash2 } from 'lucide-vue-next';
+import { EllipsisVertical, Eye, Pencil, Trash2 } from 'lucide-vue-next';
 import DeletePrompt from '../DeletePrompt.vue';
 import { ref } from 'vue';
 import { useArchiveChangeNote, usePublishChangeNote } from '@/api/change-note-api';
@@ -100,12 +100,6 @@ class="h-6"
                   <div class="w-full flex gap-2">
                     <p class="ml-auto text-text-primary">{{ changeNote.published ? t('button.unpublish') : t('button.publish') }}</p>
                     <Eye class="text-text-primary" />
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem disabled>
-                  <div class="w-full flex gap-2">
-                    <p class="ml-auto text-text-primary">{{ t('button.export') }}</p>
-                    <FileDown class="text-text-primary" />
                   </div>
                 </DropdownMenuItem>
               </DropdownMenuContent>
