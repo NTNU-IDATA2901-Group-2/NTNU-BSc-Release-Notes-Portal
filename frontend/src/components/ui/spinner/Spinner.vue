@@ -12,6 +12,6 @@ const props = defineProps<{
   <Loader2Icon
     role="status"
     aria-label="Loading"
-    :class="cn('size-8 animate-spin text-accent my-40', props.class)"
+    :class="cn('size-8 animate-spin text-text-primary dark:text-accent  my-40', props.class)"
   />
 </template>
