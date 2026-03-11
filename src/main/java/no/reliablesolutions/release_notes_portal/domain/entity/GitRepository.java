@@ -25,4 +25,8 @@ public class GitRepository {
     @Setter
     @NotBlank
     private String url;
+
+    @Setter
+    @NotBlank
+    private String lastCheckedCommitHash;
 }

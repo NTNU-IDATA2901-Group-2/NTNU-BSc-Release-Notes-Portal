@@ -35,4 +35,12 @@ public class GitRepositoryService {
     public List<GitRepository> getAllGitRepositories() {
         return gitRepositoryRepository.findAll();
     }
+
+    public void updateGitRepository(GitRepository gitRepository) {
+        try {
+            gitRepositoryRepository.save(gitRepository);
+        } catch (Exception _) {
+            throw new FailedToSaveEntityException("Failed to update Git repository with id " + gitRepository.getId());
+        }
+    }
 }
