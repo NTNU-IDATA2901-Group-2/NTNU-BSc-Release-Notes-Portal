@@ -16,7 +16,7 @@ public class AuthenticationUtil {
 
   public static boolean isAdmin() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
+    
     if (authentication == null) {
       return false;
     }
