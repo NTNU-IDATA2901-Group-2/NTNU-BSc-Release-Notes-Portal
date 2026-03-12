@@ -113,38 +113,28 @@ public class ChangeNoteService {
    *         ChangeNoteDTOs
    */
   public List<ChangeNoteDTO> getAllChangeNotes(ChangeNoteFilterOptionsDTO filterOptions) {
-    boolean isAdmin = AuthenticationUtil.isAdmin();
 
+    if (filterOptions == null) {
+      filterOptions = new ChangeNoteFilterOptionsDTO(null, null, null, null, null, null, null, null);
+    }
+
+    boolean isAdmin = AuthenticationUtil.isAdmin();
+    
     if (isAdmin) {
-      if (filterOptions == null) {
-        return changeNoteRepository.findAll().stream().map(ChangeNoteDTO::fromChangeNote).toList();
-      } else {
-        return changeNoteRepository.findByArchivedFalseAndMatchingFilterParameters(filterOptions).stream()
-            .map(ChangeNoteDTO::fromChangeNote)
-            .toList();
-      }
-    } else {
-      List<Long> customerIds = AuthenticationUtil.getCustomerGroups().stream()
-          .map(customerName -> customerRepository.findByName(customerName).get().getId())
+      return changeNoteRepository.findByArchivedFalseAndMatchingFilterParameters(filterOptions).stream()
+          .map(ChangeNoteDTO::fromChangeNote)
           .toList();
 
-      if (filterOptions == null) {
-        filterOptions = new ChangeNoteFilterOptionsDTO();
-      }
-
-      filterOptions = new ChangeNoteFilterOptionsDTO(
-          filterOptions.query(),
-          filterOptions.published(),
-          filterOptions.hasReleaseNote(),
-          filterOptions.filteredIds(),
-          customerIds,
-          filterOptions.featureIds(),
-          filterOptions.scopeIds(),
-          filterOptions.productIds());
-
-      return changeNoteRepository
-          .findByArchivedFalseAndMatchingFilterParameters(filterOptions)
-          .stream().map(ChangeNoteDTO::fromChangeNote).toList();
+    } else {
+      List<String> customerNames = AuthenticationUtil.getCustomerGroups();
+      return changeNoteRepository.findForCustomerNamesMatchingFilterParameters(customerNames, filterOptions).stream()
+          .map(note -> {
+            note.setDeveloperNotes(null);
+            note.setUpgradeNotes(null);
+            return note;
+          })
+          .map(ChangeNoteDTO::fromChangeNote)
+          .toList();
     }
   }
 
