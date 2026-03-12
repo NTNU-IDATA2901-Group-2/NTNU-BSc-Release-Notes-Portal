@@ -18,42 +18,49 @@ import org.springframework.security.oauth2.jwt.Jwt;
  */
 public class JwtRolesGrantedAuthoritiesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
 
+  private static final String REALM_ACCESS = "realm_access";
+  private static final String ROLES = "roles";
+  private static final String GROUPS_CLAIM = "groups";
+  private static final String CUSTOMER_GROUP_PREFIX = "/Customers/";
+  private static final String CUSTOMER_PREFIX = "CUSTOMER_";
+  private static final String ROLE_PREFIX = "ROLE_";
+
   private Logger logger = LoggerFactory.getLogger(JwtRolesGrantedAuthoritiesConverter.class);
 
   @Override
   public List<GrantedAuthority> convert(Jwt jwt) {
-    Map<String, Object> realmAccess = jwt.getClaimAsMap("realm_access");
-    if (realmAccess == null || !realmAccess.containsKey("roles")) {
-      logger.warn("No 'realm_access.roles' claim found in JWT");
-      return List.of();
-    }
-
     ArrayList<String> roles = new ArrayList<>();
-    Object rolesObj = realmAccess.get("roles");
-    if (rolesObj instanceof List) {
-      for (Object role : (List<?>) rolesObj) {
-        if (role instanceof String string) {
-          roles.add(string);
-        } else {
-          logger.warn("Unexpected type for role: {}", role.getClass().getName());
+    Map<String, Object> realmAccess = jwt.getClaimAsMap(REALM_ACCESS);
+    if (realmAccess != null && realmAccess.containsKey(ROLES)) {
+      Object rolesObj = realmAccess.get(ROLES);
+      if (rolesObj instanceof List) {
+        for (Object role : (List<?>) rolesObj) {
+          if (role instanceof String string) {
+            roles.add(string.toUpperCase());
+          } else {
+            logger.warn("Unexpected type for role: {}", role.getClass().getName());
+          }
         }
+      } else {
+        logger.warn("Unexpected type for 'roles' claim: {}", rolesObj.getClass().getName());
       }
-    } else {
-      logger.warn("Unexpected type for 'roles' claim: {}", rolesObj.getClass().getName());
     }
 
-    List<String> groups = jwt.getClaimAsStringList("groups");
 
-    List<String> customerGroups = groups != null
-        ? groups.stream().filter(group -> group.startsWith("/Customers/")).map(group -> group.substring(11)).toList()
-        : List.of();
-
-    for (String customerGroup : customerGroups) {
-      roles.add("CUSTOMER_" + customerGroup);
+    List<String> groups = jwt.getClaimAsStringList(GROUPS_CLAIM);
+    if (groups != null) {
+      groups.stream()
+        .filter(group -> group.startsWith(CUSTOMER_GROUP_PREFIX))
+        .map(group -> group.substring(CUSTOMER_GROUP_PREFIX.length()))
+        .filter(group -> !group.isBlank())
+        .forEach(group -> roles.add(CUSTOMER_PREFIX + group.toUpperCase()));
     }
-
+    
     return roles.stream()
-        .map(role -> (GrantedAuthority) new SimpleGrantedAuthority("ROLE_" + role))
+        .map(role -> (GrantedAuthority) new SimpleGrantedAuthority(ROLE_PREFIX + role))
         .toList();
   }
+
+
+
 }
