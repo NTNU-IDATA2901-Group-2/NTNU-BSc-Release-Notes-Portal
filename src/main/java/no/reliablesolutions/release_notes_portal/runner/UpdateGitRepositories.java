@@ -1,11 +1,16 @@
 package no.reliablesolutions.release_notes_portal.runner;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffFormatter;
+import org.eclipse.jgit.util.io.DisabledOutputStream;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.revwalk.RevSort;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -25,10 +30,11 @@ import no.reliablesolutions.release_notes_portal.service.GitRepositoryService;
 @AllArgsConstructor
 public class UpdateGitRepositories implements CommandLineRunner {
 
-    private final Logger logger = LoggerFactory.getLogger(UpdateGitRepositories.class);
-    private final GitRepositoryService gitRepositoryService;
+  private final Logger logger = LoggerFactory.getLogger(UpdateGitRepositories.class);
+  private final GitRepositoryService gitRepositoryService;
 
-    private static final String REPOSITORY_DIRECTORIES_PATH = "git_repositories";
+  private static final String REPOSITORY_DIRECTORIES_PATH = "git_repositories";
+  private static final String CHANGE_NOTE_DIRECTORY = "notes";
 
   @Override
   public void run(String... args) throws Exception {
@@ -38,16 +44,16 @@ public class UpdateGitRepositories implements CommandLineRunner {
     if (!repositoriesDirectory.exists()) {
       repositoriesDirectory.mkdirs();
     }
-    
+
     List<GitRepository> gitRepositories = gitRepositoryService.getAllGitRepositories();
     logger.info("Found {} git repositories", gitRepositories.size());
     gitRepositories.forEach(gitRepository -> {
-        logger.info("Updating Git repository: {}", gitRepository.getName());
-        
-        File repositoryDirectory = new File(REPOSITORY_DIRECTORIES_PATH + File.separator + gitRepository.getName());
+      logger.info("Updating Git repository: {}", gitRepository.getName());
 
-        prepareGitRepository(gitRepository, repositoryDirectory);
-        updateGitRepository(gitRepository, repositoryDirectory);
+      File repositoryDirectory = new File(REPOSITORY_DIRECTORIES_PATH + File.separator + gitRepository.getName());
+
+      prepareGitRepository(gitRepository, repositoryDirectory);
+      updateGitRepository(gitRepository, repositoryDirectory);
     });
   }
 
@@ -73,24 +79,24 @@ public class UpdateGitRepositories implements CommandLineRunner {
   }
 
   private void cloneRepository(GitRepository gitRepository, File repositoryDirectory) {
-      if (gitRepository == null) {
-        throw new IllegalArgumentException("Git repository cannot be null");
-      }
-      if (repositoryDirectory == null) {
-        throw new IllegalArgumentException("Repository directory cannot be null");
-      }
+    if (gitRepository == null) {
+      throw new IllegalArgumentException("Git repository cannot be null");
+    }
+    if (repositoryDirectory == null) {
+      throw new IllegalArgumentException("Repository directory cannot be null");
+    }
 
-      try {
-        logger.info("Cloning repository {} with id {}", gitRepository.getName(), gitRepository.getId());
-        Git.cloneRepository()
-          .setURI(gitRepository.getUrl())
-          .setDirectory(repositoryDirectory) 
-          .call();
-      } catch (GitAPIException e) {
-        logger.error("Failed to clone repository with id {}", gitRepository.getId(), e);
-      } catch (Exception e) {
-        logger.error("Failed to clone repository with id {} due to unexpected error", gitRepository.getId(), e);
-      }
+    try {
+      logger.info("Cloning repository {} with id {}", gitRepository.getName(), gitRepository.getId());
+      Git.cloneRepository()
+	.setURI(gitRepository.getUrl())
+	.setDirectory(repositoryDirectory) 
+	.call();
+    } catch (GitAPIException e) {
+      logger.error("Failed to clone repository with id {}", gitRepository.getId(), e);
+    } catch (Exception e) {
+      logger.error("Failed to clone repository with id {} due to unexpected error", gitRepository.getId(), e);
+    }
   }
 
   private void pullRepository(GitRepository gitRepository, File repositoryDirectory) {
@@ -105,7 +111,7 @@ public class UpdateGitRepositories implements CommandLineRunner {
       logger.info("Pulling repository {} with id {}", gitRepository.getName(), gitRepository.getId());
       git.pull().call();
     } catch (Exception e) {
-        logger.error("Failed to pull repository with id {} due to unexpected error", gitRepository.getId(), e);
+      logger.error("Failed to pull repository with id {} due to unexpected error", gitRepository.getId(), e);
     }
   }
 
@@ -129,7 +135,7 @@ public class UpdateGitRepositories implements CommandLineRunner {
 	revWalk.markStart(headCommit);
 	lastCheckedCommit = revWalk.next(); // oldest commit
       }
-      doDiffLogic(lastCheckedCommit, headCommit);
+      doDiffLogic(lastCheckedCommit, headCommit, repositoryDirectory);
       updateLastCheckedCommitHash(gitRepository, headCommit);
     } catch (IOException e) {
       logger.error("Failed to open repository with id {} due to IO error", gitRepository.getId(), e);
@@ -138,8 +144,45 @@ public class UpdateGitRepositories implements CommandLineRunner {
 
   }
 
-  private void doDiffLogic(RevCommit from, RevCommit to) {
+  private void doDiffLogic(RevCommit from, RevCommit to, File repositoryDirectory) {
+    if (from == null) {
+      throw new IllegalArgumentException("From commit cannot be null");
+    }
+    if (to == null) {
+      throw new IllegalArgumentException("To commit cannot be null");
+    }
+    if (repositoryDirectory == null) {
+      throw new IllegalArgumentException("Repository directory cannot be null");
+    }
     logger.info("Performing diff logic between commits {} and {}", from.getName(), to.getName());
+    try (Git git = Git.open(repositoryDirectory);
+	Repository repository = git.getRepository();
+      DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
+	) {
+      diffFormatter.setRepository(repository);
+      List<DiffEntry> diffEntries = diffFormatter.scan(from.getTree(), to.getTree());
+      List<File> newChangeNoteFiles = diffEntries.stream()
+	.filter(diffEntry -> diffEntry.getChangeType() == DiffEntry.ChangeType.ADD)
+	.filter(diffEntry -> diffEntry.getNewPath().startsWith(CHANGE_NOTE_DIRECTORY + "/"))
+	.map(diffEntry -> new File(repositoryDirectory, diffEntry.getNewPath()))
+	.toList();
+      logger.info("Found {} new change note files", newChangeNoteFiles.size());
+      newChangeNoteFiles.forEach(file -> {
+        try {
+
+	BufferedReader br = new BufferedReader(new FileReader(file));
+	String line;
+	while ((line = br.readLine()) != null) {
+	  logger.info("Read line from change note file {}: {}", file.getPath(), line);
+	}
+	} catch (IOException e) {
+	  logger.error("Failed to read change note file at {} due to IO error", file.getPath(), e);
+	} 
+      });
+    } catch (IOException e) {
+      logger.error("Failed to perform diff logic for repository at {} due to IO error", repositoryDirectory.getPath(), e);
+    }
+
   }
 
   private void updateLastCheckedCommitHash(GitRepository gitRepository, ObjectId newLastCheckedCommit) {
@@ -154,8 +197,8 @@ public class UpdateGitRepositories implements CommandLineRunner {
 
 
 
-    
-  
-    
+
+
+
 }
 
