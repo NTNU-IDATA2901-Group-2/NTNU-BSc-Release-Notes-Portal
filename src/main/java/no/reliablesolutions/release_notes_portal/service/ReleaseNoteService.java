@@ -2,6 +2,7 @@ package no.reliablesolutions.release_notes_portal.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -118,6 +119,15 @@ public class ReleaseNoteService {
     if (releaseNoteOptional.isEmpty() || Boolean.TRUE.equals(releaseNoteOptional.get().getArchived())) {
       throw new ReleaseNoteNotFoundException(id);
     }
+
+    boolean isAdmin = AuthenticationUtil.isAdmin();
+    if (!isAdmin) {
+      releaseNoteOptional.get().getChangeNotes().forEach(changeNote -> {
+        changeNote.setDeveloperNotes(null);
+        changeNote.setUpgradeNotes(null);
+      });
+    }
+
     return ReleaseNoteDTO.fromReleaseNote(releaseNoteOptional.get());
   }
 
@@ -150,7 +160,7 @@ public class ReleaseNoteService {
         ChangeNote changeNote = changeNoteRepository.findById(changeNoteId)
             .orElseThrow(() -> new ChangeNoteNotFoundException(changeNoteId));
 
-        if (changeNote.getReleaseNote() != null && changeNote.getReleaseNote().getId() != releaseNote.getId()) {
+        if (changeNote.getReleaseNote() != null && !Objects.equals(changeNote.getReleaseNote().getId(), releaseNote.getId())) {
           throw new ChangeNoteAlreadyHasReleaseNoteException(changeNoteId, changeNote.getReleaseNote().getId());
         }
         changeNote.setReleaseNote(releaseNote);

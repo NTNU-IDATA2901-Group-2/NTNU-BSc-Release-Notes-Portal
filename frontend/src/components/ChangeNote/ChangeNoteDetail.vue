@@ -123,13 +123,13 @@ class="h-6"
       </div>
       <Separator class="w-full h-2" />
       <div class="flex flex-col w-full text-xl gap-10">
-        <div>
+        <div v-if="changeNote.developerNotes">
           <h3 class="text-2xl">{{ t('title.developerNotes') }}</h3>
-          <div class="text-text-primary" v-html="md.render(changeNote.developerNotes)"></div>
+          <div class="text-text-primary"  v-html="md.render(changeNote.developerNotes)"></div>
         </div>
-        <div>
+        <div v-if="changeNote.upgradeNotes">
           <h3 class="text-2xl">{{ t('title.upgradeRequirements') }}</h3>
-          <p v-html="md.render(changeNote.upgradeNotes)"></p>
+          <p  v-html="md.render(changeNote.upgradeNotes)"></p>
         </div>
       </div>
     </div>

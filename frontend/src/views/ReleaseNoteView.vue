@@ -245,11 +245,11 @@ const publishReleaseNoteMutation = usePublishReleaseNote({
                 <h3 class="text-xl">{{ t('title.description') }}</h3>
                 <p class="ml-4" v-html="md.render(change.description)"></p>
               </div>
-              <div>
+              <div v-if="change.developerNotes">
                 <h3 class="text-xl">{{ t('title.developerNotes') }}</h3>
                 <p class="ml-4" v-html="md.render(change.developerNotes)"></p>
               </div>
-              <div>
+              <div v-if="change.upgradeNotes">
                 <h3 class="text-xl">{{ t('title.upgradeRequirements') }}</h3>
                 <p class="ml-4" v-html="md.render(change.upgradeNotes)"></p>
               </div>

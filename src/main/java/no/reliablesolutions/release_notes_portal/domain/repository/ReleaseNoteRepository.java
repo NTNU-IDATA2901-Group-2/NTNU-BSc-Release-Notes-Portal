@@ -42,7 +42,7 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
       FROM ReleaseNote r
       LEFT JOIN ChangeNote c ON c.releaseNote = r 
         AND c.archived = false
-        And (c.customer IS NULL OR UPPER( c.customer.name ) IN :customerGroups)
+        AND (c.customer IS NULL OR UPPER( c.customer.name ) IN :customerGroups)
       WHERE r.archived = false AND
         (:published IS NULL OR r.published = :published) AND
         (:productIds IS NULL OR c.product.id IN :productIds) AND

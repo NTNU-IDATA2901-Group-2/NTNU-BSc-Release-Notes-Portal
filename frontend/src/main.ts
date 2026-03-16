@@ -14,6 +14,7 @@ app.use(i18n)
 keycloak.init({
   onLoad: "check-sso",
   checkLoginIframe: false,
+  
 }).then((authenticated) => {
   console.log("Keycloak initialized:", authenticated);
 
