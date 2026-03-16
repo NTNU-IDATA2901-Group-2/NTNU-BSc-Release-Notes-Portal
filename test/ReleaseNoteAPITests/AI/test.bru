@@ -1,0 +1,20 @@
+meta {
+  name: test
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseurl}}/ai?prompt=What would elon do
+  body: none
+  auth: inherit
+}
+
+params:query {
+  prompt: What would elon do
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
