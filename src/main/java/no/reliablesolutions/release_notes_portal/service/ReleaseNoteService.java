@@ -16,6 +16,7 @@ import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteDTO;
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteAlreadyHasReleaseNoteException;
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
+import no.reliablesolutions.release_notes_portal.util.AuthenticationUtil;
 
 /**
  * Service class for managing release notes. Provides methods for creating, updating, retrieving, and archiving release notes.
@@ -39,7 +40,7 @@ public class ReleaseNoteService {
     ReleaseNote releaseNote = new ReleaseNote();
     releaseNote.setTag(createReleaseNoteDTO.tag());
     releaseNote.setSummary(createReleaseNoteDTO.summary());
-    releaseNote.setPublished(createReleaseNoteDTO.published() != null ? createReleaseNoteDTO.published() : false);
+    releaseNote.setPublished(createReleaseNoteDTO.published() != null && createReleaseNoteDTO.published());
 
     List<ChangeNote> changeNotesInReleaseNote = new ArrayList<>();
     if (createReleaseNoteDTO.changeNoteIds() != null) {
@@ -88,7 +89,21 @@ public class ReleaseNoteService {
    * @return a list of ReleaseNoteDTOs representing all non-archived release notes that match the provided filters
    */
   public List<ReleaseNoteDTO> getAllReleaseNotes(String query, Boolean published, List<Long> productIds) {
-    return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParameters(query, published, productIds).stream().map(ReleaseNoteDTO::fromReleaseNote).toList();
+    boolean isAdmin = AuthenticationUtil.isAdmin();
+    if (isAdmin) {
+      return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParameters(query, published, productIds).stream().map(ReleaseNoteDTO::fromReleaseNote).toList();
+
+    } else {
+      List<String> customerGroups = AuthenticationUtil.getCustomerGroups();
+      return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParametersForCustomers(query, published, productIds, customerGroups).stream().map(releaseNote -> {
+        releaseNote.getChangeNotes().forEach(changeNote -> {
+          changeNote.setDeveloperNotes(null);
+          changeNote.setUpgradeNotes(null);
+        });
+
+        return ReleaseNoteDTO.fromReleaseNote(releaseNote);
+      }).toList();
+    }
   }
 
   /**
@@ -165,7 +180,7 @@ public class ReleaseNoteService {
   public void publishReleaseNote(long id, boolean publish) {
     Optional<ReleaseNote> releaseNoteOptional = releaseNoteRepository.findById(id);
 
-    if (releaseNoteOptional.isEmpty() || releaseNoteOptional.get().getArchived()) {
+    if (releaseNoteOptional.isEmpty() || Boolean.TRUE.equals(releaseNoteOptional.get().getArchived())) {
       throw new ReleaseNoteNotFoundException(id);
     }
 

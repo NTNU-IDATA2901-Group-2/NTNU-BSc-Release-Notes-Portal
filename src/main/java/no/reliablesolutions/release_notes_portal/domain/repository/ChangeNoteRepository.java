@@ -15,6 +15,16 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
 
   Optional<ChangeNote> findByIdAndArchivedFalse(Long id);
 
+  @Query("""
+      SELECT c
+      FROM ChangeNote c
+      LEFT JOIN c.customer customer
+      WHERE c.archived = false
+      AND (customer IS NULL OR UPPER( customer.name ) IN :customerNames)
+      AND c.id = :id
+      """)
+  Optional<ChangeNote> findForCustomerByIdAndArchivedFalse(Long id, List<String> customerNames);
+
   /**
    * Finds all non-archived change notes that match the provided filter
    * parameters.

@@ -2,6 +2,7 @@ package no.reliablesolutions.release_notes_portal.service;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
@@ -147,10 +148,19 @@ public class ChangeNoteService {
    *                                     exists
    */
   public ChangeNoteDTO getChangeNoteById(long id) {
-    ChangeNote changeNote = changeNoteRepository.findByIdAndArchivedFalse(id)
-        .orElseThrow(() -> new ChangeNoteNotFoundException(id));
+    List<String> customerNames = AuthenticationUtil.getCustomerGroups();
+    boolean isAdmin = AuthenticationUtil.isAdmin();
+    if (!isAdmin) {
+      ChangeNote changeNote = changeNoteRepository.findForCustomerByIdAndArchivedFalse(id, customerNames).orElseThrow(() -> new ChangeNoteNotFoundException(id));
 
-    return ChangeNoteDTO.fromChangeNote(changeNote);
+      changeNote.setDeveloperNotes(null);
+      changeNote.setUpgradeNotes(null);
+
+      return ChangeNoteDTO.fromChangeNote(changeNote);
+    } else {
+      ChangeNote changeNote = changeNoteRepository.findByIdAndArchivedFalse(id).orElseThrow(() -> new ChangeNoteNotFoundException(id));
+      return ChangeNoteDTO.fromChangeNote(changeNote);
+    }
   }
 
   /**

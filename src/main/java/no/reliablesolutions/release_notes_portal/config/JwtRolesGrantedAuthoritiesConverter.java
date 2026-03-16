@@ -46,6 +46,7 @@ public class JwtRolesGrantedAuthoritiesConverter implements Converter<Jwt, Colle
       }
     }
 
+    
 
     List<String> groups = jwt.getClaimAsStringList(GROUPS_CLAIM);
     if (groups != null) {
@@ -55,6 +56,9 @@ public class JwtRolesGrantedAuthoritiesConverter implements Converter<Jwt, Colle
         .filter(group -> !group.isBlank())
         .forEach(group -> roles.add(CUSTOMER_PREFIX + group.toUpperCase()));
     }
+
+    System.out.println("Extracted roles from JWT: asdføkakjsdfdøasldkjfaøsldkfjasdøflkjkasdfølkjasdfølakjsdfdølkajsdfølkakjsdfdølkasjdfølkajsdfdølkjkasdfdølkj");
+    roles.forEach(System.out::println);
     
     return roles.stream()
         .map(role -> (GrantedAuthority) new SimpleGrantedAuthority(ROLE_PREFIX + role))
