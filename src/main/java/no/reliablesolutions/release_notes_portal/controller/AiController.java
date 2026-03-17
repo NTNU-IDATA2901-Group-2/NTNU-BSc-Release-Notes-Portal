@@ -5,8 +5,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
-
-import no.reliablesolutions.release_notes_portal.util.AiWrapper;
+import no.reliablesolutions.release_notes_portal.service.AiService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,12 +17,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 @RestController
 @AllArgsConstructor
 public class AiController {
-    private final AiWrapper ai;
     private final Logger logger = LoggerFactory.getLogger(AiController.class);
+    private final AiService aiService;
 
-    @PostMapping("")
-    public ResponseEntity<String> postMethodName(@RequestParam String prompt) {
-        logger.info("Received AI request with prompt: {}", prompt);
-        return ResponseEntity.ok(ai.getResponse(prompt));
+
+    @PostMapping("/translate")
+    public ResponseEntity<String> translate(@RequestParam(required = true) String locale, @RequestParam(required = true) String text) {
+        var response = aiService.translate(locale, text);
+        return ResponseEntity.ok(response);
     }
 }

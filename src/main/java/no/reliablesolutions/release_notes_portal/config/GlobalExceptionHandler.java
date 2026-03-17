@@ -206,4 +206,15 @@ public class GlobalExceptionHandler {
     logger.warn("Git repository not found: {}", e.getGitRepositoryId());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Git repository with ID %d not found", e.getGitRepositoryId()));
   }
+
+  /**
+   * Handles the case where a locale is not supported. Logs the event and returns a 400 response with a message indicating the unsupported locale and the supported locales.
+   * @param e the exception containing details about the unsupported locale
+   * @return a ResponseEntity with a 400 status and a message indicating the unsupported locale and the supported locales
+   */
+  @ExceptionHandler(value = {no.reliablesolutions.release_notes_portal.exception.LocaleNotSupportedException.class})
+  public ResponseEntity<String> handleLocaleNotSupportedException(no.reliablesolutions.release_notes_portal.exception.LocaleNotSupportedException e) {
+    logger.warn("Locale not supported: {}", e.getLocale());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(String.format("Locale '%s' is not supported. Supported locales are: en (English), no (Norwegian Bokmål), fr (French)", e.getLocale()));
+  }
 }
