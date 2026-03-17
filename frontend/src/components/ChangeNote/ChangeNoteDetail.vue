@@ -18,12 +18,10 @@ import { router } from '@/utils/router';
 import { useI18n } from 'vue-i18n';
 import { isAdmin } from '@/utils/keycloak';
 import md from '@/utils/markdown-it';
-
-const { t, locale } = useI18n();
-
-import md from '@/utils/markdown-it';
 import { useTranslate } from '@/api/ai';
 import Button from '../ui/button/Button.vue';
+
+const { t, locale } = useI18n();
 
 const props = defineProps<{
     changeNote: ChangeNote;
