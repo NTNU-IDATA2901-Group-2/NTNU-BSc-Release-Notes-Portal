@@ -301,7 +301,7 @@ const onTranslate = async () => {
 
           <div v-if="!isEditing" class="flex flex-col gap-16">
             <div 
-              v-for="change in releaseNote.changeNotes" :key="change.id"
+              v-for="change in translatedChangeNotes ?? releaseNote.changeNotes" :key="change.id"
               class="flex flex-col gap-2">
 
               <h3 class="text-2xl">{{ change.reference }}</h3>
@@ -320,33 +320,6 @@ const onTranslate = async () => {
             </div>
           </div>
         </div>
-            <div v-if="isEditing" class="flex flex-col gap-1">
-              <h4 class="text-md">{{ t('title.changeNotes') }}</h4>
-              <MultiselectChangeNotes v-model="changeNotes" />
-            </div>
-            <h2 v-else class="text-3xl">{{ t('title.changeNotes') }}</h2>
-            
-            <div v-if="!isEditing" class="flex flex-col gap-16">
-              <div 
-                v-for="change in translatedChangeNotes ?? releaseNote.changeNotes" :key="change.id"
-                class="flex flex-col gap-2">
-                
-                <h3 class="text-2xl">{{ change.reference }}</h3>
-                <div>
-                  <h3 data-pdf-exclude class="text-xl">{{ t('title.description') }}</h3>
-                  <p class="ml-4" v-html="md.render(change.description)"></p>
-                </div>
-                <div data-pdf-exclude>
-                  <h3 class="text-xl">{{ t('title.developerNotes') }}</h3>
-                  <p class="ml-4" v-html="md.render(change.developerNotes)"></p>
-                </div>
-                <div data-pdf-exclude>
-                  <h3 class="text-xl">{{ t('title.upgradeRequirements') }}</h3>
-                  <p class="ml-4" v-html="md.render(change.upgradeNotes)"></p>
-                </div>
-              </div>
-            </div>
-          </div>
       </div>
     </form>
   </div>
