@@ -9,18 +9,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { EllipsisVertical, Eye, Pencil, Trash2 } from 'lucide-vue-next';
+import { EllipsisVertical, Eye, Pencil, Sparkles, Trash2 } from 'lucide-vue-next';
 import DeletePrompt from '../DeletePrompt.vue';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useArchiveChangeNote, usePublishChangeNote } from '@/api/change-note-api';
 import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';
 import { useI18n } from 'vue-i18n';
 import { isAdmin } from '@/utils/keycloak';
 import md from '@/utils/markdown-it';
+import { useTranslate } from '@/api/ai';
+import Button from '../ui/button/Button.vue';
 
-const { t } = useI18n();
-
+const { t, locale } = useI18n();
 
 const props = defineProps<{
     changeNote: ChangeNote;
@@ -32,6 +33,7 @@ const emit = defineEmits<{
 }>();
 
 const showDeletePrompt = ref(false);
+const translatedDescription = ref<string | null>(null);
 
 const deleteChangeNoteMutation = useArchiveChangeNote(props.changeNote.id, {
   onSuccess: () => {
@@ -61,7 +63,31 @@ const { mutate: publishChangeNoteMutation } = usePublishChangeNote(props.changeN
 const onPublishToggle = () => {
   publishChangeNoteMutation(!props.changeNote.published);
   
-} 
+}
+
+const hasTranslation = computed(() => translatedDescription.value !== null);
+
+const translateMutation = useTranslate({
+  onSuccess: () => {
+    toast.success(t('toast.translationSuccess'));
+  },
+  onError: () => {
+    toast.error(t('toast.translationError'));
+  },
+});
+
+const onTranslate = async () => {
+  if (translatedDescription.value) {
+    translatedDescription.value = null;
+    return;
+  }
+  const result = await translateMutation.mutateAsync({
+    text: props.changeNote.description,
+    locale: locale.value,
+  });
+  translatedDescription.value = result;
+  console.log("Translation result:", translatedDescription.value);
+}
 
 </script>
 
@@ -78,7 +104,8 @@ const onPublishToggle = () => {
               :variant="changeNote.published ? 'success' : 'destructive'">{{ changeNote.published ?
                 'Published' : 'Private' }}</Badge>
           </div>
-          <div class="flex gap-4">
+          <div class="flex gap-4 justify-center items-center">
+            <Button v-if="!(locale === 'en')" variant="glow" @click="onTranslate">{{hasTranslation ? t('button.undo') : t('button.translate') }} <Sparkles /></Button>
             <DropdownMenu v-if="isAdmin">
               <DropdownMenuTrigger
                 class="cursor-pointer hover:bg-border/50 rounded-md p-2 transition-colors">
@@ -108,7 +135,8 @@ const onPublishToggle = () => {
           </div>
         </div>
 
-        <p v-html="md.render(changeNote.description)"></p>
+        <p v-html="md.render(translatedDescription ?? changeNote.description)"></p>
+        <p v-if="hasTranslation" class="text-text-primary/50 text-right">{{ t('ai.translationDisclaimer') }}</p>
         <div class="flex flex-wrap gap-4">
           <Badge v-if="changeNote.product" class="h-6">{{ changeNote.product.name }}</Badge>
           <Badge v-if="changeNote.scope" class="h-6">{{ changeNote.scope.name }}</Badge>

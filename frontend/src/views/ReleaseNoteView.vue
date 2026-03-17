@@ -12,8 +12,8 @@ import {
 import { useGetReleaseNote, useArchiveReleaseNote, useUpdateReleaseNote, usePublishReleaseNote } from '@/api/release-note-api';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 
-import { Pencil, Trash2, Eye, EyeOff, FileDown, Ban, Save, ArrowLeft, EllipsisVertical } from "lucide-vue-next"
-import { ref } from 'vue';
+import { Pencil, Trash2, Eye, EyeOff, FileDown, Ban, Save, ArrowLeft, EllipsisVertical, Sparkles } from "lucide-vue-next"
+import { computed, ref } from 'vue';
 import Input from '@/components/ui/input/Input.vue';
 import { Textarea } from '@/components/ui/textarea';
 import DeletePrompt from '@/components/DeletePrompt.vue';
@@ -28,17 +28,17 @@ import { useI18n } from 'vue-i18n';
 import md from '@/utils/markdown-it';
 import { exportToPdf } from '@/utils/pdf';
 import { isAdmin } from '@/utils/keycloak';
+import { useTranslate } from '@/api/ai';
+import type { ChangeNote } from '@/utils/types';
 
 const route = useRoute();
+const { t, locale } = useI18n();
 const isEditing = ref(route.query.edit === 'true');
 
 if (route.query.edit !== undefined) {
   delete route.query.edit;
   router.replace({ query: route.query });
 }
-
-
-const { t } = useI18n();
 
 const id = route.params.id as string;
 
@@ -137,10 +137,55 @@ const handleExport = () => {
     toast.error(t('toast.exportPdfError'));
   }
 }
+
+const translateMutation = useTranslate({
+  onSuccess: () => {
+    toast.success(t('toast.translationSuccess'));
+  },
+  onError: () => {
+    toast.error(t('toast.translationError'));
+  },
+});
+
+const translatedChangeNotes = ref<ChangeNote[] | null>(null);
+const translatedSummary = ref<string | null>(null);
+const hasTranslation = computed(() => translatedSummary.value !== null && translatedChangeNotes.value !== null);
+
+const onTranslate = async () => {
+  if (translatedSummary.value || translatedChangeNotes.value) {
+    translatedSummary.value = null;
+    translatedChangeNotes.value = null;
+    return;
+  }
+
+  const summaryResult = await translateMutation.mutateAsync({ 
+    text: releaseNote.value?.summary || '',
+    locale: locale.value,
+  });
+
+  translatedSummary.value = summaryResult;
+
+  if (releaseNote.value?.changeNotes) {
+    releaseNote.value.changeNotes.forEach(async (changeNote, index) => {
+      const result = await translateMutation.mutateAsync({
+        text: changeNote.description,
+        locale: locale.value,
+      });
+
+      if (result) {
+        if (!translatedChangeNotes.value) translatedChangeNotes.value = [];
+        translatedChangeNotes.value[index] = {
+          ...changeNote,
+          description: result,
+        }
+      }
+    })
+  }
+}
+
 </script>
 
 <template>
-
   <div class="flex flex-col w-full items-center px-4 mb-20">
     <DeletePrompt v-model:open="deletePromptOpen" :on-confirm="() => archiveReleaseNote()" />
     <div class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10 flex items-center gap-4">
@@ -193,6 +238,7 @@ const handleExport = () => {
                   releaseNote.published ? 'Published' : 'Private' }}</Badge>
             </div>
             <div data-pdf-exclude class="flex gap-4">
+              <Button type="button" v-if="!(locale === 'en')" variant="glow" @click="onTranslate">{{hasTranslation ? t('button.undo') : t('button.translate') }} <Sparkles /></Button>
               <DropdownMenu v-if="!isEditing">
                 <DropdownMenuTrigger
                   class="cursor-pointer hover:bg-border/50 rounded-md p-2 transition-colors">
@@ -241,7 +287,8 @@ const handleExport = () => {
             </div>
           </div>
 
-          <p v-if="!isEditing && releaseNote.summary" v-html="md.render(releaseNote.summary)"></p>
+          <p v-if="!isEditing" v-html="md.render(translatedSummary ?? releaseNote.summary)"></p>
+          <p v-if="hasTranslation" class="text-text-primary/50 text-right">{{ t('ai.translationDisclaimer') }}</p>
           <div class="flex flex-col gap-1" v-if="isEditing">
             <h4 class="text-md">{{ t('title.description') }}</h4>
             <Textarea 
@@ -259,13 +306,14 @@ const handleExport = () => {
 
           <div v-if="!isEditing" class="flex flex-col gap-16">
             <div 
-              v-for="change in releaseNote.changeNotes" :key="change.id"
+              v-for="change in translatedChangeNotes ?? releaseNote.changeNotes" :key="change.id"
               class="flex flex-col gap-2">
 
               <h3 class="text-2xl">{{ change.reference }}</h3>
               <div>
                 <h3 class="text-xl" data-pdf-exclude>{{ t('title.description') }}</h3>
                 <p class="ml-4" v-html="md.render(change.description)"></p>
+                <p v-if="hasTranslation" class="text-text-primary/50 text-right">{{ t('ai.translationDisclaimer') }}</p>
               </div>
               <div v-if="change.developerNotes" data-pdf-exclude>
                 <h3 class="text-xl">{{ t('title.developerNotes') }}</h3>
