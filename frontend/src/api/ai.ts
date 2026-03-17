@@ -13,6 +13,11 @@ const translate = async (text: string, locale: string) => {
   return response.data;
 }
 
+/**
+ * Custom hook for translating text using the AI translation API.
+ * @param onFinished An object containing callback functions to handle the success, error, and settled states of the mutation.
+ * @return A mutation object that can be used to trigger the translation process and manage its state.
+ */
 export const useTranslate = (onFinished: OnMutationApiCallFinished) => {
     const queryClient = useQueryClient();
 

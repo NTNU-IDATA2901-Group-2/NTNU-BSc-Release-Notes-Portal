@@ -136,6 +136,7 @@ const onTranslate = async () => {
         </div>
 
         <p v-html="md.render(translatedDescription ?? changeNote.description)"></p>
+        <p v-if="hasTranslation" class="text-text-primary/50 text-right">{{ t('ai.translationDisclaimer') }}</p>
         <div class="flex flex-wrap gap-4">
           <Badge v-if="changeNote.product" class="h-6">{{ changeNote.product.name }}</Badge>
           <Badge v-if="changeNote.scope" class="h-6">{{ changeNote.scope.name }}</Badge>

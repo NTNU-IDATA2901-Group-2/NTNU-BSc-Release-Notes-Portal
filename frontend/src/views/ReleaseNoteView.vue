@@ -145,7 +145,7 @@ const translateMutation = useTranslate({
 
 const translatedChangeNotes = ref<ChangeNote[] | null>(null);
 const translatedSummary = ref<string | null>(null);
-const hasTranslation = computed(() => translatedSummary.value !== null || translatedChangeNotes.value !== null);
+const hasTranslation = computed(() => translatedSummary.value !== null && translatedChangeNotes.value !== null);
 
 const onTranslate = async () => {
   if (translatedSummary.value || translatedChangeNotes.value) {
@@ -284,6 +284,7 @@ const onTranslate = async () => {
           </div>
 
           <p v-if="!isEditing" v-html="md.render(translatedSummary ?? releaseNote.summary)"></p>
+          <p v-if="hasTranslation" class="text-text-primary/50 text-right">{{ t('ai.translationDisclaimer') }}</p>
           <div class="flex flex-col gap-1" v-if="isEditing">
             <h4 class="text-md">{{ t('title.description') }}</h4>
             <Textarea 
@@ -308,6 +309,7 @@ const onTranslate = async () => {
               <div>
                 <h3 class="text-xl" data-pdf-exclude>{{ t('title.description') }}</h3>
                 <p class="ml-4" v-html="md.render(change.description)"></p>
+                <p v-if="hasTranslation" class="text-text-primary/50 text-right">{{ t('ai.translationDisclaimer') }}</p>
               </div>
               <div v-if="change.developerNotes" data-pdf-exclude>
                 <h3 class="text-xl">{{ t('title.developerNotes') }}</h3>

@@ -122,5 +122,8 @@
         "nameRequired": "Navn er påkrevd",
         "urlRequired": "URL er påkrevd",
         "error": "Det oppsto en feil under innlastning av repositoryer"
+    },
+    "ai": {
+        "translationDisclaimer": "Oversettelsen er generert av KI. Vennligst sjekk viktige fakta."
     }
 }

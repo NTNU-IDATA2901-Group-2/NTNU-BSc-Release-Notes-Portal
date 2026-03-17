@@ -121,5 +121,8 @@
         "nameRequired": "Name is required",
         "urlRequired": "URL is required",
         "error": "An error occurred while loading repositories"
+    },
+    "ai": {
+        "translationDisclaimer": "This translation is AI generated. Please check important facts."
     }
 }
