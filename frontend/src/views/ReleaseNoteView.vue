@@ -29,9 +29,15 @@ import md from '@/utils/markdown-it';
 import { exportToPdf } from '@/utils/pdf';
 import { isAdmin } from '@/utils/keycloak';
 
-const isEditing = ref(false)
-
 const route = useRoute();
+const isEditing = ref(route.query.edit === 'true');
+
+if (route.query.edit !== undefined) {
+  delete route.query.edit;
+  router.replace({ query: route.query });
+}
+
+
 const { t } = useI18n();
 
 const id = route.params.id as string;
@@ -235,7 +241,7 @@ const handleExport = () => {
             </div>
           </div>
 
-          <p v-if="!isEditing" v-html="md.render(releaseNote.summary)"></p>
+          <p v-if="!isEditing && releaseNote.summary" v-html="md.render(releaseNote.summary)"></p>
           <div class="flex flex-col gap-1" v-if="isEditing">
             <h4 class="text-md">{{ t('title.description') }}</h4>
             <Textarea 
