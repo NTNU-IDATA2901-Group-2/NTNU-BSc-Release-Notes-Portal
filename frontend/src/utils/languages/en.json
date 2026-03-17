@@ -61,7 +61,8 @@
         "releaseNotePublishError": "An error occurred while publishing release note",
         "releaseNoteUnpublishError": "An error occurred while unpublishing release note",
         "releaseNoteUpdatedSuccess": "Release note updated successfully",
-        "releaseNoteUpdateError": "An error occurred while updating the release note"
+        "releaseNoteUpdateError": "An error occurred while updating the release note",
+        "exportPdfError": "An error occurred while exporting to PDF"
     },
     "deletePrompt": {
         "title": "Are you sure you want to delete?",
