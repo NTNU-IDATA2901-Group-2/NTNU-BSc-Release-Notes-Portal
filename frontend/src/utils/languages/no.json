@@ -24,7 +24,9 @@
         "filter": "Filtrer",
         "search": "Søk",
         "signIn": "Logg inn",
-        "clearFilters": "Fjern filtre"
+        "clearFilters": "Fjern filtre",
+        "translate": "Oversett",
+        "undo": "Angre"
     },
     "title": {
         "title": "Tittel",
@@ -63,7 +65,9 @@
         "releaseNoteUnpublishError": "Det oppsto en feil under avpublisering av utgivelsesnotat",
         "releaseNoteUpdatedSuccess": "Utgivelsesnotat oppdatert",
         "releaseNoteUpdateError": "Det oppsto en feil under oppdatering av utgivelsesnotat",
-        "exportPdfError": "Det oppsto en feil under eksportering til PDF"
+        "exportPdfError": "Det oppsto en feil under eksportering til PDF",
+        "translationError": "Det oppsto en feil under oversettelse av endringsnotat",
+        "translationSuccess": "Endringsnotat oversatt"
     },
     "deletePrompt": {
         "title": "Er du sikker på at du vil slette?",

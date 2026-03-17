@@ -5,13 +5,22 @@ meta {
 }
 
 post {
-  url: {{baseurl}}/ai?prompt=What would elon do
+  url: '''
+    {{baseurl}}/translate?text=A question that has become a meme and a cultural phenomenon. "What would Elon do?" refers to the idea of imagining how Elon Musk, the billionaire entrepreneur and business magnate, would approach a particular situation or problem.
+    
+    Elon Musk is known for his innovative and often unconventional thinking, as well as his willingness to take risks and challenge the status quo. He has founded or co-founded companies like PayPal, SpaceX, Tesla, Neuralink, and The Boring Company, and has become a household name in the tech and business worlds.&locale=no
+'''
   body: none
   auth: inherit
 }
 
 params:query {
-  prompt: What would elon do
+  text: '''
+    A question that has become a meme and a cultural phenomenon. "What would Elon do?" refers to the idea of imagining how Elon Musk, the billionaire entrepreneur and business magnate, would approach a particular situation or problem.
+    
+    Elon Musk is known for his innovative and often unconventional thinking, as well as his willingness to take risks and challenge the status quo. He has founded or co-founded companies like PayPal, SpaceX, Tesla, Neuralink, and The Boring Company, and has become a household name in the tech and business worlds.
+  '''
+  locale: no
 }
 
 settings {
