@@ -13,6 +13,7 @@ import ProductFilter from '@/components/filters/ProductFilter.vue';
 import PublicPrivateFilter from '@/components/filters/PublicPrivateFilter..vue';
 import { useRouter } from 'vue-router';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
+import { isAdmin } from '@/utils/keycloak';
 
 const { t } = useI18n();
 
@@ -58,7 +59,7 @@ const onSearch = () => {
         <div class="h-min hidden md:block">
           <h1 class="text-3xl text-nowrap">{{ t('title.releaseNotes') }}</h1>
           <ProductFilter />
-          <PublicPrivateFilter />
+          <PublicPrivateFilter v-if="isAdmin"/>
           <Button class="mt-4" variant="outline" @click="clearFilters">{{ t('button.clearFilters')
           }}</Button>
         </div>

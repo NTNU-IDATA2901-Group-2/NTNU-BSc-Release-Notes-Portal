@@ -1,11 +1,14 @@
 import Keycloak from "keycloak-js";
 import { config } from "./constants";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { jwtDecode } from "jwt-decode"
 
 type DecodedJwtToken = {
   given_name?: string;
   family_name?: string;
+  realm_access?: {
+    roles?: string[];
+  };
 };
 
 const keycloak = new Keycloak({
@@ -17,6 +20,11 @@ const keycloak = new Keycloak({
 export const isAuthenticated = ref<boolean>(keycloak.authenticated);
 export const jwtToken = ref<string | undefined>(undefined);
 export const jwtTokenDecoded = ref<DecodedJwtToken | undefined>(undefined);
+export const isAdmin = computed(() => {
+  if (!jwtTokenDecoded.value) return false;
+  const roles = jwtTokenDecoded.value.realm_access?.roles || [];
+  return roles.includes("Admin");
+});
 
 keycloak.onAuthSuccess = () => {
   isAuthenticated.value = true;

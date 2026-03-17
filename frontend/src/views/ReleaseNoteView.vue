@@ -27,6 +27,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbS
 import { useI18n } from 'vue-i18n';
 import md from '@/utils/markdown-it';
 import { exportToPdf } from '@/utils/pdf';
+import { isAdmin } from '@/utils/keycloak';
 
 const isEditing = ref(false)
 
@@ -181,7 +182,7 @@ const handleExport = () => {
               </div>
               <Badge 
                 data-pdf-exclude
-                v-if="!isEditing" class="h-6"
+                v-if="!isEditing && isAdmin" class="h-6"
                 :variant="releaseNote.published ? 'success' : 'destructive'">{{
                   releaseNote.published ? 'Published' : 'Private' }}</Badge>
             </div>
@@ -192,19 +193,19 @@ const handleExport = () => {
                   <EllipsisVertical class="text-text-primary" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent class="mr-6 lg:mr-20 mt-2">
-                  <DropdownMenuItem @click="startEditing">
+                  <DropdownMenuItem @click="startEditing" v-if="isAdmin">
                     <div class="w-full flex gap-2">
                       <p class="text-text-primary ml-auto">{{ t('button.edit') }}</p>
                       <Pencil class="text-text-primary" />
                     </div>
                   </DropdownMenuItem>
-                  <DropdownMenuItem @click="deletePromptOpen = true">
+                  <DropdownMenuItem @click="deletePromptOpen = true" v-if="isAdmin">
                     <div class="w-full flex gap-2">
                       <p class="ml-auto text-text-primary">{{ t('button.delete') }}</p>
                       <Trash2 class="text-text-primary" />
                     </div>
                   </DropdownMenuItem>
-                  <DropdownMenuItem @click="handlePublish">
+                  <DropdownMenuItem @click="handlePublish" v-if="isAdmin">
                     <div class="w-full flex gap-2">
                       <p class="ml-auto text-text-primary">{{ !releaseNote.published ?
                         t('button.publish')

@@ -4,6 +4,7 @@ import Badge from './ui/badge/Badge.vue';
 import type { ChangeNote } from '@/utils/types';
 import { Checkbox } from './ui/checkbox';
 import { useI18n } from 'vue-i18n';
+import { isAdmin } from '@/utils/keycloak';
 
 const props = defineProps<PrimitiveProps & {
   changeNote: ChangeNote
@@ -29,7 +30,7 @@ const handleCheckboxClick = (event: Event) => {
       <div class="flex justify-between">
         <div class="flex gap-4 items-center">
 
-          <div @click="handleCheckboxClick" class="flex items-center">
+          <div @click="handleCheckboxClick" class="flex items-center" v-if="isAdmin">
             <Checkbox v-model="selected" :disabled="false" />
           </div>
 
@@ -39,7 +40,7 @@ const handleCheckboxClick = (event: Event) => {
 
         </div>
         <div>
-          <Badge :variant="changeNote.published ? 'success' : 'destructive'">{{ changeNote.published
+          <Badge v-if="isAdmin" :variant="changeNote.published ? 'success' : 'destructive'">{{ changeNote.published
             ? t('card.published') : t('card.private') }}</Badge>
         </div>
       </div>

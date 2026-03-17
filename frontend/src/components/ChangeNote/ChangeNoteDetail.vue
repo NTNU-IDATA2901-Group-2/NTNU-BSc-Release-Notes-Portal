@@ -16,10 +16,11 @@ import { useArchiveChangeNote, usePublishChangeNote } from '@/api/change-note-ap
 import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';
 import { useI18n } from 'vue-i18n';
+import { isAdmin } from '@/utils/keycloak';
+import md from '@/utils/markdown-it';
 
 const { t } = useI18n();
 
-import md from '@/utils/markdown-it';
 
 const props = defineProps<{
     changeNote: ChangeNote;
@@ -72,13 +73,13 @@ const onPublishToggle = () => {
           <div class="flex items-center gap-4">
             <h1 class="text-3xl max-w-60 whitespace-nowrap overflow-hidden">{{
               changeNote.reference }}</h1>
-            <Badge
-class="h-6"
+            <Badge 
+              v-if="isAdmin" class="h-6"
               :variant="changeNote.published ? 'success' : 'destructive'">{{ changeNote.published ?
                 'Published' : 'Private' }}</Badge>
           </div>
           <div class="flex gap-4">
-            <DropdownMenu>
+            <DropdownMenu v-if="isAdmin">
               <DropdownMenuTrigger
                 class="cursor-pointer hover:bg-border/50 rounded-md p-2 transition-colors">
                 <EllipsisVertical class="text-text-primary" />
