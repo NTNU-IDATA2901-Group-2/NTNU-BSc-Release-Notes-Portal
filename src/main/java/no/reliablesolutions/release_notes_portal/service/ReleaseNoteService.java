@@ -17,7 +17,10 @@ import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteDTO;
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteAlreadyHasReleaseNoteException;
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
+import no.reliablesolutions.release_notes_portal.util.AccessScope;
+import no.reliablesolutions.release_notes_portal.util.AccessScopeFactory;
 import no.reliablesolutions.release_notes_portal.util.AuthenticationUtil;
+import no.reliablesolutions.release_notes_portal.util.ReleaseNoteMapper;
 
 /**
  * Service class for managing release notes. Provides methods for creating, updating, retrieving, and archiving release notes.
@@ -90,9 +93,9 @@ public class ReleaseNoteService {
    * @return a list of ReleaseNoteDTOs representing all non-archived release notes that match the provided filters
    */
   public List<ReleaseNoteDTO> getAllReleaseNotes(String query, Boolean published, List<Long> productIds) {
-    boolean isAdmin = AuthenticationUtil.isAdmin();
-    if (isAdmin) {
-      return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParameters(query, published, productIds).stream().map(ReleaseNoteDTO::fromReleaseNote).toList();
+    AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
+    if (accessScope.isAdmin()) {
+      return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParameters(query, published, productIds).stream().map(rn -> ReleaseNoteMapper.toDTO(rn, accessScope)).toList();
 
     } else {
       List<String> customerGroups = AuthenticationUtil.getCustomerGroups();
@@ -102,7 +105,7 @@ public class ReleaseNoteService {
           changeNote.setUpgradeNotes(null);
         });
 
-        return ReleaseNoteDTO.fromReleaseNote(releaseNote);
+        return ReleaseNoteMapper.toDTO(releaseNote, accessScope);
       }).toList();
     }
   }
@@ -115,7 +118,8 @@ public class ReleaseNoteService {
    */
   public ReleaseNoteDTO getReleaseNoteById(long id) {
     Optional<ReleaseNote> releaseNoteOptional = releaseNoteRepository.findById(id);
-    
+    AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
+
     if (releaseNoteOptional.isEmpty() || Boolean.TRUE.equals(releaseNoteOptional.get().getArchived())) {
       throw new ReleaseNoteNotFoundException(id);
     }
@@ -128,7 +132,7 @@ public class ReleaseNoteService {
       });
     }
 
-    return ReleaseNoteDTO.fromReleaseNote(releaseNoteOptional.get());
+    return ReleaseNoteMapper.toDTO(releaseNoteOptional.get(), accessScope);
   }
 
   /**
@@ -175,7 +179,7 @@ public class ReleaseNoteService {
     releaseNote.setPublished(createReleaseNoteDTO.published());
 
     releaseNoteRepository.save(releaseNote);
-    return ReleaseNoteDTO.fromReleaseNote(releaseNote);
+    return ReleaseNoteMapper.toDTO(releaseNote, AccessScopeFactory.fromCurrentUser());
 
   }
   

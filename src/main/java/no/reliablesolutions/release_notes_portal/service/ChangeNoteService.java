@@ -19,7 +19,10 @@ import no.reliablesolutions.release_notes_portal.exception.CustomerNotFoundExcep
 import no.reliablesolutions.release_notes_portal.exception.FeatureNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ProductNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ScopeNotFoundException;
+import no.reliablesolutions.release_notes_portal.util.AccessScope;
+import no.reliablesolutions.release_notes_portal.util.AccessScopeFactory;
 import no.reliablesolutions.release_notes_portal.util.AuthenticationUtil;
+import no.reliablesolutions.release_notes_portal.util.ChangeNoteMapper;
 
 @Service
 @AllArgsConstructor
@@ -118,22 +121,21 @@ public class ChangeNoteService {
       filterOptions = new ChangeNoteFilterOptionsDTO(null, null, null, null, null, null, null, null);
     }
 
-    boolean isAdmin = AuthenticationUtil.isAdmin();
+    AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
     
-    if (isAdmin) {
+    if (accessScope.isAdmin()) {
       return changeNoteRepository.findByArchivedFalseAndMatchingFilterParameters(filterOptions).stream()
-          .map(ChangeNoteDTO::fromChangeNote)
+          .map(changeNote -> ChangeNoteMapper.toDTO(changeNote, accessScope))
           .toList();
 
     } else {
-      List<String> customerNames = AuthenticationUtil.getCustomerGroups();
-      return changeNoteRepository.findForCustomerNamesMatchingFilterParameters(customerNames, filterOptions).stream()
+      return changeNoteRepository.findForCustomerNamesMatchingFilterParameters(accessScope.getCustomerGroups(), filterOptions).stream()
           .map(note -> {
             note.setDeveloperNotes(null);
             note.setUpgradeNotes(null);
             return note;
           })
-          .map(ChangeNoteDTO::fromChangeNote)
+          .map(changeNote -> ChangeNoteMapper.toDTO(changeNote, accessScope))
           .toList();
     }
   }
@@ -147,18 +149,16 @@ public class ChangeNoteService {
    *                                     exists
    */
   public ChangeNoteDTO getChangeNoteById(long id) {
-    List<String> customerNames = AuthenticationUtil.getCustomerGroups();
+    AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
+    
     boolean isAdmin = AuthenticationUtil.isAdmin();
     if (!isAdmin) {
-      ChangeNote changeNote = changeNoteRepository.findForCustomerByIdAndArchivedFalse(id, customerNames).orElseThrow(() -> new ChangeNoteNotFoundException(id));
+      ChangeNote changeNote = changeNoteRepository.findForCustomerByIdAndArchivedFalse(id, accessScope.getCustomerGroups()).orElseThrow(() -> new ChangeNoteNotFoundException(id));
 
-      changeNote.setDeveloperNotes(null);
-      changeNote.setUpgradeNotes(null);
-
-      return ChangeNoteDTO.fromChangeNote(changeNote);
+      return ChangeNoteMapper.toDTO(changeNote, accessScope);
     } else {
       ChangeNote changeNote = changeNoteRepository.findByIdAndArchivedFalse(id).orElseThrow(() -> new ChangeNoteNotFoundException(id));
-      return ChangeNoteDTO.fromChangeNote(changeNote);
+      return ChangeNoteMapper.toDTO(changeNote, accessScope);
     }
   }
 
@@ -209,7 +209,7 @@ public class ChangeNoteService {
       changeNote.setCustomer(null);
     }
 
-    return ChangeNoteDTO.fromChangeNote(changeNoteRepository.save(changeNote));
+    return ChangeNoteMapper.toDTO(changeNoteRepository.save(changeNote), AccessScopeFactory.fromCurrentUser());
   }
 
   /**

@@ -11,22 +11,22 @@ const app = createApp(App)
 app.use(VueQueryPlugin)
 app.use(i18n)
 
-keycloak.init({
+const authenticated = await keycloak.init({
   onLoad: "check-sso",
   checkLoginIframe: false,
-  
-}).then((authenticated) => {
-  console.log("Keycloak initialized:", authenticated);
+})
 
-  // Idk if this is the best way to do this, but it ensures router is not used before keycloak is initialized to prevent sync issues with auth state.
-  app.use(router)
-  app.mount("#app");
+console.log("Keycloak initialized:", authenticated);
 
-  router.isReady().then(() => {
-    if (window.location.hash) {
-      const url = new URL(window.location.href);
-      url.hash = '';
-      window.history.replaceState({}, document.title, url.toString());
-    }
-  });
+// Idk if this is the best way to do this, but it ensures router is not used before keycloak is initialized to prevent sync issues with auth state.
+app.use(router)
+app.mount("#app");
+
+// Remove the hash from the URL as it is not needed after initialization and can cause issues with routing.
+router.isReady().then(() => {
+  if (window.location.hash) {
+    const url = new URL(window.location.href);
+    url.hash = '';
+    window.history.replaceState({}, document.title, url.toString());
+  }
 });
