@@ -45,8 +45,6 @@ public class ReleaseNoteService {
     releaseNote.setSummary(createReleaseNoteDTO.summary());
     releaseNote.setPublished(createReleaseNoteDTO.published() != null && createReleaseNoteDTO.published());
 
-    releaseNote = releaseNoteRepository.save(releaseNote);
-
     List<ChangeNote> changeNotesInReleaseNote = new ArrayList<>();
     if (createReleaseNoteDTO.changeNoteIds() != null) {
       for (Long changeNoteId : createReleaseNoteDTO.changeNoteIds()) {
@@ -56,16 +54,22 @@ public class ReleaseNoteService {
         if (changeNote.getReleaseNote() != null) {
           throw new ChangeNoteAlreadyHasReleaseNoteException(changeNoteId, changeNote.getReleaseNote().getId());
         }
-
-        changeNote.setReleaseNote(releaseNote);
-        changeNoteRepository.save(changeNote);
         changeNotesInReleaseNote.add(changeNote);
       }
+
     }
+    
+    releaseNote = releaseNoteRepository.save(releaseNote);
 
     releaseNote.setChangeNotes(changeNotesInReleaseNote);
+    for (ChangeNote changeNote : changeNotesInReleaseNote) {
+      changeNote.setReleaseNote(releaseNote);
+      changeNoteRepository.save(changeNote);
+    }
 
-    return releaseNoteRepository.save(releaseNote).getId();
+    releaseNote = releaseNoteRepository.save(releaseNote);
+
+    return releaseNote.getId();
   }
 
   /**
