@@ -52,6 +52,7 @@
         "changeNoteUnpublishError": "An error occurred while unpublishing change note",
         "changeNoteUpdatedSuccess": "Change note updated successfully",
         "changeNoteUpdateError": "An error occurred while updating the change note",
+        "changeNoteLoadingError": "An error occurred while loading change note",
         "selectedChangeNotesPublished": "Selected change notes published successfully",
         "selectedChangeNotesPublishError": "Selected change notes could not be published",
         "releaseNoteCreated": "Release note created successfully",

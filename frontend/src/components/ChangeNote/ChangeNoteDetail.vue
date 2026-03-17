@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { EllipsisVertical, Eye, Pencil, Trash2 } from 'lucide-vue-next';
+import { EllipsisVertical, Eye, Pencil, Sparkles, Trash2 } from 'lucide-vue-next';
 import DeletePrompt from '../DeletePrompt.vue';
 import { computed, ref } from 'vue';
 import { useArchiveChangeNote, usePublishChangeNote } from '@/api/change-note-api';
@@ -104,8 +104,8 @@ class="h-6"
               :variant="changeNote.published ? 'success' : 'destructive'">{{ changeNote.published ?
                 'Published' : 'Private' }}</Badge>
           </div>
-          <div class="flex gap-4">
-            <Button v-if="!(locale === 'en')" variant="outline" @click="onTranslate">{{hasTranslation ? t('button.undo') : t('button.translate') }}</Button>
+          <div class="flex gap-4 justify-center items-center">
+            <Button v-if="!(locale === 'en')" variant="glow" @click="onTranslate">{{hasTranslation ? t('button.undo') : t('button.translate') }} <Sparkles /></Button>
             <DropdownMenu>
               <DropdownMenuTrigger
                 class="cursor-pointer hover:bg-border/50 rounded-md p-2 transition-colors">

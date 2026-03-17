@@ -53,6 +53,7 @@
         "changeNoteUnpublishError": "Det oppsto en feil under avpublisering av endringsnotat",
         "changeNoteUpdatedSuccess": "Endringsnotat oppdatert",
         "changeNoteUpdateError": "Det oppsto en feil under oppdatering av endringsnotat",
+        "changeNoteLoadingError": "Det oppsto en feil under innlastning av endringsnotat",
         "selectedChangeNotesPublished": "Valgte endringsnotater publisert",
         "selectedChangeNotesPublishError": "Kunne ikke publisere valgte endringsnotater",
         "releaseNoteCreated": "Utgivelsesnotat opprettet",
