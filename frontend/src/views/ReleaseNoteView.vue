@@ -31,10 +31,14 @@ import { isAdmin } from '@/utils/keycloak';
 import { useTranslate } from '@/api/ai';
 import type { ChangeNote } from '@/utils/types';
 
-const isEditing = ref(false)
-
 const route = useRoute();
 const { t, locale } = useI18n();
+const isEditing = ref(route.query.edit === 'true');
+
+if (route.query.edit !== undefined) {
+  delete route.query.edit;
+  router.replace({ query: route.query });
+}
 
 const id = route.params.id as string;
 

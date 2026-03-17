@@ -34,8 +34,6 @@ const initialSelections = getInitialSelections();
 const { selection, ...initialSearchParams } = initialSelections;
 const searchParams = ref(initialSearchParams);
 
-console.log('Initial search parameters:', searchParams.value);
-
 const { isLoading, isFetching, isError, data } = useGetChangeNotes(searchParams);
 
 const initialSelection = selection ?? '';

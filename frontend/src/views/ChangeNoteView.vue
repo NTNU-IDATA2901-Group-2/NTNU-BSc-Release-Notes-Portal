@@ -9,10 +9,16 @@ import ChangeNoteEdit from '@/components/ChangeNote/ChangeNoteEdit.vue';
 import ChangeNoteDetail from '@/components/ChangeNote/ChangeNoteDetail.vue';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../components/ui/breadcrumb';
 import { useI18n } from 'vue-i18n';
+import { router } from '@/utils/router';
 
 const route = useRoute();
 
 const isEditing = ref(route.query.edit === 'true');
+
+if (route.query.edit !== undefined) {
+  delete route.query.edit;
+  router.replace({ query: route.query });
+}
 
 const { t } = useI18n();
 

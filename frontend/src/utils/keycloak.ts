@@ -32,9 +32,6 @@ keycloak.onAuthSuccess = () => {
   jwtTokenDecoded.value = keycloak.token
     ? jwtDecode<DecodedJwtToken>(keycloak.token)
     : undefined;
-
-  console.log('Authenticated: ', jwtToken.value);
-  console.log('Decoded Token: ', jwtTokenDecoded.value);
 };
 
 keycloak.onAuthLogout = () => {
