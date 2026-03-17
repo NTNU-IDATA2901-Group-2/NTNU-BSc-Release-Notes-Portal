@@ -222,7 +222,6 @@ export const useGetChangeNotes = (searchParams: Ref<Record<string, string>> | UR
  * @throws An error if the API request to retrieve the change notes fails.
  */
 export const getChangeNotes = async (params?: URLSearchParams) => {
-  console.log("Fetching change notes with params:", params?.toString());
   const response = await api.get(`changenotes`, { params });
   return response.data as ChangeNote[];
 }

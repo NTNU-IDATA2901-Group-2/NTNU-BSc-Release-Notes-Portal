@@ -44,6 +44,8 @@ const id = route.params.id as string;
 
 const { isPending, isFetching, isError, data: releaseNote } = useGetReleaseNote(id);
 
+console.log('Release note data:', releaseNote);
+
 const { mutate: archiveReleaseNote } = useArchiveReleaseNote(id,
   {
     onSettled: () => {
