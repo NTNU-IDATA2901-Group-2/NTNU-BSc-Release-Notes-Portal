@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -44,6 +45,7 @@ public class ChangeNoteController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PostMapping("")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<String> createChangeNote(@RequestBody(required = false) CreateChangeNoteDTO createChangeNoteDTO) {
     long id = changeNoteService.createChangeNote(createChangeNoteDTO);
       logger.info("Change note created with id: {}", id);
@@ -58,6 +60,7 @@ public class ChangeNoteController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PatchMapping("/{id}/archive")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<String> archiveChangeNote(@PathVariable long id) {
     changeNoteService.archiveChangeNote(id);
     logger.info("Change note archived with id: {}", id);
@@ -99,6 +102,7 @@ public class ChangeNoteController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PutMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<ChangeNoteDTO> updateChangeNote(@PathVariable long id, @RequestBody CreateChangeNoteDTO createChangeNoteDTO) {
     ChangeNoteDTO changeNote = changeNoteService.updateChangeNote(id, createChangeNoteDTO);
     logger.info("Updated change note with id: {}", id);
@@ -113,6 +117,7 @@ public class ChangeNoteController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PatchMapping("/{id}/publish")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<String> publishChangeNote(@PathVariable long id, @Valid @RequestParam boolean publish) {
     changeNoteService.publishChangeNote(id, publish);
     logger.info("Published change note with id: {}", id);

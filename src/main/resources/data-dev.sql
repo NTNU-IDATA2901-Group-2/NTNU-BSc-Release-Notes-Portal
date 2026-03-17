@@ -1,6 +1,6 @@
 -- AI generated sample data for change_note and release_note tables
 INSERT INTO change_note (id, archived, published, reference, description, developer_notes, upgrade_notes, change_source, product_id, customer_id, feature_id, scope_id, timestamp) VALUES
-(1, false, false, 'REF-001', 'Initial release', 'Dev notes 1', 'Upgrade notes 1', 'JIRA-11', 1, 1, 1, 1, 1706745600000),
+(1, false, false, 'REF-001', 'Initial release', 'Dev notes 1', 'Upgrade notes 1', 'JIRA-11', 1, null, 1, 1, 1706745600000),
 (2, false, false, 'REF-002', 'Added new feature X', 'Dev notes 2', 'Upgrade notes 2', 'JIRA-12', 2, 2, 2, 2, 1708300200000),
 (3, false, false, 'REF-003', 'Fixed bug Y', 'Dev notes 3', 'Upgrade notes 3', 'JIRA-13', 3, 3, 2, 3, 1710063900000),
 (4, false, false, 'REF-004', 'Added new feature Z', 'Dev notes 4', 'Upgrade notes 4', 'JIRA-14', 1, 1, 1, 1, 1711728500000),
