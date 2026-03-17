@@ -20,6 +20,7 @@ import { computed, provide, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue-sonner';
+import { isAdmin } from '@/utils/keycloak';
 
 const router = useRouter();
 const { t } = useI18n();
@@ -122,29 +123,28 @@ const onSearch = () => {
       <ScrollArea class="h-100 p-5">
         <Button class="mt-4" variant="outline" @click="clearFilters">{{ t('button.clearFilters')
         }}</Button>
-        <PublicPrivateFilter />
+        <PublicPrivateFilter v-if="isAdmin"/>
         <ProductFilter />
         <ScopeFilter />
         <FeatureFilter />
-        <CustomerFilter />
+        <CustomerFilter v-if="isAdmin" />
       </ScrollArea>
     </DrawerContent>
     <div class="min-h-screen w-full flex justify-center align-bottom mt-6">
       <div class="flex gap-8 flex-col h-min w-full md:flex-row justify-center p-4">
         <div class="h-min hidden md:block">
           <h1 class="text-3xl text-nowrap">Change Notes</h1>
-          <PublicPrivateFilter />
+          <PublicPrivateFilter v-if="isAdmin"/>
           <ProductFilter />
           <ScopeFilter />
           <FeatureFilter />
-          <CustomerFilter />
-          <Button class="mt-4" variant="outline" @click="clearFilters">{{ t('button.clearFilters')
-          }}</Button>
+          <CustomerFilter v-if="isAdmin" />
+          <Button class="mt-4" variant="outline" @click="clearFilters">{{ t('button.clearFilters') }}</Button>
         </div>
 
         <div class="flex flex-col w-full gap-4 max-w-4xl">
           <div class="w-full flex flex-col md:flex-row-reverse justify-center md:justify-end gap-2">
-            <div class="flex justify-center gap-2 flex-wrap md:flex-nowrap">
+            <div class="flex justify-center gap-2 flex-wrap md:flex-nowrap" v-if="isAdmin">
               <Button variant="outline" @click="handlePublish">
                 {{ t('button.publish') }}
                 <Eye />
@@ -179,7 +179,7 @@ const onSearch = () => {
             </div>
           </div>
 
-          <div>
+          <div v-if="isAdmin">
             <MultiselectChangeNotes v-model="selectedChangeNotes" />
           </div>
 

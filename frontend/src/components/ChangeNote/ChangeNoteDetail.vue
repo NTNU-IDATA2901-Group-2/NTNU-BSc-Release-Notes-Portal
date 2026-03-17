@@ -16,6 +16,8 @@ import { useArchiveChangeNote, usePublishChangeNote } from '@/api/change-note-ap
 import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';
 import { useI18n } from 'vue-i18n';
+import { isAdmin } from '@/utils/keycloak';
+import md from '@/utils/markdown-it';
 
 const { t, locale } = useI18n();
 
@@ -99,14 +101,14 @@ const onTranslate = async () => {
           <div class="flex items-center gap-4">
             <h1 class="text-3xl max-w-60 whitespace-nowrap overflow-hidden">{{
               changeNote.reference }}</h1>
-            <Badge
-class="h-6"
+            <Badge 
+              v-if="isAdmin" class="h-6"
               :variant="changeNote.published ? 'success' : 'destructive'">{{ changeNote.published ?
                 'Published' : 'Private' }}</Badge>
           </div>
           <div class="flex gap-4 justify-center items-center">
             <Button v-if="!(locale === 'en')" variant="glow" @click="onTranslate">{{hasTranslation ? t('button.undo') : t('button.translate') }} <Sparkles /></Button>
-            <DropdownMenu>
+            <DropdownMenu v-if="isAdmin">
               <DropdownMenuTrigger
                 class="cursor-pointer hover:bg-border/50 rounded-md p-2 transition-colors">
                 <EllipsisVertical class="text-text-primary" />
@@ -145,13 +147,13 @@ class="h-6"
       </div>
       <Separator class="w-full h-2" />
       <div class="flex flex-col w-full text-xl gap-10">
-        <div>
+        <div v-if="changeNote.developerNotes">
           <h3 class="text-2xl">{{ t('title.developerNotes') }}</h3>
-          <div class="text-text-primary" v-html="md.render(changeNote.developerNotes)"></div>
+          <div class="text-text-primary"  v-html="md.render(changeNote.developerNotes)"></div>
         </div>
-        <div>
+        <div v-if="changeNote.upgradeNotes">
           <h3 class="text-2xl">{{ t('title.upgradeRequirements') }}</h3>
-          <p v-html="md.render(changeNote.upgradeNotes)"></p>
+          <p  v-html="md.render(changeNote.upgradeNotes)"></p>
         </div>
       </div>
     </div>

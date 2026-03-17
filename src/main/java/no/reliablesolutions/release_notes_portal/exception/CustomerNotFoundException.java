@@ -10,4 +10,9 @@ public class CustomerNotFoundException extends RuntimeException {
     super("Customer with ID " + customerId + " not found");
     this.customerId = customerId;
   }
+
+  public CustomerNotFoundException(String name) {
+    super("Customer with name " + name + " not found");
+    this.customerId = null;
+  }
 }
