@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
@@ -127,10 +128,12 @@ public class ReleaseNoteService {
       throw new ReleaseNoteNotFoundException(id);
     }
 
+    List<String> customerGroups = accessScope.getCustomerGroups();
     boolean isAdmin = AuthenticationUtil.isAdmin();
     if (!isAdmin) {
+      LoggerFactory.getLogger(ReleaseNoteService.class).warn("Filtering release note with id {} for customer groups: {}", id, customerGroups);
       releaseNoteOptional.get().getChangeNotes().removeIf(changeNote -> !changeNote.isPublished());
-      
+      releaseNoteOptional.get().getChangeNotes().removeIf(changeNote -> !customerGroups.contains(changeNote.getCustomer().getName().toUpperCase()));  
 
       releaseNoteOptional.get().getChangeNotes().forEach(changeNote -> {
         changeNote.setDeveloperNotes(null);
