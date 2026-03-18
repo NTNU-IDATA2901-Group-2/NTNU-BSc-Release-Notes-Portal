@@ -9,14 +9,13 @@ import ReleaseNoteEdit from '@/components/releaseNote/ReleaseNoteEdit.vue';
 import ReleaseNoteDetail from '@/components/releaseNote/ReleaseNoteDetail.vue';
 
 const route = useRoute();
+const { t } = useI18n();
 const isEditing = ref(route.query.edit === 'true');
 
 if (route.query.edit !== undefined) {
   delete route.query.edit;
   router.replace({ query: route.query });
 }
-
-const { t } = useI18n();
 
 const id = route.params.id as string;
 

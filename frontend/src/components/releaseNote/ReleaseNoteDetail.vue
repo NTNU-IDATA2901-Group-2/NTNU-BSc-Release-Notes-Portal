@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { exportToPdf } from '@/utils/pdf';
 import { useArchiveReleaseNote, usePublishReleaseNote } from '@/api/release-note-api';
-import type { ReleaseNote } from '@/utils/types';
+import type { ChangeNote, ReleaseNote } from '@/utils/types';
 import { useRouter } from 'vue-router';
 import { routeNames } from '@/utils/router';
 import { toast } from 'vue-sonner';
@@ -16,6 +16,7 @@ import { Badge } from '../ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { Separator } from '../ui/separator';
 import { Button } from '../ui/button';
+import { useTranslate } from '@/api/ai';
 
 const props = defineProps<{
   releaseNote: ReleaseNote;
@@ -24,7 +25,7 @@ const props = defineProps<{
 const isEditing = defineModel("isEditing", { type: Boolean, required: true });
 
 const router = useRouter();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const releaseNote = props.releaseNote;
 
@@ -65,7 +66,6 @@ const publishReleaseNoteMutation = usePublishReleaseNote({
   }
 })
 
-
 const releaseNoteRef = ref<HTMLDivElement>();
 
 const handleExport = () => {
@@ -77,6 +77,52 @@ const handleExport = () => {
     toast.error(t('toast.exportPdfError'));
   }
 }
+
+const translateMutation = useTranslate({
+  onSuccess: () => {
+    toast.success(t('toast.translationSuccess'));
+  },
+  onError: () => {
+    toast.error(t('toast.translationError'));
+  },
+});
+
+const translatedChangeNotes = ref<ChangeNote[] | null>(null);
+const translatedSummary = ref<string | null>(null);
+const hasTranslation = computed(() => translatedSummary.value !== null && translatedChangeNotes.value !== null);
+
+const onTranslate = async () => {
+  if (translatedSummary.value || translatedChangeNotes.value) {
+    translatedSummary.value = null;
+    translatedChangeNotes.value = null;
+    return;
+  }
+
+  const summaryResult = await translateMutation.mutateAsync({ 
+    text: releaseNote.summary || '',
+    locale: locale.value,
+  });
+
+  translatedSummary.value = summaryResult;
+
+  if (releaseNote.changeNotes) {
+    releaseNote.changeNotes.forEach(async (changeNote, index) => {
+      const result = await translateMutation.mutateAsync({
+        text: changeNote.description,
+        locale: locale.value,
+      });
+
+      if (result) {
+        if (!translatedChangeNotes.value) translatedChangeNotes.value = [];
+        translatedChangeNotes.value[index] = {
+          ...changeNote,
+          description: result,
+        }
+      }
+    })
+  }
+}
+
 
 </script>
 
@@ -115,6 +161,7 @@ const handleExport = () => {
                 releaseNote.published ? 'Published' : 'Private' }}</Badge>
           </div>
           <div data-pdf-exclude class="flex gap-4">
+            <Button type="button" v-if="!(locale === 'en')" variant="glow" @click="onTranslate">{{hasTranslation ? t('button.undo') : t('button.translate') }} <Sparkles /></Button>
             <DropdownMenu>
               <DropdownMenuTrigger
                 class="cursor-pointer hover:bg-border/50 rounded-md p-2 transition-colors">
@@ -154,7 +201,8 @@ const handleExport = () => {
           </div>
         </div>
 
-        <p v-if="releaseNote.summary" v-html="md.render(releaseNote.summary)"></p>
+        <p v-if="releaseNote.summary" v-html="md.render(translatedSummary ?? releaseNote.summary)"></p>
+        <p v-if="hasTranslation" class="text-text-primary/50 text-right">{{ t('ai.translationDisclaimer') }}</p>
       </div>
       <Separator class="w-full h-2" />
       <div class="flex flex-col w-full gap-10">
@@ -162,13 +210,14 @@ const handleExport = () => {
 
         <div class="flex flex-col gap-16">
           <div 
-            v-for="change in releaseNote.changeNotes" :key="change.id"
+            v-for="change in translatedChangeNotes ?? releaseNote.changeNotes" :key="change.id"
             class="flex flex-col gap-2">
 
             <h3 class="text-2xl">{{ change.reference }}</h3>
             <div>
               <h3 class="text-xl" data-pdf-exclude>{{ t('title.description') }}</h3>
-              <p class="ml-4" v-html="md.render(change.description)"></p>
+              <p class="ml-4" v-if="change.description" v-html="md.render(change.description)"></p>
+              <p v-if="hasTranslation" class="text-text-primary/50 text-right" data-pdf-exclude>{{ t('ai.translationDisclaimer') }}</p>
             </div>
             <div v-if="change.developerNotes" data-pdf-exclude>
               <h3 class="text-xl">{{ t('title.developerNotes') }}</h3>

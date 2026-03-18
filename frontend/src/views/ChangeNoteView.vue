@@ -55,7 +55,7 @@ const { isPending, isFetching, isError, data: changeNote } = useGetChangeNote(id
     <div v-else-if="isPending || isFetching">
       <Spinner />
     </div>
-    <h1 v-else-if="isError">{{ t('loadingError.changeNote') }}</h1>
+    <h1 v-else-if="isError">{{ t('toast.changeNoteLoadingError') }}</h1>
 
   </div>
 </template>
