@@ -19,6 +19,7 @@ import MenubarTrigger from './ui/menubar/MenubarTrigger.vue';
 import MenubarContent from './ui/menubar/MenubarContent.vue';
 import MenubarSeparator from './ui/menubar/MenubarSeparator.vue';
 import { i18n } from '@/utils/i18n';
+import { isAdmin } from '@/utils/keycloak';
 
 const { theme } = useTheme()
 const { t } = useI18n()
@@ -92,13 +93,15 @@ const handleLogoClick = () => {
 							</MenubarItem>
 						</MenubarSubContent>
 					</MenubarSub>
-					<MenubarSeparator/>
-					<MenubarItem>
-						<div class="w-full flex justify-end gap-2">
-							<RouterLink class="text-md" :to="routeNames.gitRepositories">{{ t('header.repositories') }}</RouterLink>
-							<GitBranch class="text-text-primary"/>
-						</div>
-					</MenubarItem>
+          <template v-if="isAdmin">
+            <MenubarSeparator/>
+            <MenubarItem>
+              <div class="w-full flex justify-end gap-2">
+                <RouterLink class="text-md" :to="routeNames.gitRepositories">{{ t('header.repositories') }}</RouterLink>
+                <GitBranch class="text-text-primary"/>
+              </div>
+            </MenubarItem>
+          </template>
 					<MenubarSeparator />
 					<MenubarItem @click="handleLogOut">
 						<div class="w-full flex gap-2">

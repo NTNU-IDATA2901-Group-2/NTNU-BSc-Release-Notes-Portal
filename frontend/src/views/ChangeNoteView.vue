@@ -5,8 +5,8 @@ import Spinner from '@/components/ui/spinner/Spinner.vue';
 import { ArrowLeft } from "lucide-vue-next"
 import { ref } from 'vue';
 import { useGetChangeNote } from '@/api/change-note-api';
-import ChangeNoteEdit from '@/components/ChangeNote/ChangeNoteEdit.vue';
-import ChangeNoteDetail from '@/components/ChangeNote/ChangeNoteDetail.vue';
+import ChangeNoteEdit from '@/components/changeNote/ChangeNoteEdit.vue';
+import ChangeNoteDetail from '@/components/changeNote/ChangeNoteDetail.vue';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../components/ui/breadcrumb';
 import { useI18n } from 'vue-i18n';
 import { router } from '@/utils/router';
