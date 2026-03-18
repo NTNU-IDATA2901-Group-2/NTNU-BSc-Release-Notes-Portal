@@ -87,4 +87,8 @@ public class CustomerService {
         .orElseThrow(() -> new CustomerNotFoundException(id));
     customerRepository.delete(customer);
   }
+
+  public List<Customer> getCustomerByName(String customer) {
+    return customerRepository.findAllByNameIgnoreCase(customer);
+  }
 }

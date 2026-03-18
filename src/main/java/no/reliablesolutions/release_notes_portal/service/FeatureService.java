@@ -87,4 +87,8 @@ public class FeatureService {
         .orElseThrow(() -> new FeatureNotFoundException(id));
     featureRepository.delete(feature);
   }
+
+  public List<Feature> getFeatureByName(String feature) {
+    return featureRepository.findAllByNameIgnoreCase(feature);
+  }
 }

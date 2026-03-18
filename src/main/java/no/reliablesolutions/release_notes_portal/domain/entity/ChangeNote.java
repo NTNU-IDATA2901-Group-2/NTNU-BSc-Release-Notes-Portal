@@ -25,8 +25,7 @@ public class ChangeNote {
   private String description = "";
   private String developerNotes = "";
   private String upgradeNotes = "";
-  private String changeSource = "";
-  private final long timestamp = new Date().getTime();
+  private final long creationTimestamp = new Date().getTime();
   private boolean published = false;
   private boolean archived = false;
 
@@ -45,4 +44,11 @@ public class ChangeNote {
 
   @ManyToOne(optional = true)
   private Customer customer;
+
+  private String gitCommitHash;
+
+  private Long gitCommitTimestamp;
+
+  @ManyToOne(optional = true)
+  private GitRepository gitRepository;
 }

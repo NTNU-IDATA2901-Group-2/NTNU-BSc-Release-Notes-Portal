@@ -40,7 +40,7 @@ public class ChangeNoteService {
    * @throws FeatureNotFoundException  if the specified feature ID does not exist
    * @throws CustomerNotFoundException if the specified customer ID does not exist
    */
-  public long createChangeNote(CreateChangeNoteDTO changeNoteDTO) {
+  public long createChangeNoteFromDto(CreateChangeNoteDTO changeNoteDTO) {
     ChangeNote changeNote = new ChangeNote();
 
     if (changeNoteDTO != null) {
@@ -48,7 +48,6 @@ public class ChangeNoteService {
       changeNote.setDescription(changeNoteDTO.description());
       changeNote.setDeveloperNotes(changeNoteDTO.developerNotes());
       changeNote.setUpgradeNotes(changeNoteDTO.upgradeNotes());
-      changeNote.setChangeSource(changeNoteDTO.changeSource());
       
       if (changeNoteDTO.published() != null) {
         changeNote.setPublished(changeNoteDTO.published());
@@ -77,6 +76,10 @@ public class ChangeNoteService {
     }
 
     return changeNoteRepository.save(changeNote).getId();
+  }
+
+  public void updateChangeNote(ChangeNote changeNote) {
+    changeNoteRepository.save(changeNote);
   }
 
   /**

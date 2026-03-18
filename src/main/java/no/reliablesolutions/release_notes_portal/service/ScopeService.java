@@ -56,6 +56,10 @@ public class ScopeService {
     return ScopeDTO.fromScope(scope);
   }
 
+  public List<Scope> getScopeByName(String name) {
+    return scopeRepository.findAllByNameIgnoreCase(name);
+  }
+
   /**
    * Updates an existing scope with new details from the provided DTO.
    *

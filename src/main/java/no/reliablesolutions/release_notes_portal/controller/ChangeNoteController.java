@@ -45,7 +45,7 @@ public class ChangeNoteController {
   })
   @PostMapping("")
   public ResponseEntity<String> createChangeNote(@RequestBody(required = false) CreateChangeNoteDTO createChangeNoteDTO) {
-    long id = changeNoteService.createChangeNote(createChangeNoteDTO);
+    long id = changeNoteService.createChangeNoteFromDto(createChangeNoteDTO);
       logger.info("Change note created with id: {}", id);
       return ResponseEntity.status(HttpStatus.CREATED).body(String.valueOf(id));
   }

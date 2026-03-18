@@ -50,8 +50,7 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
         LOWER(c.reference) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
         LOWER(c.description) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
         LOWER(c.developerNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
-        LOWER(c.upgradeNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
-        LOWER(c.changeSource) LIKE LOWER('%' || :#{#filterOptions.query} || '%'))
+        LOWER(c.upgradeNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%'))
       """)
     public List<ChangeNote> findByArchivedFalseAndMatchingFilterParameters(@Param("filterOptions") ChangeNoteFilterOptionsDTO filterOptions);
 }
