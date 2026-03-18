@@ -131,7 +131,7 @@ const onSearch = () => {
     <div class="min-h-screen w-full flex justify-center align-bottom mt-6">
       <div class="flex gap-8 flex-col h-min w-full md:flex-row justify-center p-4">
         <div class="h-min hidden md:block">
-          <h1 class="text-3xl text-nowrap">Change Notes</h1>
+          <h1 class="text-3xl text-nowrap">{{ t('title.changeNotes') }}</h1>
           <PublicPrivateFilter v-if="isAdmin"/>
           <ProductFilter />
           <ScopeFilter />

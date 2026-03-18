@@ -144,7 +144,7 @@ const onTranslate = async () => {
       <Breadcrumb class="text-text-primary">
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/">Release Notes</BreadcrumbLink>
+            <BreadcrumbLink href="/">{{ t('title.releaseNotes') }}</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>

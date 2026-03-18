@@ -36,7 +36,7 @@ const { isPending, isFetching, isError, data: changeNote } = useGetChangeNote(id
       <Breadcrumb class="text-text-primary">
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/change-notes">Change Notes</BreadcrumbLink>
+            <BreadcrumbLink href="/change-notes">{{ t('title.changeNotes') }}</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
