@@ -20,7 +20,7 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
   /**
    * Finds all non-archived change notes that match the provided filter parameters.
    * 
-   * @param query          optional filter for searching change notes by reference, description, developer notes, upgrade notes, or change source
+   * @param query          optional filter for searching change notes by reference, description, developer notes or upgrade notes
    * @param published      optional filter for published status
    * @param hasReleaseNote optional filter for change notes that have an associated release note
    * @param filteredIds    optional filter for specific change note IDs

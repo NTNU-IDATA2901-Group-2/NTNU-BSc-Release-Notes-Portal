@@ -98,7 +98,7 @@ public class ChangeNoteService {
   /**
    * Retrieves all change notes from the repository, with optional filtering based on query, published status, customer ID, feature ID, scope ID, and product ID.
    * 
-   * @param query          optional filter for searching change notes by reference, description, developer notes, upgrade notes, or change source
+   * @param query          optional filter for searching change notes by reference, description, developer notes or upgrade notes
    * @param published      optional filter for published status
    * @param hasReleaseNote optional filter for change notes that have an associated release note
    * @param customerIds    optional filter for customer ID
@@ -152,7 +152,6 @@ public class ChangeNoteService {
     changeNote.setDescription(createChangeNoteDTO.description());
     changeNote.setDeveloperNotes(createChangeNoteDTO.developerNotes());
     changeNote.setUpgradeNotes(createChangeNoteDTO.upgradeNotes());
-    changeNote.setChangeSource(createChangeNoteDTO.changeSource());
 
     if (createChangeNoteDTO.productId() != null) {
       changeNote.setProduct(productRepository.findById(createChangeNoteDTO.productId())
