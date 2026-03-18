@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { exportToPdf } from '@/utils/pdf';
 import { useArchiveReleaseNote, usePublishReleaseNote } from '@/api/release-note-api';
 import type { ChangeNote, ReleaseNote } from '@/utils/types';
@@ -8,7 +8,7 @@ import { routeNames } from '@/utils/router';
 import { toast } from 'vue-sonner';
 import { useI18n } from 'vue-i18n';
 import { isAdmin } from '@/utils/keycloak';
-import { Pencil, Trash2, Eye, EyeOff, FileDown, ArrowLeft, EllipsisVertical } from "lucide-vue-next"
+import { Pencil, Trash2, Eye, EyeOff, FileDown, ArrowLeft, EllipsisVertical, Sparkles } from "lucide-vue-next"
 import md from '@/utils/markdown-it';
 import DeletePrompt from '../DeletePrompt.vue';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../ui/breadcrumb';
@@ -17,6 +17,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Separator } from '../ui/separator';
 import { Button } from '../ui/button';
 import { useTranslate } from '@/api/ai';
+import Spinner from '../ui/spinner/Spinner.vue';
 
 const props = defineProps<{
   releaseNote: ReleaseNote;
@@ -89,16 +90,19 @@ const translateMutation = useTranslate({
 
 const translatedChangeNotes = ref<ChangeNote[] | null>(null);
 const translatedSummary = ref<string | null>(null);
-const hasTranslation = computed(() => translatedSummary.value !== null && translatedChangeNotes.value !== null);
+const hasTranslation = ref(false);
+const isTranslating = ref(false);
 
 const onTranslate = async () => {
   if (translatedSummary.value || translatedChangeNotes.value) {
     translatedSummary.value = null;
     translatedChangeNotes.value = null;
+    hasTranslation.value = false;
     return;
   }
 
-  const summaryResult = await translateMutation.mutateAsync({ 
+  isTranslating.value = true;
+  const summaryResult = await translateMutation.mutateAsync({
     text: releaseNote.summary || '',
     locale: locale.value,
   });
@@ -121,6 +125,9 @@ const onTranslate = async () => {
       }
     })
   }
+
+  hasTranslation.value = true;
+  isTranslating.value = false;
 }
 
 
@@ -161,7 +168,13 @@ const onTranslate = async () => {
                 releaseNote.published ? 'Published' : 'Private' }}</Badge>
           </div>
           <div data-pdf-exclude class="flex gap-4">
-            <Button type="button" v-if="!(locale === 'en')" variant="glow" @click="onTranslate">{{hasTranslation ? t('button.undo') : t('button.translate') }} <Sparkles /></Button>
+            <Button 
+              type="button" v-if="!(locale === 'en')" variant="glow" @click="onTranslate"
+              :disabled="isTranslating" class="inline-flex items-center gap-2">
+              {{ hasTranslation ? t('button.undo') : t('button.translate') }}
+                <Spinner v-if="isTranslating" />
+                <Sparkles v-else/>
+            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger
                 class="cursor-pointer hover:bg-border/50 rounded-md p-2 transition-colors">
@@ -201,8 +214,11 @@ const onTranslate = async () => {
           </div>
         </div>
 
-        <p v-if="releaseNote.summary" v-html="md.render(translatedSummary ?? releaseNote.summary)"></p>
-        <p v-if="hasTranslation" class="text-text-primary/50 text-right">{{ t('ai.translationDisclaimer') }}</p>
+        <p v-if="releaseNote.summary" v-html="md.render(translatedSummary ?? releaseNote.summary)">
+        </p>
+        <p v-if="hasTranslation" class="text-text-primary/50 text-right">{{
+          t('ai.translationDisclaimer') }}
+        </p>
       </div>
       <Separator class="w-full h-2" />
       <div class="flex flex-col w-full gap-10">
@@ -217,7 +233,8 @@ const onTranslate = async () => {
             <div>
               <h3 class="text-xl" data-pdf-exclude>{{ t('title.description') }}</h3>
               <p class="ml-4" v-if="change.description" v-html="md.render(change.description)"></p>
-              <p v-if="hasTranslation" class="text-text-primary/50 text-right" data-pdf-exclude>{{ t('ai.translationDisclaimer') }}</p>
+              <p v-if="hasTranslation" class="text-text-primary/50 text-right" data-pdf-exclude>{{
+                t('ai.translationDisclaimer') }}</p>
             </div>
             <div v-if="change.developerNotes" data-pdf-exclude>
               <h3 class="text-xl">{{ t('title.developerNotes') }}</h3>
