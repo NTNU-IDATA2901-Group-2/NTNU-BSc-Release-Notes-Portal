@@ -129,6 +129,17 @@ public class ChangeNoteService {
           .toList();
 
     } else {
+      filterOptions = new ChangeNoteFilterOptionsDTO(
+          filterOptions.query(),
+          true,
+          filterOptions.hasReleaseNote(),
+          filterOptions.filteredIds(),
+          filterOptions.customerIds(),
+          filterOptions.featureIds(),
+          filterOptions.scopeIds(),
+          filterOptions.productIds()
+      );
+      
       return changeNoteRepository.findForCustomerNamesMatchingFilterParameters(accessScope.getCustomerGroups(), filterOptions).stream()
           .map(note -> {
             note.setDeveloperNotes(null);
@@ -155,6 +166,9 @@ public class ChangeNoteService {
     if (!isAdmin) {
       ChangeNote changeNote = changeNoteRepository.findForCustomerByIdAndArchivedFalse(id, accessScope.getCustomerGroups()).orElseThrow(() -> new ChangeNoteNotFoundException(id));
 
+      if (!changeNote.isPublished()) {
+        throw new ChangeNoteNotFoundException(id);
+      }
       return ChangeNoteMapper.toDTO(changeNote, accessScope);
     } else {
       ChangeNote changeNote = changeNoteRepository.findByIdAndArchivedFalse(id).orElseThrow(() -> new ChangeNoteNotFoundException(id));

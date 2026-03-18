@@ -102,7 +102,7 @@ public class ReleaseNoteService {
 
     } else {
       List<String> customerGroups = AuthenticationUtil.getCustomerGroups();
-      return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParametersForCustomers(query, published, productIds, customerGroups).stream().map(releaseNote -> {
+      return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParametersForCustomers(query, true, productIds, customerGroups).stream().map(releaseNote -> {
         releaseNote.getChangeNotes().forEach(changeNote -> {
           changeNote.setDeveloperNotes(null);
           changeNote.setUpgradeNotes(null);
@@ -129,11 +129,18 @@ public class ReleaseNoteService {
 
     boolean isAdmin = AuthenticationUtil.isAdmin();
     if (!isAdmin) {
+      releaseNoteOptional.get().getChangeNotes().removeIf(changeNote -> !changeNote.isPublished());
+      
+
       releaseNoteOptional.get().getChangeNotes().forEach(changeNote -> {
         changeNote.setDeveloperNotes(null);
         changeNote.setUpgradeNotes(null);
       });
+      if (releaseNoteOptional.get().getPublished().equals(false)) {
+        throw new ReleaseNoteNotFoundException(id);
+      }
     }
+
 
     return ReleaseNoteMapper.toDTO(releaseNoteOptional.get(), accessScope);
   }

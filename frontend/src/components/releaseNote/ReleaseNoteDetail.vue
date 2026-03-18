@@ -172,7 +172,7 @@ const onTranslate = async () => {
               type="button" v-if="!(locale === 'en')" variant="glow" @click="onTranslate"
               :disabled="isTranslating" class="inline-flex items-center gap-2">
               {{ hasTranslation ? t('button.undo') : t('button.translate') }}
-                <Spinner v-if="isTranslating" />
+                <Spinner v-if="isTranslating" class="h-4 dark:text-text-primary"/>
                 <Sparkles v-else/>
             </Button>
             <DropdownMenu>
@@ -229,7 +229,10 @@ const onTranslate = async () => {
             v-for="change in translatedChangeNotes ?? releaseNote.changeNotes" :key="change.id"
             class="flex flex-col gap-2">
 
-            <h3 class="text-2xl">{{ change.reference }}</h3>
+            <div class="flex items-center gap-4">
+              <h3 class="text-2xl">{{ change.reference }}</h3>
+              <Badge v-if="change.customer" :variant="'outline'">{{ change.customer.name }}</Badge>
+            </div>
             <div>
               <h3 class="text-xl" data-pdf-exclude>{{ t('title.description') }}</h3>
               <p class="ml-4" v-if="change.description" v-html="md.render(change.description)"></p>

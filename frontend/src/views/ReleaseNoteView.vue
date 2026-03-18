@@ -25,7 +25,9 @@ const { isPending, isFetching, isError, data: releaseNote } = useGetReleaseNote(
 
 <template>
   <Spinner v-if="isPending || isFetching" />
-  <p v-else-if="isError">{{ t('loadingError.releaseNotes') }}</p>
+  <div v-else-if="isError" class="flex flex-col items-center justify-center gap-4">
+    <p>{{ t('loadingError.releaseNotes') }}</p>
+  </div>
   <ReleaseNoteEdit v-else-if="releaseNote != null  && isEditing" :release-note="releaseNote" v-model:is-editing="isEditing"/>
   <ReleaseNoteDetail v-else-if="releaseNote != null" :release-note="releaseNote" v-model:is-editing="isEditing"/>
   <h1 v-else>{{ t('loadingError.releaseNotes') }}</h1>
