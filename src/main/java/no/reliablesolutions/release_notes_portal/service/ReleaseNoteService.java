@@ -133,7 +133,14 @@ public class ReleaseNoteService {
     if (!isAdmin) {
       LoggerFactory.getLogger(ReleaseNoteService.class).warn("Filtering release note with id {} for customer groups: {}", id, customerGroups);
       releaseNoteOptional.get().getChangeNotes().removeIf(changeNote -> !changeNote.isPublished());
-      releaseNoteOptional.get().getChangeNotes().removeIf(changeNote -> !customerGroups.contains(changeNote.getCustomer().getName().toUpperCase()));  
+
+
+      releaseNoteOptional.get().getChangeNotes().removeIf(changeNote -> {
+        if (changeNote.getCustomer() != null) {
+          return !customerGroups.contains(changeNote.getCustomer().getName().toUpperCase());
+        }
+        return false;
+      });  
 
       releaseNoteOptional.get().getChangeNotes().forEach(changeNote -> {
         changeNote.setDeveloperNotes(null);

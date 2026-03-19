@@ -18,6 +18,7 @@ import { Separator } from '../ui/separator';
 import { Button } from '../ui/button';
 import { useTranslate } from '@/api/ai';
 import Spinner from '../ui/spinner/Spinner.vue';
+import Checkbox from '../ui/checkbox/Checkbox.vue';
 
 const props = defineProps<{
   releaseNote: ReleaseNote;
@@ -130,7 +131,11 @@ const onTranslate = async () => {
   isTranslating.value = false;
 }
 
+const generalReleasesChecked = ref(true);
 
+const onGeneralReleasesToggle = () => {
+
+}
 </script>
 
 <template>
@@ -159,7 +164,7 @@ const onTranslate = async () => {
       class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
       <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-row items-center justify-between w-full">
-          <div class="flex items-center gap-4">
+          <div class="flex items-center sm:gap-4">
             <h1 class="text-4xl max-w-60 whitespace-nowrap overflow-hidden">{{
               releaseNote.tag }}</h1>
             <Badge 
@@ -167,7 +172,7 @@ const onTranslate = async () => {
               :variant="releaseNote.published ? 'success' : 'destructive'">{{
                 releaseNote.published ? 'Published' : 'Private' }}</Badge>
           </div>
-          <div data-pdf-exclude class="flex gap-4">
+          <div data-pdf-exclude class="flex sm:gap-4">
             <Button 
               type="button" v-if="!(locale === 'en')" variant="glow" @click="onTranslate"
               :disabled="isTranslating" class="inline-flex items-center gap-2">
@@ -222,31 +227,39 @@ const onTranslate = async () => {
       </div>
       <Separator class="w-full h-2" />
       <div class="flex flex-col w-full gap-10">
-        <h2 class="text-3xl">{{ t('title.changeNotes') }}</h2>
-
+        <div class="flex justify-between items-center">
+          <h2 class="text-3xl">{{ t('title.changeNotes') }}</h2>
+          <div class="flex gap-2">
+            <p data-pdf-exclude>{{ t('button.showGeneralChanges') }}</p>
+            <Checkbox data-pdf-exclude v-model="generalReleasesChecked" @update:model-value="onGeneralReleasesToggle"/>
+          </div>
+        </div>
         <div class="flex flex-col gap-16">
-          <div 
-            v-for="change in translatedChangeNotes ?? releaseNote.changeNotes" :key="change.id"
-            class="flex flex-col gap-2">
-
-            <div class="flex items-center gap-4">
-              <h3 class="text-2xl">{{ change.reference }}</h3>
-              <Badge v-if="change.customer" :variant="'outline'">{{ change.customer.name }}</Badge>
-            </div>
-            <div>
-              <h3 class="text-xl" data-pdf-exclude>{{ t('title.description') }}</h3>
-              <p class="ml-4" v-if="change.description" v-html="md.render(change.description)"></p>
-              <p v-if="hasTranslation" class="text-text-primary/50 text-right" data-pdf-exclude>{{
-                t('ai.translationDisclaimer') }}</p>
-            </div>
-            <div v-if="change.developerNotes" data-pdf-exclude>
-              <h3 class="text-xl">{{ t('title.developerNotes') }}</h3>
-              <p class="ml-4" v-html="md.render(change.developerNotes)"></p>
-            </div>
-            <div v-if="change.upgradeNotes" data-pdf-exclude>
-              <h3 class="text-xl">{{ t('title.upgradeRequirements') }}</h3>
-              <p class="ml-4" v-html="md.render(change.upgradeNotes)"></p>
-            </div>
+          <div class="flex flex-col gap-10">
+            <template 
+              v-for="change in translatedChangeNotes ?? releaseNote.changeNotes" :key="change.id"
+              >
+              <div v-if="generalReleasesChecked || change.customer !== null">
+                <div class="flex items-center gap-4">
+                  <h3 class="text-2xl">{{ change.reference }}</h3>
+                  <Badge v-if="change.customer" :variant="'outline'">{{ change.customer.name }}</Badge>
+                </div>
+                <div>
+                  <h3 class="text-xl" data-pdf-exclude>{{ t('title.description') }}</h3>
+                  <p class="ml-4" v-if="change.description" v-html="md.render(change.description)"></p>
+                  <p v-if="hasTranslation" class="text-text-primary/50 text-right" data-pdf-exclude>{{
+                    t('ai.translationDisclaimer') }}</p>
+                </div>
+                <div v-if="change.developerNotes" data-pdf-exclude>
+                  <h3 class="text-xl">{{ t('title.developerNotes') }}</h3>
+                  <p class="ml-4" v-html="md.render(change.developerNotes)"></p>
+                </div>
+                <div v-if="change.upgradeNotes" data-pdf-exclude>
+                  <h3 class="text-xl">{{ t('title.upgradeRequirements') }}</h3>
+                  <p class="ml-4" v-html="md.render(change.upgradeNotes)"></p>
+                </div>
+              </div>
+            </template>
           </div>
         </div>
       </div>

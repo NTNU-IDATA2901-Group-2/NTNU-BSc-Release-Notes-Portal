@@ -26,7 +26,8 @@
         "signIn": "Sign In",
         "clearFilters": "Clear Filters",
         "translate": "Translate",
-        "undo": "Undo"
+        "undo": "Undo",
+        "showGeneralChanges": "Show General Changes"
     },
     "title": {
         "title": "Title",

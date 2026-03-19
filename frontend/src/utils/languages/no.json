@@ -26,7 +26,8 @@
         "signIn": "Logg inn",
         "clearFilters": "Fjern filtre",
         "translate": "Oversett",
-        "undo": "Angre"
+        "undo": "Angre",
+        "showGeneralChanges": "Vis generelle endringer"
     },
     "title": {
         "title": "Tittel",
