@@ -132,10 +132,6 @@ const onTranslate = async () => {
 }
 
 const generalReleasesChecked = ref(true);
-
-const onGeneralReleasesToggle = () => {
-
-}
 </script>
 
 <template>
@@ -231,7 +227,7 @@ const onGeneralReleasesToggle = () => {
           <h2 class="text-3xl">{{ t('title.changeNotes') }}</h2>
           <div class="flex gap-2">
             <p data-pdf-exclude>{{ t('button.showGeneralChanges') }}</p>
-            <Checkbox data-pdf-exclude v-model="generalReleasesChecked" @update:model-value="onGeneralReleasesToggle"/>
+            <Checkbox data-pdf-exclude v-model="generalReleasesChecked"/>
           </div>
         </div>
         <div class="flex flex-col gap-16">
