@@ -46,11 +46,13 @@ public class ReleaseNoteService {
     releaseNote.setPublished(createReleaseNoteDTO.published() != null && createReleaseNoteDTO.published());
 
     List<ChangeNote> changeNotesInReleaseNote = new ArrayList<>();
-    for (Long changeNoteId : createReleaseNoteDTO.changeNoteIds()) {
-      ChangeNote changeNote = changeNoteRepository.findById(changeNoteId)
-          .orElseThrow(() -> new ChangeNoteNotFoundException(changeNoteId));
-      changeNotesInReleaseNote.add(changeNote);
+    if (createReleaseNoteDTO.changeNoteIds() != null) {
+      for (Long changeNoteId : createReleaseNoteDTO.changeNoteIds()) {
+        ChangeNote changeNote = changeNoteRepository.findById(changeNoteId)
+            .orElseThrow(() -> new ChangeNoteNotFoundException(changeNoteId));
+        changeNotesInReleaseNote.add(changeNote);
       }
+    }
       
     releaseNote.setChangeNotes(changeNotesInReleaseNote);
     releaseNote = releaseNoteRepository.save(releaseNote);
