@@ -2,6 +2,7 @@ package no.reliablesolutions.release_notes_portal.domain.entity;
 
 import java.util.Date;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,8 +23,11 @@ public class ChangeNote {
   private Long id;
 
   private String reference = "";
+  @Column(columnDefinition = "TEXT")
   private String description = "";
+  @Column(columnDefinition = "TEXT")
   private String developerNotes = "";
+  @Column(columnDefinition = "TEXT")
   private String upgradeNotes = "";
   private String changeSource = "";
   private final long timestamp = new Date().getTime();
