@@ -241,7 +241,8 @@ const onGeneralReleasesToggle = () => {
               >
               <div v-if="generalReleasesChecked || change.customer !== null">
                 <div class="flex items-center gap-4">
-                  <h3 class="text-2xl">{{ change.reference }}</h3>
+                  <RouterLink class="text-2xl text-text-dark-static hover:underline" :to="`${routeNames.changeNotes}/${change.id}`">{{ change.reference }}</RouterLink>
+
                   <Badge v-if="change.customer" :variant="'outline'">{{ change.customer.name }}</Badge>
                 </div>
                 <div>
