@@ -26,7 +26,7 @@ const router = useRouter();
 const { t } = useI18n();
 
 const getInitialSelections = () => {
-  const url = new URL(window.location.href);
+  const url = new URL(globalThis.location.href);
   return Object.fromEntries(url.searchParams.entries());
 }
 

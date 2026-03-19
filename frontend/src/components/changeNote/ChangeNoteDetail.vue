@@ -20,6 +20,7 @@ import { isAdmin } from '@/utils/keycloak';
 import md from '@/utils/markdown-it';
 import { useTranslate } from '@/api/ai';
 import Button from '../ui/button/Button.vue';
+import Spinner from '../ui/spinner/Spinner.vue';
 
 const { t, locale } = useI18n();
 
@@ -34,6 +35,7 @@ const emit = defineEmits<{
 
 const showDeletePrompt = ref(false);
 const translatedDescription = ref<string | null>(null);
+const isTranslating = ref(false);
 
 const deleteChangeNoteMutation = useArchiveChangeNote(props.changeNote.id, {
   onSuccess: () => {
@@ -81,11 +83,13 @@ const onTranslate = async () => {
     translatedDescription.value = null;
     return;
   }
+  isTranslating.value = true;
   const result = await translateMutation.mutateAsync({
     text: props.changeNote.description,
     locale: locale.value,
   });
   translatedDescription.value = result;
+  isTranslating.value = false;
   console.log("Translation result:", translatedDescription.value);
 }
 
@@ -105,7 +109,10 @@ const onTranslate = async () => {
                 'Published' : 'Private' }}</Badge>
           </div>
           <div class="flex gap-4 justify-center items-center">
-            <Button v-if="!(locale === 'en')" variant="glow" @click="onTranslate">{{hasTranslation ? t('button.undo') : t('button.translate') }} <Sparkles /></Button>
+            <Button :disabled="isTranslating" v-if="!(locale === 'en')" variant="glow" @click="onTranslate">{{hasTranslation ? t('button.undo') : t('button.translate') }}
+              <Spinner v-if="isTranslating" class="h-4 dark:text-text-primary"/>
+              <Sparkles v-else/> 
+            </Button>
             <DropdownMenu v-if="isAdmin">
               <DropdownMenuTrigger
                 class="cursor-pointer hover:bg-border/50 rounded-md p-2 transition-colors">

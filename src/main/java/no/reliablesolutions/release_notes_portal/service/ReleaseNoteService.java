@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
@@ -102,7 +103,7 @@ public class ReleaseNoteService {
 
     } else {
       List<String> customerGroups = AuthenticationUtil.getCustomerGroups();
-      return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParametersForCustomers(query, published, productIds, customerGroups).stream().map(releaseNote -> {
+      return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParametersForCustomers(query, true, productIds, customerGroups).stream().map(releaseNote -> {
         releaseNote.getChangeNotes().forEach(changeNote -> {
           changeNote.setDeveloperNotes(null);
           changeNote.setUpgradeNotes(null);
@@ -127,13 +128,29 @@ public class ReleaseNoteService {
       throw new ReleaseNoteNotFoundException(id);
     }
 
+    List<String> customerGroups = accessScope.getCustomerGroups();
     boolean isAdmin = AuthenticationUtil.isAdmin();
     if (!isAdmin) {
+      LoggerFactory.getLogger(ReleaseNoteService.class).warn("Filtering release note with id {} for customer groups: {}", id, customerGroups);
+      releaseNoteOptional.get().getChangeNotes().removeIf(changeNote -> !changeNote.isPublished());
+
+
+      releaseNoteOptional.get().getChangeNotes().removeIf(changeNote -> {
+        if (changeNote.getCustomer() != null) {
+          return !customerGroups.contains(changeNote.getCustomer().getName().toUpperCase());
+        }
+        return false;
+      });  
+
       releaseNoteOptional.get().getChangeNotes().forEach(changeNote -> {
         changeNote.setDeveloperNotes(null);
         changeNote.setUpgradeNotes(null);
       });
+      if (releaseNoteOptional.get().getPublished().equals(false)) {
+        throw new ReleaseNoteNotFoundException(id);
+      }
     }
+
 
     return ReleaseNoteMapper.toDTO(releaseNoteOptional.get(), accessScope);
   }
