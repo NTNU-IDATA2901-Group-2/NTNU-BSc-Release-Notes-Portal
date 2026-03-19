@@ -150,9 +150,9 @@ public class ChangeNoteFileHandler {
       }
       
     } catch (FileNotFoundException e) {
-      logger.error("Could not locate file {}", changeNoteFile.getName());
+      logger.error("Could not locate file {}", changeNoteFile.getName(), e);
     } catch (IOException e) {
-      logger.error("Error reading file {}", changeNoteFile.getName());
+      logger.error("Error reading file {}", changeNoteFile.getName(), e);
     } catch (ClassCastException e) {
       throw new InvalidChangeNoteYamlException("Invalid data type for one or more fields in the YAML file: " + e.getMessage());
     }
