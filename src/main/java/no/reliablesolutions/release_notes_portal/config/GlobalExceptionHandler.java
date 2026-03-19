@@ -20,7 +20,6 @@ import no.reliablesolutions.release_notes_portal.exception.ScopeNotFoundExceptio
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
-import no.reliablesolutions.release_notes_portal.exception.ChangeNoteAlreadyHasReleaseNoteException;
 
 /**
  * Global exception handler for the application. Catches specific exceptions thrown by controllers and services, logs the events, and returns appropriate HTTP responses with messages.
@@ -173,17 +172,6 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleReleaseNoteNotFoundException(ReleaseNoteNotFoundException e) {
     logger.warn("Release note not found: {}", e.getReleaseNoteId());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Release note with ID %d not found", e.getReleaseNoteId()));
-  }
-
-  /**
-   * Handles the case where a change note already has an associated release note. Logs the event and returns a 400 response with a message.
-   * @param e the exception containing details about the change note and existing release note
-   * @return a ResponseEntity with a 400 status and a message indicating the change note already has a release note
-   */
-  @ExceptionHandler(value = {ChangeNoteAlreadyHasReleaseNoteException.class})
-  public ResponseEntity<String> handleChangeNoteAlreadyHasReleaseNoteException(ChangeNoteAlreadyHasReleaseNoteException e) {
-    logger.warn("Change note already has a release note: {}", e.getMessage());
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Change note with ID " + e.getChangeNoteId() + " already has a release note with ID " + e.getExistingReleaseNoteId());
   }
 
   /**

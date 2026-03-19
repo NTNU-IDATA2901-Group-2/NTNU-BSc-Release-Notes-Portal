@@ -14,7 +14,6 @@ import no.reliablesolutions.release_notes_portal.domain.repository.ChangeNoteRep
 import no.reliablesolutions.release_notes_portal.domain.repository.ReleaseNoteRepository;
 import no.reliablesolutions.release_notes_portal.dto.CreateReleaseNoteDTO;
 import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteDTO;
-import no.reliablesolutions.release_notes_portal.exception.ChangeNoteAlreadyHasReleaseNoteException;
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.util.AccessScope;
@@ -47,27 +46,13 @@ public class ReleaseNoteService {
     releaseNote.setPublished(createReleaseNoteDTO.published() != null && createReleaseNoteDTO.published());
 
     List<ChangeNote> changeNotesInReleaseNote = new ArrayList<>();
-    if (createReleaseNoteDTO.changeNoteIds() != null) {
-      for (Long changeNoteId : createReleaseNoteDTO.changeNoteIds()) {
-        ChangeNote changeNote = changeNoteRepository.findById(changeNoteId)
-            .orElseThrow(() -> new ChangeNoteNotFoundException(changeNoteId));
-
-        if (changeNote.getReleaseNote() != null) {
-          throw new ChangeNoteAlreadyHasReleaseNoteException(changeNoteId, changeNote.getReleaseNote().getId());
-        }
-        changeNotesInReleaseNote.add(changeNote);
+    for (Long changeNoteId : createReleaseNoteDTO.changeNoteIds()) {
+      ChangeNote changeNote = changeNoteRepository.findById(changeNoteId)
+          .orElseThrow(() -> new ChangeNoteNotFoundException(changeNoteId));
+      changeNotesInReleaseNote.add(changeNote);
       }
-
-    }
-    
-    releaseNote = releaseNoteRepository.save(releaseNote);
-
+      
     releaseNote.setChangeNotes(changeNotesInReleaseNote);
-    for (ChangeNote changeNote : changeNotesInReleaseNote) {
-      changeNote.setReleaseNote(releaseNote);
-      changeNoteRepository.save(changeNote);
-    }
-
     releaseNote = releaseNoteRepository.save(releaseNote);
 
     return releaseNote.getId();
@@ -172,22 +157,17 @@ public class ReleaseNoteService {
     ReleaseNote releaseNote = releaseNoteOptional.get();
 
     for (ChangeNote changeNote : releaseNote.getChangeNotes()) {
-      changeNote.setReleaseNote(null);
+      changeNote.setReleaseNotes(null);
       changeNoteRepository.save(changeNote);
     }
 
     List<ChangeNote> changeNotesInReleaseNote = new ArrayList<>();
     if (createReleaseNoteDTO.changeNoteIds() == null) {
-      releaseNote.setChangeNotes(new ArrayList<ChangeNote>());
+      releaseNote.setChangeNotes(new ArrayList<>());
     } else {
       for (Long changeNoteId : createReleaseNoteDTO.changeNoteIds()) {
         ChangeNote changeNote = changeNoteRepository.findById(changeNoteId)
             .orElseThrow(() -> new ChangeNoteNotFoundException(changeNoteId));
-
-        if (changeNote.getReleaseNote() != null && changeNote.getReleaseNote().getId().longValue() == releaseNote.getId().longValue()) {
-          throw new ChangeNoteAlreadyHasReleaseNoteException(changeNoteId, changeNote.getReleaseNote().getId());
-        }
-        changeNote.setReleaseNote(releaseNote);
         changeNoteRepository.save(changeNote);
         changeNotesInReleaseNote.add(changeNote);
       }
