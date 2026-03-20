@@ -230,4 +230,15 @@ public class GlobalExceptionHandler {
     logger.warn("Locale not supported: {}", e.getLocale());
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(String.format("Locale '%s' is not supported. Supported locales are: en (English), no (Norwegian Bokmål), fr (French)", e.getLocale()));
   }
+
+  /**
+   * Handles the case where a non-transient AI exception occurs. Logs the event and returns a 500 response with a message indicating the non-transient AI exception.
+   * @param e the exception containing details about the non-transient AI exception
+   * @return a ResponseEntity with a 500 status and a message indicating the non-transient AI exception
+   */
+  @ExceptionHandler(value = {org.springframework.ai.retry.NonTransientAiException.class})
+  public ResponseEntity<String> handleNonTransientAiException(org.springframework.ai.retry.NonTransientAiException e) {
+    logger.warn("Non-transient AI exception: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Non-transient AI exception: " + e.getMessage());
+  }
 }
