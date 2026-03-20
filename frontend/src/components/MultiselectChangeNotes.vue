@@ -22,8 +22,7 @@ const model = defineModel<number[]>({ required: true })
 const params = computed(() => { return { filteredIds : model.value.join(',') } })
 const { data: selectedChangeNotes } = useGetChangeNotes(params)
 
-const availableParams = new URLSearchParams({ hasReleaseNote: 'false' })
-const { data: availableChangeNotes } = useGetChangeNotes(availableParams)
+const { data: availableChangeNotes } = useGetChangeNotes()
 
 const changeNoteOptions = computed(() =>
   (availableChangeNotes.value ?? []).map((cn) => ({ value: cn.id, label: cn.reference })),

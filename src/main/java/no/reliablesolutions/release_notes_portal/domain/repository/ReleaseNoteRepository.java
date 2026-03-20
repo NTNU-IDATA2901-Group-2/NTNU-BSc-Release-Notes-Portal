@@ -20,7 +20,8 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
   @Query("""
       SELECT r
       FROM ReleaseNote r
-      LEFT JOIN ChangeNote c ON c.releaseNote = r AND c.archived = false
+      LEFT JOIN r.changeNotes c
+        ON c.archived = false
       WHERE r.archived = false AND
         (:published IS NULL OR r.published = :published) AND
         (:productIds IS NULL OR c.product.id IN :productIds) AND
@@ -40,8 +41,7 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
   @Query("""
       SELECT r
       FROM ReleaseNote r
-      LEFT JOIN ChangeNote c ON c.releaseNote = r 
-        AND c.archived = false
+      LEFT JOIN r.changeNotes c ON c.archived = false
         AND (c.customer IS NULL OR UPPER( c.customer.name ) IN :customerGroups)
       WHERE r.archived = false AND
         (:published IS NULL OR r.published = :published) AND

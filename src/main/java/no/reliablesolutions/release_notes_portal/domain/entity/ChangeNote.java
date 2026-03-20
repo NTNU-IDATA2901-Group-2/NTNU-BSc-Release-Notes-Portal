@@ -1,13 +1,14 @@
 package no.reliablesolutions.release_notes_portal.domain.entity;
 
 import java.util.Date;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,9 +35,8 @@ public class ChangeNote {
   private boolean published = false;
   private boolean archived = false;
 
-  @ManyToOne
-  @JoinColumn(name = "release_note_id")
-  private ReleaseNote releaseNote;
+  @ManyToMany(mappedBy = "changeNotes")
+  private List<ReleaseNote> releaseNotes;
 
   @ManyToOne(optional = true)
   private Product product;
