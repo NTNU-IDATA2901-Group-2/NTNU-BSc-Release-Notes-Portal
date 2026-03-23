@@ -81,7 +81,7 @@ public class GitRepositoryController {
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/sync")
-    public ResponseEntity<String> postMethodName() {
+    public ResponseEntity<String> syncAllRepositories() {
         gitRepositoryService.syncGitRepositories();
         logger.info("Git repositories synced successfully");
         return ResponseEntity.ok("Git repositories synced successfully");
@@ -93,7 +93,7 @@ public class GitRepositoryController {
      * @return a response entity indicating the result of the synchronization operation
      */
     @PostMapping("/sync/{id}")
-    public ResponseEntity<String> postMethodName(@PathVariable long id) {
+    public ResponseEntity<String> syncGitRepository(@PathVariable long id) {
         gitRepositoryService.syncGitRepository(id);
         logger.info("Git repository with id {} synced successfully", id);
         return ResponseEntity.ok("Git repository synced successfully");
