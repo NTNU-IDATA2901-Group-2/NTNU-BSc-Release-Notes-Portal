@@ -6,7 +6,6 @@ public record ChangeNoteDTO(
     String description,
     String developerNotes,
     String upgradeNotes,
-    String changeSource,
     ProductDTO product,
     ScopeDTO scope,
     FeatureDTO feature,

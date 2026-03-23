@@ -87,4 +87,8 @@ public class ProductService {
         .orElseThrow(() -> new ProductNotFoundException(id));
     productRepository.delete(product);
   }
+
+  public List<Product> getProductByName(String product) {
+    return productRepository.findAllByNameIgnoreCase(product);
+  }
 }

@@ -122,7 +122,11 @@
         "createError": "Det oppsto en feil under tillegg av repository",
         "nameRequired": "Navn er påkrevd",
         "urlRequired": "URL er påkrevd",
-        "error": "Det oppsto en feil under innlastning av repositoryer"
+        "error": "Det oppsto en feil under innlastning av repositoryer",
+        "syncAll": "Synkroniser alle repositoryer",
+        "syncSuccess": "Repositoryer synkronisert",
+        "syncError": "Det oppsto en feil under synkronisering av repositoryer",
+        "sync": "Synkroniser"
     },
     "ai": {
         "translationDisclaimer": "Oversettelsen er generert av KI. Vennligst sjekk viktige fakta."

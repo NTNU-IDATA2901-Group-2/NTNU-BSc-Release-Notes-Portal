@@ -29,9 +29,7 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
    * Finds all non-archived change notes that match the provided filter
    * parameters.
    * 
-   * @param query          optional filter for searching change notes by
-   *                       reference, description, developer notes, upgrade notes,
-   *                       or change source
+   * @param query          optional filter for searching change notes by reference, description, developer notes or upgrade notes
    * @param published      optional filter for published status
    * @param hasReleaseNote optional filter for change notes that have an
    *                       associated release note
@@ -63,8 +61,7 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
         LOWER(c.reference) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
         LOWER(c.description) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
         LOWER(c.developerNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
-        LOWER(c.upgradeNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
-        LOWER(c.changeSource) LIKE LOWER('%' || :#{#filterOptions.query} || '%'))
+        LOWER(c.upgradeNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%'))
       """)
   public List<ChangeNote> findByArchivedFalseAndMatchingFilterParameters(
       @Param("filterOptions") ChangeNoteFilterOptionsDTO filterOptions);
@@ -99,8 +96,7 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
       OR LOWER(c.reference) LIKE LOWER('%' || :#{#filterOptions.query} || '%')
       OR LOWER(c.description) LIKE LOWER('%' || :#{#filterOptions.query} || '%')
       OR LOWER(c.developerNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%')
-      OR LOWER(c.upgradeNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%')
-      OR LOWER(c.changeSource) LIKE LOWER('%' || :#{#filterOptions.query} || '%'))
+      OR LOWER(c.upgradeNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%'))
       """)
   public List<ChangeNote> findForCustomerNamesMatchingFilterParameters(
       @Param("customerNames") List<String> customerNames,

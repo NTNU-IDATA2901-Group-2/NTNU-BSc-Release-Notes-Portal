@@ -7,9 +7,9 @@ import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
 import { useI18n } from 'vue-i18n';
 import { TableCell, Table, TableHeader, TableRow, TableHead, TableBody } from '@/components/ui/table';
-import { Trash2 } from 'lucide-vue-next';
+import { RefreshCw, Trash2 } from 'lucide-vue-next';
 import { toast } from 'vue-sonner';
-import { useDeleteGitRepository, useGetGitRepositories, usePersistGitRepository } from '@/api/git-repository-api';
+import { useDeleteGitRepository, useGetGitRepositories, usePersistGitRepository, useSyncAllRepositories, useSyncRepository } from '@/api/git-repository-api';
 
 const { t } = useI18n();
 
@@ -46,12 +46,38 @@ const deleteGitRepositoryMutation = useDeleteGitRepository({
 const onDeleteRepository = (id: number) => {
     deleteGitRepositoryMutation.mutate(id);
 }
+
+const syncAllRepositoriesMutation = useSyncAllRepositories({
+    onSuccess: () => {
+        toast.success(t('repositories.syncSuccess'));
+    },
+    onError: () => {
+        toast.error(t('repositories.syncError'));
+    }
+})
+
+const syncGitRepositoryMutation = useSyncRepository({
+    onSuccess: () => {
+        toast.success(t('repositories.syncSuccess'));
+    },
+    onError: () => {
+        toast.error(t('repositories.syncError'));
+    }
+})
+
+const onSyncRepository = (id: number) => {
+    syncGitRepositoryMutation.mutate(id);
+}
+
 </script>
 
 <template>
     <div class="flex flex-col items-center mt-20">
         <div class="flex flex-col gap-8">
-            <h1 class="text-xl">{{ t('repositories.title') }}</h1>
+            <div class="flex flex-row justify-between">
+                <h1 class="text-xl">{{ t('repositories.title') }}</h1>
+                <Button variant="solidaccent" @click="syncAllRepositoriesMutation.mutate()">{{ t('repositories.syncAll') }}</Button>
+            </div>
             <form class="flex flex-row gap-4" @submit.prevent="onSubmit">
                 <FormField v-slot="{ componentField }" name="name">
                     <FormItem class="relative">
@@ -86,6 +112,9 @@ const onDeleteRepository = (id: number) => {
                     <TableHead>
                     {{ t('repositories.url') }}
                     </TableHead>
+                    <TableHead>
+                    {{ t('repositories.sync') }}
+                    </TableHead>
                     <TableHead class="text-right">
                     {{ t('repositories.remove') }}
                     </TableHead>
@@ -96,7 +125,12 @@ const onDeleteRepository = (id: number) => {
                     <TableCell class="font-medium text-text-primary">{{ repo.id }}</TableCell>
                     <TableCell class="text-text-primary">{{ repo.name }}</TableCell>
                     <TableCell class="text-text-primary">{{ repo.url }}</TableCell>
-                    <TableCell class="text-text-primary flex justify-end">
+                    <TableCell class="text-text-primary text-center">
+                        <Button class="self-center" variant="outline" size="sm" @click="onSyncRepository(repo.id)">
+                            <RefreshCw />
+                        </Button>
+                    </TableCell>
+                    <TableCell class="text-text-primary text-center">
                         <Button class="self-right" variant="destructive" size="sm" @click="onDeleteRepository(repo.id)">
                             <Trash2 />
                         </Button>

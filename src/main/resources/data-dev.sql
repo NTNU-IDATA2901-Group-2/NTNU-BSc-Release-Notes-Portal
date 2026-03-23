@@ -1,15 +1,15 @@
 -- AI generated sample data for change_note and release_note tables
-INSERT INTO change_note (id, archived, published, reference, description, developer_notes, upgrade_notes, change_source, product_id, customer_id, feature_id, scope_id, timestamp) VALUES
-(1, false, true, 'REF-001', 'Initial portal release with core workflows for drafting, reviewing, and publishing release notes. Added shared validation rules, clear required-field messages, and stable defaults to improve onboarding and reduce submission errors.', 'Dev notes 1', 'Upgrade notes 1', 'JIRA-11', 1, 1, 1, 1, 1706745600000),
-(2, false, true, 'REF-002', 'Added feature X with broader configuration options, safer defaults, and clearer validation guidance. Users can resolve conflicting inputs earlier, reducing rework and improving consistency across products and customer contexts.', 'Dev notes 2', 'Upgrade notes 2', 'JIRA-12', 2, 2, 2, 2, 1708300200000),
-(3, false, true, 'REF-003', 'Fixed bug Y causing inconsistent rendering in edge cases and improved state sync after failed updates. Recovery paths now avoid stale values, and transitions between loading, error, and success are more predictable during retries.', 'Dev notes 3', 'Upgrade notes 3', 'JIRA-13', 3, null, 2, 3, 1710063900000),
-(4, false, true, 'REF-004', 'Added feature Z for richer metadata selection with better filtering, sensible defaults, and clearer guidance text. Editors can capture precise context with fewer misclassifications, improving reporting quality and cross-team consistency.', 'Dev notes 4', 'Upgrade notes 4', 'JIRA-14', 1, null, 1, 1, 1711728500000),
-(5, false, true, 'REF-005', 'Implemented performance improvements for list retrieval and table rendering to reduce wait times on large datasets. Optimized query paths and reduced client recalculations, resulting in smoother navigation and faster feedback.', 'Dev notes 5', 'Upgrade notes 5', 'JIRA-15', 2, null, 2, 2, 1713393100000),
-(6, false, true, 'REF-006', 'Applied a security patch for token validation edge cases and privileged request handling. Added stricter checks for malformed or expired credentials, stronger endpoint safeguards, and clearer diagnostics for incident analysis.', 'Dev notes 6', 'Upgrade notes 6', 'JIRA-16', 3, 3, 1, 3, 1715057700000),
-(7, false, false, 'REF-007', 'Added support for a new platform integration layer with adapter mapping, fallback behavior, and stronger compatibility checks. Early validation now catches unsupported combinations sooner, reducing sync failures and troubleshooting time.', 'Dev notes 7', 'Upgrade notes 7', 'JIRA-17', 1, 1, 1, 1, 1716722300000),
-(8, false, false, 'REF-008', 'Deprecated the old API surface and added migration guidance with warnings, compatibility notes, and timeline expectations. Consumers get clearer upgrade signals while teams receive practical steps to reduce migration risk.', 'Dev notes 8', 'Upgrade notes 8', 'JIRA-18', 2, 2, 2, 2, 1718386900000),
-(9, false, true, 'REF-009', 'Added feature A to improve bulk workflow productivity and reduce repetitive editing. Users can apply coordinated changes across records with guardrails and clearer previews, cutting routine effort for high-volume maintenance.', 'Dev notes 9', 'Upgrade notes 9', 'JIRA-19', 3, 3, 2, 3, 1720051500000),
-(10, false, false, 'REF-010', 'Fixed critical bug B that intermittently blocked publication and improved diagnostics for incident response. Recovery behavior is now more reliable, and operators can resolve publish issues faster during deadline-sensitive releases.', 'Dev notes 10', 'Upgrade notes 10', 'JIRA-20', 1, 1, 1, 1, 1721716100000)
+INSERT INTO change_note (id, archived, published, reference, description, developer_notes, upgrade_notes, product_id, customer_id, feature_id, scope_id, creation_timestamp) VALUES
+(1, false, false, 'REF-001', 'Initial release', 'Dev notes 1', 'Upgrade notes 1', 1, 1, 1, 1, 1706745600000),
+(2, false, false, 'REF-002', 'Added new feature X', 'Dev notes 2', 'Upgrade notes 2', 2, 2, 2, 2, 1708300200000),
+(3, false, false, 'REF-003', 'Fixed bug Y', 'Dev notes 3', 'Upgrade notes 3', 3, 3, 2, 3, 1710063900000),
+(4, false, false, 'REF-004', 'Added new feature Z', 'Dev notes 4', 'Upgrade notes 4', 1, 1, 1, 1, 1711728500000),
+(5, false, false, 'REF-005', 'Performance improvements', 'Dev notes 5', 'Upgrade notes 5', 2, 2, 2, 2, 1713393100000),
+(6, false, false, 'REF-006', 'Security patch', 'Dev notes 6', 'Upgrade notes 6', 3, 3, 1, 3, 1715057700000),
+(7, false, false, 'REF-007', 'Added support for new platform', 'Dev notes 7', 'Upgrade notes 7', 1, 1, 1, 1, 1716722300000),
+(8, false, false, 'REF-008', 'Deprecated old API', 'Dev notes 8', 'Upgrade notes 8', 2, 2, 2, 2, 1718386900000),
+(9, false, false, 'REF-009', 'Added new feature A', 'Dev notes 9', 'Upgrade notes 9', 3, 3, 2, 3, 1720051500000),
+(10, false, false, 'REF-010', 'Fixed critical bug B', 'Dev notes 10', 'Upgrade notes 10', 1, 1, 1, 1, 1721716100000)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO release_note (id, archived, published, created_at, summary, tag) VALUES

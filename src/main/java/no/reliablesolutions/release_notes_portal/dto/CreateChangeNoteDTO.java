@@ -5,7 +5,6 @@ public record CreateChangeNoteDTO (
   String description,
   String developerNotes,
   String upgradeNotes,
-  String changeSource,
   Long productId,
   Long scopeId,
   Long featureId,

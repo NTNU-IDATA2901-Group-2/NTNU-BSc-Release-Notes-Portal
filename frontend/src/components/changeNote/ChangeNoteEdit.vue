@@ -34,7 +34,6 @@ const { handleSubmit, defineField } = useForm({
     customerId: props.changeNote.customer?.id,
     developerNotes: props.changeNote.developerNotes,
     upgradeNotes: props.changeNote.upgradeNotes,
-    changeSource: props.changeNote.changeSource,
   }
 });
 

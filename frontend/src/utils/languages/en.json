@@ -121,7 +121,11 @@
         "createError": "An error occurred while adding the repository",
         "nameRequired": "Name is required",
         "urlRequired": "URL is required",
-        "error": "An error occurred while loading repositories"
+        "error": "An error occurred while loading repositories",
+        "syncAll": "Sync all repositories",
+        "syncSuccess": "Repositories synchronized successfully",
+        "syncError": "An error occurred while synchronizing repositories",
+        "sync": "Synchronize"
     },
     "ai": {
         "translationDisclaimer": "This translation is AI generated. Please check important facts."
