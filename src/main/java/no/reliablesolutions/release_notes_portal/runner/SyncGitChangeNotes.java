@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 import lombok.AllArgsConstructor;
 import no.reliablesolutions.release_notes_portal.domain.entity.ChangeNote;
 import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
+import no.reliablesolutions.release_notes_portal.domain.repository.GitRepositoryRepository;
 import no.reliablesolutions.release_notes_portal.exception.InvalidChangeNoteYamlException;
 import no.reliablesolutions.release_notes_portal.service.ChangeNoteService;
 import no.reliablesolutions.release_notes_portal.service.GitRepositoryService;
@@ -36,7 +37,7 @@ import no.reliablesolutions.release_notes_portal.util.ChangeNoteFileHandler;
 public class SyncGitChangeNotes implements CommandLineRunner {
   
   private final Logger logger = LoggerFactory.getLogger(SyncGitChangeNotes.class);
-  private final GitRepositoryService gitRepositoryService;
+  private final GitRepositoryRepository gitRepositoryRepository;
   private final ChangeNoteService changeNoteService;
   private final ChangeNoteFileHandler changeNoteFileHandler;
   
@@ -44,35 +45,43 @@ public class SyncGitChangeNotes implements CommandLineRunner {
   private static final String CHANGE_NOTE_DIRECTORY = "notes";
   
   /**
-   * Runs the synchronization process for Git change notes.
-   * 
+   * Runs the synchronization process for Git change notes on all Git repositories.
+   */
+  @Override
+  public void run(String... args) throws Exception {    
+    List<GitRepository> gitRepositories = gitRepositoryRepository.findAll();
+    logger.info("Found {} git repositories", gitRepositories.size());
+    gitRepositories.forEach(this::syncGitRepository);
+  }
+  
+
+  /*
+   * Synchronizes change notes from a Git repository.
+   *
    * This is done using the following steps:
    * <ul>
    * <li> Prepares local directory for Git repositories
-   * <li> Prepares each Git repository, ensuring it is up to date
-   * <li> Synchronizes change notes from each repository
+   * <li> Prepare the Git repository
+   * <li> Synchronize change notes from the Git repository
    * </ul>
    */
-  @Override
-  public void run(String... args) throws Exception {
-    
+  public void syncGitRepository(GitRepository gitRepository) {
+
+    if (gitRepository == null) {
+      throw new IllegalArgumentException("Git repository cannot be null");
+    }
+
     File repositoriesDirectory = new File(REPOSITORY_DIRECTORIES_PATH);
     if (!repositoriesDirectory.exists()) {
       repositoriesDirectory.mkdirs();
     }
-    
-    List<GitRepository> gitRepositories = gitRepositoryService.getAllGitRepositories();
-    logger.info("Found {} git repositories", gitRepositories.size());
-    gitRepositories.forEach(gitRepository -> {
-      logger.info("Updating Git repository: {}", gitRepository.getName());
-      
-      File repositoryDirectory = new File(REPOSITORY_DIRECTORIES_PATH + File.separator + gitRepository.getName());
-      
-      prepareGitRepository(gitRepository, repositoryDirectory);
-      syncFromGitRepository(gitRepository, repositoryDirectory);
-    });
+
+    logger.info("Updating Git repository: {}", gitRepository.getName());
+    File repositoryDirectory = new File(REPOSITORY_DIRECTORIES_PATH + File.separator + gitRepository.getName());
+    prepareGitRepository(gitRepository, repositoryDirectory);
+    syncFromGitRepository(gitRepository, repositoryDirectory);
   }
-  
+
   /**
    * Prepares a Git repository by cloning it if it does not exist locally, or pulling the latest changes if it does.
    * 
@@ -96,7 +105,7 @@ public class SyncGitChangeNotes implements CommandLineRunner {
     File gitDir = new File(repositoryDirectory, ".git");
     if (!gitDir.exists()) {
       gitRepository.setLastCheckedCommitHash(null);
-      gitRepositoryService.updateGitRepository(gitRepository);
+      gitRepositoryRepository.save(gitRepository);
       cloneRepository(gitRepository, repositoryDirectory);
     } else {
       pullRepository(gitRepository, repositoryDirectory);
@@ -290,7 +299,7 @@ public class SyncGitChangeNotes implements CommandLineRunner {
       throw new IllegalArgumentException("Git repository cannot be null");
     }
     gitRepository.setLastCheckedCommitHash(newLastCheckedCommitId.getName());
-    gitRepositoryService.updateGitRepository(gitRepository);
+    gitRepositoryRepository.save(gitRepository);
     logger.info("Updated last checked commit hash for repository with id {} to {}", gitRepository.getId(), newLastCheckedCommitId.getName());
     
   }

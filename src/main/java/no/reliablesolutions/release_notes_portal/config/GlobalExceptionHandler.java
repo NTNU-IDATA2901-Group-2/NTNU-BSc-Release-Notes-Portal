@@ -18,6 +18,7 @@ import no.reliablesolutions.release_notes_portal.exception.FeatureNotFoundExcept
 import no.reliablesolutions.release_notes_portal.exception.ProductNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ScopeNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
+import no.reliablesolutions.release_notes_portal.exception.FailedSyncGitChangeNotesException;
 import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
 
@@ -71,6 +72,17 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleScopeNotFoundException(ScopeNotFoundException e) {
     logger.warn("Scope not found: {}", e.getScopeId());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Scope with ID %d not found", e.getScopeId()));
+  }
+
+  /**
+   * Handles the case where syncing Git change notes fails. Logs the event and returns a 500 response with a message indicating the failure to sync Git change notes.
+   * @param e the exception containing details about the failure to sync Git change notes
+   * @return a ResponseEntity with a 500 status and a message indicating the failure to sync Git change notes
+   */
+  @ExceptionHandler(value = {FailedSyncGitChangeNotesException.class})
+  public ResponseEntity<String> handleFailedSyncGitChangeNotesException(FailedSyncGitChangeNotesException e) {
+    logger.warn("Failed to sync Git change notes: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to sync Git change notes: " + e.getMessage());
   }
 
 

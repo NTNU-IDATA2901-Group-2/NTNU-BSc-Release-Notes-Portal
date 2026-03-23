@@ -96,8 +96,7 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
       OR LOWER(c.reference) LIKE LOWER('%' || :#{#filterOptions.query} || '%')
       OR LOWER(c.description) LIKE LOWER('%' || :#{#filterOptions.query} || '%')
       OR LOWER(c.developerNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%')
-      OR LOWER(c.upgradeNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%')
-      OR LOWER(c.changeSource) LIKE LOWER('%' || :#{#filterOptions.query} || '%'))
+      OR LOWER(c.upgradeNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%'))
       """)
   public List<ChangeNote> findForCustomerNamesMatchingFilterParameters(
       @Param("customerNames") List<String> customerNames,

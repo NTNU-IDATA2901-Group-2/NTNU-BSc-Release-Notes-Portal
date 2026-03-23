@@ -29,7 +29,7 @@ const getGitRepositories = async () => {
  * Creates a new git repository with the provided data.
  * 
  * @param data - An object containing the name and URL of the git repository to be created.
- * @returns A promise that resolves to the data of the newly created git repository.
+ * @returns the data of the newly created git repository when the API request is successful.
  * @throws An error if the API request to create the git repository fails.
  */
 const createGitRepository = async (dto: PersistGitRepositoryDTO) => {
@@ -65,7 +65,7 @@ export const usePersistGitRepository = (onFinished: OnMutationApiCallFinished) =
  * Deletes a git repository by its ID.
  * 
  * @param id The ID of the git repository to delete.
- * @returns A promise that resolves when the git repository is successfully deleted.
+ * @returns the data from the API response when the deletion is successful.
  * @throws An error if the API request to delete the git repository fails or if the provided ID is invalid.
  */
 const deleteGitRepository = async (id: number) => {
@@ -92,6 +92,71 @@ export const useDeleteGitRepository = (onFinished: OnMutationApiCallFinished) =>
         },
         onError: () => {
             console.error("Failed to delete git repository");
+            onFinished.onError();
+        },
+        onSettled: () => onFinished.onSettled?.(),
+    })
+}
+
+/**
+ * Synchronizes all git repositories.
+ *
+ * @returns the data from the API response.
+ */
+const syncAllRepositories = async () => {
+    const response = await api.post(`git-repositories/sync`);
+    return response.data;
+}
+
+/**
+ * Synchronizes all git repositories and handles the API call lifecycle.
+ *
+ * @param onFinished An object containing callback functions to be called on success, error, and settled states of the API call.
+ * @returns A mutation object that can be used to trigger the synchronization of all git repositories.
+ */
+export const useSyncAllRepositories = (onFinished: OnMutationApiCallFinished) => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: () => syncAllRepositories(),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['git-repositories'] });
+            onFinished.onSuccess();
+        },
+        onError: () => {
+            console.error("Failed to sync git repositories");
+            onFinished.onError();
+        },
+        onSettled: () => onFinished.onSettled?.(),
+    })
+}
+
+/**
+ * Synchronizes a git repository by its ID.
+ *
+ * @param id The ID of the git repository to synchronize.
+ * @returns the data from the API response.
+ */
+const syncRepository = async (id: number) => {
+    const response = await api.post(`git-repositories/sync/${id}`);
+    return response.data;
+}
+
+/**
+ * Synchronizes a git repository by its ID and handles the API call lifecycle.
+ *
+ * @param onFinished An object containing callback functions to be called on success, error, and settled states of the API call.
+ * @returns A mutation object that can be used to trigger the synchronization of a git repository.
+ */
+export const useSyncRepository = (onFinished: OnMutationApiCallFinished) => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: number) => syncRepository(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['git-repositories'] });
+            onFinished.onSuccess();
+        },
+        onError: () => {
+            console.error("Failed to sync git repository");
             onFinished.onError();
         },
         onSettled: () => onFinished.onSettled?.(),

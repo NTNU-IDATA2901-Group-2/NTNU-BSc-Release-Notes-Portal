@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 
 
@@ -69,4 +70,34 @@ public class GitRepositoryController {
         List<GitRepository> gitRepositories = gitRepositoryService.getAllGitRepositories();
         return ResponseEntity.ok(gitRepositories);
     }
+
+    /**
+     * Triggers synchronization of Git repositories.
+     * @return a response entity indicating the result of the synchronization operation
+     */
+    @Operation(summary = "Sync Git repositories", description = "Syncs Git repositories with external source")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Git repositories synced successfully"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PostMapping("/sync")
+    public ResponseEntity<String> postMethodName() {
+        gitRepositoryService.syncGitRepositories();
+        logger.info("Git repositories synced successfully");
+        return ResponseEntity.ok("Git repositories synced successfully");
+    }
+
+    /**
+     * Triggers synchronization of a specific Git repository by ID.
+     * @param id the ID of the Git repository to synchronize
+     * @return a response entity indicating the result of the synchronization operation
+     */
+    @PostMapping("/sync/{id}")
+    public ResponseEntity<String> postMethodName(@PathVariable long id) {
+        gitRepositoryService.syncGitRepository(id);
+        logger.info("Git repository with id {} synced successfully", id);
+        return ResponseEntity.ok("Git repository synced successfully");
+    }
+    
+    
 }
