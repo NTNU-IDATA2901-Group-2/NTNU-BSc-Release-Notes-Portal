@@ -10,7 +10,7 @@
   --radius-xl: calc(var(--radius) + 4px);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-muted: var(--muted);
+  --color-muted: var(--foreground);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-destructive: var(--destructive);
@@ -65,5 +65,57 @@
 
   p {
     font-size: 14px;
+  }
+}
+
+@layer components {
+  .btn-glow {
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    isolation: isolate;
+    border-radius: inherit;
+    background: transparent;
+    color: var(--text);
+    z-index: 0;
+  }
+
+  .btn-glow::before {
+    content: "";
+    position: absolute;
+    inset: -100% -25%;
+    background: conic-gradient(
+      from 0deg in oklch,
+      #9900ff 0turn,
+      #71009a 0.33turn,
+      #454efc 0.66turn,
+      #9900ff 0.995turn,
+      #9900ff 1turn
+    );
+    z-index: -2;
+    pointer-events: none;
+  }
+
+  .btn-glow::after {
+    content: "";
+    position: absolute;
+    inset: 2px;
+    border-radius: calc(var(--radius) - 2px);
+    background: var(--background);
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .btn-glow:hover::before {
+    animation: spin 2s linear infinite;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }

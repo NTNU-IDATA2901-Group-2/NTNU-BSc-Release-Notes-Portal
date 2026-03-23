@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
@@ -13,9 +14,12 @@ import no.reliablesolutions.release_notes_portal.domain.repository.ChangeNoteRep
 import no.reliablesolutions.release_notes_portal.domain.repository.ReleaseNoteRepository;
 import no.reliablesolutions.release_notes_portal.dto.CreateReleaseNoteDTO;
 import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteDTO;
-import no.reliablesolutions.release_notes_portal.exception.ChangeNoteAlreadyHasReleaseNoteException;
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
+import no.reliablesolutions.release_notes_portal.util.AccessScope;
+import no.reliablesolutions.release_notes_portal.util.AccessScopeFactory;
+import no.reliablesolutions.release_notes_portal.util.AuthenticationUtil;
+import no.reliablesolutions.release_notes_portal.util.ReleaseNoteMapper;
 
 /**
  * Service class for managing release notes. Provides methods for creating, updating, retrieving, and archiving release notes.
@@ -39,29 +43,21 @@ public class ReleaseNoteService {
     ReleaseNote releaseNote = new ReleaseNote();
     releaseNote.setTag(createReleaseNoteDTO.tag());
     releaseNote.setSummary(createReleaseNoteDTO.summary());
-    releaseNote.setPublished(createReleaseNoteDTO.published() != null ? createReleaseNoteDTO.published() : false);
+    releaseNote.setPublished(createReleaseNoteDTO.published() != null && createReleaseNoteDTO.published());
 
     List<ChangeNote> changeNotesInReleaseNote = new ArrayList<>();
     if (createReleaseNoteDTO.changeNoteIds() != null) {
       for (Long changeNoteId : createReleaseNoteDTO.changeNoteIds()) {
         ChangeNote changeNote = changeNoteRepository.findById(changeNoteId)
             .orElseThrow(() -> new ChangeNoteNotFoundException(changeNoteId));
-
-        if (changeNote.getReleaseNote() != null) {
-          throw new ChangeNoteAlreadyHasReleaseNoteException(changeNoteId, changeNote.getReleaseNote().getId());
-        }
-        releaseNote = releaseNoteRepository.save(releaseNote);
-        changeNote.setReleaseNote(releaseNote);
-        changeNoteRepository.save(changeNote);
         changeNotesInReleaseNote.add(changeNote);
       }
     }
-    
+      
     releaseNote.setChangeNotes(changeNotesInReleaseNote);
+    releaseNote = releaseNoteRepository.save(releaseNote);
 
-
-
-    return releaseNoteRepository.save(releaseNote).getId();
+    return releaseNote.getId();
   }
 
   /**
@@ -88,7 +84,21 @@ public class ReleaseNoteService {
    * @return a list of ReleaseNoteDTOs representing all non-archived release notes that match the provided filters
    */
   public List<ReleaseNoteDTO> getAllReleaseNotes(String query, Boolean published, List<Long> productIds) {
-    return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParameters(query, published, productIds).stream().map(ReleaseNoteDTO::fromReleaseNote).toList();
+    AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
+    if (accessScope.isAdmin()) {
+      return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParameters(query, published, productIds).stream().map(rn -> ReleaseNoteMapper.toDTO(rn, accessScope)).toList();
+
+    } else {
+      List<String> customerGroups = AuthenticationUtil.getCustomerGroups();
+      return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParametersForCustomers(query, true, productIds, customerGroups).stream().map(releaseNote -> {
+        releaseNote.getChangeNotes().forEach(changeNote -> {
+          changeNote.setDeveloperNotes(null);
+          changeNote.setUpgradeNotes(null);
+        });
+
+        return ReleaseNoteMapper.toDTO(releaseNote, accessScope);
+      }).toList();
+    }
   }
 
   /**
@@ -99,11 +109,37 @@ public class ReleaseNoteService {
    */
   public ReleaseNoteDTO getReleaseNoteById(long id) {
     Optional<ReleaseNote> releaseNoteOptional = releaseNoteRepository.findById(id);
-    
+    AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
+
     if (releaseNoteOptional.isEmpty() || Boolean.TRUE.equals(releaseNoteOptional.get().getArchived())) {
       throw new ReleaseNoteNotFoundException(id);
     }
-    return ReleaseNoteDTO.fromReleaseNote(releaseNoteOptional.get());
+
+    List<String> customerGroups = accessScope.getCustomerGroups();
+    boolean isAdmin = AuthenticationUtil.isAdmin();
+    if (!isAdmin) {
+      LoggerFactory.getLogger(ReleaseNoteService.class).warn("Filtering release note with id {} for customer groups: {}", id, customerGroups);
+      releaseNoteOptional.get().getChangeNotes().removeIf(changeNote -> !changeNote.isPublished());
+
+
+      releaseNoteOptional.get().getChangeNotes().removeIf(changeNote -> {
+        if (changeNote.getCustomer() != null) {
+          return !customerGroups.contains(changeNote.getCustomer().getName().toUpperCase());
+        }
+        return false;
+      });  
+
+      releaseNoteOptional.get().getChangeNotes().forEach(changeNote -> {
+        changeNote.setDeveloperNotes(null);
+        changeNote.setUpgradeNotes(null);
+      });
+      if (releaseNoteOptional.get().getPublished().equals(false)) {
+        throw new ReleaseNoteNotFoundException(id);
+      }
+    }
+
+
+    return ReleaseNoteMapper.toDTO(releaseNoteOptional.get(), accessScope);
   }
 
   /**
@@ -123,22 +159,17 @@ public class ReleaseNoteService {
     ReleaseNote releaseNote = releaseNoteOptional.get();
 
     for (ChangeNote changeNote : releaseNote.getChangeNotes()) {
-      changeNote.setReleaseNote(null);
+      changeNote.setReleaseNotes(null);
       changeNoteRepository.save(changeNote);
     }
 
     List<ChangeNote> changeNotesInReleaseNote = new ArrayList<>();
     if (createReleaseNoteDTO.changeNoteIds() == null) {
-      releaseNote.setChangeNotes(new ArrayList<ChangeNote>());
+      releaseNote.setChangeNotes(new ArrayList<>());
     } else {
       for (Long changeNoteId : createReleaseNoteDTO.changeNoteIds()) {
         ChangeNote changeNote = changeNoteRepository.findById(changeNoteId)
             .orElseThrow(() -> new ChangeNoteNotFoundException(changeNoteId));
-
-        if (changeNote.getReleaseNote() != null && changeNote.getReleaseNote().getId() != releaseNote.getId()) {
-          throw new ChangeNoteAlreadyHasReleaseNoteException(changeNoteId, changeNote.getReleaseNote().getId());
-        }
-        changeNote.setReleaseNote(releaseNote);
         changeNoteRepository.save(changeNote);
         changeNotesInReleaseNote.add(changeNote);
       }
@@ -150,7 +181,7 @@ public class ReleaseNoteService {
     releaseNote.setPublished(createReleaseNoteDTO.published());
 
     releaseNoteRepository.save(releaseNote);
-    return ReleaseNoteDTO.fromReleaseNote(releaseNote);
+    return ReleaseNoteMapper.toDTO(releaseNote, AccessScopeFactory.fromCurrentUser());
 
   }
   
@@ -165,7 +196,7 @@ public class ReleaseNoteService {
   public void publishReleaseNote(long id, boolean publish) {
     Optional<ReleaseNote> releaseNoteOptional = releaseNoteRepository.findById(id);
 
-    if (releaseNoteOptional.isEmpty() || releaseNoteOptional.get().getArchived()) {
+    if (releaseNoteOptional.isEmpty() || Boolean.TRUE.equals(releaseNoteOptional.get().getArchived())) {
       throw new ReleaseNoteNotFoundException(id);
     }
 

@@ -208,9 +208,9 @@ const getChangeNote = async (id: string): Promise<ChangeNote> => {
  * @returns An array of change note data that matches the provided search parameters.
  * @throws An error if the API request to retrieve the change notes fails.
  */
-export const useGetChangeNotes = (searchParams: Ref<Record<string, string>> | URLSearchParams) => useQuery<ChangeNote[]>({  
+export const useGetChangeNotes = (searchParams?: Ref<Record<string, string>> | URLSearchParams) => useQuery<ChangeNote[]>({  
   queryKey: ['changeNotes', searchParams],
-  queryFn: () => getChangeNotes(new URLSearchParams(searchParams instanceof URLSearchParams ? searchParams : searchParams.value)),
+  queryFn: () => getChangeNotes(new URLSearchParams(searchParams instanceof URLSearchParams ? searchParams : searchParams?.value)),
 });
 
 
@@ -222,7 +222,6 @@ export const useGetChangeNotes = (searchParams: Ref<Record<string, string>> | UR
  * @throws An error if the API request to retrieve the change notes fails.
  */
 export const getChangeNotes = async (params?: URLSearchParams) => {
-  console.log("Fetching change notes with params:", params?.toString());
   const response = await api.get(`changenotes`, { params });
   return response.data as ChangeNote[];
 }

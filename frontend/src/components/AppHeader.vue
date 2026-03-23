@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { routeNames } from '../utils/router';
+import { routeNames, router } from '../utils/router';
 import logoSvg from '../assets/solwr_logo.svg';
 import Avatar from './ui/avatar/Avatar.vue';
 import Separator from './ui/separator/Separator.vue';
@@ -19,6 +19,7 @@ import MenubarTrigger from './ui/menubar/MenubarTrigger.vue';
 import MenubarContent from './ui/menubar/MenubarContent.vue';
 import MenubarSeparator from './ui/menubar/MenubarSeparator.vue';
 import { i18n } from '@/utils/i18n';
+import { isAdmin } from '@/utils/keycloak';
 
 const { theme } = useTheme()
 const { t } = useI18n()
@@ -46,12 +47,17 @@ const handleLocalChange = (locale : "en" | "no" | "fr") => {
   localStorage.setItem('locale', locale);
 }
 
+const handleLogoClick = () => {
+	if (isAuthenticated.value) {
+		router.push(routeNames.releaseNotes);
+	}
+}
 </script>
 
 <template>
     <header class="flex flex-col bg-background-dark-static">
 	<div class="flex items-center h-20 px-8 gap-12">
-	    <img :src="logoSvg" alt="Logo" class="w-50 h-7.5" />
+	    <img :src="logoSvg" alt="Logo" class="w-50 h-7.5 cursor-pointer" @click="handleLogoClick"/>
 	    <nav class="hidden md:flex flex-row gap-12">
 		<RouterLink v-if="isAuthenticated" class="text-md text-text-dark-static hover:underline" :to="routeNames.releaseNotes">{{ t('header.releaseNotesLink') }}</RouterLink>
 		<RouterLink v-if="isAuthenticated" class="text-md text-text-dark-static hover:underline" :to="routeNames.changeNotes">{{ t('header.changeNotesLink') }}</RouterLink>
@@ -87,13 +93,15 @@ const handleLocalChange = (locale : "en" | "no" | "fr") => {
 							</MenubarItem>
 						</MenubarSubContent>
 					</MenubarSub>
-					<MenubarSeparator/>
-					<MenubarItem>
-						<div class="w-full flex justify-end gap-2">
-							<RouterLink class="text-md" :to="routeNames.gitRepositories">{{ t('header.repositories') }}</RouterLink>
-							<GitBranch class="text-text-primary"/>
-						</div>
-					</MenubarItem>
+          <template v-if="isAdmin">
+            <MenubarSeparator/>
+            <MenubarItem>
+              <div class="w-full flex justify-end gap-2">
+                <RouterLink class="text-md" :to="routeNames.gitRepositories">{{ t('header.repositories') }}</RouterLink>
+                <GitBranch class="text-text-primary"/>
+              </div>
+            </MenubarItem>
+          </template>
 					<MenubarSeparator />
 					<MenubarItem @click="handleLogOut">
 						<div class="w-full flex gap-2">

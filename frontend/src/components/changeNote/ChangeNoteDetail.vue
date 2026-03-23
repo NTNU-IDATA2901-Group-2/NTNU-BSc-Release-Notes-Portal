@@ -9,17 +9,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { EllipsisVertical, Eye, FileDown, Pencil, Trash2 } from 'lucide-vue-next';
+import { EllipsisVertical, Eye, Pencil, Sparkles, Trash2 } from 'lucide-vue-next';
 import DeletePrompt from '../DeletePrompt.vue';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useArchiveChangeNote, usePublishChangeNote } from '@/api/change-note-api';
 import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';
 import { useI18n } from 'vue-i18n';
-
-const { t } = useI18n();
-
+import { isAdmin } from '@/utils/keycloak';
 import md from '@/utils/markdown-it';
+import { useTranslate } from '@/api/ai';
+import Button from '../ui/button/Button.vue';
+import Spinner from '../ui/spinner/Spinner.vue';
+
+const { t, locale } = useI18n();
 
 const props = defineProps<{
     changeNote: ChangeNote;
@@ -31,6 +34,8 @@ const emit = defineEmits<{
 }>();
 
 const showDeletePrompt = ref(false);
+const translatedDescription = ref<string | null>(null);
+const isTranslating = ref(false);
 
 const deleteChangeNoteMutation = useArchiveChangeNote(props.changeNote.id, {
   onSuccess: () => {
@@ -60,7 +65,33 @@ const { mutate: publishChangeNoteMutation } = usePublishChangeNote(props.changeN
 const onPublishToggle = () => {
   publishChangeNoteMutation(!props.changeNote.published);
   
-} 
+}
+
+const hasTranslation = computed(() => translatedDescription.value !== null);
+
+const translateMutation = useTranslate({
+  onSuccess: () => {
+    toast.success(t('toast.translationSuccess'));
+  },
+  onError: () => {
+    toast.error(t('toast.translationError'));
+  },
+});
+
+const onTranslate = async () => {
+  if (translatedDescription.value) {
+    translatedDescription.value = null;
+    return;
+  }
+  isTranslating.value = true;
+  const result = await translateMutation.mutateAsync({
+    text: props.changeNote.description,
+    locale: locale.value,
+  });
+  translatedDescription.value = result;
+  isTranslating.value = false;
+  console.log("Translation result:", translatedDescription.value);
+}
 
 </script>
 
@@ -72,13 +103,17 @@ const onPublishToggle = () => {
           <div class="flex items-center gap-4">
             <h1 class="text-3xl max-w-60 whitespace-nowrap overflow-hidden">{{
               changeNote.reference }}</h1>
-            <Badge
-class="h-6"
+            <Badge 
+              v-if="isAdmin" class="h-6"
               :variant="changeNote.published ? 'success' : 'destructive'">{{ changeNote.published ?
                 'Published' : 'Private' }}</Badge>
           </div>
-          <div class="flex gap-4">
-            <DropdownMenu>
+          <div class="flex gap-4 justify-center items-center">
+            <Button :disabled="isTranslating" v-if="!(locale === 'en')" variant="glow" @click="onTranslate">{{hasTranslation ? t('button.undo') : t('button.translate') }}
+              <Spinner v-if="isTranslating" class="h-4 dark:text-text-primary"/>
+              <Sparkles v-else/> 
+            </Button>
+            <DropdownMenu v-if="isAdmin">
               <DropdownMenuTrigger
                 class="cursor-pointer hover:bg-border/50 rounded-md p-2 transition-colors">
                 <EllipsisVertical class="text-text-primary" />
@@ -102,18 +137,13 @@ class="h-6"
                     <Eye class="text-text-primary" />
                   </div>
                 </DropdownMenuItem>
-                <DropdownMenuItem disabled>
-                  <div class="w-full flex gap-2">
-                    <p class="ml-auto text-text-primary">{{ t('button.export') }}</p>
-                    <FileDown class="text-text-primary" />
-                  </div>
-                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
 
-        <p v-html="md.render(changeNote.description)"></p>
+        <p v-html="md.render(translatedDescription ?? changeNote.description)"></p>
+        <p v-if="hasTranslation" class="text-text-primary/50 text-right">{{ t('ai.translationDisclaimer') }}</p>
         <div class="flex flex-wrap gap-4">
           <Badge v-if="changeNote.product" class="h-6">{{ changeNote.product.name }}</Badge>
           <Badge v-if="changeNote.scope" class="h-6">{{ changeNote.scope.name }}</Badge>
@@ -123,13 +153,13 @@ class="h-6"
       </div>
       <Separator class="w-full h-2" />
       <div class="flex flex-col w-full text-xl gap-10">
-        <div>
+        <div v-if="changeNote.developerNotes">
           <h3 class="text-2xl">{{ t('title.developerNotes') }}</h3>
-          <div class="text-text-primary" v-html="md.render(changeNote.developerNotes)"></div>
+          <div class="text-text-primary"  v-html="md.render(changeNote.developerNotes)"></div>
         </div>
-        <div>
+        <div v-if="changeNote.upgradeNotes">
           <h3 class="text-2xl">{{ t('title.upgradeRequirements') }}</h3>
-          <p v-html="md.render(changeNote.upgradeNotes)"></p>
+          <p  v-html="md.render(changeNote.upgradeNotes)"></p>
         </div>
       </div>
     </div>

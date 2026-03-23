@@ -19,6 +19,10 @@ import no.reliablesolutions.release_notes_portal.exception.CustomerNotFoundExcep
 import no.reliablesolutions.release_notes_portal.exception.FeatureNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ProductNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ScopeNotFoundException;
+import no.reliablesolutions.release_notes_portal.util.AccessScope;
+import no.reliablesolutions.release_notes_portal.util.AccessScopeFactory;
+import no.reliablesolutions.release_notes_portal.util.AuthenticationUtil;
+import no.reliablesolutions.release_notes_portal.util.ChangeNoteMapper;
 
 @Service
 @AllArgsConstructor
@@ -96,28 +100,56 @@ public class ChangeNoteService {
   }
 
   /**
-   * Retrieves all change notes from the repository, with optional filtering based on query, published status, customer ID, feature ID, scope ID, and product ID.
+   * Retrieves all change notes from the repository, with optional filtering based
+   * on query, published status, customer ID, feature ID, scope ID, and product
+   * ID.
    * 
    * @param query          optional filter for searching change notes by reference, description, developer notes or upgrade notes
    * @param published      optional filter for published status
-   * @param hasReleaseNote optional filter for change notes that have an associated release note
+   * @param hasReleaseNote optional filter for change notes that have an
+   *                       associated release note
    * @param customerIds    optional filter for customer ID
    * @param featureIds     optional filter for feature ID
    * @param scopeIds       optional filter for scope ID
    * @param productIds     optional filter for product ID
    * 
-   * @return a list of all change notes that match the provided filters, mapped to ChangeNoteDTOs
+   * @return a list of all change notes that match the provided filters, mapped to
+   *         ChangeNoteDTOs
    */
   public List<ChangeNoteDTO> getAllChangeNotes(ChangeNoteFilterOptionsDTO filterOptions) {
+
     if (filterOptions == null) {
-      return changeNoteRepository.findByArchivedFalse().stream().map(ChangeNoteDTO::fromChangeNote).toList();
-    } else {
-      return changeNoteRepository
-          .findByArchivedFalseAndMatchingFilterParameters(filterOptions)
-          .stream().map(ChangeNoteDTO::fromChangeNote).toList();
+      filterOptions = new ChangeNoteFilterOptionsDTO(null, null, null, null, null, null, null, null);
     }
 
+    AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
+    
+    if (accessScope.isAdmin()) {
+      return changeNoteRepository.findByArchivedFalseAndMatchingFilterParameters(filterOptions).stream()
+          .map(changeNote -> ChangeNoteMapper.toDTO(changeNote, accessScope))
+          .toList();
 
+    } else {
+      filterOptions = new ChangeNoteFilterOptionsDTO(
+          filterOptions.query(),
+          true,
+          filterOptions.hasReleaseNote(),
+          filterOptions.filteredIds(),
+          filterOptions.customerIds(),
+          filterOptions.featureIds(),
+          filterOptions.scopeIds(),
+          filterOptions.productIds()
+      );
+      
+      return changeNoteRepository.findForCustomerNamesMatchingFilterParameters(accessScope.getCustomerGroups(), filterOptions).stream()
+          .map(note -> {
+            note.setDeveloperNotes(null);
+            note.setUpgradeNotes(null);
+            return note;
+          })
+          .map(changeNote -> ChangeNoteMapper.toDTO(changeNote, accessScope))
+          .toList();
+    }
   }
 
   /**
@@ -129,10 +161,20 @@ public class ChangeNoteService {
    *                                     exists
    */
   public ChangeNoteDTO getChangeNoteById(long id) {
-    ChangeNote changeNote = changeNoteRepository.findByIdAndArchivedFalse(id)
-        .orElseThrow(() -> new ChangeNoteNotFoundException(id));
+    AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
+    
+    boolean isAdmin = AuthenticationUtil.isAdmin();
+    if (!isAdmin) {
+      ChangeNote changeNote = changeNoteRepository.findForCustomerByIdAndArchivedFalse(id, accessScope.getCustomerGroups()).orElseThrow(() -> new ChangeNoteNotFoundException(id));
 
-    return ChangeNoteDTO.fromChangeNote(changeNote);
+      if (!changeNote.isPublished()) {
+        throw new ChangeNoteNotFoundException(id);
+      }
+      return ChangeNoteMapper.toDTO(changeNote, accessScope);
+    } else {
+      ChangeNote changeNote = changeNoteRepository.findByIdAndArchivedFalse(id).orElseThrow(() -> new ChangeNoteNotFoundException(id));
+      return ChangeNoteMapper.toDTO(changeNote, accessScope);
+    }
   }
 
   /**
@@ -181,7 +223,7 @@ public class ChangeNoteService {
       changeNote.setCustomer(null);
     }
 
-    return ChangeNoteDTO.fromChangeNote(changeNoteRepository.save(changeNote));
+    return ChangeNoteMapper.toDTO(changeNoteRepository.save(changeNote), AccessScopeFactory.fromCurrentUser());
   }
 
   /**

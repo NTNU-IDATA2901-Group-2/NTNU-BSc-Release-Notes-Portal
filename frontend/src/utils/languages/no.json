@@ -24,7 +24,10 @@
         "filter": "Filtrer",
         "search": "Søk",
         "signIn": "Logg inn",
-        "clearFilters": "Fjern filtre"
+        "clearFilters": "Fjern filtre",
+        "translate": "Oversett",
+        "undo": "Angre",
+        "showGeneralChanges": "Vis generelle endringer"
     },
     "title": {
         "title": "Tittel",
@@ -51,6 +54,7 @@
         "changeNoteUnpublishError": "Det oppsto en feil under avpublisering av endringsnotat",
         "changeNoteUpdatedSuccess": "Endringsnotat oppdatert",
         "changeNoteUpdateError": "Det oppsto en feil under oppdatering av endringsnotat",
+        "changeNoteLoadingError": "Det oppsto en feil under innlastning av endringsnotat",
         "selectedChangeNotesPublished": "Valgte endringsnotater publisert",
         "selectedChangeNotesPublishError": "Kunne ikke publisere valgte endringsnotater",
         "releaseNoteCreated": "Utgivelsesnotat opprettet",
@@ -62,7 +66,10 @@
         "releaseNotePublishError": "Det oppsto en feil under publisering av utgivelsesnotat",
         "releaseNoteUnpublishError": "Det oppsto en feil under avpublisering av utgivelsesnotat",
         "releaseNoteUpdatedSuccess": "Utgivelsesnotat oppdatert",
-        "releaseNoteUpdateError": "Det oppsto en feil under oppdatering av utgivelsesnotat"
+        "releaseNoteUpdateError": "Det oppsto en feil under oppdatering av utgivelsesnotat",
+        "exportPdfError": "Det oppsto en feil under eksportering til PDF",
+        "translationError": "Det oppsto en feil under oversettelse av endringsnotat",
+        "translationSuccess": "Endringsnotat oversatt"
     },
     "deletePrompt": {
         "title": "Er du sikker på at du vil slette?",
@@ -116,5 +123,8 @@
         "nameRequired": "Navn er påkrevd",
         "urlRequired": "URL er påkrevd",
         "error": "Det oppsto en feil under innlastning av repositoryer"
+    },
+    "ai": {
+        "translationDisclaimer": "Oversettelsen er generert av KI. Vennligst sjekk viktige fakta."
     }
 }

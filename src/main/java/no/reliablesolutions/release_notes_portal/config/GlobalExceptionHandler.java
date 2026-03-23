@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,7 +20,6 @@ import no.reliablesolutions.release_notes_portal.exception.ScopeNotFoundExceptio
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
-import no.reliablesolutions.release_notes_portal.exception.ChangeNoteAlreadyHasReleaseNoteException;
 
 /**
  * Global exception handler for the application. Catches specific exceptions thrown by controllers and services, logs the events, and returns appropriate HTTP responses with messages.
@@ -175,17 +175,6 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * Handles the case where a change note already has an associated release note. Logs the event and returns a 400 response with a message.
-   * @param e the exception containing details about the change note and existing release note
-   * @return a ResponseEntity with a 400 status and a message indicating the change note already has a release note
-   */
-  @ExceptionHandler(value = {ChangeNoteAlreadyHasReleaseNoteException.class})
-  public ResponseEntity<String> handleChangeNoteAlreadyHasReleaseNoteException(ChangeNoteAlreadyHasReleaseNoteException e) {
-    logger.warn("Change note already has a release note: {}", e.getMessage());
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Change note with ID " + e.getChangeNoteId() + " already has a release note with ID " + e.getExistingReleaseNoteId());
-  }
-
-  /**
    * Handles the case where a requested resource is not found. Logs the event and returns a 404 response with a message.
    * @param e the exception containing details about the missing resource
    * @return a ResponseEntity with a 404 status and a message indicating the resource was not found
@@ -205,5 +194,39 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleGitRepositoryNotFoundException(no.reliablesolutions.release_notes_portal.exception.GitRepositoryNotFoundException e) {
     logger.warn("Git repository not found: {}", e.getGitRepositoryId());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Git repository with ID %d not found", e.getGitRepositoryId()));
+  }
+
+  /**
+   * Handles the case where authorization is denied. Logs the event and returns a 403 response with a message indicating that authorization was denied.
+  *
+   * @param e the exception containing details about the authorization denial
+   * @return a ResponseEntity with a 403 status and a message indicating that authorization was denied
+   */
+  @ExceptionHandler(value = {AuthorizationDeniedException.class})
+  public ResponseEntity<String> handleAuthorizationDeniedException(AuthorizationDeniedException e) {
+    logger.warn("Authorization denied: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Authorization denied: " + e.getMessage());
+  }
+
+  /**
+   * Handles the case where a locale is not supported. Logs the event and returns a 400 response with a message indicating the unsupported locale and the supported locales.
+   * @param e the exception containing details about the unsupported locale
+   * @return a ResponseEntity with a 400 status and a message indicating the unsupported locale and the supported locales
+   */
+  @ExceptionHandler(value = {no.reliablesolutions.release_notes_portal.exception.LocaleNotSupportedException.class})
+  public ResponseEntity<String> handleLocaleNotSupportedException(no.reliablesolutions.release_notes_portal.exception.LocaleNotSupportedException e) {
+    logger.warn("Locale not supported: {}", e.getLocale());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(String.format("Locale '%s' is not supported. Supported locales are: en (English), no (Norwegian Bokmål), fr (French)", e.getLocale()));
+  }
+
+  /**
+   * Handles the case where a non-transient AI exception occurs. Logs the event and returns a 500 response with a message indicating the non-transient AI exception.
+   * @param e the exception containing details about the non-transient AI exception
+   * @return a ResponseEntity with a 500 status and a message indicating the non-transient AI exception
+   */
+  @ExceptionHandler(value = {org.springframework.ai.retry.NonTransientAiException.class})
+  public ResponseEntity<String> handleNonTransientAiException(org.springframework.ai.retry.NonTransientAiException e) {
+    logger.warn("Non-transient AI exception: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Non-transient AI exception: " + e.getMessage());
   }
 }
