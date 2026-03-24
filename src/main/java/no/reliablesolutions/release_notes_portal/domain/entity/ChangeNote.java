@@ -10,6 +10,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,6 +20,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@Table(
+  uniqueConstraints = @UniqueConstraint(name="unique_git_commit_repository", columnNames = {"gitCommitHash", "gitRepository_id"})
+)
 public class ChangeNote {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

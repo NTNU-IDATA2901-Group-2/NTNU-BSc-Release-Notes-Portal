@@ -14,10 +14,13 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevSort;
 import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.treewalk.CanonicalTreeParser;
+import org.eclipse.jgit.treewalk.EmptyTreeIterator;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
 import lombok.AllArgsConstructor;
@@ -51,7 +54,13 @@ public class SyncGitChangeNotes implements CommandLineRunner {
   public void run(String... args) throws Exception {    
     List<GitRepository> gitRepositories = gitRepositoryRepository.findAll();
     logger.info("Found {} git repositories", gitRepositories.size());
-    gitRepositories.forEach(this::syncGitRepository);
+    gitRepositories.forEach(gitRepository -> {
+      try {
+        this.syncGitRepository(gitRepository);
+      } catch (Exception e) {
+        logger.error("Failed to synchronize Git repository with id {} due to unexpected error", gitRepository.getId(), e);
+      }
+    });
   }
   
 
@@ -65,7 +74,7 @@ public class SyncGitChangeNotes implements CommandLineRunner {
    * <li> Synchronize change notes from the Git repository
    * </ul>
    */
-  public void syncGitRepository(GitRepository gitRepository) {
+  public void syncGitRepository(GitRepository gitRepository) throws Exception {
 
     if (gitRepository == null) {
       throw new IllegalArgumentException("Git repository cannot be null");
@@ -225,46 +234,56 @@ public class SyncGitChangeNotes implements CommandLineRunner {
       throw new IllegalArgumentException("Git repository cannot be null");
     }
     
-    RevCommit previousCommitWithChangeNote = null;
-    
+
+    RevCommit lastCheckedCommit = null;
     try (DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);) {
       diffFormatter.setRepository(repository);
-      RevCommit firstCommit = revWalk.next();
+
       for (RevCommit commit : revWalk) {
-        RevCommit previousCommit = previousCommitWithChangeNote != null ? previousCommitWithChangeNote : firstCommit;
-        List<DiffEntry> diffEntries = diffFormatter.scan(previousCommit.getTree(), commit.getTree());
-        
+        if (commit.getParentCount() == 0) {
+          logger.warn("No parent commit for commit {} with message '{}'. Skipping diff", commit.getName(), commit.getShortMessage());
+          continue;
+        }
+
+        RevCommit parentCommit = revWalk.parseCommit(commit.getParent(0).getId());
+        List<DiffEntry> diffEntries = diffFormatter.scan(parentCommit.getTree(), commit.getTree());
         List<File> newChangeNoteFiles = diffEntries.stream()
-        .filter(diffEntry -> diffEntry.getChangeType() == DiffEntry.ChangeType.ADD)
-        .filter(diffEntry -> diffEntry.getNewPath().startsWith(CHANGE_NOTE_DIRECTORY + "/"))
-        .map(diffEntry -> new File(repositoryDirectory, diffEntry.getNewPath()))
-        .toList();
+          .filter(diffEntry -> diffEntry.getChangeType() == DiffEntry.ChangeType.ADD)
+          .filter(diffEntry -> diffEntry.getNewPath().startsWith(CHANGE_NOTE_DIRECTORY + File.separator))
+          .filter(diffEntry -> diffEntry.getNewPath().endsWith(".yaml") || diffEntry.getNewPath().endsWith(".yml"))
+          .map(diffEntry -> new File(repositoryDirectory, diffEntry.getNewPath()))
+          .toList();
+
         if (!newChangeNoteFiles.isEmpty()) {
-          previousCommitWithChangeNote = commit;
           if (newChangeNoteFiles.size() > 1) {
-            logger.warn("Found multiple new change note files for commit {}: {}. Only the first will be processed.", commit.getName(), newChangeNoteFiles.stream().map(File::getPath).toList());
+            logger.warn("Found multiple new change note files for commit {}: {}. Only the first will be processed", commit.getName(), newChangeNoteFiles.stream().map(File::getPath).toList());
           }
           File changeNoteFile = newChangeNoteFiles.get(0);
           ChangeNote changeNote = getChangeNoteFromFile(changeNoteFile);
           if (changeNote != null) {
             changeNote.setGitRepository(gitRepository);
             changeNote.setGitCommitHash(commit.getName());
-            changeNote.setGitCommitTimestamp(Long.valueOf(commit.getCommitTime()));
-            changeNoteService.updateChangeNote(changeNote);
+            changeNote.setGitCommitTimestamp(commit.getCommitTime() * 1000L); // convert seconds to milliseconds
+            try {
+              changeNoteService.updateChangeNote(changeNote);
+            } catch (DataIntegrityViolationException e) {
+              logger.warn("Failed to create change note from file {} for commit {} in repository with id {} due to data integrity violation. This is likely caused by a duplicate git commit hash. Skipping this change note file", changeNoteFile.getPath(), commit.getName(), gitRepository.getId());
+            }
             logger.info("Created change note from file {} for commit {} in repository with id {}", changeNoteFile.getPath(), commit.getName(), gitRepository.getId());
           }
         }
+        lastCheckedCommit = commit;
       }
       
     } catch (IOException e) {
       logger.error("Failed to check new commits for repository at {} due to IO error", repositoryDirectory.getPath(), e);
     }
     
-    if (previousCommitWithChangeNote == null) {
+    if (lastCheckedCommit == null) {
       logger.warn("No commits with change notes found in repository at {}", repositoryDirectory.getPath());
       return null;
     }
-    return previousCommitWithChangeNote.getId();
+    return lastCheckedCommit.getId();
     
   }
   
@@ -281,7 +300,7 @@ public class SyncGitChangeNotes implements CommandLineRunner {
     try {
       changeNote = changeNoteFileHandler.getChangeNoteFromFile(changeNoteFile);
     } catch (InvalidChangeNoteYamlException e) {
-      logger.warn("Failed to parse change note file at {} due to invalid YAML format. Reason: {}. Skipping this change note file.", changeNoteFile.getPath(), e.getReason());
+      logger.warn("Failed to parse change note file at {} due to invalid YAML format. Reason: {}. Skipping this change note file", changeNoteFile.getPath(), e.getReason());
     }
     return changeNote;
   }
