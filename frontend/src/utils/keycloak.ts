@@ -6,9 +6,7 @@ import { jwtDecode } from "jwt-decode"
 type DecodedJwtToken = {
   given_name?: string;
   family_name?: string;
-  realm_access?: {
-    roles?: string[];
-  };
+  roles?: string[];
 };
 
 const keycloak = new Keycloak({
@@ -22,7 +20,7 @@ export const jwtToken = ref<string | undefined>(undefined);
 export const jwtTokenDecoded = ref<DecodedJwtToken | undefined>(undefined);
 export const isAdmin = computed(() => {
   if (!jwtTokenDecoded.value) return false;
-  const roles = jwtTokenDecoded.value.realm_access?.roles || [];
+  const roles = jwtTokenDecoded.value.roles || [];
   return roles.includes("Admin");
 });
 
