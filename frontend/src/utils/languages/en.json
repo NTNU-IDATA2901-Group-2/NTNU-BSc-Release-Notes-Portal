@@ -68,7 +68,9 @@
         "releaseNoteUpdateError": "An error occurred while updating the release note",
         "exportPdfError": "An error occurred while exporting to PDF",
         "translationError": "An error occurred while translating the change note",
-        "translationSuccess": "Change note translated successfully"
+        "translationSuccess": "Change note translated successfully",
+        "copySuccess": "Content copied to clipboard",
+        "copyError": "An error occurred while copying to clipboard"
     },
     "deletePrompt": {
         "title": "Are you sure you want to delete?",

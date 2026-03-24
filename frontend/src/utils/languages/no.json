@@ -69,7 +69,9 @@
         "releaseNoteUpdateError": "Det oppsto en feil under oppdatering av utgivelsesnotat",
         "exportPdfError": "Det oppsto en feil under eksportering til PDF",
         "translationError": "Det oppsto en feil under oversettelse av endringsnotat",
-        "translationSuccess": "Endringsnotat oversatt"
+        "translationSuccess": "Endringsnotat oversatt",
+        "copySuccess": "Innhold kopiert til utklippstavle",
+        "copyError": "Det oppsto en feil under kopiering til utklippstavle"
     },
     "deletePrompt": {
         "title": "Er du sikker på at du vil slette?",

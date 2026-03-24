@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onBeforeUnmount, ref } from 'vue';
 import { exportToPdf } from '@/utils/pdf';
 import { useArchiveReleaseNote, usePublishReleaseNote } from '@/api/release-note-api';
 import type { ChangeNote, ReleaseNote } from '@/utils/types';
@@ -8,7 +8,7 @@ import { routeNames } from '@/utils/router';
 import { toast } from 'vue-sonner';
 import { useI18n } from 'vue-i18n';
 import { isAdmin } from '@/utils/keycloak';
-import { Pencil, Trash2, Eye, EyeOff, FileDown, ArrowLeft, EllipsisVertical, Sparkles } from "lucide-vue-next"
+import { Pencil, Trash2, Eye, EyeOff, FileDown, ArrowLeft, EllipsisVertical, Sparkles, Copy, Check } from "lucide-vue-next"
 import md from '@/utils/markdown-it';
 import DeletePrompt from '../DeletePrompt.vue';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../ui/breadcrumb';
@@ -132,6 +132,42 @@ const onTranslate = async () => {
 }
 
 const generalReleasesChecked = ref(true);
+
+const copiedKey = ref<string | null>(null);
+let copyResetTimeout: ReturnType<typeof setTimeout> | null = null;
+
+const resetCopiedState = () => {
+  copiedKey.value = null;
+  if (copyResetTimeout) {
+    clearTimeout(copyResetTimeout);
+    copyResetTimeout = null;
+  }
+};
+
+const handleCopy = (text: string | null | undefined, key: string) => {
+  if (!releaseNote) return;
+
+  navigator.clipboard.writeText(text ?? '')
+    .then(() => {
+      copiedKey.value = key;
+      if (copyResetTimeout) {
+        clearTimeout(copyResetTimeout);
+      }
+      copyResetTimeout = setTimeout(() => {
+        copiedKey.value = null;
+        copyResetTimeout = null;
+      }, 5000);
+      toast.success(t('toast.copySuccess'));
+    })
+    .catch((err) => {
+      console.error('Error copying to clipboard:', err);
+      toast.error(t('toast.copyError'));
+    });
+}
+
+onBeforeUnmount(() => {
+  resetCopiedState();
+});
 </script>
 
 <template>
@@ -215,8 +251,13 @@ const generalReleasesChecked = ref(true);
           </div>
         </div>
 
+        <div class="flex justify-between">
         <p v-if="releaseNote.summary" v-html="md.render(translatedSummary ?? releaseNote.summary)">
         </p>
+        <Button data-pdf-exclude class="size-fit" variant="outline" @click="handleCopy(hasTranslation ? translatedSummary ?? '' : releaseNote.summary, 'summary')">
+          <component :is="copiedKey === 'summary' ? Check : Copy" />
+        </Button>
+        </div>
         <p v-if="hasTranslation" class="text-text-primary/50 text-right">{{
           t('ai.translationDisclaimer') }}
         </p>
@@ -243,7 +284,12 @@ const generalReleasesChecked = ref(true);
                 </div>
                 <div>
                   <h3 class="text-xl" data-pdf-exclude>{{ t('title.description') }}</h3>
-                  <p class="ml-4" v-if="change.description" v-html="md.render(change.description)"></p>
+                  <div class="flex justify-between">
+                    <p class="ml-4" v-if="change.description" v-html="md.render(change.description)"></p>
+                    <Button data-pdf-exclude variant="outline" size="icon-sm" @click="handleCopy(hasTranslation ? translatedChangeNotes?.find(c => c.id === change.id)?.description ?? '' : change.description ?? '', `change-${change.id}`)">
+                      <component :is="copiedKey === `change-${change.id}` ? Check : Copy" />
+                    </Button>
+                  </div>
                   <p v-if="hasTranslation" class="text-text-primary/50 text-right" data-pdf-exclude>{{
                     t('ai.translationDisclaimer') }}</p>
                 </div>

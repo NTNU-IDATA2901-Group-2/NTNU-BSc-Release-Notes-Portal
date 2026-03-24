@@ -9,9 +9,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { EllipsisVertical, Eye, Pencil, Sparkles, Trash2 } from 'lucide-vue-next';
+import { Check, Copy, EllipsisVertical, Eye, Pencil, Sparkles, Trash2 } from 'lucide-vue-next';
 import DeletePrompt from '../DeletePrompt.vue';
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, ref } from 'vue';
 import { useArchiveChangeNote, usePublishChangeNote } from '@/api/change-note-api';
 import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';
@@ -93,6 +93,42 @@ const onTranslate = async () => {
   console.log("Translation result:", translatedDescription.value);
 }
 
+const copiedKey = ref<string | null>(null);
+let copyResetTimeout: ReturnType<typeof setTimeout> | null = null;
+
+const resetCopiedState = () => {
+  copiedKey.value = null;
+  if (copyResetTimeout) {
+    clearTimeout(copyResetTimeout);
+    copyResetTimeout = null;
+  }
+};
+
+const handleCopy = (text: string | null | undefined, key: string) => {
+  if (!props.changeNote) return;
+
+  navigator.clipboard.writeText(text ?? '')
+    .then(() => {
+      copiedKey.value = key;
+      if (copyResetTimeout) {
+        clearTimeout(copyResetTimeout);
+      }
+      copyResetTimeout = setTimeout(() => {
+        copiedKey.value = null;
+        copyResetTimeout = null;
+      }, 5000);
+      toast.success(t('toast.copySuccess'));
+    })
+    .catch((err) => {
+      console.error('Error copying to clipboard:', err);
+      toast.error(t('toast.copyError'));
+    });
+}
+
+onBeforeUnmount(() => {
+  resetCopiedState();
+});
+
 </script>
 
 <template>
@@ -142,7 +178,12 @@ const onTranslate = async () => {
           </div>
         </div>
 
+        <div class="flex justify-between">
         <p v-html="md.render(translatedDescription ?? changeNote.description)"></p>
+        <Button data-pdf-exclude class="size-fit" variant="outline" @click="handleCopy(hasTranslation ? translatedDescription ?? '' : changeNote.description, 'summary')">
+          <component :is="copiedKey === 'summary' ? Check : Copy" />
+        </Button>
+        </div>
         <p v-if="hasTranslation" class="text-text-primary/50 text-right">{{ t('ai.translationDisclaimer') }}</p>
         <div class="flex flex-wrap gap-4">
           <Badge v-if="changeNote.product" class="h-6">{{ changeNote.product.name }}</Badge>
