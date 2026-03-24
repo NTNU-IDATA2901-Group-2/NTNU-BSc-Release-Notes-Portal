@@ -185,6 +185,7 @@ const onSearch = () => {
           <p v-else-if="isError">{{ t('loadingError.releaseNotes') }}</p>
 
           <ScrollArea class="h-[75vh] w-full" v-else>
+            <p v-if="data?.length === 0" class="text-center">{{ t('placeholder.noChangeNotesFound') }}</p>
             <div v-for="changeNote in data" :key="changeNote.id" class="flex flex-col">
               <ChangeNoteCard 
                 class="my-4" :key="changeNote.id"

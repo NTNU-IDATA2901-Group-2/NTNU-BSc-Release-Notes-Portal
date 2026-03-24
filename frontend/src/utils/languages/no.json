@@ -107,7 +107,9 @@
         "title": "Tittel",
         "description": "Beskrivelse",
         "developerNotes": "Utviklernotater",
-        "upgradeRequirements": "Oppgraderingskrav"
+        "upgradeRequirements": "Oppgraderingskrav",
+        "noReleaseNotesFound": "Ingen utgivelsesnotater funnet",
+        "noChangeNotesFound": "Ingen endringsnotater funnet"
     },
     "repositories": {
         "title": "Git Repositorier",
