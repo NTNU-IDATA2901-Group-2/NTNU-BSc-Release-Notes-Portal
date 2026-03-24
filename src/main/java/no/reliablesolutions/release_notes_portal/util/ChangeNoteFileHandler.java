@@ -68,8 +68,6 @@ public class ChangeNoteFileHandler {
    */
   public ChangeNote getChangeNoteFromFile(File changeNoteFile) throws InvalidChangeNoteYamlException {
     logger.info("Parsing change note file at {}", changeNoteFile.getPath());
-    boolean missingScope = false;
-    List<String> invalidFields = new ArrayList<>();
     ChangeNote changeNote = new ChangeNote();
     try (InputStream inputStream = new FileInputStream(changeNoteFile);) {
       Map<String, Object> changeNoteData = yaml.load(inputStream);
@@ -81,11 +79,11 @@ public class ChangeNoteFileHandler {
       changeNote.setReference((String) changeNoteData.getOrDefault(REFERENCE_FIELD, null)); // optional
       String scope = (String) changeNoteData.get(SCOPE_FIELD);
       if (scope == null) {
-        missingScope = true;
+        changeNote.setScope(null);
       } else {
         List<Scope> scopes = scopeService.getScopeByName(scope);
         if (scopes.isEmpty()) {
-          invalidFields.add(SCOPE_FIELD);
+          changeNote.setScope(null);
         } else {
           if (scopes.size() > 1) {
             logger.warn("Multiple scopes found with name '{}', using the first one with id {}", scope, scopes.get(0).getId());
@@ -100,7 +98,7 @@ public class ChangeNoteFileHandler {
       } else {
         List<Product> products = productService.getProductByName(product);
         if (products.isEmpty()) {
-          invalidFields.add(PRODUCT_FIELD);
+          changeNote.setProduct(null);
         } else {
           if (products.size() > 1) {
             logger.warn("Multiple products found with name '{}', using the first one with id {}", product, products.get(0).getId());
@@ -115,7 +113,7 @@ public class ChangeNoteFileHandler {
       } else {
         List<Feature> features = featureService.getFeatureByName(feature);
         if (features.isEmpty()) {
-          invalidFields.add(FEATURE_FIELD);
+          changeNote.setFeature(null);
         } else {
           if (features.size() > 1) {
             logger.warn("Multiple features found with name '{}', using the first one with id {}", feature, features.get(0).getId());
@@ -130,7 +128,7 @@ public class ChangeNoteFileHandler {
       } else {
         List<Customer> customers = customerService.getCustomerByName(customer);
         if (customers.isEmpty()) {
-          invalidFields.add(CUSTOMER_FIELD);
+          changeNote.setCustomer(null);
         } else {
           if (customers.size() > 1) {
             logger.warn("Multiple customers found with name '{}', using the first one with id {}", customer, customers.get(0).getId());
@@ -142,12 +140,6 @@ public class ChangeNoteFileHandler {
       changeNote.setDescription((String) changeNoteData.getOrDefault(CHANGE_FIELD, null)); // optional
       changeNote.setDeveloperNotes((String) changeNoteData.getOrDefault(TECHNICAL_CHANGE_FIELD, null)); // optional
       changeNote.setUpgradeNotes((String) changeNoteData.getOrDefault(UPGRADE_REQUIREMENTS_FIELD, null)); // optional
-
-      if (missingScope) {
-        throw new InvalidChangeNoteYamlException("Missing required field: " + SCOPE_FIELD);
-      } else if (!invalidFields.isEmpty()) {
-        throw new InvalidChangeNoteYamlException("Invalid reference(s) in field(s): " + String.join(", ", invalidFields));
-      }
       
     } catch (FileNotFoundException e) {
       logger.error("Could not locate file {}", changeNoteFile.getName(), e);

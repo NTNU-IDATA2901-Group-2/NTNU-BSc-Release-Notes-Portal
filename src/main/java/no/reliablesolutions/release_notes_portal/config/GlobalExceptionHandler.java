@@ -3,6 +3,7 @@ package no.reliablesolutions.release_notes_portal.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -81,9 +82,21 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler(value = {FailedSyncGitChangeNotesException.class})
   public ResponseEntity<String> handleFailedSyncGitChangeNotesException(FailedSyncGitChangeNotesException e) {
-    logger.warn("Failed to sync Git change notes: {}", e.getMessage());
+    logger.warn("Failed to sync Git change notes", e);
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to sync Git change notes: " + e.getMessage());
   }
+
+  /**
+   * Handles the case where a data integrity violation occurs. Logs the event and returns a 500 response with a message indicating the data integrity violation.
+   * @param e the exception containing details about the data integrity violation
+   * @return a ResponseEntity with a 500 status and a message indicating the data integrity violation
+   */
+  @ExceptionHandler(value = {DataIntegrityViolationException.class})
+  public ResponseEntity<String> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+    logger.warn("Data integrity violation: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Data integrity violation: " + e.getMessage());
+  }
+  
 
 
   /**
