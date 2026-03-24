@@ -198,7 +198,7 @@ onBeforeUnmount(() => {
         <div class="flex flex-row items-center justify-between w-full">
           <div class="flex items-center sm:gap-4">
             <h1 v-if="!releaseNote.tag" class="text-4xl text-text-primary/50">{{ t('placeholder.noTitle') }}</h1>
-            <h1 class="text-4xl max-w-60 whitespace-nowrap overflow-hidden">{{
+            <h1 v-else class="text-4xl max-w-60 whitespace-nowrap overflow-hidden">{{
               releaseNote.tag }}</h1>
             <Badge 
               data-pdf-exclude v-if="isAdmin" class="h-6"
