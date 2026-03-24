@@ -41,7 +41,8 @@
         "search": "Søk",
         "status": "Status",
         "changeNotes": "Endringsnotater",
-        "releaseNotes": "Utgivelsesnotater"
+        "releaseNotes": "Utgivelsesnotater",
+        "allocated": "Tildelt"
     },
     "toast": {
         "changeNoteDeleted": "Endringsnotat slettet",

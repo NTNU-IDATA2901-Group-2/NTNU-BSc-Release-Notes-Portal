@@ -40,7 +40,8 @@
         "upgradeRequirements": "Upgrade Requirements",
         "status": "Status",
         "changeNotes": "Change Notes",
-        "releaseNotes": "Release Notes"
+        "releaseNotes": "Release Notes",
+        "allocated": "Allocated"
     },
     "toast": {
         "changeNoteDeleted": "Change note deleted successfully",

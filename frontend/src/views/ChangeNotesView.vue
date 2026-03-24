@@ -21,6 +21,7 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue-sonner';
 import { isAdmin } from '@/utils/keycloak';
+import AllocatedFilter from '@/components/filters/AllocatedFilter.vue';
 
 const router = useRouter();
 const { t } = useI18n();
@@ -121,6 +122,7 @@ const onSearch = () => {
       <ScrollArea class="h-100 p-5">
         <Button class="mt-4" variant="outline" @click="clearFilters">{{ t('button.clearFilters')
         }}</Button>
+        <AllocatedFilter v-if="isAdmin" />
         <PublicPrivateFilter v-if="isAdmin"/>
         <ProductFilter />
         <ScopeFilter />
@@ -132,6 +134,7 @@ const onSearch = () => {
       <div class="flex gap-8 flex-col h-min w-full md:flex-row justify-center p-4">
         <div class="h-min hidden md:block">
           <h1 class="text-3xl text-nowrap">{{ t('title.changeNotes') }}</h1>
+          <AllocatedFilter v-if="isAdmin" />
           <PublicPrivateFilter v-if="isAdmin"/>
           <ProductFilter />
           <ScopeFilter />
