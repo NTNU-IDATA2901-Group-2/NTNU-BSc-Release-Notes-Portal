@@ -29,8 +29,8 @@ const changeNotes = ref<number[]>(releaseNote.changeNotes?.map(cn => cn.id) || [
 const form = useForm({
   validationSchema: toTypedSchema(EditReleaseNoteSchema),
   initialValues: {
-    tag: releaseNote.tag,
-    summary: releaseNote.summary,
+    tag: releaseNote.tag || '',
+    summary: releaseNote.summary || '',
     changeNoteIds: changeNotes.value,
     published: releaseNote.published,
   }
