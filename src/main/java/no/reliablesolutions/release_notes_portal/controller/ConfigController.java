@@ -3,6 +3,7 @@ package no.reliablesolutions.release_notes_portal.controller;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @RestController
 @RequestMapping("/api/public/config")
+@Profile({ "dev", "prod" })
 public class ConfigController {
 
   @Value("${KC_URL}")
