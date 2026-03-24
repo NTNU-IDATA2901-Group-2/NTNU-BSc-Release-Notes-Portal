@@ -266,10 +266,10 @@ public class SyncGitChangeNotes implements CommandLineRunner {
             changeNote.setGitCommitTimestamp(commit.getCommitTime() * 1000L); // convert seconds to milliseconds
             try {
               changeNoteService.updateChangeNote(changeNote);
+              logger.info("Created change note from file {} for commit {} in repository with id {}", changeNoteFile.getPath(), commit.getName(), gitRepository.getId());
             } catch (DataIntegrityViolationException e) {
               logger.warn("Failed to create change note from file {} for commit {} in repository with id {} due to data integrity violation. This is likely caused by a duplicate git commit hash. Skipping this change note file", changeNoteFile.getPath(), commit.getName(), gitRepository.getId());
             }
-            logger.info("Created change note from file {} for commit {} in repository with id {}", changeNoteFile.getPath(), commit.getName(), gitRepository.getId());
           }
         }
         lastCheckedCommit = commit;
