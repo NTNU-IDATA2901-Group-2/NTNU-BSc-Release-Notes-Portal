@@ -137,8 +137,9 @@ onBeforeUnmount(() => {
       <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-row items-center justify-between w-full">
           <div class="flex items-center gap-4">
-            <h1 class="text-3xl max-w-60 whitespace-nowrap overflow-hidden">{{
+            <h1 v-if="changeNote.reference" class="text-3xl max-w-60 whitespace-nowrap overflow-hidden">{{
               changeNote.reference }}</h1>
+            <h1 v-if="!changeNote.reference" class="text-3xl text-text-primary/50">{{ t('placeholder.noTitle') }}</h1>
             <Badge 
               v-if="isAdmin" class="h-6"
               :variant="changeNote.published ? 'success' : 'destructive'">{{ changeNote.published ?
@@ -179,7 +180,8 @@ onBeforeUnmount(() => {
         </div>
 
         <div class="flex justify-between">
-        <p v-html="md.render(translatedDescription ?? changeNote.description)"></p>
+        <p v-if="changeNote.description" v-html="md.render(translatedDescription ?? changeNote.description)"></p>
+        <p v-if="!changeNote.description" class="text-text-primary/50">{{ t('placeholder.noDescription') }}</p>
         <Button data-pdf-exclude class="size-fit" variant="outline" @click="handleCopy(hasTranslation ? translatedDescription ?? '' : changeNote.description, 'summary')">
           <component :is="copiedKey === 'summary' ? Check : Copy" />
         </Button>

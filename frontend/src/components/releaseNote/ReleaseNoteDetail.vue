@@ -197,6 +197,7 @@ onBeforeUnmount(() => {
       <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-row items-center justify-between w-full">
           <div class="flex items-center sm:gap-4">
+            <h1 v-if="!releaseNote.tag" class="text-4xl text-text-primary/50">{{ t('placeholder.noTitle') }}</h1>
             <h1 class="text-4xl max-w-60 whitespace-nowrap overflow-hidden">{{
               releaseNote.tag }}</h1>
             <Badge 
@@ -254,6 +255,7 @@ onBeforeUnmount(() => {
         <div class="flex justify-between">
         <p v-if="releaseNote.summary" v-html="md.render(translatedSummary ?? releaseNote.summary)">
         </p>
+        <p class="text-text-primary/50" v-else>{{ t('placeholder.noSummary') }}</p>
         <Button data-pdf-exclude class="size-fit" variant="outline" @click="handleCopy(hasTranslation ? translatedSummary ?? '' : releaseNote.summary, 'summary')">
           <component :is="copiedKey === 'summary' ? Check : Copy" />
         </Button>
@@ -273,6 +275,7 @@ onBeforeUnmount(() => {
         </div>
         <div class="flex flex-col gap-16">
           <div class="flex flex-col gap-10">
+            <p class="text-text-primary/50" v-if="releaseNote.changeNotes.length === 0">{{ t('placeholder.noChangeNotesAdded') }}</p>
             <template 
               v-for="change in translatedChangeNotes ?? releaseNote.changeNotes" :key="change.id"
               >

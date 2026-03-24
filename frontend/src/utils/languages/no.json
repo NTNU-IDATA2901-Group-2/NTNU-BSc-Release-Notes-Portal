@@ -109,7 +109,11 @@
         "developerNotes": "Utviklernotater",
         "upgradeRequirements": "Oppgraderingskrav",
         "noReleaseNotesFound": "Ingen utgivelsesnotater funnet",
-        "noChangeNotesFound": "Ingen endringsnotater funnet"
+        "noChangeNotesFound": "Ingen endringsnotater funnet",
+        "noSummary": "Ingen oppsummering",
+        "noChangeNotesAdded": "Ingen endringsnotater lagt til",
+        "noTitle": "Ingen tittel",
+        "noDescription": "Ingen beskrivelse"
     },
     "repositories": {
         "title": "Git Repositorier",

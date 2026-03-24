@@ -108,7 +108,11 @@
         "developerNotes": "Developer Notes",
         "upgradeRequirements": "Upgrade Requirements",
         "noReleaseNotesFound": "No release notes found",
-        "noChangeNotesFound": "No change notes found"
+        "noChangeNotesFound": "No change notes found",
+        "noSummary": "No summary provided",
+        "noChangeNotesAdded": "No change notes added",
+        "noTitle": "No title",
+        "noDescription": "No description"
     },
     "repositories": {
         "title": "Git Repositories",
