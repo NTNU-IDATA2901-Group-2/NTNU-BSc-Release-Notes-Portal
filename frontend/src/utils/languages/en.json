@@ -68,7 +68,9 @@
         "releaseNoteUpdateError": "An error occurred while updating the release note",
         "exportPdfError": "An error occurred while exporting to PDF",
         "translationError": "An error occurred while translating the change note",
-        "translationSuccess": "Change note translated successfully"
+        "translationSuccess": "Change note translated successfully",
+        "copySuccess": "Content copied to clipboard",
+        "copyError": "An error occurred while copying to clipboard"
     },
     "deletePrompt": {
         "title": "Are you sure you want to delete?",
@@ -104,7 +106,13 @@
         "title": "Title",
         "description": "Description",
         "developerNotes": "Developer Notes",
-        "upgradeRequirements": "Upgrade Requirements"
+        "upgradeRequirements": "Upgrade Requirements",
+        "noReleaseNotesFound": "No release notes found",
+        "noChangeNotesFound": "No change notes found",
+        "noSummary": "No summary provided",
+        "noChangeNotesAdded": "No change notes added",
+        "noTitle": "No title",
+        "noDescription": "No description"
     },
     "repositories": {
         "title": "Git Repositories",

@@ -9,9 +9,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { EllipsisVertical, Eye, Pencil, Sparkles, Trash2 } from 'lucide-vue-next';
+import { Check, Copy, EllipsisVertical, Eye, Pencil, Sparkles, Trash2 } from 'lucide-vue-next';
 import DeletePrompt from '../DeletePrompt.vue';
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, ref } from 'vue';
 import { useArchiveChangeNote, usePublishChangeNote } from '@/api/change-note-api';
 import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';
@@ -93,6 +93,42 @@ const onTranslate = async () => {
   console.log("Translation result:", translatedDescription.value);
 }
 
+const copiedKey = ref<string | null>(null);
+let copyResetTimeout: ReturnType<typeof setTimeout> | null = null;
+
+const resetCopiedState = () => {
+  copiedKey.value = null;
+  if (copyResetTimeout) {
+    clearTimeout(copyResetTimeout);
+    copyResetTimeout = null;
+  }
+};
+
+const handleCopy = (text: string | null | undefined, key: string) => {
+  if (!props.changeNote) return;
+
+  navigator.clipboard.writeText(text ?? '')
+    .then(() => {
+      copiedKey.value = key;
+      if (copyResetTimeout) {
+        clearTimeout(copyResetTimeout);
+      }
+      copyResetTimeout = setTimeout(() => {
+        copiedKey.value = null;
+        copyResetTimeout = null;
+      }, 5000);
+      toast.success(t('toast.copySuccess'));
+    })
+    .catch((err) => {
+      console.error('Error copying to clipboard:', err);
+      toast.error(t('toast.copyError'));
+    });
+}
+
+onBeforeUnmount(() => {
+  resetCopiedState();
+});
+
 </script>
 
 <template>
@@ -101,8 +137,9 @@ const onTranslate = async () => {
       <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-row items-center justify-between w-full">
           <div class="flex items-center gap-4">
-            <h1 class="text-3xl max-w-60 whitespace-nowrap overflow-hidden">{{
+            <h1 v-if="changeNote.reference" class="text-3xl max-w-60 whitespace-nowrap overflow-hidden">{{
               changeNote.reference }}</h1>
+            <h1 v-else class="text-3xl text-text-primary/50">{{ t('placeholder.noTitle') }}</h1>
             <Badge 
               v-if="isAdmin" class="h-6"
               :variant="changeNote.published ? 'success' : 'destructive'">{{ changeNote.published ?
@@ -142,7 +179,13 @@ const onTranslate = async () => {
           </div>
         </div>
 
-        <p v-html="md.render(translatedDescription ?? changeNote.description)"></p>
+        <div class="flex justify-between">
+        <p v-if="changeNote.description" v-html="md.render(translatedDescription ?? changeNote.description)"></p>
+        <p v-else class="text-text-primary/50">{{ t('placeholder.noDescription') }}</p>
+        <Button data-pdf-exclude class="size-fit" variant="outline" @click="handleCopy(hasTranslation ? translatedDescription ?? '' : changeNote.description, 'summary')">
+          <component :is="copiedKey === 'summary' ? Check : Copy" />
+        </Button>
+        </div>
         <p v-if="hasTranslation" class="text-text-primary/50 text-right">{{ t('ai.translationDisclaimer') }}</p>
         <div class="flex flex-wrap gap-4">
           <Badge v-if="changeNote.product" class="h-6">{{ changeNote.product.name }}</Badge>
