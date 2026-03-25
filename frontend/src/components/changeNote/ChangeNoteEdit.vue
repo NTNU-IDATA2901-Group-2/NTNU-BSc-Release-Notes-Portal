@@ -13,6 +13,8 @@ import { useUpdateChangeNote } from '@/api/change-note-api';
 import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';
 import { useI18n } from 'vue-i18n';
+import Checkbox from '../ui/checkbox/Checkbox.vue';
+import { ref } from 'vue';
 
 const props = defineProps<{
   changeNote: ChangeNote;
@@ -22,6 +24,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
 }>();
+
+const viewAbleByEveryone = ref(props.changeNote.viewableByEveryone);
 
 const { handleSubmit, defineField } = useForm({
   validationSchema: toTypedSchema(EditChangeNoteSchema),
@@ -34,7 +38,8 @@ const { handleSubmit, defineField } = useForm({
     customerId: props.changeNote.customer?.id,
     developerNotes: props.changeNote.developerNotes,
     upgradeNotes: props.changeNote.upgradeNotes,
-  }
+    viewableByEveryone: props.changeNote.viewableByEveryone,
+}
 });
 
 const [reference] = defineField('reference');
@@ -64,6 +69,7 @@ const onSubmit = handleSubmit((values : PersistChangeNoteDTO) => {
     values.scopeId = values.scopeId === -1 ? undefined : values.scopeId;
     values.featureId = values.featureId === -1 ? undefined : values.featureId;
     values.customerId = values.customerId === -1 ? undefined : values.customerId;
+    values.viewableByEveryone = values.customerId === -1 ? undefined : viewAbleByEveryone.value;
   updateChangeNoteMutation.mutate({ id: props.changeNote.id, dto: values });
 });
 
@@ -126,6 +132,10 @@ const onCancel = () => {
             <h4 class="text-md">{{ t('title.customer') }}</h4>
             <TagSelect mode="customer" v-model="customerId"/>
         </div>
+        </div>
+        <div v-if="customerId !== -1" class="flex gap-2">
+            <Checkbox v-model="viewAbleByEveryone"  />
+            <p>{{ t('changeNoteEdit.viewableByEveryone') }}</p>
         </div>
     </div>
 

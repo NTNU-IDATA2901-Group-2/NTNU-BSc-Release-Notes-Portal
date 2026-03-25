@@ -223,6 +223,10 @@ public class ChangeNoteService {
       changeNote.setCustomer(null);
     }
 
+    if (createChangeNoteDTO.viewableByEveryone() != null) {
+      changeNote.setViewableByEveryone(createChangeNoteDTO.viewableByEveryone());
+    }
+
     return ChangeNoteMapper.toDTO(changeNoteRepository.save(changeNote), AccessScopeFactory.fromCurrentUser());
   }
 

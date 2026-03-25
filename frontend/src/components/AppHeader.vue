@@ -6,7 +6,7 @@ import Avatar from './ui/avatar/Avatar.vue';
 import Separator from './ui/separator/Separator.vue';
 import { GitBranch, SunMoon, LogOut } from "lucide-vue-next"
 import { useTheme } from '@/utils/theme';
-import keycloak, { isAuthenticated, jwtTokenDecoded } from '@/utils/keycloak';
+import keycloak, { isAuthenticated, jwtTokenDecoded, isAdmin } from '@/utils/keycloak';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import MenubarSub from './ui/menubar/MenubarSub.vue';
@@ -19,14 +19,13 @@ import MenubarTrigger from './ui/menubar/MenubarTrigger.vue';
 import MenubarContent from './ui/menubar/MenubarContent.vue';
 import MenubarSeparator from './ui/menubar/MenubarSeparator.vue';
 import { i18n } from '@/utils/i18n';
-import { isAdmin } from '@/utils/keycloak';
 
 const { theme } = useTheme()
 const { t } = useI18n()
 
 const handleLogOut = () => {
 	keycloak.logout({
-		redirectUri: `${window.location.origin}${routeNames.signIn}`
+		redirectUri: `${globalThis.location.origin}${routeNames.signIn}`
 	}).then(() => {
 	}).catch(err => {
 		console.error('Keycloak logout error:', err);
