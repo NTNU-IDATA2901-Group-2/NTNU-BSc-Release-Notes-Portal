@@ -13,15 +13,22 @@ import { useUpdateChangeNote } from '@/api/change-note-api';
 import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';
 import { useI18n } from 'vue-i18n';
+import Checkbox from '../ui/checkbox/Checkbox.vue';
+import { ref } from 'vue';
+import DialogPrompt from '../DialogPrompt.vue';
 
 const props = defineProps<{
   changeNote: ChangeNote;
   modelValue?: boolean;
 }>();
 
+const showConfirmPrompt = ref(false);
+
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
 }>();
+
+const viewAbleByEveryone = ref(props.changeNote.viewableByEveryone);
 
 const { handleSubmit, defineField } = useForm({
   validationSchema: toTypedSchema(EditChangeNoteSchema),
@@ -34,7 +41,8 @@ const { handleSubmit, defineField } = useForm({
     customerId: props.changeNote.customer?.id,
     developerNotes: props.changeNote.developerNotes,
     upgradeNotes: props.changeNote.upgradeNotes,
-  }
+    viewableByEveryone: props.changeNote.viewableByEveryone,
+}
 });
 
 const [reference] = defineField('reference');
@@ -64,6 +72,7 @@ const onSubmit = handleSubmit((values : PersistChangeNoteDTO) => {
     values.scopeId = values.scopeId === -1 ? undefined : values.scopeId;
     values.featureId = values.featureId === -1 ? undefined : values.featureId;
     values.customerId = values.customerId === -1 ? undefined : values.customerId;
+    values.viewableByEveryone = values.customerId === -1 ? undefined : viewAbleByEveryone.value;
   updateChangeNoteMutation.mutate({ id: props.changeNote.id, dto: values });
 });
 
@@ -72,10 +81,20 @@ const onCancel = () => {
     router.push(`/change-notes/${props.changeNote.id}`);
 }
 
+const onViewableChecked = () => {
+    if (!viewAbleByEveryone.value) {
+        showConfirmPrompt.value = true;
+    }
+}
+
+const onCancelViewable = () => {
+    viewAbleByEveryone.value = false;
+}
+
 </script>
 
 <template>
-
+<DialogPrompt :open="showConfirmPrompt" :mode="'confirm'" :title-key="'changeNoteEdit.viewableByEveryoneTitle'" :description-key="'changeNoteEdit.viewableByEveryone'" @update:open="showConfirmPrompt = false" @cancel="onCancelViewable"/>
 <form @submit="onSubmit">
     <div class="md:hidden flex w-full mt-4 justify-end gap-2">
     <Button type="button" @click="onCancel" variant="outline">{{ t('button.cancel') }}
@@ -126,6 +145,10 @@ const onCancel = () => {
             <h4 class="text-md">{{ t('title.customer') }}</h4>
             <TagSelect mode="customer" v-model="customerId"/>
         </div>
+        </div>
+        <div v-if="customerId !== -1" class="flex flex-col gap-2">
+            <h4 class="text-md">{{ t('title.visibility') }}</h4>
+            <Checkbox v-model="viewAbleByEveryone" @click="onViewableChecked"/>
         </div>
     </div>
 

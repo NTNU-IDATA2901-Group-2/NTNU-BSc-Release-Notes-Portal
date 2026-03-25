@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { Checkbox } from '@/components/ui/checkbox';
-import { computed, inject, type Ref } from 'vue';
+import { computed, inject, onMounted, type Ref } from 'vue';
 
 const props = defineProps<{
     label: string,
     queryKey: string,
     value: string,
+    initialState?: boolean,
 }>()
 
 const searchParams = inject('searchParams') as Ref<{ [key: string]: string }>;
@@ -21,6 +22,15 @@ const update = (value: string | boolean) => {
   }
 }
 
+const applyInitialState = () => {
+  if (props.initialState && searchParams.value[props.queryKey] === undefined) {
+    searchParams.value[props.queryKey] = props.value;
+  }
+};
+
+onMounted(() => {
+  applyInitialState();
+});
 </script>
 
 <template>

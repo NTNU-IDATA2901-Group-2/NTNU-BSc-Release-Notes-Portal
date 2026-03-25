@@ -9,5 +9,6 @@ public record CreateChangeNoteDTO (
   Long scopeId,
   Long featureId,
   Long customerId,
-  Boolean published
+  Boolean published,
+  Boolean viewableByEveryone
 ) {}

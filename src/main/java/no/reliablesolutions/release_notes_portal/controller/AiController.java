@@ -23,6 +23,7 @@ public class AiController {
 
     @PostMapping("/translate")
     public ResponseEntity<String> translate(@RequestParam(required = true) String locale, @RequestParam(required = true) String text) {
+        logger.info("Translating text to locale: {}", locale);
         var response = aiService.translate(locale, text);
         return ResponseEntity.ok(response);
     }
