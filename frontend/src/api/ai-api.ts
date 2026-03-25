@@ -34,3 +34,25 @@ export const useTranslate = (onFinished: OnMutationApiCallFinished) => {
         onSettled: () => onFinished.onSettled?.(),
     })
 }
+
+const summarizeChangeNote = async (changeNoteId: number) => {
+  const response = await api.get(`ai/summarize-changenote/${changeNoteId}`);
+  return response.data;
+}
+
+export const useSummarizeChangeNote = (onFinished: OnMutationApiCallFinished) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (changeNoteId: number) => summarizeChangeNote(changeNoteId),
+        onSuccess: (data: string) => {
+            queryClient.invalidateQueries({ queryKey: ['summarizeChangeNote'] });
+            onFinished.onSuccess(data);
+        },
+        onError: () => {
+            console.error("Failed to summarize change note");
+            onFinished.onError();
+        },
+        onSettled: () => onFinished.onSettled?.(),
+    })
+}

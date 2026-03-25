@@ -18,7 +18,7 @@ import { router } from '@/utils/router';
 import { useI18n } from 'vue-i18n';
 import { isAdmin } from '@/utils/keycloak';
 import md from '@/utils/markdown-it';
-import { useTranslate } from '@/api/ai';
+import { useTranslate } from '@/api/ai-api';
 import Button from '../ui/button/Button.vue';
 import Spinner from '../ui/spinner/Spinner.vue';
 
@@ -142,7 +142,7 @@ const onTranslate = async () => {
           </div>
         </div>
 
-        <p v-html="md.render(translatedDescription ?? changeNote.description)"></p>
+        <p v-html="md.render(translatedDescription ?? changeNote.description ?? '')"></p>
         <p v-if="hasTranslation" class="text-text-primary/50 text-right">{{ t('ai.translationDisclaimer') }}</p>
         <div class="flex flex-wrap gap-4">
           <Badge v-if="changeNote.product" class="h-6">{{ changeNote.product.name }}</Badge>

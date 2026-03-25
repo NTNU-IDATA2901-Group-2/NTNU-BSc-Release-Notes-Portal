@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import no.reliablesolutions.release_notes_portal.domain.entity.ChangeNote;
 import no.reliablesolutions.release_notes_portal.dto.ChangeNoteFilterOptionsDTO;
+import no.reliablesolutions.release_notes_portal.dto.GitCommitHashAndPreviousGitCommitHash;
 
 public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
   List<ChangeNote> findByArchivedFalse();
@@ -101,4 +102,21 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
   public List<ChangeNote> findForCustomerNamesMatchingFilterParameters(
       @Param("customerNames") List<String> customerNames,
       @Param("filterOptions") ChangeNoteFilterOptionsDTO filterOptions);
+      
+  @Query("""
+      SELECT c.gitCommitHash AS gitCommitHash, 
+        (SELECT c2.gitCommitHash 
+        FROM ChangeNote c2 
+        WHERE c2.gitRepository.id = c.gitRepository.id 
+          AND c2.gitCommitTimestamp IS NOT NULL
+          AND c2.gitCommitTimestamp < c.gitCommitTimestamp
+          AND c2.archived = false
+        ORDER BY c2.gitCommitTimestamp DESC
+        LIMIT 1) AS previousGitCommitHash
+      FROM ChangeNote c
+      WHERE c.id = :changeNoteId
+        AND c.archived = false
+        AND c.gitCommitHash IS NOT NULL
+      """)
+  public GitCommitHashAndPreviousGitCommitHash findCommitHashAndPreviousCommitHash(Long changeNoteId);
 }

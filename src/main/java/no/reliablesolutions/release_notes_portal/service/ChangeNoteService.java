@@ -24,6 +24,8 @@ import no.reliablesolutions.release_notes_portal.util.AccessScopeFactory;
 import no.reliablesolutions.release_notes_portal.util.AuthenticationUtil;
 import no.reliablesolutions.release_notes_portal.util.ChangeNoteMapper;
 
+import no.reliablesolutions.release_notes_portal.dto.GitCommitHashAndPreviousGitCommitHash;
+
 @Service
 @AllArgsConstructor
 public class ChangeNoteService {
@@ -238,4 +240,14 @@ public class ChangeNoteService {
     changeNote.setPublished(publish);
     changeNoteRepository.save(changeNote);
   }
+
+  /**
+   * Retrieves the git commit hash and the previous git commit hash for a given change note ID.
+   * @param changeNoteId the ID of the change note
+   * @return the commit hashes
+   */
+  public GitCommitHashAndPreviousGitCommitHash getGitCommitHashAndPreviousGitCommitHash(Long changeNoteId) {
+    return changeNoteRepository.findCommitHashAndPreviousCommitHash(changeNoteId);
+  }
 }
+

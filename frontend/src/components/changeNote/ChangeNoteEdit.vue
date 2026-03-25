@@ -13,6 +13,7 @@ import { useUpdateChangeNote } from '@/api/change-note-api';
 import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';
 import { useI18n } from 'vue-i18n';
+import { useSummarizeChangeNote } from '@/api/ai-api';
 
 const props = defineProps<{
   changeNote: ChangeNote;
@@ -72,6 +73,16 @@ const onCancel = () => {
     router.push(`/change-notes/${props.changeNote.id}`);
 }
 
+const summarizeChangeNote = useSummarizeChangeNote({
+    onSuccess: (summary?: string) => {
+        description.value = summary;
+        toast.success(t('toast.summarizeSuccess'));
+    },
+    onError: () => {
+        toast.error(t('toast.summarizeError'));
+    }
+})
+
 </script>
 
 <template>
@@ -105,7 +116,10 @@ const onCancel = () => {
         </div>
 
         <div class="flex flex-col gap-1">
-            <h4 class="text-md">{{ t('title.description') }}</h4>
+            <div class = "flex flex-row justify-between">
+                <h4 class="text-md">{{ t('title.description') }}</h4>
+                <Button type="button" @click="summarizeChangeNote.mutate(props.changeNote.id)" variant="outline">Summarize</Button>
+            </div>
             <Textarea :placeholder="t('placeholder.description')" class="w-full" v-model="description"></Textarea>
         </div>
 
