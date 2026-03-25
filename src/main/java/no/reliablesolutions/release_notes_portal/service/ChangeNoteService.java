@@ -249,5 +249,14 @@ public class ChangeNoteService {
   public GitCommitHashAndPreviousGitCommitHash getGitCommitHashAndPreviousGitCommitHash(Long changeNoteId) {
     return changeNoteRepository.findCommitHashAndPreviousCommitHash(changeNoteId);
   }
+
+  /**
+   * Checks if a change note has associated git commit hashes.
+   * @param changeNoteId the ID of the change note
+   * @return true if the change note has associated git commit hashes, false otherwise
+   */
+  public boolean hasCommitHash(Long changeNoteId) {
+    return changeNoteRepository.findCommitHashAndPreviousCommitHash(changeNoteId) != null;
+  }
 }
 

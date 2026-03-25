@@ -2,18 +2,22 @@
 import type { ChangeNote, PersistChangeNoteDTO } from '@/utils/types';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
-import { Ban, Save } from 'lucide-vue-next';
+import { Ban, Save, Sparkles } from 'lucide-vue-next';
 import { Textarea } from '../ui/textarea';
 import TagSelect from '../TagSelect.vue';
 import { Separator } from '../ui/separator';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { EditChangeNoteSchema } from '@/schemas';
-import { useUpdateChangeNote } from '@/api/change-note-api';
+import { useGetHasCommits, useUpdateChangeNote } from '@/api/change-note-api';
 import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';
 import { useI18n } from 'vue-i18n';
 import { useSummarizeChangeNote } from '@/api/ai-api';
+import { computed, ref } from 'vue';
+import Tooltip from '../ui/tooltip/Tooltip.vue';
+import TooltipTrigger from '../ui/tooltip/TooltipTrigger.vue';
+import TooltipContent from '../ui/tooltip/TooltipContent.vue';
 
 const props = defineProps<{
   changeNote: ChangeNote;
@@ -83,43 +87,76 @@ const summarizeChangeNote = useSummarizeChangeNote({
     }
 })
 
+const hasCommits = useGetHasCommits(props.changeNote.id);
+const disableSummarizeButton = computed(() => hasCommits.isPending.value || hasCommits.isError.value || hasCommits.data.value !== true);  
+
 </script>
 
 <template>
 
 <form @submit="onSubmit">
-    <div class="md:hidden flex w-full mt-4 justify-end gap-2">
-    <Button type="button" @click="onCancel" variant="outline">{{ t('button.cancel') }}
-        <Ban />
-    </Button>
-    <Button type="submit" variant="outline">{{ t('button.save') }}
-        <Save />
-    </Button>
-    </div>
-
     <div class="flex flex-col gap-16 flex-1 w-full items-center mt-16 lg:w-4xl md:mt-42">
     <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-row items-center justify-between w-full">
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col gap-1 w-full">
+            <div class="flex sm:hidden ml-auto gap-4">
+                <Button
+                    :disabled="disableSummarizeButton"
+                    type="button"
+                    @click="summarizeChangeNote.mutate(props.changeNote.id)"
+                    variant="glow"
+                >
+                    {{t('button.summarize')}}
+                    <Sparkles />
+                </Button>
+            
+                <Button type="button" @click="onCancel"variant="outline">
+                    {{ t('button.cancel') }}
+                    <Ban />
+                </Button>
+                <Button type="submit" variant="outline">
+                    {{ t('button.save') }}
+                    <Save />
+                </Button>
+            </div>
             <h4 class="text-md">{{ t('title.title') }}</h4>
-            <Input class="w-full" v-model="reference" :placeholder="t('placeholder.title')" />
+            <div class="flex gap-4">
+            <Input class="w-45" v-model="reference" :placeholder="t('placeholder.title')" />
+            <div class="hidden sm:flex ml-auto gap-4">
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <div class = "inline-flex">
+                            <Button
+                                :disabled="disableSummarizeButton"
+                                type="button"
+                                @click="summarizeChangeNote.mutate(props.changeNote.id)"
+                                variant="glow"
+                            >
+                                {{t('button.summarize')}}
+                                <Sparkles />
+                            </Button>
+                        </div>
+                    </TooltipTrigger>
+                    <TooltipContent v-if="disableSummarizeButton">
+                        {{ t('tooltip.noCommits') }}
+                    </TooltipContent>
+                </Tooltip>
+                <Button type="button" @click="onCancel"variant="outline">
+                    {{ t('button.cancel') }}
+                    <Ban />
+                </Button>
+                <Button type="submit" variant="outline">
+                    {{ t('button.save') }}
+                    <Save />
+                </Button>
+            </div>
         </div>
-        <div class="flex gap-4">
-            <Button type="button" @click="onCancel" class="hidden md:flex" variant="outline">
-                {{ t('button.cancel') }}
-            <Ban />
-            </Button>
-            <Button class="hidden md:flex" type="submit" variant="outline">{{ t('button.save') }}
-            <Save />
-            </Button>
         </div>
+        
         </div>
 
         <div class="flex flex-col gap-1">
-            <div class = "flex flex-row justify-between">
-                <h4 class="text-md">{{ t('title.description') }}</h4>
-                <Button type="button" @click="summarizeChangeNote.mutate(props.changeNote.id)" variant="outline">Summarize</Button>
-            </div>
+            <h4 class="text-md">{{ t('title.description') }}</h4>
             <Textarea :placeholder="t('placeholder.description')" class="w-full" v-model="description"></Textarea>
         </div>
 

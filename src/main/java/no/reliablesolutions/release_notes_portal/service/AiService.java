@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import lombok.AllArgsConstructor;
 import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
 import no.reliablesolutions.release_notes_portal.dto.GitCommitHashAndPreviousGitCommitHash;
+import no.reliablesolutions.release_notes_portal.exception.ChangeNoteHasNoGitCommitsException;
 import no.reliablesolutions.release_notes_portal.exception.LocaleNotSupportedException;
 
 @Service
@@ -63,6 +64,9 @@ public class AiService {
      */
     public String summarizeChangeNote(long changeNoteId) {
       GitCommitHashAndPreviousGitCommitHash commits = changeNoteService.getGitCommitHashAndPreviousGitCommitHash(changeNoteId);
+      if (commits == null) {
+        throw new ChangeNoteHasNoGitCommitsException(changeNoteId);
+      }
       GitRepository gitRepository = gitRepositoryService.getGitRepositoryForChangeNote(changeNoteId);
       String diffString = diffService.getDiffString(commits.getGitCommitHash(), commits.getPreviousGitCommitHash(), gitRepository);
 

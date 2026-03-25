@@ -225,3 +225,23 @@ export const getChangeNotes = async (params?: URLSearchParams) => {
   const response = await api.get(`changenotes`, { params });
   return response.data as ChangeNote[];
 }
+
+/**
+ * Checks if a change note has any associated Git commits.
+ * @param changeNoteId The ID of the change note to check.
+ * @returns A promise resolving to a boolean indicating whether the change note has commits.
+ */
+const getHasCommits = async (changeNoteId: number): Promise<boolean> => {
+  const response = await api.get(`changenotes/${changeNoteId}/has-commits`);
+  return response.data as boolean;
+}
+
+/**
+ * Retrieves a boolean indicating whether a change note has any associated Git commits.
+ * @param changeNoteId The ID of the change note to check.
+ * @returns A boolean indicating whether the change note has commits.
+ */
+export const useGetHasCommits = (changeNoteId: number) => useQuery<boolean>({
+  queryKey: ['changeNote', changeNoteId, 'hasCommits'],
+  queryFn: () => getHasCommits(changeNoteId),
+})

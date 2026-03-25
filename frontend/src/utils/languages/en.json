@@ -27,7 +27,8 @@
         "clearFilters": "Clear Filters",
         "translate": "Translate",
         "undo": "Undo",
-        "showGeneralChanges": "Show General Changes"
+        "showGeneralChanges": "Show General Changes",
+        "summarize": "Summarize"
     },
     "title": {
         "title": "Title",
@@ -68,7 +69,9 @@
         "releaseNoteUpdateError": "An error occurred while updating the release note",
         "exportPdfError": "An error occurred while exporting to PDF",
         "translationError": "An error occurred while translating the change note",
-        "translationSuccess": "Change note translated successfully"
+        "translationSuccess": "Change note translated successfully",
+        "summarizeSuccess": "Change note summarized successfully",
+        "summarizeError": "An error occurred while summarizing the change note"
     },
     "deletePrompt": {
         "title": "Are you sure you want to delete?",
@@ -129,5 +132,8 @@
     },
     "ai": {
         "translationDisclaimer": "This translation is AI generated. Please check important facts."
+    },
+    "tooltip": {
+        "noCommits": "No associated git commits"
     }
 }

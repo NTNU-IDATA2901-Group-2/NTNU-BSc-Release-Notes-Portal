@@ -27,7 +27,8 @@
         "clearFilters": "Fjern filtre",
         "translate": "Oversett",
         "undo": "Angre",
-        "showGeneralChanges": "Vis generelle endringer"
+        "showGeneralChanges": "Vis generelle endringer",
+        "summarize": "Oppsummer"
     },
     "title": {
         "title": "Tittel",
@@ -69,7 +70,9 @@
         "releaseNoteUpdateError": "Det oppsto en feil under oppdatering av utgivelsesnotat",
         "exportPdfError": "Det oppsto en feil under eksportering til PDF",
         "translationError": "Det oppsto en feil under oversettelse av endringsnotat",
-        "translationSuccess": "Endringsnotat oversatt"
+        "translationSuccess": "Endringsnotat oversatt",
+        "summarizeSuccess": "Endringsnotat oppsummert",
+        "summarizeError": "Det oppsto en feil under oppsummering av endringsnotat"
     },
     "deletePrompt": {
         "title": "Er du sikker på at du vil slette?",
@@ -130,5 +133,8 @@
     },
     "ai": {
         "translationDisclaimer": "Oversettelsen er generert av KI. Vennligst sjekk viktige fakta."
+    },
+    "tooltip": {
+        "noCommits": "Ingen tilknyttede git commits"
     }
 }

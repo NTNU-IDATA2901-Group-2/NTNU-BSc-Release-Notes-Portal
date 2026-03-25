@@ -17,19 +17,24 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
+import no.reliablesolutions.release_notes_portal.exception.DiffStringGenerationException;
 
 @Service
 class DiffService {
 
   private final Logger logger = LoggerFactory.getLogger(DiffService.class);
   private final String repositoryDirectoriesPath;
-  
+  private final String changeNoteDirectory;
   /**
    * Constructor for DiffService.
    * @param repositoryDirectoriesPath the base path where local git repositories are stored, injected from application properties
    */
-  public DiffService(@Value("${REPOSITORY_DIRECTORIES_PATH}") String repositoryDirectoriesPath) {
+  public DiffService(
+    @Value("${REPOSITORY_DIRECTORIES_PATH}") String repositoryDirectoriesPath,
+    @Value("${CHANGE_NOTE_DIRECTORY}") String changeNoteDirectory
+  ) {
     this.repositoryDirectoriesPath = repositoryDirectoriesPath;
+    this.changeNoteDirectory = changeNoteDirectory;
   }
 
   /**
@@ -41,7 +46,7 @@ class DiffService {
    * @throws IllegalArgumentException if any of the parameters are null or if the repository directory does not exist
    * @throws RuntimeException if there is an error while generating the diff string
    */
-  public String getDiffString(String commitHash, String previousCommitHash, GitRepository gitRepository) {
+  public String getDiffString(String commitHash, String previousCommitHash, GitRepository gitRepository) throws DiffStringGenerationException {
     if (commitHash == null || previousCommitHash == null) {
       throw new IllegalArgumentException("Commit hashes cannot be null");
     }
@@ -69,13 +74,16 @@ class DiffService {
 
       List<DiffEntry> diffs = diffFormatter.scan(oldCommit.getTree(), newCommit.getTree());
       for (DiffEntry diff : diffs) {
-        diffFormatter.format(diff);
+        if (!diff.getNewPath().startsWith(changeNoteDirectory)) {
+          diffFormatter.format(diff);
+        }
       }
       diffStringBuilder.append(outputStream.toString());
-    } catch (IOException e) {
-      throw new RuntimeException("Error while generating diff string", e);
+    } catch (Exception e) {
+      throw new DiffStringGenerationException("Error generating diff string: " + e.getMessage());
     }
 
+    logger.info("Generated diff string for commit {} and previous commit {} in repository {}", commitHash, previousCommitHash, gitRepository.getName());
     return diffStringBuilder.toString();
   }
 }

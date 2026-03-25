@@ -3,6 +3,7 @@ package no.reliablesolutions.release_notes_portal.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.retry.NonTransientAiException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import no.reliablesolutions.release_notes_portal.exception.ChangeNoteHasNoGitCommitsException;
 import no.reliablesolutions.release_notes_portal.exception.CustomerNotFoundException;
+import no.reliablesolutions.release_notes_portal.exception.DiffStringGenerationException;
 import no.reliablesolutions.release_notes_portal.exception.FeatureNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ProductNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ScopeNotFoundException;
@@ -97,6 +100,27 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Data integrity violation: " + e.getMessage());
   }
   
+  /**
+   * Handles the case where a change note has no associated git commits. Logs the event and returns a 400 response with a message indicating that the change note has no associated git commits.
+   * @param e the exception containing details about the change note with no git commits
+   * @return a ResponseEntity with a 400 status and a message indicating that the change note has no associated git commits
+   */
+  @ExceptionHandler(value = {ChangeNoteHasNoGitCommitsException.class})
+  public ResponseEntity<String> handleChangeNoteHasNoGitCommitsException(ChangeNoteHasNoGitCommitsException e) {
+    logger.warn("Change note has no associated git commits: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+  }
+
+  /**
+   * Handles the case where there is an error during the generation of a diff string. Logs the event and returns a 500 response with a message indicating the error generating the diff string.
+   * @param e the exception containing details about the error generating the diff string
+   * @return a ResponseEntity with a 500 status and a message indicating the error generating the diff string
+   */
+  @ExceptionHandler(value = {DiffStringGenerationException.class})
+  public ResponseEntity<String> handleDiffStringGenerationException(DiffStringGenerationException e) {
+    logger.warn("Error generating diff string: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error generating diff string");
+  }
 
 
   /**
@@ -249,8 +273,8 @@ public class GlobalExceptionHandler {
    * @param e the exception containing details about the non-transient AI exception
    * @return a ResponseEntity with a 500 status and a message indicating the non-transient AI exception
    */
-  @ExceptionHandler(value = {org.springframework.ai.retry.NonTransientAiException.class})
-  public ResponseEntity<String> handleNonTransientAiException(org.springframework.ai.retry.NonTransientAiException e) {
+  @ExceptionHandler(value = {NonTransientAiException.class})
+  public ResponseEntity<String> handleNonTransientAiException(NonTransientAiException e) {
     logger.warn("Non-transient AI exception: {}", e.getMessage());
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Non-transient AI exception: " + e.getMessage());
   }
