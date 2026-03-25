@@ -148,9 +148,7 @@ const onCancelViewable = () => {
         </div>
         <div v-if="customerId !== -1" class="flex flex-col gap-2">
             <h4 class="text-md">{{ t('title.visibility') }}</h4>
-            <div class="flex gap-2">
-                <Checkbox v-model="viewAbleByEveryone" @click="onViewableChecked"/>
-            </div>
+            <Checkbox v-model="viewAbleByEveryone" @click="onViewableChecked"/>
         </div>
     </div>
 
