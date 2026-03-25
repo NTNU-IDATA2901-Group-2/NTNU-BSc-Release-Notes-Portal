@@ -41,7 +41,6 @@ public class AiController {
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/translate")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> translate(@RequestParam(required = true) String locale, @RequestParam(required = true) String text) {
         logger.info("Translating text to locale: {}", locale);
         String response = aiService.translate(locale, text);
