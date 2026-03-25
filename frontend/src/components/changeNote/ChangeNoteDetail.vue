@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Check, Copy, EllipsisVertical, Eye, Pencil, Sparkles, Trash2 } from 'lucide-vue-next';
-import DeletePrompt from '../DeletePrompt.vue';
+import DialogPrompt from '../DialogPrompt.vue';
 import { computed, onBeforeUnmount, ref } from 'vue';
 import { useArchiveChangeNote, usePublishChangeNote } from '@/api/change-note-api';
 import { toast } from 'vue-sonner';
@@ -64,7 +64,6 @@ const { mutate: publishChangeNoteMutation } = usePublishChangeNote(props.changeN
 
 const onPublishToggle = () => {
   publishChangeNoteMutation(!props.changeNote.published);
-  
 }
 
 const hasTranslation = computed(() => translatedDescription.value !== null);
@@ -132,7 +131,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <DeletePrompt :open="showDeletePrompt" @update:open="showDeletePrompt = false" @confirm="onDelete" />
+  <DialogPrompt :open="showDeletePrompt" :mode="'delete'" :title-key="'deletePrompt.title'" :description-key="'deletePrompt.description'" @update:open="showDeletePrompt = false" @confirm="onDelete" />
     <div class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
       <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-row items-center justify-between w-full">

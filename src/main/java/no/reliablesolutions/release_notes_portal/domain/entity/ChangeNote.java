@@ -38,6 +38,7 @@ public class ChangeNote {
   private final long creationTimestamp = new Date().getTime();
   private boolean published = false;
   private boolean archived = false;
+  private boolean viewableByEveryone = false;
 
   @ManyToMany(mappedBy = "changeNotes")
   private List<ReleaseNote> releaseNotes;

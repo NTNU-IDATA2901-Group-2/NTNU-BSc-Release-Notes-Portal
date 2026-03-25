@@ -27,7 +27,8 @@
         "clearFilters": "Fjern filtre",
         "translate": "Oversett",
         "undo": "Angre",
-        "showGeneralChanges": "Vis generelle endringer"
+        "showGeneralChanges": "Vis generelle endringer",
+        "confirm": "Bekreft"
     },
     "title": {
         "title": "Tittel",
@@ -42,7 +43,8 @@
         "status": "Status",
         "changeNotes": "Endringsnotater",
         "releaseNotes": "Utgivelsesnotater",
-        "allocated": "Tildelt"
+        "allocated": "Tildelt",
+        "visibility": "Synlig for alle"
     },
     "toast": {
         "changeNoteDeleted": "Endringsnotat slettet",
@@ -139,5 +141,9 @@
     },
     "ai": {
         "translationDisclaimer": "Oversettelsen er generert av KI. Vennligst sjekk viktige fakta."
+    },
+    "changeNoteEdit": {
+        "viewableByEveryone": "Hvis denne er krysset av, vil dette endringsnotatet være synlig for alle. Dette kan føre til at sensitiv informasjon blir eksponert. Er du sikker på at du vil gjøre dette endringsnotatet synlig for alle?",
+        "viewableByEveryoneTitle": "Endringsnotat synlighet"
     }
 }

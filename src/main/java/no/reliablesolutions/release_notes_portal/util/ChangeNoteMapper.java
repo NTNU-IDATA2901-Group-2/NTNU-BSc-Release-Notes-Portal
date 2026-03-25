@@ -25,7 +25,8 @@ public class ChangeNoteMapper {
         changeNote.getScope() != null ? ScopeDTO.fromScope(changeNote.getScope()) : null,
         changeNote.getFeature() != null ? FeatureDTO.fromFeature(changeNote.getFeature()) : null,
         changeNote.getCustomer() != null ? CustomerDTO.fromCustomer(changeNote.getCustomer()) : null,
-        changeNote.isPublished()
+        changeNote.isPublished(),
+        null
       );
     } else {
       return new ChangeNoteDTO(
@@ -38,7 +39,8 @@ public class ChangeNoteMapper {
         changeNote.getScope() != null ? ScopeDTO.fromScope(changeNote.getScope()) : null,
         changeNote.getFeature() != null ? FeatureDTO.fromFeature(changeNote.getFeature()) : null,
         changeNote.getCustomer() != null ? CustomerDTO.fromCustomer(changeNote.getCustomer()) : null,
-        changeNote.isPublished()
+        changeNote.isPublished(),
+        changeNote.isViewableByEveryone()
       );
     }
   }

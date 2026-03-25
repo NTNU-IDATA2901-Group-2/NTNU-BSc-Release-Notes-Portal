@@ -20,14 +20,14 @@ const { t } = useI18n();
 const selectedItems = ref<number[]>([]);
 
 const router = useRouter();
-const url = new URL(window.location.href);
+const url = new URL(globalThis.location.href);
 const searchParams = ref({ ...Object.fromEntries(url.searchParams.entries()) });
 const urlSearchParams = computed(() => new URLSearchParams(searchParams.value));
 
 const { data, isLoading, isFetching, isError } = useGetReleaseNotes(searchParams)
 const search = ref(urlSearchParams.value.get('query') || '');
 watch(searchParams, () => {
-  const url = new URL(window.location.href);
+  const url = new URL(globalThis.location.href);
   url.search = urlSearchParams.value.toString();
   router.replace({ query: searchParams.value });
 }, { deep: true });

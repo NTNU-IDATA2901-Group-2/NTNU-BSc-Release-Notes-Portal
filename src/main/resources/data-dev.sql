@@ -1,15 +1,15 @@
 -- AI generated sample data for change_note and release_note tables
-INSERT INTO change_note (id, archived, published, reference, description, developer_notes, upgrade_notes, product_id, customer_id, feature_id, scope_id, creation_timestamp) VALUES
-(1, false, false, 'REF-001', 'Initial release', 'Dev notes 1', 'Upgrade notes 1', 1, 1, 1, 1, 1706745600000),
-(2, false, false, 'REF-002', 'Added new feature X', 'Dev notes 2', 'Upgrade notes 2', 2, 2, 2, 2, 1708300200000),
-(3, false, false, 'REF-003', 'Fixed bug Y', 'Dev notes 3', 'Upgrade notes 3', 3, 3, 2, 3, 1710063900000),
-(4, false, false, 'REF-004', 'Added new feature Z', 'Dev notes 4', 'Upgrade notes 4', 1, 1, 1, 1, 1711728500000),
-(5, false, false, 'REF-005', 'Performance improvements', 'Dev notes 5', 'Upgrade notes 5', 2, 2, 2, 2, 1713393100000),
-(6, false, false, 'REF-006', 'Security patch', 'Dev notes 6', 'Upgrade notes 6', 3, 3, 1, 3, 1715057700000),
-(7, false, false, 'REF-007', 'Added support for new platform', 'Dev notes 7', 'Upgrade notes 7', 1, 1, 1, 1, 1716722300000),
-(8, false, false, 'REF-008', 'Deprecated old API', 'Dev notes 8', 'Upgrade notes 8', 2, 2, 2, 2, 1718386900000),
-(9, false, false, 'REF-009', 'Added new feature A', 'Dev notes 9', 'Upgrade notes 9', 3, 3, 2, 3, 1720051500000),
-(10, false, false, 'REF-010', 'Fixed critical bug B', 'Dev notes 10', 'Upgrade notes 10', 1, 1, 1, 1, 1721716100000)
+INSERT INTO change_note (id, archived, published, reference, description, developer_notes, upgrade_notes, product_id, customer_id, feature_id, scope_id, creation_timestamp, viewable_by_everyone) VALUES
+(1, false, true, 'REF-001', 'Initial release', 'Dev notes 1', 'Upgrade notes 1', 1, 1, 1, 1, 1706745600000, false),
+(2, false, false, 'REF-002', 'Added new feature X', 'Dev notes 2', 'Upgrade notes 2', 2, 2, 2, 2, 1708300200000, false),
+(3, false, true, 'REF-003', 'Fixed bug Y', 'Dev notes 3', 'Upgrade notes 3', 3, 3, 2, 3, 1710063900000, false),
+(4, false, true, 'REF-004', 'Added new feature Z', 'Dev notes 4', 'Upgrade notes 4', 1, 1, 1, 1, 1711728500000, false),
+(5, false, true, 'REF-005', 'Performance improvements', 'Dev notes 5', 'Upgrade notes 5', 2, 2, 2, 2, 1713393100000, false),
+(6, false, true, 'REF-006', 'Security patch', 'Dev notes 6', 'Upgrade notes 6', 3, 3, 1, 3, 1715057700000, false),
+(7, false, true, 'REF-007', 'Added support for new platform', 'Dev notes 7', 'Upgrade notes 7', 1, 1, 1, 1, 1716722300000, false),
+(8, false, false, 'REF-008', 'Deprecated old API', 'Dev notes 8', 'Upgrade notes 8', 2, 2, 2, 2, 1718386900000, false),
+(9, false, false, 'REF-009', 'Added new feature A', 'Dev notes 9', 'Upgrade notes 9', 3, 3, 2, 3, 1720051500000, false),
+(10, false, false, 'REF-010', 'Fixed critical bug B', 'Dev notes 10', 'Upgrade notes 10', 1, 1, 1, 1, 1721716100000, false)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO release_note (id, archived, published, created_at, summary, tag) VALUES

@@ -10,7 +10,6 @@ import { useI18n } from 'vue-i18n';
 import { isAdmin } from '@/utils/keycloak';
 import { Pencil, Trash2, Eye, EyeOff, FileDown, ArrowLeft, EllipsisVertical, Sparkles, Copy, Check } from "lucide-vue-next"
 import md from '@/utils/markdown-it';
-import DeletePrompt from '../DeletePrompt.vue';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../ui/breadcrumb';
 import { Badge } from '../ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
@@ -19,6 +18,7 @@ import { Button } from '../ui/button';
 import { useTranslate } from '@/api/ai';
 import Spinner from '../ui/spinner/Spinner.vue';
 import Checkbox from '../ui/checkbox/Checkbox.vue';
+import DialogPrompt from '../DialogPrompt.vue';
 
 const props = defineProps<{
   releaseNote: ReleaseNote;
@@ -172,7 +172,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="flex flex-col w-full items-center px-4 mb-20">
-    <DeletePrompt v-model:open="deletePromptOpen" :on-confirm="() => archiveReleaseNote()" />
+    <DialogPrompt v-model:open="deletePromptOpen" :mode="'delete'" :title-key="'deletePrompt.title'" :description-key="'deletePrompt.description'" :on-confirm="() => archiveReleaseNote()" />
 
     <div class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10 flex items-center gap-4">
       <Button variant="outline" class="" @click="$router.back()">
