@@ -83,7 +83,7 @@
   .btn-glow::before {
     content: "";
     position: absolute;
-    inset: -100% -25%;
+    inset: -150% -25%;
     background: conic-gradient(
       from 0deg in oklch,
       #9900ff 0turn,

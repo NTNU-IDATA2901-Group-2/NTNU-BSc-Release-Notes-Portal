@@ -76,4 +76,8 @@ public class GitRepositoryService {
             throw new FailedSyncGitChangeNotesException(e.getMessage());
         }
     }
+
+    public GitRepository getGitRepositoryForChangeNote(long changeNoteId) {
+      return gitRepositoryRepository.findByChangeNoteId(changeNoteId);
+    }
 }

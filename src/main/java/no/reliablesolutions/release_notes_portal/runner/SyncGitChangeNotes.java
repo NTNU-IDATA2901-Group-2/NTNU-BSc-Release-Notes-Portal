@@ -19,24 +19,23 @@ import org.eclipse.jgit.treewalk.EmptyTreeIterator;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
-import lombok.AllArgsConstructor;
+import jakarta.persistence.Transient;
 import no.reliablesolutions.release_notes_portal.domain.entity.ChangeNote;
 import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
 import no.reliablesolutions.release_notes_portal.domain.repository.GitRepositoryRepository;
 import no.reliablesolutions.release_notes_portal.exception.InvalidChangeNoteYamlException;
 import no.reliablesolutions.release_notes_portal.service.ChangeNoteService;
-import no.reliablesolutions.release_notes_portal.service.GitRepositoryService;
 import no.reliablesolutions.release_notes_portal.util.ChangeNoteFileHandler;
 
 /**
  * This class is responsible for synchronizing change notes from Git repositories. It will clone or pull the repositories, check for new commits, and create change notes from any new change note files found in the commits.
  */
 @Component
-@AllArgsConstructor
 public class SyncGitChangeNotes implements CommandLineRunner {
   
   private final Logger logger = LoggerFactory.getLogger(SyncGitChangeNotes.class);
@@ -44,9 +43,23 @@ public class SyncGitChangeNotes implements CommandLineRunner {
   private final ChangeNoteService changeNoteService;
   private final ChangeNoteFileHandler changeNoteFileHandler;
   
-  private static final String REPOSITORY_DIRECTORIES_PATH = "git_repositories";
-  private static final String CHANGE_NOTE_DIRECTORY = "notes";
-  
+  private final String repositoryDirectoriesPath;
+  private final String changeNoteDirectory;
+
+  public SyncGitChangeNotes(
+    GitRepositoryRepository gitRepositoryRepository,
+    ChangeNoteService changeNoteService,
+    ChangeNoteFileHandler changeNoteFileHandler,
+    @Value("${REPOSITORY_DIRECTORIES_PATH:repository_directory}") String repositoryDirectoriesPath,
+    @Value("${CHANGE_NOTE_DIRECTORY:change_note_directory}") String changeNoteDirectory
+  ) {
+    this.gitRepositoryRepository = gitRepositoryRepository;
+    this.changeNoteService = changeNoteService;
+    this.changeNoteFileHandler = changeNoteFileHandler;
+    this.repositoryDirectoriesPath = repositoryDirectoriesPath;
+    this.changeNoteDirectory = changeNoteDirectory;
+  }
+
   /**
    * Runs the synchronization process for Git change notes on all Git repositories.
    */
@@ -80,13 +93,13 @@ public class SyncGitChangeNotes implements CommandLineRunner {
       throw new IllegalArgumentException("Git repository cannot be null");
     }
 
-    File repositoriesDirectory = new File(REPOSITORY_DIRECTORIES_PATH);
+    File repositoriesDirectory = new File(repositoryDirectoriesPath);
     if (!repositoriesDirectory.exists()) {
       repositoriesDirectory.mkdirs();
     }
 
     logger.info("Updating Git repository: {}", gitRepository.getName());
-    File repositoryDirectory = new File(REPOSITORY_DIRECTORIES_PATH + File.separator + gitRepository.getName());
+    File repositoryDirectory = new File(gitRepository.getLocalPath(repositoryDirectoriesPath));
     prepareGitRepository(gitRepository, repositoryDirectory);
     syncFromGitRepository(gitRepository, repositoryDirectory);
   }
@@ -249,7 +262,7 @@ public class SyncGitChangeNotes implements CommandLineRunner {
         List<DiffEntry> diffEntries = diffFormatter.scan(parentCommit.getTree(), commit.getTree());
         List<File> newChangeNoteFiles = diffEntries.stream()
           .filter(diffEntry -> diffEntry.getChangeType() == DiffEntry.ChangeType.ADD)
-          .filter(diffEntry -> diffEntry.getNewPath().startsWith(CHANGE_NOTE_DIRECTORY + File.separator))
+          .filter(diffEntry -> diffEntry.getNewPath().startsWith(changeNoteDirectory + File.separator))
           .filter(diffEntry -> diffEntry.getNewPath().endsWith(".yaml") || diffEntry.getNewPath().endsWith(".yml"))
           .map(diffEntry -> new File(repositoryDirectory, diffEntry.getNewPath()))
           .toList();

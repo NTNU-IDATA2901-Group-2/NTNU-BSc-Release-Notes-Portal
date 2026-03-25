@@ -34,3 +34,35 @@ export const useTranslate = (onFinished: OnMutationApiCallFinished) => {
         onSettled: () => onFinished.onSettled?.(),
     })
 }
+
+/**
+ * Summarizes a change note using the AI summarization API.
+ * @param changeNoteId the ID of the change note to be summarized
+ * @returns a promise that resolves to the summarized text of the change note
+ */
+const summarizeChangeNote = async (changeNoteId: number) => {
+  const response = await api.get(`ai/summarize-changenote/${changeNoteId}`);
+  return response.data;
+}
+
+/**
+ * Custom hook for summarizing a change note using the AI summarization API.
+ * @param onFinished An object containing callback functions to handle the success, error, and settled states of the mutation.
+ * @returns A mutation object that can be used to trigger the summarization process.
+ */
+export const useSummarizeChangeNote = (onFinished: OnMutationApiCallFinished) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (changeNoteId: number) => summarizeChangeNote(changeNoteId),
+        onSuccess: (data: string) => {
+            queryClient.invalidateQueries({ queryKey: ['summarizeChangeNote'] });
+            onFinished.onSuccess(data);
+        },
+        onError: () => {
+            console.error("Failed to summarize change note");
+            onFinished.onError();
+        },
+        onSettled: () => onFinished.onSettled?.(),
+    })
+}

@@ -15,7 +15,7 @@ import { Badge } from '../ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { Separator } from '../ui/separator';
 import { Button } from '../ui/button';
-import { useTranslate } from '@/api/ai';
+import { useTranslate } from '@/api/ai-api';
 import Spinner from '../ui/spinner/Spinner.vue';
 import Checkbox from '../ui/checkbox/Checkbox.vue';
 import DialogPrompt from '../DialogPrompt.vue';
