@@ -9,6 +9,7 @@ services:
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_PASSWORD}
       KC_HOSTNAME: ${KC_URL}
     entrypoint: ["/opt/keycloak/bin/kc.sh", "start-dev"]
+    
     ports:
       - "8081:8080"
     volumes:
@@ -20,6 +21,11 @@ services:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_DATABASE}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE} -h localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
       - "5432:5432"
     volumes:
