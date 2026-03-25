@@ -5,19 +5,30 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 
 const props = defineProps<{
   open: boolean;
-  onConfirm: () => void;
+  titleKey: string;
+  descriptionKey: string;
+  mode: DialogPromptMode;
+  onConfirm?: () => void;
+  onCancel?: () => void;
 }>()
+
+export type DialogPromptMode = 'delete' | 'confirm';
 
 const emit = defineEmits<{
   'update:open': [value: boolean];
 }>()
 
 const handleClose = () => {
+  if (props.onCancel) {
+    props.onCancel();
+  }
   emit('update:open', false);
 }
 
 const handleConfirm = () => {
-  props.onConfirm();
+  if (props.onConfirm) {
+    props.onConfirm();
+  }
   emit('update:open', false);
 }
 
@@ -29,17 +40,15 @@ const { t } = useI18n();
   <Dialog :open="open" @update:open="handleClose">
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>{{ t('deletePrompt.title') }}</DialogTitle>
+        <DialogTitle>{{ t(props.titleKey) }}</DialogTitle>
         <DialogDescription>
-          {{ t('deletePrompt.description') }}
+          {{ t(props.descriptionKey) }}
         </DialogDescription>
       </DialogHeader>
       <DialogFooter>
-        <Button variant="outline" @click="handleClose">Cancel</Button>
-        <Button variant="destructive" @click="handleConfirm">Delete</Button>
+        <Button variant="outline" @click="handleClose">{{ t('button.cancel') }}</Button>
+        <Button variant="destructive" @click="handleConfirm">{{ t(`button.${props.mode}`) }}</Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>
-
-
 </template>

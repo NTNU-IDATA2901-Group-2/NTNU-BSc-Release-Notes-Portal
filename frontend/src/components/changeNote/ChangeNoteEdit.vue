@@ -15,11 +15,14 @@ import { router } from '@/utils/router';
 import { useI18n } from 'vue-i18n';
 import Checkbox from '../ui/checkbox/Checkbox.vue';
 import { ref } from 'vue';
+import DialogPrompt from '../DialogPrompt.vue';
 
 const props = defineProps<{
   changeNote: ChangeNote;
   modelValue?: boolean;
 }>();
+
+const showConfirmPrompt = ref(false);
 
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
@@ -78,10 +81,20 @@ const onCancel = () => {
     router.push(`/change-notes/${props.changeNote.id}`);
 }
 
+const onViewableChecked = () => {
+    if (!viewAbleByEveryone.value) {
+        showConfirmPrompt.value = true;
+    }
+}
+
+const onCancelViewable = () => {
+    viewAbleByEveryone.value = false;
+}
+
 </script>
 
 <template>
-
+<DialogPrompt :open="showConfirmPrompt" :mode="'confirm'" :title-key="'changeNoteEdit.viewableByEveryoneTitle'" :description-key="'changeNoteEdit.viewableByEveryone'" @update:open="showConfirmPrompt = false" @cancel="onCancelViewable"/>
 <form @submit="onSubmit">
     <div class="md:hidden flex w-full mt-4 justify-end gap-2">
     <Button type="button" @click="onCancel" variant="outline">{{ t('button.cancel') }}
@@ -133,9 +146,11 @@ const onCancel = () => {
             <TagSelect mode="customer" v-model="customerId"/>
         </div>
         </div>
-        <div v-if="customerId !== -1" class="flex gap-2">
-            <Checkbox v-model="viewAbleByEveryone"  />
-            <p>{{ t('changeNoteEdit.viewableByEveryone') }}</p>
+        <div v-if="customerId !== -1" class="flex flex-col gap-2">
+            <h4 class="text-md">{{ t('title.visibility') }}</h4>
+            <div class="flex gap-2">
+                <Checkbox v-model="viewAbleByEveryone" @click="onViewableChecked"/>
+            </div>
         </div>
     </div>
 
