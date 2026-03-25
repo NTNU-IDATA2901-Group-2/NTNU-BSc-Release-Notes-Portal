@@ -20,14 +20,14 @@ const { t } = useI18n();
 const selectedItems = ref<number[]>([]);
 
 const router = useRouter();
-const url = new URL(window.location.href);
+const url = new URL(globalThis.location.href);
 const searchParams = ref({ ...Object.fromEntries(url.searchParams.entries()) });
 const urlSearchParams = computed(() => new URLSearchParams(searchParams.value));
 
 const { data, isLoading, isFetching, isError } = useGetReleaseNotes(searchParams)
 const search = ref(urlSearchParams.value.get('query') || '');
 watch(searchParams, () => {
-  const url = new URL(window.location.href);
+  const url = new URL(globalThis.location.href);
   url.search = urlSearchParams.value.toString();
   router.replace({ query: searchParams.value });
 }, { deep: true });
@@ -87,6 +87,7 @@ const onSearch = () => {
           <Spinner v-if="isLoading || isFetching" />
           <p v-else-if="isError">{{ t('loadingError.releaseNotes') }}</p>
           <ScrollArea class="h-[80vh] w-full" v-else>
+            <p v-if="data?.length === 0" class="text-center">{{ t('placeholder.noReleaseNotesFound') }}</p>
             <div v-for="releaseNote in data" :key="releaseNote.id" class="flex flex-col">
               <ReleaseNoteCard 
                 class="my-4" :key="releaseNote.id"

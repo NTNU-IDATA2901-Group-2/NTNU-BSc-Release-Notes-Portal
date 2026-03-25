@@ -1,19 +1,31 @@
 networks:
   release-notes-network:
 services:
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.5.2
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_USERNAME}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_PASSWORD}
+      KC_HOSTNAME: ${KC_URL}
+    entrypoint: ["/opt/keycloak/bin/kc.sh", "start-dev"]
+    
+    ports:
+      - "8081:8080"
+    volumes:
+      - keycloak_data:/opt/keycloak/release-notes-data
+
   db:
-    image: postgres:18.3
-    networks:
-      - release-notes-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    image: postgres:latest
     environment:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_DATABASE}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE} -h localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
       - "5432:5432"
     volumes:
@@ -21,17 +33,14 @@ services:
 
   app:
     image: ghcr.io/ntnu-idata2901-group-2/ntnu-bsc-release-notes-portal:latest
-    networks:
-      - release-notes-network
     depends_on:
       db:
-        condition: service_healthy
-    environment:
-      SPRING_DATASOURCE_URL: ${DB_URL}
-      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+        condition: service_started
     ports:
-      - "8080:8080"
+      - "80:8080"
+    env_file:
+      - .\.env
       
 volumes:
   db_data:
+  keycloak_data:

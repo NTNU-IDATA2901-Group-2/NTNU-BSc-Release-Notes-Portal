@@ -21,6 +21,7 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue-sonner';
 import { isAdmin } from '@/utils/keycloak';
+import AllocatedFilter from '@/components/filters/AllocatedFilter.vue';
 
 const router = useRouter();
 const { t } = useI18n();
@@ -121,6 +122,7 @@ const onSearch = () => {
       <ScrollArea class="h-100 p-5">
         <Button class="mt-4" variant="outline" @click="clearFilters">{{ t('button.clearFilters')
         }}</Button>
+        <AllocatedFilter v-if="isAdmin" />
         <PublicPrivateFilter v-if="isAdmin"/>
         <ProductFilter />
         <ScopeFilter />
@@ -132,6 +134,7 @@ const onSearch = () => {
       <div class="flex gap-8 flex-col h-min w-full md:flex-row justify-center p-4">
         <div class="h-min hidden md:block">
           <h1 class="text-3xl text-nowrap">{{ t('title.changeNotes') }}</h1>
+          <AllocatedFilter v-if="isAdmin" />
           <PublicPrivateFilter v-if="isAdmin"/>
           <ProductFilter />
           <ScopeFilter />
@@ -185,6 +188,7 @@ const onSearch = () => {
           <p v-else-if="isError">{{ t('loadingError.releaseNotes') }}</p>
 
           <ScrollArea class="h-[75vh] w-full" v-else>
+            <p v-if="data?.length === 0" class="text-center">{{ t('placeholder.noChangeNotesFound') }}</p>
             <div v-for="changeNote in data" :key="changeNote.id" class="flex flex-col">
               <ChangeNoteCard 
                 class="my-4" :key="changeNote.id"

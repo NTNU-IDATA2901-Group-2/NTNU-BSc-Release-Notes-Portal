@@ -28,6 +28,7 @@
         "translate": "Oversett",
         "undo": "Angre",
         "showGeneralChanges": "Vis generelle endringer",
+        "confirm": "Bekreft",
         "summarize": "Oppsummer"
     },
     "title": {
@@ -42,7 +43,9 @@
         "search": "Søk",
         "status": "Status",
         "changeNotes": "Endringsnotater",
-        "releaseNotes": "Utgivelsesnotater"
+        "releaseNotes": "Utgivelsesnotater",
+        "allocated": "Tildelt",
+        "visibility": "Synlig for alle"
     },
     "toast": {
         "changeNoteDeleted": "Endringsnotat slettet",
@@ -71,6 +74,8 @@
         "exportPdfError": "Det oppsto en feil under eksportering til PDF",
         "translationError": "Det oppsto en feil under oversettelse av endringsnotat",
         "translationSuccess": "Endringsnotat oversatt",
+        "copySuccess": "Innhold kopiert til utklippstavle",
+        "copyError": "Det oppsto en feil under kopiering til utklippstavle",
         "summarizeSuccess": "Endringsnotat oppsummert",
         "summarizeError": "Det oppsto en feil under oppsummering av endringsnotat"
     },
@@ -108,7 +113,13 @@
         "title": "Tittel",
         "description": "Beskrivelse",
         "developerNotes": "Utviklernotater",
-        "upgradeRequirements": "Oppgraderingskrav"
+        "upgradeRequirements": "Oppgraderingskrav",
+        "noReleaseNotesFound": "Ingen utgivelsesnotater funnet",
+        "noChangeNotesFound": "Ingen endringsnotater funnet",
+        "noSummary": "Ingen oppsummering",
+        "noChangeNotesAdded": "Ingen endringsnotater lagt til",
+        "noTitle": "Ingen tittel",
+        "noDescription": "Ingen beskrivelse"
     },
     "repositories": {
         "title": "Git Repositorier",
@@ -133,6 +144,10 @@
     },
     "ai": {
         "translationDisclaimer": "Oversettelsen er generert av KI. Vennligst sjekk viktige fakta."
+    },
+    "changeNoteEdit": {
+        "viewableByEveryone": "Hvis denne er krysset av, vil dette endringsnotatet være synlig for alle. Dette kan føre til at sensitiv informasjon blir eksponert. Er du sikker på at du vil gjøre dette endringsnotatet synlig for alle?",
+        "viewableByEveryoneTitle": "Endringsnotat synlighet"
     },
     "tooltip": {
         "noCommits": "Ingen tilknyttede git commits"

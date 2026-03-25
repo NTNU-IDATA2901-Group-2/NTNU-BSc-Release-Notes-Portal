@@ -16,6 +16,7 @@ export const EditChangeNoteSchema = z.object({
   scopeId: z.number().optional(),
   featureId: z.number().optional(),
   customerId: z.number().optional(),
+  viewableByEveryone: z.boolean().optional(),
 })
 
 export const CreateGitRepositorySchema = z.object({

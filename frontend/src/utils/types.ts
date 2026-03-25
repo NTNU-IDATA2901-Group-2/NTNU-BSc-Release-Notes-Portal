@@ -9,7 +9,8 @@ export interface ChangeNote {
     feature: Feature,
     customer: Customer,
     published: boolean,
-    archived: boolean
+    archived: boolean,
+    viewableByEveryone: boolean
 }
 
 export interface PersistChangeNoteDTO {
@@ -78,7 +79,8 @@ export interface PersistChangeNoteDTO {
     productId?: number,
     scopeId?: number,
     featureId?: number,
-    customerId?: number
+    customerId?: number,
+    viewableByEveryone?: boolean,
 }
 
 export interface Tag {

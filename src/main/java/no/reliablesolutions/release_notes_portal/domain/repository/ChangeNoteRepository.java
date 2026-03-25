@@ -21,7 +21,7 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
       FROM ChangeNote c
       LEFT JOIN c.customer customer
       WHERE c.archived = false
-      AND (customer IS NULL OR UPPER( customer.name ) IN :customerNames)
+      AND (c.viewableByEveryone = true OR customer IS NULL OR UPPER( customer.name ) IN :customerNames)
       AND c.id = :id
       """)
   Optional<ChangeNote> findForCustomerByIdAndArchivedFalse(Long id, List<String> customerNames);
@@ -82,7 +82,10 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
       LEFT JOIN c.customer customer
       LEFT JOIN c.releaseNotes r ON r.archived = false
       WHERE c.archived = false
-      AND (customer IS NULL OR UPPER( customer.name ) IN :customerNames)
+      AND (
+        c.viewableByEveryone = true
+        OR (customer IS NULL OR UPPER( customer.name ) IN :customerNames)
+      )
       AND (:#{#filterOptions.published} IS NULL OR c.published = :#{#filterOptions.published}) 
       AND (:#{#filterOptions.hasReleaseNote} IS NULL OR
             (:#{#filterOptions.hasReleaseNote} = TRUE AND r IS NOT NULL) OR

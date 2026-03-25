@@ -1,5 +1,6 @@
 package no.reliablesolutions.release_notes_portal.controller;
 
+import org.slf4j.Logger;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import no.reliablesolutions.release_notes_portal.service.AiService;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +26,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 @AllArgsConstructor
 public class AiController {
     private final AiService aiService;
-
+    private final Logger logger = LoggerFactory.getLogger(AiController.class);
 
     /**
      * Translates the given text to the specified locale.
@@ -41,6 +43,7 @@ public class AiController {
     @PostMapping("/translate")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> translate(@RequestParam(required = true) String locale, @RequestParam(required = true) String text) {
+        logger.info("Translating text to locale: {}", locale);
         String response = aiService.translate(locale, text);
         return ResponseEntity.ok(response);
     }

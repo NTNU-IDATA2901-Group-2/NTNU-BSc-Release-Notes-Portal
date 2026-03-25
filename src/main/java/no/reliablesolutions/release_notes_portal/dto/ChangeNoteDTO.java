@@ -10,5 +10,6 @@ public record ChangeNoteDTO(
     ScopeDTO scope,
     FeatureDTO feature,
     CustomerDTO customer,
-    boolean published) {
+    boolean published,
+    Boolean viewableByEveryone) {
 }
