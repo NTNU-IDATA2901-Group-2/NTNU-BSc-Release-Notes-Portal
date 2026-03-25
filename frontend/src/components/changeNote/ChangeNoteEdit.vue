@@ -14,7 +14,7 @@ import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';
 import { useI18n } from 'vue-i18n';
 import { useSummarizeChangeNote } from '@/api/ai-api';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import Tooltip from '../ui/tooltip/Tooltip.vue';
 import TooltipTrigger from '../ui/tooltip/TooltipTrigger.vue';
 import TooltipContent from '../ui/tooltip/TooltipContent.vue';
@@ -110,7 +110,7 @@ const disableSummarizeButton = computed(() => hasCommits.isPending.value || hasC
                     <Sparkles />
                 </Button>
             
-                <Button type="button" @click="onCancel"variant="outline">
+                <Button type="button" @click="onCancel" variant="outline">
                     {{ t('button.cancel') }}
                     <Ban />
                 </Button>
@@ -124,7 +124,7 @@ const disableSummarizeButton = computed(() => hasCommits.isPending.value || hasC
             <Input class="w-45" v-model="reference" :placeholder="t('placeholder.title')" />
             <div class="hidden sm:flex ml-auto gap-4">
                 <Tooltip>
-                    <TooltipTrigger asChild>
+                    <TooltipTrigger as-child>
                         <div class = "inline-flex">
                             <Button
                                 :disabled="disableSummarizeButton"
@@ -141,7 +141,7 @@ const disableSummarizeButton = computed(() => hasCommits.isPending.value || hasC
                         {{ t('tooltip.noCommits') }}
                     </TooltipContent>
                 </Tooltip>
-                <Button type="button" @click="onCancel"variant="outline">
+                <Button type="button" @click="onCancel" variant="outline">
                     {{ t('button.cancel') }}
                     <Ban />
                 </Button>
