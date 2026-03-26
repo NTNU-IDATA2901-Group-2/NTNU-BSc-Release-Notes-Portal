@@ -52,7 +52,6 @@ export const useGetPrompts = () => useQuery({
  * @returns a promise that resolves when the update operation is complete
  */
 const updatePrompts = async (prompts: Prompt[]) => {
-    console.log(prompts);
     const response = await api.patch(`ai/prompts`, prompts);
     return response.data;
 }
