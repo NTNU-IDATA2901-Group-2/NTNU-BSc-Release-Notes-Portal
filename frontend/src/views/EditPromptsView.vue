@@ -16,16 +16,16 @@ const editablePrompts = ref<Prompt[] | undefined>(undefined);
 
 const useGetPrompts = () => useQuery({
     queryKey: ['prompts'],
-    queryFn: () => getPrompts(),
+    queryFn: getPrompts,
+    refetchOnMount: 'always',
 })
 
 const { isPending, isError, data: prompts } = useGetPrompts();
 
 watch(prompts, (newPrompts) => {
-    if (newPrompts) {
-        editablePrompts.value = newPrompts.map((prompt) => ({ ...prompt }));
-    }
-})
+    editablePrompts.value = newPrompts?.map((prompt) => ({ ...prompt }));
+}, { immediate: true })
+
 
 const useUpdatePrompts = (onFinished: OnMutationApiCallFinished) => {
     const queryClient = useQueryClient();
@@ -41,7 +41,7 @@ const useUpdatePrompts = (onFinished: OnMutationApiCallFinished) => {
             onFinished.onError();
         },
         onSettled: () => {
-            editablePrompts.value = prompts.value;
+            editablePrompts.value = prompts.value?.map((prompt) => ({ ...prompt }));
         },
     })
 }
@@ -78,7 +78,7 @@ const onSubmit = (event: Event) => {
          <p v-else-if="isError">
              {{ t('prompts.errorLoadingPrompts') }}
          </p>
-        <form v-if="editablePrompts" class="flex flex-col gap-8 sm:min-w-[500px]" @submit="onSubmit">
+        <form v-if="editablePrompts" class="flex flex-col gap-8 w-full px-2 sm:w-[600px]" @submit="onSubmit">
             <h1 class="text-xl">
                 {{ t('prompts.editPrompts') }}
             </h1>

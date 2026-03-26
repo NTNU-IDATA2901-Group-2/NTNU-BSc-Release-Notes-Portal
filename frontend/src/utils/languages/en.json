@@ -155,6 +155,8 @@
         "changeNoteSummaryPromptPlaceholder": "Enter the prompt used for AI summarization of change notes",
         "releaseNoteSummaryPromptPlaceholder": "Enter the prompt used for AI summarization of release notes",
         "errorLoadingPrompts": "An error occurred while loading prompts",
-        "promptPlaceholder": "Enter the prompt"
+        "promptPlaceholder": "Enter the prompt",
+        "saveSuccess": "Prompts updated successfully",
+        "saveError": "An error occurred while updating prompts"
     }
 }
