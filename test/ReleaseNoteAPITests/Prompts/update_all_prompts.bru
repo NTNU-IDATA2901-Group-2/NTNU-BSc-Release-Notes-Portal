@@ -1,0 +1,40 @@
+meta {
+  name: update_all_prompts
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseurl}}/ai/prompts
+  body: json
+  auth: inherit
+}
+
+body:json {
+  [
+      {
+        "id": 3,
+        "name": "Change Note Summary",
+        "prompt": "test"
+      },
+      {
+        "id": 2,
+        "name": "Release Note Summary",
+        "prompt": "test"
+      },
+      {
+        "id": 1,
+        "name": "Translation Prompt",
+        "prompt": "e"
+      }
+    ]
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

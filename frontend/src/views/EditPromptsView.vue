@@ -58,10 +58,10 @@ const savePromptsMutation = useUpdatePrompts({
 
 const onSubmit = (event: Event) => {
     event.preventDefault();
-
     const parsedPrompts = UpdatePromptsSchema.safeParse({
         prompts: editablePrompts.value,
     });
+
 
     if (!parsedPrompts.success) {
         toast.error(t('prompts.saveError'));
