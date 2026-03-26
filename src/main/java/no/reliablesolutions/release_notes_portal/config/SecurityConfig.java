@@ -28,8 +28,9 @@ public class SecurityConfig {
         })
         .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/public/**").permitAll()
-            .anyRequest().authenticated())
+            .requestMatchers("/api/public/config").permitAll()
+            .requestMatchers("/api/*").authenticated()
+            .anyRequest().permitAll())
         .oauth2ResourceServer(oauth2 -> oauth2
             .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
 

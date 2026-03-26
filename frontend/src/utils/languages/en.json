@@ -29,7 +29,8 @@
         "translate": "Translate",
         "undo": "Undo",
         "showGeneralChanges": "Show General Changes",
-        "confirm": "Confirm"
+        "confirm": "Confirm",
+        "summarize": "Summarize"
     },
     "title": {
         "title": "Title",
@@ -74,7 +75,9 @@
         "translationError": "An error occurred while translating the change note",
         "translationSuccess": "Change note translated successfully",
         "copySuccess": "Content copied to clipboard",
-        "copyError": "An error occurred while copying to clipboard"
+        "copyError": "An error occurred while copying to clipboard",
+        "summarizeSuccess": "Change note summarized successfully",
+        "summarizeError": "An error occurred while summarizing the change note"
     },
     "deletePrompt": {
         "title": "Are you sure you want to delete?",
@@ -145,6 +148,9 @@
     "changeNoteEdit": {
         "viewableByEveryone": "If checked, this change note will be visible to everyone. This action can lead to sensitive information being exposed. Are you sure you want to make this change note viewable by everyone?",
         "viewableByEveryoneTitle": "Change Note Visibility"
+    },
+    "tooltip": {
+        "noCommits": "No associated git commits"
     },
     "prompts": {
         "translationPrompt": "Translation Prompt",

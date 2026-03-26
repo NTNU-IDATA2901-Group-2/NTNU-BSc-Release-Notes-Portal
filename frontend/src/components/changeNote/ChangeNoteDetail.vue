@@ -179,7 +179,7 @@ onBeforeUnmount(() => {
         </div>
 
         <div class="flex justify-between">
-        <p v-if="changeNote.description" v-html="md.render(translatedDescription ?? changeNote.description)"></p>
+        <p v-if="changeNote.description" v-html="md.render(translatedDescription ?? changeNote.description ?? '')"></p>
         <p v-else class="text-text-primary/50">{{ t('placeholder.noDescription') }}</p>
         <Button data-pdf-exclude class="size-fit" variant="outline" @click="handleCopy(hasTranslation ? translatedDescription ?? '' : changeNote.description, 'summary')">
           <component :is="copiedKey === 'summary' ? Check : Copy" />

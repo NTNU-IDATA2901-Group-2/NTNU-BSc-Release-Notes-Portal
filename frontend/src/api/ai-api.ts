@@ -36,7 +36,11 @@ export const useTranslate = (onFinished: OnMutationApiCallFinished) => {
 }
 
 
-
+/**
+ * Updates the AI prompts by sending a PATCH request to the backend API with the provided list of Prompt objects. Each Prompt object should contain an ID that corresponds to an existing prompt in the database.
+ * @param prompts a list of Prompt objects representing the prompts to be updated, where each Prompt object should contain an ID that corresponds to an existing prompt in the database
+ * @returns a promise that resolves when the update operation is complete
+ */
 export const updatePrompts = async (prompts: Prompt[]) => {
     console.log(prompts);
     const response = await api.patch(`ai/prompts`, prompts);
@@ -44,11 +48,42 @@ export const updatePrompts = async (prompts: Prompt[]) => {
 }
 
 /**
- * Custom hook for fetching AI prompts using the API.
- * @returns A mutation object that can be used to trigger the prompt fetching process and manage its state.
+ * Retrieves all AI prompts from the backend API.
+ * @returns a promise that resolves to an array of Prompt objects representing all AI prompts
  */
-
 export const getPrompts = async () => {
     const response = await api.get(`ai/prompts`);
     return response.data as Prompt[];
+}
+
+/**
+ * Summarizes a change note using the AI summarization API.
+ * @param changeNoteId the ID of the change note to be summarized
+ * @returns a promise that resolves to the summarized text of the change note
+ */
+const summarizeChangeNote = async (changeNoteId: number) => {
+  const response = await api.get(`ai/summarize-changenote/${changeNoteId}`);
+  return response.data;
+}
+
+/**
+ * Custom hook for summarizing a change note using the AI summarization API.
+ * @param onFinished An object containing callback functions to handle the success, error, and settled states of the mutation.
+ * @returns A mutation object that can be used to trigger the summarization process.
+ */
+export const useSummarizeChangeNote = (onFinished: OnMutationApiCallFinished) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (changeNoteId: number) => summarizeChangeNote(changeNoteId),
+        onSuccess: (data: string) => {
+            queryClient.invalidateQueries({ queryKey: ['summarizeChangeNote'] });
+            onFinished.onSuccess(data);
+        },
+        onError: () => {
+            console.error("Failed to summarize change note");
+            onFinished.onError();
+        },
+        onSettled: () => onFinished.onSettled?.(),
+    })
 }

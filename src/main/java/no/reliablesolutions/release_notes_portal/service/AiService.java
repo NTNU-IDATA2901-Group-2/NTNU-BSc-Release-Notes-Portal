@@ -2,10 +2,16 @@ package no.reliablesolutions.release_notes_portal.service;
 
 import java.util.List;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
+import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
+import no.reliablesolutions.release_notes_portal.dto.GitCommitHashAndPreviousGitCommitHash;
+import no.reliablesolutions.release_notes_portal.exception.ChangeNoteHasNoGitCommitsException;
 import no.reliablesolutions.release_notes_portal.domain.entity.Prompt;
 import no.reliablesolutions.release_notes_portal.domain.repository.PromptRepository;
 import no.reliablesolutions.release_notes_portal.dto.PromptDTO;
@@ -15,6 +21,10 @@ import no.reliablesolutions.release_notes_portal.exception.LocaleNotSupportedExc
 @AllArgsConstructor
 public class AiService {
     private final ChatClient.Builder builder;
+    private final ChangeNoteService changeNoteService;
+    private final DiffService diffService;
+    private final GitRepositoryService gitRepositoryService;
+    private final Logger logger = LoggerFactory.getLogger(AiService.class);
     private final PromptRepository promptRepository;
 
     /**
@@ -39,26 +49,37 @@ public class AiService {
 
         String lang = "";
         switch (locale) {
-            case "en":
-                lang = "English";
-                break;
-
-            case "no":
-                lang = "Norwegian Bokmål";
-                break;
-
-            case "fr":
-                lang = "French";
-                break;
-
-            default:
-                throw new LocaleNotSupportedException(locale);
+            case "en" -> lang = "English";
+            case "no" -> lang = "Norwegian Bokmål";
+            case "fr" -> lang = "French";
+            default -> throw new LocaleNotSupportedException(locale);
         }
 
         String masterPrompt = "You are an assistant that is part of a release notes portal. You are helping users translate the content of release and change notes to their preferred language. The user has requested a translation to " + lang + ". Please translate the following text to " + lang + ". Make sure to maintain the original meaning and context of the text, and ensure that the translation is accurate and natural-sounding in " + lang + ". Make sure to avoid grammatical errors and awkward phrasing. Only return the translated text, without any explainations, additional information, comments, preamble or formatting. If the provided text is given in markdown it is expected to be returned in markdown.";
 
         return builder.build().prompt().system(masterPrompt)
                 .user(text)
+                .call()
+                .content();
+    }
+
+    /**
+     * Summarizes the change note with the given ID using an AI model. The summary is generated based on the git diff of the change note.
+     * @param changeNoteId the ID of the change note to be summarized
+     * @return a summary of the change note
+     */
+    public String summarizeChangeNote(long changeNoteId) {
+      GitCommitHashAndPreviousGitCommitHash commits = changeNoteService.getGitCommitHashAndPreviousGitCommitHash(changeNoteId);
+      if (commits == null) {
+        throw new ChangeNoteHasNoGitCommitsException(changeNoteId);
+      }
+      GitRepository gitRepository = gitRepositoryService.getGitRepositoryForChangeNote(changeNoteId);
+      String diffString = diffService.getDiffString(commits.getGitCommitHash(), commits.getPreviousGitCommitHash(), gitRepository);
+
+      String masterPrompt = "You are working on a release note application. Summarize the git following git diff. Only highlight changes relevant for end users. Only talk about changes, no introduction. Do not mention anything that is not relevant for the end user when using the application. Only return the summary, without any explainations, additional information, comments, preamble or formatting.";
+
+      return builder.build().prompt().system(masterPrompt)
+                .user(diffString)
                 .call()
                 .content();
     }
