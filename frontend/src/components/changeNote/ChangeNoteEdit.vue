@@ -138,7 +138,7 @@ const disableSummarizeButton = computed(() => hasCommits.isPending.value || hasC
                     <Save />
                 </Button>
             </div>
-            <h4 class="text-md">{{ t('title.title') }}</h4>
+            <h1 class="text-2xl">{{ t('title.title') }}</h1>
             <div class="flex gap-4">
             <Input class="w-45" v-model="reference" :placeholder="t('placeholder.title')" />
             <div class="hidden sm:flex ml-auto gap-4">
@@ -175,30 +175,30 @@ const disableSummarizeButton = computed(() => hasCommits.isPending.value || hasC
         </div>
 
         <div class="flex flex-col gap-1">
-            <h4 class="text-md">{{ t('title.description') }}</h4>
+            <h1 class="text-2xl">{{ t('title.description') }}</h1>
             <Textarea :placeholder="t('placeholder.description')" class="w-full" v-model="description"></Textarea>
         </div>
 
         <div class="flex flex-wrap justify-between gap-4">
         <div class="flex flex-col gap-1">
-            <h4 class="text-md">{{ t('title.product') }}</h4>
+            <h1 class="text-2xl">{{ t('title.product') }}</h1>
             <TagSelect mode="product" v-model="productId"/>
         </div>
         <div class="flex flex-col gap-1">
-            <h4 class="text-md">{{ t('title.scope') }}</h4>
+            <h1 class="text-2xl">{{ t('title.scope') }}</h1>
             <TagSelect mode="scope" v-model="scopeId"/>
         </div>
         <div class="flex flex-col gap-1">
-            <h4 class="text-md">{{ t('title.feature') }}</h4>
+            <h1 class="text-2xl">{{ t('title.feature') }}</h1>
             <TagSelect mode="feature" v-model="featureId"/>
         </div>
         <div class="flex flex-col gap-1">
-            <h4 class="text-md">{{ t('title.customer') }}</h4>
+            <h1 class="text-2xl">{{ t('title.customer') }}</h1>
             <TagSelect mode="customer" v-model="customerId"/>
         </div>
         </div>
         <div v-if="customerId !== -1" class="flex flex-col gap-2">
-            <h4 class="text-md">{{ t('title.visibility') }}</h4>
+            <h1 class="text-2xl">{{ t('title.visibility') }}</h1>
             <Checkbox v-model="viewAbleByEveryone" @click="onViewableChecked"/>
         </div>
     </div>
@@ -207,11 +207,11 @@ const disableSummarizeButton = computed(() => hasCommits.isPending.value || hasC
 
     <div class="flex flex-col w-full gap-10">
         <div class="flex flex-col gap-1">
-        <h4 class="text-md">{{ t('title.developerNotes') }}</h4>
+        <h1 class="text-2xl">{{ t('title.developerNotes') }}</h1>
         <Textarea :placeholder="t('placeholder.developerNotes')" class="w-full" v-model="developerNotes"></Textarea>
         </div>
         <div class="flex flex-col gap-1">
-        <h4 class="text-md">{{ t('title.upgradeRequirements') }}</h4>
+        <h1 class="text-2xl">{{ t('title.upgradeRequirements') }}</h1>
         <Textarea :placeholder="t('placeholder.upgradeRequirements')" class="w-full" v-model="upgradeNotes"></Textarea>
         </div>
     </div>
