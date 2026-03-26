@@ -2,7 +2,6 @@ package no.reliablesolutions.release_notes_portal.service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 

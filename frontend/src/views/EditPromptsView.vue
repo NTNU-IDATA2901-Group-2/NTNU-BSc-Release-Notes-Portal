@@ -1,11 +1,10 @@
 <script lang="ts" setup>
-import { getPrompts, updatePrompts, useGetPrompts, useUpdatePrompts } from '@/api/ai-api';
+import { useGetPrompts, useUpdatePrompts } from '@/api/ai-api';
 import Button from '@/components/ui/button/Button.vue';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 import Textarea from '@/components/ui/textarea/Textarea.vue';
 import { UpdatePromptsSchema } from '@/schemas';
-import type { OnMutationApiCallFinished, Prompt } from '@/utils/types';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
+import type { Prompt } from '@/utils/types';
 import { Save } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
