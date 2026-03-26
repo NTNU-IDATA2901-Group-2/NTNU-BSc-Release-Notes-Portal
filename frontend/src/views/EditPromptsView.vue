@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { getPrompts, updatePrompts } from '@/api/ai-api';
+import { getPrompts, updatePrompts, useGetPrompts, useUpdatePrompts } from '@/api/ai-api';
 import Button from '@/components/ui/button/Button.vue';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 import Textarea from '@/components/ui/textarea/Textarea.vue';
@@ -14,12 +14,6 @@ import { toast } from 'vue-sonner';
 const { t } = useI18n();
 const editablePrompts = ref<Prompt[] | undefined>(undefined);
 
-const useGetPrompts = () => useQuery({
-    queryKey: ['prompts'],
-    queryFn: getPrompts,
-    refetchOnMount: 'always',
-})
-
 const { isPending, isError, data: prompts } = useGetPrompts();
 
 watch(prompts, (newPrompts) => {
@@ -27,23 +21,8 @@ watch(prompts, (newPrompts) => {
 }, { immediate: true })
 
 
-const useUpdatePrompts = (onFinished: OnMutationApiCallFinished) => {
-    const queryClient = useQueryClient();
-
-        return useMutation<string, unknown, { prompts: Prompt[] }>({
-                mutationFn: (input) => updatePrompts(input.prompts),
-                onSuccess: (data: string) => {
-            queryClient.invalidateQueries({ queryKey: ['prompts'] });
-                        onFinished.onSuccess(data);
-        },
-        onError: () => {
-            console.error("Failed to update prompts");
-            onFinished.onError();
-        },
-        onSettled: () => {
-            editablePrompts.value = prompts.value?.map((prompt) => ({ ...prompt }));
-        },
-    })
+const onSettled = () => {
+    editablePrompts.value = prompts.value?.map((prompt) => ({ ...prompt }));
 }
 
 
@@ -53,7 +32,8 @@ const savePromptsMutation = useUpdatePrompts({
     },
     onError: () => {
         toast.error(t('prompts.saveError'));
-    }
+    },
+    onSettled,
 });
 
 const onSubmit = (event: Event) => {
