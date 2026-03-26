@@ -1,0 +1,40 @@
+meta {
+  name: reset_prompts
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{baseurl}}/ai/prompts
+  body: json
+  auth: inherit
+}
+
+body:json {
+  [
+      {
+        "id": 3,
+        "name": "Change Note Summary",
+        "prompt": ""
+      },
+      {
+        "id": 2,
+        "name": "Release Note Summary",
+        "prompt": ""
+      },
+      {
+        "id": 1,
+        "name": "Translation Prompt",
+        "prompt": ""
+      }
+    ]
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

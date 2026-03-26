@@ -7,7 +7,8 @@
         "language": "Language",
         "english": "English",
         "norwegian": "Norwegian",
-        "repositories": "Repositories"
+        "repositories": "Repositories",
+        "editPrompts": "Prompts"
     },
     "button": {
         "previous": "Previous",
@@ -150,5 +151,18 @@
     },
     "tooltip": {
         "noCommits": "No associated git commits"
+    },
+    "prompts": {
+        "translationPrompt": "Translation Prompt",
+        "changeNoteSummaryPrompt": "Change Note Summary Prompt",
+        "releaseNoteSummaryPrompt": "Release Note Summary Prompt",
+        "editPrompts": "Edit Prompts",
+        "translationPromptPlaceholder": "Enter the prompt used for AI translation",
+        "changeNoteSummaryPromptPlaceholder": "Enter the prompt used for AI summarization of change notes",
+        "releaseNoteSummaryPromptPlaceholder": "Enter the prompt used for AI summarization of release notes",
+        "errorLoadingPrompts": "An error occurred while loading prompts",
+        "promptPlaceholder": "Enter the prompt",
+        "saveSuccess": "Prompts updated successfully",
+        "saveError": "An error occurred while updating prompts"
     }
 }

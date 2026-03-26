@@ -93,3 +93,9 @@ export interface OnMutationApiCallFinished {
     onSuccess: (data?: string) => void,
     onError: () => void
 }
+
+export interface Prompt {
+    id: number,
+    name: string,
+    prompt: string
+}

@@ -14,6 +14,12 @@ INSERT INTO scope (id, name) VALUES
 (1, 'Patch'), (2, 'Minor'), (3, 'Major')
 ON CONFLICT (id) DO NOTHING;
 
+INSERT INTO prompt (id, name, prompt) VALUES
+(1, 'Translation Prompt', ''),
+(2, 'Release Note Summary', ''),
+(3, 'Change Note Summary', '')
+ON CONFLICT (id) DO NOTHING;
+
 -- Update auto-increment counter to avoid conflicts
 SELECT setval('product_id_seq', (SELECT MAX(id) FROM product));
 SELECT setval('feature_id_seq', (SELECT MAX(id) FROM feature));

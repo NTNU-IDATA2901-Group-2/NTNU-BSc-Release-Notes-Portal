@@ -23,3 +23,11 @@ export const CreateGitRepositorySchema = z.object({
   name: z.string().min(1, { message: "Required" }),
   url: z.string().min(1, { message: "Required" }),
 })
+
+export const UpdatePromptsSchema = z.object({
+  prompts: z.array(z.object({
+    id: z.number(),
+    name: z.string(),
+    prompt: z.string(),
+  }))
+})

@@ -1,6 +1,6 @@
-import { useMutation, useQueryClient } from "@tanstack/vue-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import api from "./api";
-import type { OnMutationApiCallFinished } from "@/utils/types";
+import type { OnMutationApiCallFinished, Prompt } from "@/utils/types";
 
 export interface TranslateInput {
     text: string;
@@ -33,6 +33,60 @@ export const useTranslate = (onFinished: OnMutationApiCallFinished) => {
         },
         onSettled: () => onFinished.onSettled?.(),
     })
+}
+
+/**
+ * Retrieves all AI prompts from the backend API.
+ * @returns a promise that resolves to an array of Prompt objects representing all AI prompts
+ */
+export const useGetPrompts = () => useQuery({
+    queryKey: ['prompts'],
+    queryFn: getPrompts,
+    refetchOnMount: 'always',
+})
+
+
+/**
+ * Updates the AI prompts by sending a PATCH request to the backend API with the provided list of Prompt objects. Each Prompt object should contain an ID that corresponds to an existing prompt in the database.
+ * @param prompts a list of Prompt objects representing the prompts to be updated, where each Prompt object should contain an ID that corresponds to an existing prompt in the database
+ * @returns a promise that resolves when the update operation is complete
+ */
+const updatePrompts = async (prompts: Prompt[]) => {
+    const response = await api.put(`ai/prompts`, prompts);
+    return response.data;
+}
+
+/**
+ * Custom hook for updating AI prompts by sending a PATCH request to the backend API with the provided list of Prompt objects. Each Prompt object should contain an ID that corresponds to an existing prompt in the database.
+ * @param onFinished An object containing callback functions to handle the success, error, and settled states of the mutation.
+ * @returns a mutation object that can be used to trigger the update process and manage its state.
+ */
+export const useUpdatePrompts = (onFinished: OnMutationApiCallFinished) => {
+    const queryClient = useQueryClient();
+
+        return useMutation<string, unknown, { prompts: Prompt[] }>({
+                mutationFn: (input) => updatePrompts(input.prompts),
+                onSuccess: (data: string) => {
+            queryClient.invalidateQueries({ queryKey: ['prompts'] });
+                        onFinished.onSuccess(data);
+        },
+        onError: () => {
+            console.error("Failed to update prompts");
+            onFinished.onError();
+        },
+        onSettled: () => {
+            onFinished.onSettled?.();
+        },
+    })
+}
+
+/**
+ * Retrieves all AI prompts from the backend API.
+ * @returns a promise that resolves to an array of Prompt objects representing all AI prompts
+ */
+export const getPrompts = async () => {
+    const response = await api.get(`ai/prompts`);
+    return response.data as Prompt[];
 }
 
 /**
