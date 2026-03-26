@@ -69,7 +69,7 @@ onUnmounted(() => {
   <Popover v-model:open="open">
     <ListboxRoot v-model="model" highlight-on-hover multiple>
       <PopoverAnchor ref="anchorRef" class="inline-flex w-full">
-        <TagsInput v-model="model" class="w-full">
+        <TagsInput v-model="model" class="w-full" @click="open = true">
           <TagsInputItem
             v-for="changeNote in selectedChangeNotes"
             :key="changeNote.id"
@@ -77,7 +77,7 @@ onUnmounted(() => {
             class="bg-border/20 dark:bg-border p-2"
           >
             <span class="py-0.5 px-2 text-sm rounded bg-transparent">{{ changeNote.reference }}</span>
-            <TagsInputItemDelete class="cursor-pointer" />
+            <TagsInputItemDelete @click.stop class="cursor-pointer" />
           </TagsInputItem>
 
           <ListboxFilter v-model="searchTerm" as-child>
@@ -89,7 +89,7 @@ onUnmounted(() => {
           </ListboxFilter>
 
           <PopoverTrigger as-child>
-            <Button size="icon-sm" variant="ghost" class="order-last self-start ml-auto">
+            <Button @click.stop size="icon-sm" variant="ghost" class="order-last self-start ml-auto">
               <ChevronDown class="size-3.5" />
             </Button>
           </PopoverTrigger>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useUpdateReleaseNote } from '@/api/release-note-api';
 import { EditReleaseNoteSchema } from '@/schemas';
-import type { ReleaseNote } from '@/utils/types';
+import { type ChangeNote, type ReleaseNote } from '@/utils/types';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
 import { ref } from 'vue';
@@ -13,6 +13,8 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbS
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
 import MultiselectChangeNotes from '../MultiselectChangeNotes.vue';
+import SelectChangeNotes from '../SelectChangeNotes.vue';
+import { useGetChangeNotes } from '@/api/change-note-api';
 
 const { t } = useI18n();
 
@@ -24,14 +26,52 @@ const isEditing = defineModel("isEditing", { type: Boolean, required: true });
 
 const releaseNote = props.releaseNote;
 
-const changeNotes = ref<number[]>(releaseNote.changeNotes?.map(cn => cn.id) || [])
+const changeNoteIdsWithinReleaseNote = ref<number[]>(releaseNote.changeNotes?.map(cn => cn.id) || [])
+
+const { data: availableChangeNotes } = useGetChangeNotes()
+
+const fromChangeNote = ref<ChangeNote | null>(null);
+const toChangeNote = ref<ChangeNote | null>(null);
+
+const onFromChangeNoteUpdate = (value: ChangeNote | null) => {
+  fromChangeNote.value = value;
+  onChangeNoteRangeChange();
+}
+
+const onToChangeNoteUpdate = (value: ChangeNote | null) => {
+  toChangeNote.value = value;
+  onChangeNoteRangeChange();
+}
+
+const onChangeNotesUpdate = (value: number[]) => {
+  changeNoteIdsWithinReleaseNote.value = value;
+  fromChangeNote.value = null;
+  toChangeNote.value = null;
+}
+
+const onChangeNoteRangeChange = () => {
+  const fromChangeNoteValue = fromChangeNote.value
+  const toChangeNoteValue = toChangeNote.value
+  const fromIndex = availableChangeNotes.value?.findIndex((cn) => cn.id === fromChangeNoteValue?.id) ?? -1;
+  const toIndex = availableChangeNotes.value?.findIndex((cn) => cn.id === toChangeNoteValue?.id) ?? -1;
+
+  if (fromChangeNoteValue !== null && toChangeNoteValue !== null && fromIndex !== -1 && toIndex !== -1) {
+    changeNoteIdsWithinReleaseNote.value = availableChangeNotes.value?.map(cn => cn.id).slice(fromIndex,toIndex + 1) ?? []
+  } else if (fromChangeNoteValue !== null && toChangeNoteValue === null && fromIndex !== -1) {
+    changeNoteIdsWithinReleaseNote.value = availableChangeNotes.value?.map(cn => cn.id).slice(fromIndex) ?? []  
+  } else if (fromChangeNoteValue === null && toChangeNoteValue !== null && toIndex !== -1) {
+    changeNoteIdsWithinReleaseNote.value = availableChangeNotes.value?.map(cn => cn.id).slice(0,toIndex + 1) ?? []
+  } else {
+    changeNoteIdsWithinReleaseNote.value = []
+  }
+}
 
 const form = useForm({
   validationSchema: toTypedSchema(EditReleaseNoteSchema),
   initialValues: {
     tag: releaseNote.tag || '',
     summary: releaseNote.summary || '',
-    changeNoteIds: changeNotes.value,
+    changeNoteIds: changeNoteIdsWithinReleaseNote.value,
     published: releaseNote.published,
   }
 })
@@ -44,7 +84,7 @@ const onSubmit = form.handleSubmit((values) => {
   if (releaseNote !== undefined) {
     const payload = {
       ...values,
-      changeNoteIds: changeNotes.value,
+      changeNoteIds: changeNoteIdsWithinReleaseNote.value,
     }
     updateReleaseNoteMutation.mutate({ id: releaseNote.id, dto: payload });
   }
@@ -103,7 +143,7 @@ const [summary] = form.defineField('summary');
           <div class="flex flex-row items-center justify-between w-full">
             <div class="flex items-center gap-4">
               <div class="flex flex-col gap-1">
-                <h4 class="text-md">{{ t('title.title') }}</h4>
+                <h1 class="text-2xl">{{ t('title.title') }}</h1>
                 <Input class="w-full" v-model="tag" :placeholder="t('placeholder.title')" />
               </div>
             </div>
@@ -121,7 +161,7 @@ const [summary] = form.defineField('summary');
           </div>
 
           <div class="flex flex-col gap-1">
-            <h4 class="text-md">{{ t('title.description') }}</h4>
+            <h1 class="text-2xl">{{ t('title.description') }}</h1>
             <Textarea 
               class="w-full" v-model="summary"
               :placeholder="t('placeholder.description')" />
@@ -129,8 +169,12 @@ const [summary] = form.defineField('summary');
         </div>
         <div class="flex flex-col w-full gap-10">
           <div class="flex flex-col gap-1">
-            <h4 class="text-md">{{ t('title.changeNotes') }}</h4>
-            <MultiselectChangeNotes v-model="changeNotes" />
+            <h1 class="text-2xl">{{ t('title.changeNotes') }}</h1>
+            <MultiselectChangeNotes @update:model-value="onChangeNotesUpdate" v-model="changeNoteIdsWithinReleaseNote" />
+            <h2>{{ t('title.from') }}</h2>
+            <SelectChangeNotes @update:model-value="onFromChangeNoteUpdate" v-model="fromChangeNote" />
+            <h2>{{ t('title.to') }}</h2>
+            <SelectChangeNotes @update:model-value="onToChangeNoteUpdate" v-model="toChangeNote" />
           </div>
         </div>
       </div>
