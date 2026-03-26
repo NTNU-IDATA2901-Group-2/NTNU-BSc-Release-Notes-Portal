@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import api from "./api";
-import type { OnMutationApiCallFinished } from "@/utils/types";
+import type { OnMutationApiCallFinished, Prompt } from "@/utils/types";
 
 export interface TranslateInput {
     text: string;
@@ -33,4 +33,22 @@ export const useTranslate = (onFinished: OnMutationApiCallFinished) => {
         },
         onSettled: () => onFinished.onSettled?.(),
     })
+}
+
+
+
+export const updatePrompts = async (prompts: Prompt[]) => {
+    console.log(prompts);
+    const response = await api.patch(`ai/prompts`, prompts);
+    return response.data;
+}
+
+/**
+ * Custom hook for fetching AI prompts using the API.
+ * @returns A mutation object that can be used to trigger the prompt fetching process and manage its state.
+ */
+
+export const getPrompts = async () => {
+    const response = await api.get(`ai/prompts`);
+    return response.data as Prompt[];
 }

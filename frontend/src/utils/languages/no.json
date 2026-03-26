@@ -7,7 +7,8 @@
         "language": "Språk",
         "english": "Engelsk",
         "norwegian": "Norsk",
-        "repositories": "Repositorier"
+        "repositories": "Repositorier",
+        "editPrompts": "Prompts"
     },
     "button": {
         "previous": "Forrige",
@@ -145,5 +146,16 @@
     "changeNoteEdit": {
         "viewableByEveryone": "Hvis denne er krysset av, vil dette endringsnotatet være synlig for alle. Dette kan føre til at sensitiv informasjon blir eksponert. Er du sikker på at du vil gjøre dette endringsnotatet synlig for alle?",
         "viewableByEveryoneTitle": "Endringsnotat synlighet"
+    },
+    "prompts": {
+        "translationPrompt": "Oversettelsesprompt",
+        "changeNoteSummaryPrompt": "Oppsummeringsprompt for endringsnotat",
+        "releaseNoteSummaryPrompt": "Oppsummeringsprompt for utgivelsesnotat",
+        "editPrompts": "Rediger prompts",
+        "translationPromptPlaceholder": "Skriv inn prompten som skal brukes for KI-oversettelse",
+        "changeNoteSummaryPromptPlaceholder": "Skriv inn prompten som skal brukes for KI-oppsummering av endringsnotater",
+        "releaseNoteSummaryPromptPlaceholder": "Skriv inn prompten som skal brukes for KI-oppsummering av utgivelsesnotater",
+        "errorLoadingPrompts": "Det oppsto en feil under innlastning av prompts",
+        "promptPlaceholder": "Skriv inn prompten"
     }
 }

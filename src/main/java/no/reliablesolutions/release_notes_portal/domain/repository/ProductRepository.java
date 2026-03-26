@@ -9,5 +9,4 @@ import no.reliablesolutions.release_notes_portal.domain.entity.Product;
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
   List<Product> findAllByNameIgnoreCase(String product);
-  
 }

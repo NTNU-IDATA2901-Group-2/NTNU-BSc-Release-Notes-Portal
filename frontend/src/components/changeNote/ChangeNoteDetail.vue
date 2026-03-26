@@ -18,7 +18,7 @@ import { router } from '@/utils/router';
 import { useI18n } from 'vue-i18n';
 import { isAdmin } from '@/utils/keycloak';
 import md from '@/utils/markdown-it';
-import { useTranslate } from '@/api/ai';
+import { useTranslate } from '@/api/ai-api';
 import Button from '../ui/button/Button.vue';
 import Spinner from '../ui/spinner/Spinner.vue';
 
