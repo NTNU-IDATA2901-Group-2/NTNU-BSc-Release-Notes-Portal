@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { onBeforeUnmount, ref } from 'vue';
+import { computed, onBeforeUnmount, ref } from 'vue';
 import { exportToPdf } from '@/utils/pdf';
 import { useArchiveReleaseNote, usePublishReleaseNote } from '@/api/release-note-api';
-import type { ChangeNote, ReleaseNote } from '@/utils/types';
+import type { ChangeNote, Customer, ReleaseNote } from '@/utils/types';
 import { useRouter } from 'vue-router';
 import { routeNames } from '@/utils/router';
 import { toast } from 'vue-sonner';
@@ -19,6 +19,12 @@ import { useTranslate } from '@/api/ai-api';
 import Spinner from '../ui/spinner/Spinner.vue';
 import Checkbox from '../ui/checkbox/Checkbox.vue';
 import DialogPrompt from '../DialogPrompt.vue';
+import Select from '../ui/select/Select.vue';
+import SelectTrigger from '../ui/select/SelectTrigger.vue';
+import SelectValue from '../ui/select/SelectValue.vue';
+import SelectContent from '../ui/select/SelectContent.vue';
+import SelectGroup from '../ui/select/SelectGroup.vue';
+import SelectItem from '../ui/select/SelectItem.vue';
 
 const props = defineProps<{
   releaseNote: ReleaseNote;
@@ -168,6 +174,41 @@ const handleCopy = (text: string | null | undefined, key: string) => {
 onBeforeUnmount(() => {
   resetCopiedState();
 });
+
+const uniqueCustomers = computed(() => {
+  const customerArray = new Array<Customer>();
+  releaseNote.changeNotes.forEach(change => {
+    if (change.customer) {
+      if (!customerArray.some(c => c.id === change.customer?.id)) {
+        customerArray.push(change.customer);
+      }
+    }
+  });
+  return Array.from(customerArray);
+})
+
+const shouldShowChangeNote = (change: ChangeNote) => {
+  if (generalReleasesChecked.value && change.customer === null) {
+    return true;
+  } else if (!generalReleasesChecked.value && change.customer === null) {
+    return false;
+  }
+
+  if (customerFilter.value === -1) {
+    return true;
+  }
+
+  if (change.customer === null) {
+    return false;
+  }
+
+  if (change.customer.id === customerFilter.value) {
+    return true;
+  }
+  return false;
+}
+
+const customerFilter = ref<number>(-1);
 </script>
 
 <template>
@@ -266,20 +307,42 @@ onBeforeUnmount(() => {
       </div>
       <Separator class="w-full h-2" />
       <div class="flex flex-col w-full gap-10">
-        <div class="flex justify-between items-center">
+        <div class="flex gap-4 flex-col md:flex-row justify-between items-start">
           <h2 class="text-3xl">{{ t('title.changeNotes') }}</h2>
-          <div class="flex gap-2">
-            <p data-pdf-exclude>{{ t('button.showGeneralChanges') }}</p>
-            <Checkbox data-pdf-exclude v-model="generalReleasesChecked"/>
+          <div class="flex flex-row items-center gap-4">
+            <div class="flex gap-2">
+              <p data-pdf-exclude>{{ t('button.showGeneralChanges') }}</p>
+              <Checkbox data-pdf-exclude v-model="generalReleasesChecked" class="cursor-pointer"/>
+            </div>
+            <div>
+              <Select data-pdf-exclude v-model="customerFilter">
+                <SelectTrigger class="w-42">
+                  <SelectValue placeholder="Filter by customer"/>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem :value=-1 class="text-text-primary/50">
+                      {{ t('button.allCustomers') }}
+                    </SelectItem>
+                  </SelectGroup>
+                  <SelectGroup>
+                    <SelectItem v-for="customer in uniqueCustomers" :key="customer.id" :value="customer.id">
+                      {{ customer.name }}
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+
           </div>
         </div>
         <div class="flex flex-col gap-16">
           <div class="flex flex-col gap-10">
             <p class="text-text-primary/50" v-if="releaseNote.changeNotes.length === 0">{{ t('placeholder.noChangeNotesAdded') }}</p>
-            <template 
+            <template
               v-for="change in translatedChangeNotes ?? releaseNote.changeNotes" :key="change.id"
               >
-              <div v-if="generalReleasesChecked || change.customer !== null">
+              <div v-if="shouldShowChangeNote(change)">
                 <div class="flex items-center gap-4">
                   <RouterLink class="text-2xl text-text-dark-static hover:underline" :to="`${routeNames.changeNotes}/${change.id}`">{{ change.reference }}</RouterLink>
 

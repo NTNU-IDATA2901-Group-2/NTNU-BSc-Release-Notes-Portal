@@ -9,13 +9,14 @@ import no.reliablesolutions.release_notes_portal.domain.entity.ReleaseNote;
 
 public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> {
 
-
   /**
-   * Finds all non-archived release notes that match the optional provided filter parameters.
+   * Finds all non-archived release notes that match the optional provided filter
+   * parameters.
    * 
-   * @param query       The search query to match against the tag and summary fields (case-insensitive).
-   * @param published   The filter for published status
-   * @param productIds  The list of product IDs to filter by.
+   * @param query      The search query to match against the tag and summary
+   *                   fields (case-insensitive).
+   * @param published  The filter for published status
+   * @param productIds The list of product IDs to filter by.
    */
   @Query("""
       SELECT r
@@ -29,14 +30,17 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
         LOWER(r.tag) LIKE LOWER('%' || :query || '%') OR
         LOWER(r.summary) LIKE LOWER('%' || :query || '%'))
       """)
-  public List<ReleaseNote> findByArchivedFalseAndMatchingFilterParameters(String query, Boolean published, List<Long> productIds);
+  public List<ReleaseNote> findByArchivedFalseAndMatchingFilterParameters(String query, Boolean published,
+      List<Long> productIds);
 
   /**
-   * Finds all non-archived release notes that match the optional provided filter parameters.
+   * Finds all non-archived release notes that match the optional provided filter
+   * parameters.
    * 
-   * @param query       The search query to match against the tag and summary fields (case-insensitive).
-   * @param published   The filter for published status
-   * @param productIds  The list of product IDs to filter by.
+   * @param query      The search query to match against the tag and summary
+   *                   fields (case-insensitive).
+   * @param published  The filter for published status
+   * @param productIds The list of product IDs to filter by.
    */
   @Query("""
       SELECT r
@@ -50,5 +54,6 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
         LOWER(r.tag) LIKE LOWER('%' || :query || '%') OR
         LOWER(r.summary) LIKE LOWER('%' || :query || '%'))
       """)
-  public List<ReleaseNote> findByArchivedFalseAndMatchingFilterParametersForCustomers(String query, Boolean published, List<Long> productIds, List<String> customerGroups);
+  public List<ReleaseNote> findByArchivedFalseAndMatchingFilterParametersForCustomers(String query, Boolean published,
+      List<Long> productIds, List<String> customerGroups);
 }

@@ -30,7 +30,6 @@ const createGitRepositoryMutation = usePersistGitRepository({
 })
 
 const onSubmit = form.handleSubmit((values) => {
-    console.log(values);
     createGitRepositoryMutation.mutate(values);
 })
 

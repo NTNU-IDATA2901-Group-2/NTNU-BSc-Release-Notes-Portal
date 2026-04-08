@@ -4,7 +4,7 @@ import { routeNames, router } from '../utils/router';
 import logoSvg from '../assets/solwr_logo.svg';
 import Avatar from './ui/avatar/Avatar.vue';
 import Separator from './ui/separator/Separator.vue';
-import { GitBranch, SunMoon, LogOut } from "lucide-vue-next"
+import { GitBranch, SunMoon, LogOut, Sparkles } from "lucide-vue-next"
 import { useTheme } from '@/utils/theme';
 import keycloak, { isAuthenticated, jwtTokenDecoded, isAdmin } from '@/utils/keycloak';
 import { computed } from 'vue';
@@ -92,15 +92,22 @@ const handleLogoClick = () => {
 							</MenubarItem>
 						</MenubarSubContent>
 					</MenubarSub>
-          <template v-if="isAdmin">
-            <MenubarSeparator/>
-            <MenubarItem>
-              <div class="w-full flex justify-end gap-2">
-                <RouterLink class="text-md" :to="routeNames.gitRepositories">{{ t('header.repositories') }}</RouterLink>
-                <GitBranch class="text-text-primary"/>
-              </div>
-            </MenubarItem>
-          </template>
+					<template v-if="isAdmin">
+						<MenubarSeparator/>
+						<MenubarItem>
+						<div class="w-full flex justify-end gap-2">
+							<RouterLink class="text-md" :to="routeNames.gitRepositories">{{ t('header.repositories') }}</RouterLink>
+							<GitBranch class="text-text-primary"/>
+						</div>
+						</MenubarItem>
+						<MenubarSeparator />
+						<MenubarItem>
+						<div class="w-full flex justify-end gap-2">
+							<RouterLink class="text-md" :to="routeNames.editPrompts">{{ t('header.editPrompts') }}</RouterLink>
+							<Sparkles class="text-text-primary"/>
+						</div>
+						</MenubarItem>
+					</template>
 					<MenubarSeparator />
 					<MenubarItem @click="handleLogOut">
 						<div class="w-full flex gap-2">

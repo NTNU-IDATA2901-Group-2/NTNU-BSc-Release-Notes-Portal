@@ -8,6 +8,7 @@ import SignInView from '@/views/SignInView.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
 import keycloak from './keycloak'
 import GitRepositoriesView from '@/views/GitRepositoriesView.vue'
+import EditPromptsView from '@/views/EditPromptsView.vue'
 
 export const routeNames = {
   releaseNotes: '/',
@@ -17,6 +18,7 @@ export const routeNames = {
   signIn: '/sign-in',
   notFound: '/:pathMatch(.*)*',
   gitRepositories: '/git-repositories',
+  editPrompts: '/edit-prompts',
 }
 
 const routes = [
@@ -27,6 +29,7 @@ const routes = [
   { path: routeNames.signIn, component: SignInView },
   { path: routeNames.notFound, component: NotFoundView },
   { path: routeNames.gitRepositories, component: GitRepositoriesView, meta: { requiresAuth: true } },
+  { path: routeNames.editPrompts, component: EditPromptsView, meta: { requiresAuth: true } },
 ]
 
 export const router = createRouter({

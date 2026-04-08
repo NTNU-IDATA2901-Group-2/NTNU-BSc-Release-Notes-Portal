@@ -9,20 +9,28 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
+import no.reliablesolutions.release_notes_portal.dto.PromptDTO;
 import no.reliablesolutions.release_notes_portal.service.AiService;
+
+import java.util.List;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
- 
+import org.springframework.web.bind.annotation.RequestBody;
 
+ 
+/**
+ * Controller for handling AI related endpoints
+ */
 @RequestMapping("/api/ai")
 @RestController
 @AllArgsConstructor
@@ -62,9 +70,33 @@ public class AiController {
     })
     @GetMapping("/summarize-changenotes/{changeNoteIds}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> summarizeChangeNote(@PathVariable List<Long> changeNoteIds) {
+    public ResponseEntity<String> summarizeChangeNotes(@PathVariable List<Long> changeNoteIds) {
         String summary = aiService.summarizeChangeNote(changeNoteIds);
         return ResponseEntity.ok(summary);
+    }
+
+    /**
+     * Retrieves all AI prompts.
+     * @return a ResponseEntity containing a list of PromptDTOs representing all AI prompts
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/prompts")
+    public ResponseEntity<List<PromptDTO>> getAllPrompts() {
+        logger.info("Getting all prompts");
+        return ResponseEntity.ok(aiService.getPrompts());
+    }
+    
+    /**
+     * Updates the AI prompts based on the provided list of PromptDTOs. Each PromptDTO should contain an ID that corresponds to an existing prompt in the database.
+     * @param prompts a list of PromptDTOs representing the prompts to be updated, where each PromptDTO should contain an ID that corresponds to an existing prompt in the database
+     * @return a ResponseEntity indicating the success of the update operation
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/prompts")
+    public ResponseEntity<Void> updatePrompts(@RequestBody List<PromptDTO> prompts) {
+        logger.info("Updating prompts");
+        aiService.updatePrompts(prompts);
+        return ResponseEntity.ok().build();
     }
 
 }

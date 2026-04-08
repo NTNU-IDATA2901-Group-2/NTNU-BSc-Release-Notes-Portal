@@ -7,7 +7,8 @@
         "language": "Språk",
         "english": "Engelsk",
         "norwegian": "Norsk",
-        "repositories": "Repositorier"
+        "repositories": "Repositorier",
+        "editPrompts": "Prompts"
     },
     "button": {
         "previous": "Forrige",
@@ -30,6 +31,7 @@
         "showGeneralChanges": "Vis generelle endringer",
         "confirm": "Bekreft",
         "summarize": "Oppsummer",
+        "allCustomers": "Alle kunder",
         "updateRange": "Oppdater fra/til"
     },
     "title": {
@@ -159,5 +161,18 @@
     },
     "tooltip": {
         "noCommits": "Ingen tilknyttede git commits"
+    },
+    "prompts": {
+        "translationPrompt": "Oversettelsesprompt",
+        "changeNoteSummaryPrompt": "Oppsummeringsprompt for endringsnotat",
+        "releaseNoteSummaryPrompt": "Oppsummeringsprompt for utgivelsesnotat",
+        "editPrompts": "Rediger prompts",
+        "translationPromptPlaceholder": "Skriv inn prompten som skal brukes for KI-oversettelse",
+        "changeNoteSummaryPromptPlaceholder": "Skriv inn prompten som skal brukes for KI-oppsummering av endringsnotater",
+        "releaseNoteSummaryPromptPlaceholder": "Skriv inn prompten som skal brukes for KI-oppsummering av utgivelsesnotater",
+        "errorLoadingPrompts": "Det oppsto en feil under innlastning av prompts",
+        "promptPlaceholder": "Skriv inn prompten",
+        "saveSuccess": "Prompts oppdatert",
+        "saveError": "Det oppsto en feil under oppdatering av prompts"
     }
 }

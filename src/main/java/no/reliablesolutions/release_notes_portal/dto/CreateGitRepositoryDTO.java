@@ -5,6 +5,5 @@ package no.reliablesolutions.release_notes_portal.dto;
  */
 public record CreateGitRepositoryDTO(
     String name,
-    String url
-) {}
-
+    String url) {
+}

@@ -1,5 +1,9 @@
 package no.reliablesolutions.release_notes_portal.service;
 
+import java.util.List;
+
+import java.util.List;
+
 
 import java.util.List;
 
@@ -11,6 +15,10 @@ import org.springframework.stereotype.Service;
 import lombok.AllArgsConstructor;
 import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
 import no.reliablesolutions.release_notes_portal.dto.GitCommitHashAndPreviousGitCommitHash;
+import no.reliablesolutions.release_notes_portal.exception.ChangeNoteHasNoGitCommitsException;
+import no.reliablesolutions.release_notes_portal.domain.entity.Prompt;
+import no.reliablesolutions.release_notes_portal.domain.repository.PromptRepository;
+import no.reliablesolutions.release_notes_portal.dto.PromptDTO;
 import no.reliablesolutions.release_notes_portal.exception.LocaleNotSupportedException;
 
 @Service
@@ -20,6 +28,8 @@ public class AiService {
     private final ChangeNoteService changeNoteService;
     private final DiffService diffService;
     private final GitRepositoryService gitRepositoryService;
+    private final PromptRepository promptRepository;
+
     private final Logger logger = LoggerFactory.getLogger(AiService.class);
     
     /**
@@ -49,13 +59,17 @@ public class AiService {
             case "fr" -> lang = "French";
             default -> throw new LocaleNotSupportedException(locale);
         }
-        
-        String masterPrompt = "You are an assistant that is part of a release notes portal. You are helping users translate the content of release and change notes to their preferred language. The user has requested a translation to " + lang + ". Please translate the following text to " + lang + ". Make sure to maintain the original meaning and context of the text, and ensure that the translation is accurate and natural-sounding in " + lang + ". Make sure to avoid grammatical errors and awkward phrasing. Only return the translated text, without any explainations, additional information, comments, preamble or formatting. If the provided text is given in markdown it is expected to be returned in markdown.";
-        
-        return builder.build().prompt().system(masterPrompt)
-        .user(text)
-        .call()
-        .content();
+
+        Prompt translationPrompt = promptRepository.findByName("Translation Prompt");
+
+        if (translationPrompt == null) {
+            throw new IllegalStateException("Translation prompt not found in database");
+        }
+
+        return builder.build().prompt().system("You are an assistant that should translate content. The language you should translate to is:  " + lang + ". " + translationPrompt.getPrompt())
+                .user(text)
+                .call()
+                .content();
     }
     
     /**
@@ -77,6 +91,12 @@ public class AiService {
         }
         String diffsString = diffs.toString().trim();
         
+        Prompt summarizeChangeNotePrompt = promptRepository.findByName("Change Note Summary");
+
+        if (summarizeChangeNotePrompt == null) {
+            throw new IllegalStateException("Summarize change note prompt not found in database");
+        }
+
         String masterPrompt = """
                 You are an assistant for a release notes portal. Summarize the provided git diff(s) into a concise free text summary for end users. 
                 Include only user-facing changes (features, fixes, UI/UX changes, behavior changes). 
@@ -85,9 +105,30 @@ public class AiService {
                 No introduction, no conclusion, no headings, no extra commentary. Make no mistakes.
                 """;
         
-        return diffsString.isEmpty() ? "" : builder.build().prompt().system(masterPrompt)
+        return diffsString.isEmpty() ? "" : builder.build().prompt().system(summarizeChangeNotePrompt.getPrompt())
         .user(diffsString)
         .call()
         .content();
+    }
+
+    /**
+     * Retrieves all prompts from the database and converts them to PromptDTOs.
+     * @return a list of PromptDTOs representing the prompts stored in the database
+     */
+    public List<PromptDTO> getPrompts() {
+        return promptRepository.findAllByOrderByNameAsc().stream().map(PromptDTO::fromPrompt).toList();
+    }
+
+    /**
+     * Updates the prompts in the database based on the provided list of PromptDTOs.
+     * Each PromptDTO should contain an ID that corresponds to an existing prompt in the database.
+     * The method will update the name and prompt fields of each corresponding Prompt entity in the database.
+     * @param prompts a list of PromptDTOs containing the updated prompt information
+     */
+    public void updatePrompts(List<PromptDTO> prompts) {
+        List<Prompt> promptEntities = prompts.stream()
+                .map(dto -> new Prompt(dto.id(), dto.name(), dto.prompt()))
+                .toList();
+        promptRepository.saveAll(promptEntities);
     }
 }

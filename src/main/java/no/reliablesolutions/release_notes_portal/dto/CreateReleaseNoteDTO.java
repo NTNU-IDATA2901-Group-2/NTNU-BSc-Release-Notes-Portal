@@ -10,6 +10,5 @@ public record CreateReleaseNoteDTO(
     String tag,
     String summary,
     Boolean published) {
-    
 
-} 
+}
