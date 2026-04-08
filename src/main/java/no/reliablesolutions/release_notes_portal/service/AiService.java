@@ -91,19 +91,11 @@ public class AiService {
         }
         String diffsString = diffs.toString().trim();
         
-        Prompt summarizeChangeNotePrompt = promptRepository.findByName("Change Note Summary");
+        Prompt summarizeChangeNotePrompt = promptRepository.findByName("Change Notes Summary");
 
         if (summarizeChangeNotePrompt == null) {
             throw new IllegalStateException("Summarize change note prompt not found in database");
         }
-
-        String masterPrompt = """
-                You are an assistant for a release notes portal. Summarize the provided git diff(s) into a concise free text summary for end users. 
-                Include only user-facing changes (features, fixes, UI/UX changes, behavior changes). 
-                Exclude internal/refactoring/dev tooling/test/build/formatting changes unless they affect user behavior. 
-                Do not invent details. If information is unclear, omit it. Output only the summary as free text. 
-                No introduction, no conclusion, no headings, no extra commentary. Make no mistakes.
-                """;
         
         return diffsString.isEmpty() ? "" : builder.build().prompt().system(summarizeChangeNotePrompt.getPrompt())
         .user(diffsString)

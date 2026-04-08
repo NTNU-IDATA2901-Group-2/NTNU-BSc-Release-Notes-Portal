@@ -27,6 +27,6 @@ public class Prompt {
     private String name;
 
     @Setter
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String prompt;
 }
