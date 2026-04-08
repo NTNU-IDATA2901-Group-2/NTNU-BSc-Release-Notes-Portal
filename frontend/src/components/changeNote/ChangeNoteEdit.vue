@@ -106,7 +106,7 @@ const summarizeChangeNote = useSummarizeChangeNotes({
     }
 })
 
-const hasCommits = useGetHasCommits(props.changeNote.id);
+const hasCommits = useGetHasCommits([props.changeNote.id]);
 const disableSummarizeButton = computed(() => hasCommits.isPending.value || hasCommits.isError.value || hasCommits.data.value !== true);  
 
 </script>

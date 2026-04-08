@@ -127,4 +127,20 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
       """)
   public GitCommitHashAndPreviousGitCommitHash findCommitHashAndPreviousCommitHash(Long changeNoteId);
 
+
+  @Query("""
+      SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END
+      FROM ChangeNote c
+      WHERE c.id IN :changeNoteIds
+        AND c.archived = false
+        AND c.gitCommitHash IS NOT NULL
+        AND EXISTS (SELECT 1
+        FROM ChangeNote c2 
+        WHERE c2.gitRepository.id = c.gitRepository.id 
+          AND c2.gitCommitTimestamp IS NOT NULL
+          AND c2.gitCommitTimestamp < c.gitCommitTimestamp
+          AND c2.archived = false)
+      """)
+  public boolean hasCommitHashAndPreviousCommitHash(List<Long> changeNoteIds);
+
 }

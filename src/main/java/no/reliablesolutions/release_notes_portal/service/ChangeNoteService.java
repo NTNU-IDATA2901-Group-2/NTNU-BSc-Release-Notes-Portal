@@ -256,12 +256,12 @@ public class ChangeNoteService {
   }
 
   /**
-   * Checks if a change note has associated git commit hashes.
-   * @param changeNoteId the ID of the change note
-   * @return true if the change note has associated git commit hashes, false otherwise
+   * Checks if a list of change notes has associated git commit hashes.
+   * @param changeNoteIds the IDs of the change notes
+   * @return true if the change notes have associated git commit hashes, false otherwise
    */
-  public boolean hasCommitHash(Long changeNoteId) {
-    return changeNoteRepository.findCommitHashAndPreviousCommitHash(changeNoteId) != null;
+  public boolean hasCommitHash(List<Long> changeNoteIds) {
+    return changeNoteRepository.hasCommitHashAndPreviousCommitHash(changeNoteIds);
   }
 
 }

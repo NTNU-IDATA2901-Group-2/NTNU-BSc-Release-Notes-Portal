@@ -76,8 +76,7 @@ public class AiService {
             diffs.append(diffString).append("\n");
         }
         String diffsString = diffs.toString().trim();
-        logger.info(diffsString);
-
+        
         String masterPrompt = """
                 You are an assistant for a release notes portal. Summarize the provided git diff(s) into a concise free text summary for end users. 
                 Include only user-facing changes (features, fixes, UI/UX changes, behavior changes). 

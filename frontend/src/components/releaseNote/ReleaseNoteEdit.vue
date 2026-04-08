@@ -14,9 +14,12 @@ import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
 import MultiselectChangeNotes from '../MultiselectChangeNotes.vue';
 import SelectChangeNotes from '../SelectChangeNotes.vue';
-import { useGetChangeNotes } from '@/api/change-note-api';
+import { useGetChangeNotes, useGetHasCommits } from '@/api/change-note-api';
 import SelectGitRepository from '../SelectGitRepository.vue';
 import { useSummarizeChangeNotes } from '@/api/ai-api';
+import Tooltip from '../ui/tooltip/Tooltip.vue';
+import TooltipTrigger from '../ui/tooltip/TooltipTrigger.vue';
+import TooltipContent from '../ui/tooltip/TooltipContent.vue';
 
 const { t } = useI18n();
 
@@ -87,6 +90,10 @@ const summarizeReleaseNote = useSummarizeChangeNotes({
     toast.error(t('toast.summarizeError'));
   }
 })
+
+const hasCommits = useGetHasCommits(changeNoteIdsWithinReleaseNote);
+const disableSummarizeButton = computed(() => hasCommits.isPending.value || hasCommits.isError.value || hasCommits.data.value !== true);  
+
     
 const form = useForm({
   validationSchema: toTypedSchema(EditReleaseNoteSchema),
@@ -154,6 +161,7 @@ const [summary] = form.defineField('summary');
           <div class="flex flex-col gap-4 w-full">
             <div data-pdf-exclude class="flex sm:hidden gap-4 ml-auto">
               <Button
+              :disabled="disableSummarizeButton"
               type="button"
               @click="summarizeReleaseNote.mutate(changeNoteIdsWithinReleaseNote)"
               variant="glow"
@@ -179,14 +187,24 @@ const [summary] = form.defineField('summary');
             </div>
           </div>
           <div data-pdf-exclude class="hidden sm:flex gap-4 mt-auto">
-            <Button
-            type="button"
-            @click="summarizeReleaseNote.mutate(changeNoteIdsWithinReleaseNote)"
-            variant="glow"
-            >
-            {{t('button.summarize')}}
-            <Sparkles />
-          </Button>
+            <Tooltip>
+              <TooltipTrigger as-child>
+                <div class = "inline-flex">
+                  <Button
+                    :disabled="disableSummarizeButton"
+                    type="button"
+                    @click="summarizeReleaseNote.mutate(changeNoteIdsWithinReleaseNote)"
+                    variant="glow"
+                  >
+                    {{t('button.summarize')}}
+                    <Sparkles />
+                  </Button>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent v-if="disableSummarizeButton">
+                  {{ t('tooltip.noCommits') }}
+              </TooltipContent>
+            </Tooltip>
           <Button 
           class="" variant="outline"
           @click="onCancel">{{ t('button.cancel') }}

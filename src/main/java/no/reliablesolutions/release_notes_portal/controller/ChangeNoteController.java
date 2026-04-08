@@ -124,21 +124,22 @@ public class ChangeNoteController {
     logger.info("Published change note with id: {}", id);
     return ResponseEntity.ok().body("Change note published successfully");
   }
-
+ 
   /**
-   * Endpoint to check if a change note has associated git commit hashes.
-   * @param id the ID of the change note to check for associated git commit hashes
-   * @return a ResponseEntity containing a boolean value indicating whether the change note has associated git commit hashes
+   * Endpoint to check if a list of change notes has associated git commit hashes.
+   * @param ids a list of IDs of the change notes to check for associated git commit hashes
+   * @return a ResponseEntity containing a boolean value indicating whether the change notes have associated git commit hashes
    */
-  @Operation(summary = "Check if change note has associated git commits", description = "Checks if the change note with the given ID has associated git commit hashes")
+  @Operation(summary = "Check if change notes have associated git commits", description = "Checks if the change notes with the given IDs have associated git commit hashes")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "Check completed successfully"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
-  @GetMapping("/{id}/has-commits")
+  @GetMapping("/has-commits/{ids}")
   @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<Boolean> hasCommitHash(@PathVariable long id) {
-      boolean hasCommits = changeNoteService.hasCommitHash(id);
+  public ResponseEntity<Boolean> hasCommitHash(@PathVariable List<Long> ids) {
+      boolean hasCommits = changeNoteService.hasCommitHash(ids);
+      logger.info("Checked for git commits for change notes with ids: {}. Result: {}", ids, hasCommits);
       return ResponseEntity.ok().body(hasCommits);
   }
   

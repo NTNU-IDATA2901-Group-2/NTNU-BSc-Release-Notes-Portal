@@ -112,7 +112,7 @@ onUnmounted(() => {
             class="text-text-primary data-highlighted:bg-border/25 [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
             @select="() => { searchTerm = '' }"
           >
-            <span>{{ item.label }}</span>
+            <span>{{ item.label !== null ? item.label : t('changeNote.noReference') }}</span>
             <ListboxItemIndicator class="ml-auto inline-flex items-center justify-center">
               <CheckIcon />
             </ListboxItemIndicator>
