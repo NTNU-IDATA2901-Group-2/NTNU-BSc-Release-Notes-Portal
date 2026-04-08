@@ -12,6 +12,8 @@ const { t } = useI18n();
 
 const props = defineProps<{
   changeNotes: ChangeNote[];
+  disabled?: boolean;
+  placeholder: string;
 }>()
 
 const model = defineModel<ChangeNote | null>({ required: true, default: null })
@@ -19,14 +21,14 @@ const model = defineModel<ChangeNote | null>({ required: true, default: null })
 </script>
 
 <template>
-  <Select v-model="model">
+  <Select :disabled="props.disabled" v-model="model">
     <SelectTrigger class="w-45">
       <SelectValue/>
     </SelectTrigger>
     <SelectContent>
       <SelectGroup>
         <SelectItem :value="null">
-          {{ t('none') }}
+          {{ props.placeholder }}
         </SelectItem>
         <SelectItem v-for="changeNote in changeNotes" :key="changeNote.id" :value=changeNote>
           {{ changeNote.reference ?? t('changeNote.noReference') }}

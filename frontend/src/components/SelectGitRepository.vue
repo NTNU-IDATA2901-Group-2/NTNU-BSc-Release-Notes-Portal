@@ -24,7 +24,7 @@ const { data: availableGitRepositories } = useGetGitRepositories()
     <SelectContent>
       <SelectGroup>
         <SelectItem :value="null">
-          {{ t('none') }}
+          {{ t('title.fromRepository') }}
         </SelectItem>
         <SelectItem v-for="gitRepository in availableGitRepositories" :key="gitRepository.id" :value=gitRepository>
           {{ gitRepository.name }}

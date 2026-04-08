@@ -49,7 +49,8 @@
         "visibility": "Synlig for alle",
         "from": "Fra",
         "to": "Til",
-        "addFromRepository": "Legg til fra repository"
+        "addFromRepository": "Legg til fra repository",
+        "fromRepository": "Fra repository"
     },
     "toast": {
         "changeNoteDeleted": "Endringsnotat slettet",

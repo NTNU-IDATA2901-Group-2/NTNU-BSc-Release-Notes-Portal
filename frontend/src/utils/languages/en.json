@@ -48,7 +48,8 @@
         "visibility": "Visible to everyone",
         "from": "From",
         "to": "To",
-        "addFromRepository": "Add from repository"
+        "addFromRepository": "Add from repository",
+        "fromRepository": "From repository"
     },
     "toast": {
         "changeNoteDeleted": "Change note deleted successfully",
