@@ -8,7 +8,18 @@ import keycloak from './utils/keycloak';
 import { i18n } from './utils/i18n';
 
 const app = createApp(App)
-app.use(VueQueryPlugin)
+
+app.use(VueQueryPlugin, {
+  queryClientConfig: {
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+        staleTime: 1000 * 60 * 30, // 30 minutes
+      }
+    }
+  }
+  },
+)
 app.use(i18n)
 
 const authenticated = await keycloak.init({
