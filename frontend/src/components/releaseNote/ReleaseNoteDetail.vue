@@ -209,10 +209,6 @@ const shouldShowChangeNote = (change: ChangeNote) => {
 }
 
 const customerFilter = ref<number>(-1);
-watch(customerFilter, (newValue) => {
-  console.log('Selected customer ID:', newValue);
-})
-
 </script>
 
 <template>
