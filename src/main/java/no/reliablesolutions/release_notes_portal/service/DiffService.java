@@ -29,8 +29,8 @@ class DiffService {
    * @param repositoryDirectoriesPath the base path where local git repositories are stored, injected from application properties
    */
   public DiffService(
-    @Value("${REPOSITORY_DIRECTORIES_PATH}") String repositoryDirectoriesPath,
-    @Value("${CHANGE_NOTE_DIRECTORY}") String changeNoteDirectory
+    @Value("${REPOSITORY_DIRECTORIES_PATH:repository_directories_path}") String repositoryDirectoriesPath,
+    @Value("${CHANGE_NOTE_DIRECTORY:change_note_directory}") String changeNoteDirectory
   ) {
     this.repositoryDirectoriesPath = repositoryDirectoriesPath;
     this.changeNoteDirectory = changeNoteDirectory;

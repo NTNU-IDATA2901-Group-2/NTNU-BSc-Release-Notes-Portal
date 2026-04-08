@@ -47,8 +47,8 @@ public class SyncGitChangeNotes implements CommandLineRunner {
     GitRepositoryRepository gitRepositoryRepository,
     ChangeNoteService changeNoteService,
     ChangeNoteFileHandler changeNoteFileHandler,
-    @Value("${REPOSITORY_DIRECTORIES_PATH}") String repositoryDirectoriesPath,
-    @Value("${CHANGE_NOTE_DIRECTORY}") String changeNoteDirectory
+    @Value("${REPOSITORY_DIRECTORIES_PATH:repository_directories_path}") String repositoryDirectoriesPath,
+    @Value("${CHANGE_NOTE_DIRECTORY:change_note_directory}") String changeNoteDirectory
   ) {
     this.gitRepositoryRepository = gitRepositoryRepository;
     this.changeNoteService = changeNoteService;
