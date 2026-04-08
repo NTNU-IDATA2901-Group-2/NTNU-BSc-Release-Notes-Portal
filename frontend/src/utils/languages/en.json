@@ -30,7 +30,8 @@
         "undo": "Undo",
         "showGeneralChanges": "Show General Changes",
         "confirm": "Confirm",
-        "summarize": "Summarize"
+        "summarize": "Summarize",
+        "allCustomers": "All customers"
     },
     "title": {
         "title": "Title",

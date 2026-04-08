@@ -30,7 +30,8 @@
         "undo": "Angre",
         "showGeneralChanges": "Vis generelle endringer",
         "confirm": "Bekreft",
-        "summarize": "Oppsummer"
+        "summarize": "Oppsummer",
+        "allCustomers": "Alle kunder"
     },
     "title": {
         "title": "Tittel",
