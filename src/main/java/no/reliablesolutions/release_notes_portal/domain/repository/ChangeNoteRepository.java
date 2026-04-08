@@ -127,13 +127,4 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
       """)
   public GitCommitHashAndPreviousGitCommitHash findCommitHashAndPreviousCommitHash(Long changeNoteId);
 
-  @Query("""
-      SELECT DISTINCT c.id
-      FROM ChangeNote c
-      JOIN c.releaseNotes r
-      WHERE c.archived = false
-        AND (:releaseNoteId IS NULL OR :releaseNoteId = r.id)
-        AND r.archived = false
-      """)
-  List<Long> findIdsByReleaseNoteId(Long releaseNoteId);
 }

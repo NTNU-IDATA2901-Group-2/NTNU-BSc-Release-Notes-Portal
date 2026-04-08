@@ -16,7 +16,7 @@ import { useI18n } from 'vue-i18n';
 import Checkbox from '../ui/checkbox/Checkbox.vue';
 import { ref } from 'vue';
 import DialogPrompt from '../DialogPrompt.vue';
-import { useSummarizeChangeNote } from '@/api/ai-api';
+import { useSummarizeChangeNotes } from '@/api/ai-api';
 import { computed } from 'vue';
 import Tooltip from '../ui/tooltip/Tooltip.vue';
 import TooltipTrigger from '../ui/tooltip/TooltipTrigger.vue';
@@ -96,7 +96,7 @@ const onCancelViewable = () => {
     viewAbleByEveryone.value = false;
 }
 
-const summarizeChangeNote = useSummarizeChangeNote({
+const summarizeChangeNote = useSummarizeChangeNotes({
     onSuccess: (summary?: string) => {
         description.value = summary;
         toast.success(t('toast.summarizeSuccess'));
@@ -122,7 +122,7 @@ const disableSummarizeButton = computed(() => hasCommits.isPending.value || hasC
                 <Button
                     :disabled="disableSummarizeButton"
                     type="button"
-                    @click="summarizeChangeNote.mutate(props.changeNote.id)"
+                    @click="summarizeChangeNote.mutate([props.changeNote.id])"
                     variant="glow"
                 >
                     {{t('button.summarize')}}
@@ -148,7 +148,7 @@ const disableSummarizeButton = computed(() => hasCommits.isPending.value || hasC
                             <Button
                                 :disabled="disableSummarizeButton"
                                 type="button"
-                                @click="summarizeChangeNote.mutate(props.changeNote.id)"
+                                @click="summarizeChangeNote.mutate([props.changeNote.id])"
                                 variant="glow"
                             >
                                 {{t('button.summarize')}}

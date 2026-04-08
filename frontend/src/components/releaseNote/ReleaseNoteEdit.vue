@@ -16,7 +16,7 @@ import MultiselectChangeNotes from '../MultiselectChangeNotes.vue';
 import SelectChangeNotes from '../SelectChangeNotes.vue';
 import { useGetChangeNotes } from '@/api/change-note-api';
 import SelectGitRepository from '../SelectGitRepository.vue';
-import { useSummarizeReleaseNote } from '@/api/ai-api';
+import { useSummarizeChangeNotes } from '@/api/ai-api';
 
 const { t } = useI18n();
 
@@ -33,99 +33,99 @@ const changeNoteIdsWithinReleaseNote = ref<number[]>(releaseNote.changeNotes?.ma
 const { data: availableChangeNotes } = useGetChangeNotes()
 
 const gitRepository = ref<GitRepository | null>(null)
-  const params = computed(() => {
-    return { gitRepositoryIds: gitRepository.value?.id ? gitRepository.value?.id.toString() : '' }
-  });
-  const { data: currentGitRepositoryChangeNotes } = useGetChangeNotes(params)
+const params = computed(() => {
+  return { gitRepositoryIds: gitRepository.value?.id ? gitRepository.value?.id.toString() : '' }
+});
+const { data: currentGitRepositoryChangeNotes } = useGetChangeNotes(params)
+
+const fromChangeNote = ref<ChangeNote | null>(null);
+const toChangeNote = ref<ChangeNote | null>(null);
+    
+const onChangeNotesUpdate = (value: number[]) => {
+  changeNoteIdsWithinReleaseNote.value = value;
+  fromChangeNote.value = null;
+  toChangeNote.value = null;
+}
+    
+const onChangeNoteRangeChange = (gitRepositoryId: number) => {
+  const fromChangeNoteValue = fromChangeNote.value
+  const toChangeNoteValue = toChangeNote.value
+  const fromIndex = availableChangeNotes.value?.findIndex((cn) => cn.id === fromChangeNoteValue?.id) ?? -1;
+  const toIndex = availableChangeNotes.value?.findIndex((cn) => cn.id === toChangeNoteValue?.id) ?? -1;
   
-  const fromChangeNote = ref<ChangeNote | null>(null);
-    const toChangeNote = ref<ChangeNote | null>(null);
-      
-      const onChangeNotesUpdate = (value: number[]) => {
-        changeNoteIdsWithinReleaseNote.value = value;
-        fromChangeNote.value = null;
-        toChangeNote.value = null;
-      }
-      
-      const onChangeNoteRangeChange = (gitRepositoryId: number) => {
-        const fromChangeNoteValue = fromChangeNote.value
-        const toChangeNoteValue = toChangeNote.value
-        const fromIndex = availableChangeNotes.value?.findIndex((cn) => cn.id === fromChangeNoteValue?.id) ?? -1;
-        const toIndex = availableChangeNotes.value?.findIndex((cn) => cn.id === toChangeNoteValue?.id) ?? -1;
-        
-        if (gitRepositoryId !== -1) { // remove old change notes on the same repository before adding new range
-          changeNoteIdsWithinReleaseNote.value = changeNoteIdsWithinReleaseNote.value.filter(id => {
-            const cn = availableChangeNotes.value?.find(cn => cn.id === id)
-            return cn?.gitRepositoryId !== gitRepositoryId
-          })
-        }
-        
-        let newChangeNoteIds: number[];
-        if (fromChangeNoteValue !== null && toChangeNoteValue !== null && fromIndex !== -1 && toIndex !== -1) {
-          newChangeNoteIds = availableChangeNotes.value?.map(cn => cn.id).slice(fromIndex, toIndex + 1) ?? []  
-        } else if (fromChangeNoteValue !== null && toChangeNoteValue === null && fromIndex !== -1) {
-          newChangeNoteIds = availableChangeNotes.value?.map(cn => cn.id).slice(fromIndex) ?? []  
-        } else if (fromChangeNoteValue === null && toChangeNoteValue !== null && toIndex !== -1) {
-          newChangeNoteIds = availableChangeNotes.value?.map(cn => cn.id).slice(0, toIndex + 1) ?? []
-        } else {
-          newChangeNoteIds = []
-        }
-        
-        changeNoteIdsWithinReleaseNote.value = [...new Set([...(changeNoteIdsWithinReleaseNote.value ?? []), ...newChangeNoteIds])];
-      }
-      
-      const summarizeReleaseNote = useSummarizeReleaseNote({
-        onSuccess: (summary) => {
-          if (summary === undefined) {
-            toast.error(t('toast.summarizeError'));
-          } else {
-            form.setFieldValue('summary', summary);
-            toast.success(t('toast.summarizeSuccess'));
-          }
-        },
-        onError: () => {
-          toast.error(t('toast.summarizeError'));
-        }
-      })
-      
-      const form = useForm({
-        validationSchema: toTypedSchema(EditReleaseNoteSchema),
-        initialValues: {
-          tag: releaseNote.tag || '',
-          summary: releaseNote.summary || '',
-          changeNoteIds: changeNoteIdsWithinReleaseNote.value,
-          published: releaseNote.published,
-        }
-      })
-      
-      const onCancel = () => {
-        isEditing.value = false;
-      }
-      
-      const onSubmit = form.handleSubmit((values) => {
-        if (releaseNote !== undefined) {
-          const payload = {
-            ...values,
-            changeNoteIds: changeNoteIdsWithinReleaseNote.value,
-          }
-          updateReleaseNoteMutation.mutate({ id: releaseNote.id, dto: payload });
-        }
-      })
-      
-      const updateReleaseNoteMutation = useUpdateReleaseNote({
-        onSuccess: () => {
-          toast.success(t('toast.releaseNoteUpdatedSuccess'));
-          isEditing.value = false;
-        },
-        onError: () => {
-          toast.error(t('toast.releaseNoteUpdateError'));
-        }
-      })
-      
-      const [tag] = form.defineField('tag');
-      const [summary] = form.defineField('summary');
-      
-    </script>
+  if (gitRepositoryId !== -1) { // remove old change notes on the same repository before adding new range
+    changeNoteIdsWithinReleaseNote.value = changeNoteIdsWithinReleaseNote.value.filter(id => {
+      const cn = availableChangeNotes.value?.find(cn => cn.id === id)
+      return cn?.gitRepositoryId !== gitRepositoryId
+    })
+  }
+  
+  let newChangeNoteIds: number[];
+  if (fromChangeNoteValue !== null && toChangeNoteValue !== null && fromIndex !== -1 && toIndex !== -1) {
+    newChangeNoteIds = availableChangeNotes.value?.map(cn => cn.id).slice(fromIndex, toIndex + 1) ?? []  
+  } else if (fromChangeNoteValue !== null && toChangeNoteValue === null && fromIndex !== -1) {
+    newChangeNoteIds = availableChangeNotes.value?.map(cn => cn.id).slice(fromIndex) ?? []  
+  } else if (fromChangeNoteValue === null && toChangeNoteValue !== null && toIndex !== -1) {
+    newChangeNoteIds = availableChangeNotes.value?.map(cn => cn.id).slice(0, toIndex + 1) ?? []
+  } else {
+    newChangeNoteIds = []
+  }
+  
+  changeNoteIdsWithinReleaseNote.value = [...new Set([...(changeNoteIdsWithinReleaseNote.value ?? []), ...newChangeNoteIds])];
+}
+    
+const summarizeReleaseNote = useSummarizeChangeNotes({
+  onSuccess: (summary) => {
+    if (summary === undefined) {
+      toast.error(t('toast.summarizeError'));
+    } else {
+      form.setFieldValue('summary', summary);
+      toast.success(t('toast.summarizeSuccess'));
+    }
+  },
+  onError: () => {
+    toast.error(t('toast.summarizeError'));
+  }
+})
+    
+const form = useForm({
+  validationSchema: toTypedSchema(EditReleaseNoteSchema),
+  initialValues: {
+    tag: releaseNote.tag || '',
+    summary: releaseNote.summary || '',
+    changeNoteIds: changeNoteIdsWithinReleaseNote.value,
+    published: releaseNote.published,
+  }
+})
+    
+const onCancel = () => {
+  isEditing.value = false;
+}
+
+const onSubmit = form.handleSubmit((values) => {
+  if (releaseNote !== undefined) {
+    const payload = {
+      ...values,
+      changeNoteIds: changeNoteIdsWithinReleaseNote.value,
+    }
+    updateReleaseNoteMutation.mutate({ id: releaseNote.id, dto: payload });
+  }
+})
+
+const updateReleaseNoteMutation = useUpdateReleaseNote({
+  onSuccess: () => {
+    toast.success(t('toast.releaseNoteUpdatedSuccess'));
+    isEditing.value = false;
+  },
+  onError: () => {
+    toast.error(t('toast.releaseNoteUpdateError'));
+  }
+})
+
+const [tag] = form.defineField('tag');
+const [summary] = form.defineField('summary');
+  
+</script>
     
     
     <template>
@@ -155,7 +155,7 @@ const gitRepository = ref<GitRepository | null>(null)
             <div data-pdf-exclude class="flex sm:hidden gap-4 ml-auto">
               <Button
               type="button"
-              @click="summarizeReleaseNote.mutate(releaseNote.id)"
+              @click="summarizeReleaseNote.mutate(changeNoteIdsWithinReleaseNote)"
               variant="glow"
               >
               {{t('button.summarize')}}
@@ -181,7 +181,7 @@ const gitRepository = ref<GitRepository | null>(null)
           <div data-pdf-exclude class="hidden sm:flex gap-4 mt-auto">
             <Button
             type="button"
-            @click="summarizeReleaseNote.mutate(releaseNote.id)"
+            @click="summarizeReleaseNote.mutate(changeNoteIdsWithinReleaseNote)"
             variant="glow"
             >
             {{t('button.summarize')}}

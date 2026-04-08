@@ -36,63 +36,31 @@ export const useTranslate = (onFinished: OnMutationApiCallFinished) => {
 }
 
 /**
- * Summarizes a change note using the AI summarization API.
- * @param changeNoteId the ID of the change note to be summarized
- * @returns a promise that resolves to the summarized text of the change note
+ * Summarizes change notes using the AI summarization API.
+ * @param changeNoteIds an array of IDs of the change notes to be summarized
+ * @returns a promise that resolves to the summarized text of the change notes
  */
-const summarizeChangeNote = async (changeNoteId: number) => {
-  const response = await api.get(`ai/summarize-changenote/${changeNoteId}`);
+const summarizeChangeNotes = async (changeNoteIds: number[]) => {
+  const response = await api.get(`ai/summarize-changenotes/${changeNoteIds.join(',')}`);
   return response.data;
 }
 
 /**
- * Custom hook for summarizing a change note using the AI summarization API.
+ * Custom hook for summarizing change notes using the AI summarization API.
  * @param onFinished An object containing callback functions to handle the success, error, and settled states of the mutation.
  * @returns A mutation object that can be used to trigger the summarization process.
  */
-export const useSummarizeChangeNote = (onFinished: OnMutationApiCallFinished) => {
+export const useSummarizeChangeNotes = (onFinished: OnMutationApiCallFinished) => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (changeNoteId: number) => summarizeChangeNote(changeNoteId),
+        mutationFn: (changeNoteIds: number[]) => summarizeChangeNotes(changeNoteIds),
         onSuccess: (data: string) => {
             queryClient.invalidateQueries({ queryKey: ['summarizeChangeNote'] });
             onFinished.onSuccess(data);
         },
         onError: () => {
             console.error("Failed to summarize change note");
-            onFinished.onError();
-        },
-        onSettled: () => onFinished.onSettled?.(),
-    })
-}
-
-/**
- * Summarizes a release note using the AI summarization API.
- * @param releaseNoteId the ID of the release note to be summarized
- * @returns a promise that resolves to the summarized text of the release note
- */
-const summarizeReleaseNote = async (releaseNoteId: number) => {
-  const response = await api.get(`ai/summarize-releasenote/${releaseNoteId}`);
-  return response.data;
-}
-
-/**
- * Custom hook for summarizing a release note using the AI summarization API.
- * @param onFinished An object containing callback functions to handle the success, error, and settled states of the mutation.
- * @returns A mutation object that can be used to trigger the summarization process.
- */
-export const useSummarizeReleaseNote = (onFinished: OnMutationApiCallFinished) => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: (releaseNoteId: number) => summarizeReleaseNote(releaseNoteId),
-        onSuccess: (data: string) => {
-            queryClient.invalidateQueries({ queryKey: ['summarizeReleaseNote'] });
-            onFinished.onSuccess(data);
-        },
-        onError: () => {
-            console.error("Failed to summarize release note");
             onFinished.onError();
         },
         onSettled: () => onFinished.onSettled?.(),

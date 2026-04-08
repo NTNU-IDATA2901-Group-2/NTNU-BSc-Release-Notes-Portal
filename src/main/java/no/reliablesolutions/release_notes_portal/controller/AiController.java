@@ -1,5 +1,7 @@
 package no.reliablesolutions.release_notes_portal.controller;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,38 +50,21 @@ public class AiController {
     }
 
     /**
-     * Summarizes the change note with the given ID.
-     * @param changeNoteId the ID of the change note to be summarized
-     * @return a ResponseEntity containing the summary of the change note
+     * Summarizes the change notes with the given IDs.
+     * @param changeNoteIds the IDs of the change notes to be summarized
+     * @return a ResponseEntity containing the summary of the change notes
      */
-    @Operation(summary = "Summarize change note", description = "Generates a summary of the change note with the given ID using AI")
+    @Operation(summary = "Summarize change notes", description = "Generates a summary of the change notes with the given IDs using AI")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Summary generated successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid request parameters"),
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @GetMapping("/summarize-changenote/{changeNoteId}")
+    @GetMapping("/summarize-changenotes/{changeNoteIds}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> summarizeChangeNote(@PathVariable long changeNoteId) {
-        String summary = aiService.summarizeChangeNote(changeNoteId);
+    public ResponseEntity<String> summarizeChangeNote(@PathVariable List<Long> changeNoteIds) {
+        String summary = aiService.summarizeChangeNote(changeNoteIds);
         return ResponseEntity.ok(summary);
     }
 
-    /**
-     * Summarizes the release note with the given ID.
-     * @param releaseNoteId the ID of the release note to be summarized
-     * @return a ResponseEntity containing the summary of the release note
-     */
-    @Operation(summary = "Summarize release note", description = "Generates a summary of the release note with the given ID using AI")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Summary generated successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid request parameters"),
-        @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    @GetMapping("/summarize-releasenote/{releaseNoteId}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> summarizeReleaseNote(@PathVariable long releaseNoteId) {
-        String summary = aiService.summarizeReleaseNote(releaseNoteId);
-        return ResponseEntity.ok(summary);
-    }
 }
