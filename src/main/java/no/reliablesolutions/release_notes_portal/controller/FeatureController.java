@@ -25,6 +25,9 @@ import no.reliablesolutions.release_notes_portal.dto.CreateTagDTO;
 import no.reliablesolutions.release_notes_portal.dto.FeatureDTO;
 import no.reliablesolutions.release_notes_portal.service.FeatureService;
 
+/**
+ * Controller for managing features.
+ */
 @Tag(name = "Features", description = "Endpoints for managing features")
 @RestController
 @RequestMapping("/api/features")
@@ -34,6 +37,12 @@ public class FeatureController {
 	private final FeatureService featureService;
 	private final Logger logger = LoggerFactory.getLogger(FeatureController.class);
 
+  /**
+   * Endpoint for creating a new feature with the provided details.
+   * 
+   * @param featureDTO the details of the feature to be created
+   * @return a ResponseEntity containing the ID of the created feature
+   */
 	@Operation(summary = "Create feature", description = "Creates a new feature with provided details")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "201", description = "Feature created successfully"),
@@ -47,6 +56,11 @@ public class FeatureController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(String.valueOf(id));
 	}
 
+  /**
+   * Endpoint for retrieving a list of all features.
+   * 
+   * @return a ResponseEntity containing a list of all features
+   */
 	@Operation(summary = "Get all features", description = "Retrieves a list of all features")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Features retrieved successfully"),
@@ -59,6 +73,12 @@ public class FeatureController {
 		return ResponseEntity.ok(features);
 	}
 
+  /**
+   * Endpoint for retrieving details of a specific feature by its ID.
+   * 
+   * @param id the ID of the feature to be retrieved
+   * @return a ResponseEntity containing the details of the requested feature
+   */
 	@Operation(summary = "Get feature by ID", description = "Retrieves details of a specific feature by its ID")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Feature retrieved successfully"),
@@ -72,6 +92,13 @@ public class FeatureController {
 		return ResponseEntity.ok(feature);
 	}
 
+  /**
+   * Endpoint for updating an existing feature with new details.
+   * 
+   * @param id the ID of the feature to be updated
+   * @param featureDTO the new details of the feature
+   * @return a ResponseEntity containing the updated feature details
+   */
 	@Operation(summary = "Update feature", description = "Updates an existing feature with new details")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Feature updated successfully"),
@@ -85,6 +112,12 @@ public class FeatureController {
 		return ResponseEntity.ok(feature);
 	}
 
+  /**
+   * Endpoint for deleting an existing feature by its ID.
+   * 
+   * @param id the ID of the feature to be deleted
+   * @return a ResponseEntity indicating the success of the delete operation
+   */
 	@Operation(summary = "Delete feature", description = "Deletes an existing feature by its ID")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Feature deleted successfully"),

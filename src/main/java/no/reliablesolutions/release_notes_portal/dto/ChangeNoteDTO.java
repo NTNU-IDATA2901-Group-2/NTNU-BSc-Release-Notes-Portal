@@ -1,5 +1,8 @@
 package no.reliablesolutions.release_notes_portal.dto;
 
+/**
+ * A data transfer object for representing a change note.
+ */
 public record ChangeNoteDTO(
     long id,
     String reference,

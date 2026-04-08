@@ -19,6 +19,13 @@ public class GitRepositoryService {
     private final GitRepositoryRepository gitRepositoryRepository;
     private final SyncGitChangeNotes syncGitChangeNotes;
 
+    /**
+     * Creates a new Git repository based on the provided CreateGitRepositoryDTO.
+     *
+     * @param dto the DTO containing the name and URL of the Git repository to create
+     * @return the ID of the newly created Git repository
+     * @throws FailedToSaveEntityException if saving the Git repository to the database fails
+     */
     public long createGitRepository(CreateGitRepositoryDTO dto) {
         var gitRepository = new GitRepository();
         gitRepository.setName(dto.name());
@@ -30,15 +37,32 @@ public class GitRepositoryService {
         }
     }
 
+    /**
+     * Deletes a Git repository by its ID.
+     *
+     * @param id the ID of the Git repository to delete
+     * @throws GitRepositoryNotFoundException if the Git repository with the specified ID is not found
+     */
     public void deleteGitRepository(long id) {
         gitRepositoryRepository.findById(id).orElseThrow(() -> new GitRepositoryNotFoundException(id));
         gitRepositoryRepository.deleteById(id);
     }
 
+    /**
+     * Retrieves all Git repositories.
+     *
+     * @return a list of all Git repositories
+     */
     public List<GitRepository> getAllGitRepositories() {
         return gitRepositoryRepository.findAll();
     }
 
+    /**
+     * Updates an existing Git repository.
+     *
+     * @param gitRepository the Git repository to update
+     * @throws FailedToSaveEntityException if saving the Git repository to the database fails
+     */
     public void updateGitRepository(GitRepository gitRepository) {
         try {
             gitRepositoryRepository.save(gitRepository);

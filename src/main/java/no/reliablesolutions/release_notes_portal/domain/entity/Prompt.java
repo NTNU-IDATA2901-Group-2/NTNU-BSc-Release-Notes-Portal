@@ -10,6 +10,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Entity representing a prompt.
+ */
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor

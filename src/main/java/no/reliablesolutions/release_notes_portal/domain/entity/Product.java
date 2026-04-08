@@ -10,6 +10,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Entity representing a product.
+ */
 @Entity
 @NoArgsConstructor
 @Getter

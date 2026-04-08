@@ -22,6 +22,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ * Security configuration for CI profile.
+ */
 @Configuration
 @Profile("ci") // Apply this security configuration only for 'ci' profile
 public class SecurityConfigCi {

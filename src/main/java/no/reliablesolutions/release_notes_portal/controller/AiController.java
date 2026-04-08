@@ -26,7 +26,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.web.bind.annotation.RequestBody;
 
  
-
+/**
+ * Controller for handling AI related endpoints
+ */
 @RequestMapping("/api/ai")
 @RestController
 @AllArgsConstructor

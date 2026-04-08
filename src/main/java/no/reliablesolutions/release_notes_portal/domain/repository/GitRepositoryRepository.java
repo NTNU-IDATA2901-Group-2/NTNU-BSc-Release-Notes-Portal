@@ -7,6 +7,12 @@ import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
 
 public interface GitRepositoryRepository extends JpaRepository<GitRepository, Long> {
 
+  /**
+   * Finds a Git repository associated with the specified change note ID.
+   *
+   * @param changeNoteId the ID of the change note
+   * @return the Git repository associated with the specified change note ID
+   */
   @Query("""
       SELECT g
       FROM GitRepository g

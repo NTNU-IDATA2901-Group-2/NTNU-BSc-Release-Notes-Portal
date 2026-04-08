@@ -13,6 +13,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
+/**
+ * Controller for managing public configuration endpoints.
+ */
 @RestController
 @RequestMapping("/api/public/config")
 @Profile({ "dev", "prod" })
@@ -27,15 +30,16 @@ public class ConfigController {
   @Value("${KC_CLIENT_ID}")
   private String kcClientId;
 
-
   /**
-   * Endpoint to retrieve public configuration values for the frontend, such as Keycloak settings.
+   * Endpoint to retrieve public configuration values for the frontend, such as
+   * Keycloak settings.
+   * 
    * @return A map containing the configuration values.
    */
   @Operation(summary = "Get configuration", description = "Returns public configuration values for the frontend")
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "200", description = "Configuration retrieved successfully"),
-    @ApiResponse(responseCode = "500", description = "Internal server error")
+      @ApiResponse(responseCode = "200", description = "Configuration retrieved successfully"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @GetMapping
   public ResponseEntity<Map<String, String>> getConfig() {

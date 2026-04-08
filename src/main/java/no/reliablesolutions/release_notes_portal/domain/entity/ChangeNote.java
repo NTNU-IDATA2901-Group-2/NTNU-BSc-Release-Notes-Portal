@@ -16,13 +16,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Entity representing a change note.
+ */
 @Entity
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(
-  uniqueConstraints = @UniqueConstraint(name="unique_git_commit_repository", columnNames = {"gitCommitHash", "gitRepository_id"})
-)
+@Table(uniqueConstraints = @UniqueConstraint(name = "unique_git_commit_repository", columnNames = { "gitCommitHash",
+    "gitRepository_id" }))
 public class ChangeNote {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
