@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, ref } from 'vue';
 import { exportToPdf } from '@/utils/pdf';
 import { useArchiveReleaseNote, usePublishReleaseNote } from '@/api/release-note-api';
 import type { ChangeNote, Customer, ReleaseNote } from '@/utils/types';
