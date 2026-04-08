@@ -15,7 +15,6 @@ import { Textarea } from '../ui/textarea';
 import MultiselectChangeNotes from '../MultiselectChangeNotes.vue';
 import SelectChangeNotes from '../SelectChangeNotes.vue';
 import { useGetChangeNotes, useGetHasCommits } from '@/api/change-note-api';
-import DialogPrompt from '../DialogPrompt.vue';
 import { onBeforeRouteLeave } from 'vue-router';
 import SelectGitRepository from '../SelectGitRepository.vue';
 import { useSummarizeChangeNotes } from '@/api/ai-api';

@@ -17,7 +17,6 @@ import Checkbox from '../ui/checkbox/Checkbox.vue';
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import DialogPrompt from '../DialogPrompt.vue';
 import { useSummarizeChangeNotes } from '@/api/ai-api';
-import { computed } from 'vue';
 import Tooltip from '../ui/tooltip/Tooltip.vue';
 import TooltipTrigger from '../ui/tooltip/TooltipTrigger.vue';
 import TooltipContent from '../ui/tooltip/TooltipContent.vue';
