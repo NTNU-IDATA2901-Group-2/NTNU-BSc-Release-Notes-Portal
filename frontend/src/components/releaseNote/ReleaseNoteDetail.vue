@@ -316,7 +316,7 @@ watch(customerFilter, (newValue) => {
           <div class="flex flex-row items-center gap-4">
             <div class="flex gap-2">
               <p data-pdf-exclude>{{ t('button.showGeneralChanges') }}</p>
-              <Checkbox data-pdf-exclude v-model="generalReleasesChecked"/>
+              <Checkbox data-pdf-exclude v-model="generalReleasesChecked" class="cursor-pointer"/>
             </div>
             <div>
               <Select data-pdf-exclude v-model="customerFilter">
@@ -330,7 +330,7 @@ watch(customerFilter, (newValue) => {
                     </SelectItem>
                   </SelectGroup>
                   <SelectGroup>
-                    <SelectItem v-for="customer in uniqueCustomers" :value="customer.id">
+                    <SelectItem v-for="customer in uniqueCustomers" :key="customer.id" :value="customer.id">
                       {{ customer.name }}
                     </SelectItem>
                   </SelectGroup>
