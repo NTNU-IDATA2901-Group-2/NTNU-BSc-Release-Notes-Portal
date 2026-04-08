@@ -14,13 +14,14 @@ import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';
 import { useI18n } from 'vue-i18n';
 import Checkbox from '../ui/checkbox/Checkbox.vue';
-import { ref } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import DialogPrompt from '../DialogPrompt.vue';
 import { useSummarizeChangeNotes } from '@/api/ai-api';
 import { computed } from 'vue';
 import Tooltip from '../ui/tooltip/Tooltip.vue';
 import TooltipTrigger from '../ui/tooltip/TooltipTrigger.vue';
 import TooltipContent from '../ui/tooltip/TooltipContent.vue';
+import { onBeforeRouteLeave } from 'vue-router';
 
 const props = defineProps<{
   changeNote: ChangeNote;
@@ -28,6 +29,7 @@ const props = defineProps<{
 }>();
 
 const showConfirmPrompt = ref(false);
+const showConfirmCancelPrompt = ref(false);
 
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
@@ -82,6 +84,10 @@ const onSubmit = handleSubmit((values : PersistChangeNoteDTO) => {
 });
 
 const onCancel = () => {
+    showConfirmCancelPrompt.value = true;
+}
+
+const cancelEdit = () => {
     emit('update:modelValue', false);
     router.push(`/change-notes/${props.changeNote.id}`);
 }
@@ -109,10 +115,28 @@ const summarizeChangeNote = useSummarizeChangeNotes({
 const hasCommits = useGetHasCommits([props.changeNote.id]);
 const disableSummarizeButton = computed(() => hasCommits.isPending.value || hasCommits.isError.value || hasCommits.data.value !== true);  
 
+// Warn user of unsaved changes when trying to leave the page
+const beforeUnloadListener = (event: BeforeUnloadEvent) => {
+     event.preventDefault();
+    ;(event as unknown as { returnValue: string }).returnValue = ''
+}
+
+onBeforeRouteLeave(() => {
+    return globalThis.confirm(t('changeNoteEdit.cancelDescription')) === true;
+})
+
+onMounted(() => {
+    globalThis.addEventListener('beforeunload', beforeUnloadListener);
+})
+
+onBeforeUnmount(() => {
+    globalThis.removeEventListener('beforeunload', beforeUnloadListener);
+})
 </script>
 
 <template>
 <DialogPrompt :open="showConfirmPrompt" :mode="'confirm'" :title-key="'changeNoteEdit.viewableByEveryoneTitle'" :description-key="'changeNoteEdit.viewableByEveryone'" @update:open="showConfirmPrompt = false" @cancel="onCancelViewable"/>
+<DialogPrompt :open="showConfirmCancelPrompt" :mode="'confirm'" :title-key="'changeNoteEdit.cancelTitle'" :description-key="'changeNoteEdit.cancelDescription'" @update:open="showConfirmCancelPrompt = false" @confirm="cancelEdit"/>
 <form @submit="onSubmit">
     <div class="flex flex-col gap-16 flex-1 w-full items-center mt-16 lg:w-4xl md:mt-42">
     <div class="flex flex-col gap-4 w-full">
@@ -138,7 +162,7 @@ const disableSummarizeButton = computed(() => hasCommits.isPending.value || hasC
                     <Save />
                 </Button>
             </div>
-            <h1 class="text-2xl">{{ t('title.title') }}</h1>
+            <h1 class="text-lg">{{ t('title.title') }}</h1>
             <div class="flex gap-4">
             <Input class="w-45" v-model="reference" :placeholder="t('placeholder.title')" />
             <div class="hidden sm:flex ml-auto gap-4">
@@ -175,30 +199,30 @@ const disableSummarizeButton = computed(() => hasCommits.isPending.value || hasC
         </div>
 
         <div class="flex flex-col gap-1">
-            <h1 class="text-2xl">{{ t('title.description') }}</h1>
+            <h1 class="text-lg">{{ t('title.description') }}</h1>
             <Textarea :placeholder="t('placeholder.description')" class="w-full" v-model="description"></Textarea>
         </div>
 
         <div class="flex flex-wrap justify-between gap-4">
         <div class="flex flex-col gap-1">
-            <h1 class="text-2xl">{{ t('title.product') }}</h1>
+            <h1 class="text-lg">{{ t('title.product') }}</h1>
             <TagSelect mode="product" v-model="productId"/>
         </div>
         <div class="flex flex-col gap-1">
-            <h1 class="text-2xl">{{ t('title.scope') }}</h1>
+            <h1 class="text-lg">{{ t('title.scope') }}</h1>
             <TagSelect mode="scope" v-model="scopeId"/>
         </div>
         <div class="flex flex-col gap-1">
-            <h1 class="text-2xl">{{ t('title.feature') }}</h1>
+            <h1 class="text-lg">{{ t('title.feature') }}</h1>
             <TagSelect mode="feature" v-model="featureId"/>
         </div>
         <div class="flex flex-col gap-1">
-            <h1 class="text-2xl">{{ t('title.customer') }}</h1>
+            <h1 class="text-lg">{{ t('title.customer') }}</h1>
             <TagSelect mode="customer" v-model="customerId"/>
         </div>
         </div>
         <div v-if="customerId !== -1" class="flex flex-col gap-2">
-            <h1 class="text-2xl">{{ t('title.visibility') }}</h1>
+            <h1 class="text-lg">{{ t('title.visibility') }}</h1>
             <Checkbox v-model="viewAbleByEveryone" @click="onViewableChecked"/>
         </div>
     </div>
@@ -207,11 +231,11 @@ const disableSummarizeButton = computed(() => hasCommits.isPending.value || hasC
 
     <div class="flex flex-col w-full gap-10">
         <div class="flex flex-col gap-1">
-        <h1 class="text-2xl">{{ t('title.developerNotes') }}</h1>
+        <h1 class="text-lg">{{ t('title.developerNotes') }}</h1>
         <Textarea :placeholder="t('placeholder.developerNotes')" class="w-full" v-model="developerNotes"></Textarea>
         </div>
         <div class="flex flex-col gap-1">
-        <h1 class="text-2xl">{{ t('title.upgradeRequirements') }}</h1>
+        <h1 class="text-lg">{{ t('title.upgradeRequirements') }}</h1>
         <Textarea :placeholder="t('placeholder.upgradeRequirements')" class="w-full" v-model="upgradeNotes"></Textarea>
         </div>
     </div>

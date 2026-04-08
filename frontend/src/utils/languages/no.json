@@ -154,7 +154,13 @@
     },
     "changeNoteEdit": {
         "viewableByEveryone": "Hvis denne er krysset av, vil dette endringsnotatet være synlig for alle. Dette kan føre til at sensitiv informasjon blir eksponert. Er du sikker på at du vil gjøre dette endringsnotatet synlig for alle?",
-        "viewableByEveryoneTitle": "Endringsnotat synlighet"
+        "viewableByEveryoneTitle": "Endringsnotat synlighet",
+        "cancelTitle": "Avbryt redigering",
+        "cancelDescription": "Er du sikker på at du vil avbryte redigeringen? Alle ikke lagrede endringer vil gå tapt."
+    },
+    "releaseNoteEdit": {
+        "cancelTitle": "Avbryt redigering",
+        "cancelDescription": "Er du sikker på at du vil avbryte redigeringen? Alle ikke lagrede endringer vil gå tapt."
     },
     "changeNote": {
         "noReference": "Ingen referanse oppgitt"

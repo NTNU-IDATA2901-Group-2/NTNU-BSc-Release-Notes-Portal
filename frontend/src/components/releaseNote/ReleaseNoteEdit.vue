@@ -4,7 +4,7 @@ import { EditReleaseNoteSchema } from '@/schemas';
 import type { GitRepository, ChangeNote, ReleaseNote } from '@/utils/types';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
-import { computed, ref } from 'vue';
+import { onBeforeUnmount, onMounted, computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { toast } from 'vue-sonner';
 import { Button } from '../ui/button';
@@ -15,11 +15,14 @@ import { Textarea } from '../ui/textarea';
 import MultiselectChangeNotes from '../MultiselectChangeNotes.vue';
 import SelectChangeNotes from '../SelectChangeNotes.vue';
 import { useGetChangeNotes, useGetHasCommits } from '@/api/change-note-api';
+import DialogPrompt from '../DialogPrompt.vue';
+import { onBeforeRouteLeave } from 'vue-router';
 import SelectGitRepository from '../SelectGitRepository.vue';
 import { useSummarizeChangeNotes } from '@/api/ai-api';
 import Tooltip from '../ui/tooltip/Tooltip.vue';
 import TooltipTrigger from '../ui/tooltip/TooltipTrigger.vue';
 import TooltipContent from '../ui/tooltip/TooltipContent.vue';
+import DialogPrompt from '../DialogPrompt.vue';
 
 const { t } = useI18n();
 
@@ -28,6 +31,7 @@ const props = defineProps<{
 }>();
 
 const isEditing = defineModel("isEditing", { type: Boolean, required: true });
+const cancelDialogOpen = ref(false);
 
 const releaseNote = props.releaseNote;
 
@@ -106,6 +110,10 @@ const form = useForm({
 })
     
 const onCancel = () => {
+  cancelDialogOpen.value = true;
+}
+
+const cancelEdit = () => {
   isEditing.value = false;
 }
 
@@ -132,10 +140,28 @@ const updateReleaseNoteMutation = useUpdateReleaseNote({
 const [tag] = form.defineField('tag');
 const [summary] = form.defineField('summary');
   
+// Warn user of unsaved changes when trying to leave the page
+const beforeUnloadListener = (event: BeforeUnloadEvent) => {
+     event.preventDefault();
+    ;(event as unknown as { returnValue: string }).returnValue = ''
+}
+
+onBeforeRouteLeave(() => {
+    return globalThis.confirm(t('changeNoteEdit.cancelDescription')) === true;
+})
+
+onMounted(() => {
+    globalThis.addEventListener('beforeunload', beforeUnloadListener);
+})
+
+onBeforeUnmount(() => {
+    globalThis.removeEventListener('beforeunload', beforeUnloadListener);
+})
 </script>
     
     
     <template>
+      <DialogPrompt :open="cancelDialogOpen" :mode="'confirm'" :title-key="'releaseNoteEdit.cancelTitle'" :description-key="'releaseNoteEdit.cancelDescription'" @update:open="cancelDialogOpen = false" @confirm="cancelEdit" />
       <div class="flex flex-col w-full items-center px-4 mb-20">
         <div class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10 flex items-center gap-4">
           <Button variant="outline" class="" @click="$router.back()">
@@ -169,8 +195,10 @@ const [summary] = form.defineField('summary');
               {{t('button.summarize')}}
               <Sparkles />
             </Button>
-            <Button 
-            class="" variant="outline"
+            <Button
+            type="button"
+            class=""
+            variant="outline"
             @click="onCancel">{{ t('button.cancel') }}
             <Ban />
           </Button>
@@ -182,7 +210,7 @@ const [summary] = form.defineField('summary');
         <div class="flex flex-row items-center justify-between w-full">
           <div class="flex items-center gap-4">
             <div class="flex flex-col gap-1">
-              <h1 class="text-2xl">{{ t('title.title') }}</h1>
+              <h1 class="text-lg">{{ t('title.title') }}</h1>
               <Input class="w-full" v-model="tag" :placeholder="t('placeholder.title')" />
             </div>
           </div>
@@ -206,7 +234,8 @@ const [summary] = form.defineField('summary');
               </TooltipContent>
             </Tooltip>
           <Button 
-          class="" variant="outline"
+          type="button"
+          variant="outline"
           @click="onCancel">{{ t('button.cancel') }}
           <Ban />
         </Button>
@@ -218,7 +247,7 @@ const [summary] = form.defineField('summary');
     </div>
     
     <div class="flex flex-col gap-1">
-      <h1 class="text-2xl">{{ t('title.description') }}</h1>
+      <h1 class="text-lg">{{ t('title.description') }}</h1>
       <Textarea 
       class="w-full" v-model="summary"
       :placeholder="t('placeholder.description')" />
@@ -227,7 +256,7 @@ const [summary] = form.defineField('summary');
   <div class="flex flex-col w-full gap-10">
     <div class="flex flex-col gap-4">
       <div class="flex flex-col gap-1">
-        <h1 class="text-2xl">{{ t('title.changeNotes') }}</h1>
+        <h1 class="text-lg">{{ t('title.changeNotes') }}</h1>
         <MultiselectChangeNotes @update:model-value="onChangeNotesUpdate" v-model="changeNoteIdsWithinReleaseNote" />
       </div>
       <div class="flex flex-col gap-1">
