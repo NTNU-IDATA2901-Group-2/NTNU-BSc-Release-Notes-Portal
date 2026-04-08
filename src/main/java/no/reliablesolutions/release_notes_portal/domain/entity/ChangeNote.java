@@ -63,4 +63,29 @@ public class ChangeNote {
 
   @ManyToOne(optional = true)
   private GitRepository gitRepository;
+
+
+  /**
+   * Adds a release note to the list of release notes associated with this change note.
+   * 
+   * @param releaseNote the release note to be added to this change note
+   */
+  public void addReleaseNote(ReleaseNote releaseNote) {
+    this.releaseNotes.add(releaseNote);
+  }
+
+  /**
+   * Removes a release note from the list of release notes associated with this change note.
+   * @param releaseNote the release note to be removed from this change note
+   */
+  public void removeReleaseNote(ReleaseNote releaseNote) {
+    this.releaseNotes.remove(releaseNote);
+  }
+
+  /**
+   * Clears the list of release notes associated with this change note.
+   */
+  public void clearReleaseNotes() {
+    this.releaseNotes.clear();
+  }
 }

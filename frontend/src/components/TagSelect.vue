@@ -37,9 +37,9 @@ const hookMap = {
 const { data: tags } = hookMap[props.mode]()
 
 const getTagFromId = (id?: number) => {
-    if (id === undefined || id === -1) return 'None'
+    if (id === undefined || id === -1) return  t('button.none') 
     const tag: Tag | undefined = tags.value?.find(t => t.id === id)
-    return tag ? tag.name : 'None'
+    return tag ? tag.name :  t('button.none') 
 }
 
 const { t } = useI18n();
@@ -50,7 +50,7 @@ const currentValue = () => (props.modelValue ?? props.selectedId ?? -1).toString
 
 <template>
     <Select :model-value="currentValue()" @update:model-value="(val) => emit('update:modelValue', val ? parseInt(val as string) : -1)">
-    <SelectTrigger class="w-[180px]">
+    <SelectTrigger class="w-45">
         <SelectValue 
         :text-value="getTagFromId(parseInt(currentValue()))"/>
     </SelectTrigger>
