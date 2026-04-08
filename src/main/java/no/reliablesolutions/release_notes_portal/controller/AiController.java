@@ -64,4 +64,22 @@ public class AiController {
         String summary = aiService.summarizeChangeNote(changeNoteId);
         return ResponseEntity.ok(summary);
     }
+
+    /**
+     * Summarizes the release note with the given ID.
+     * @param releaseNoteId the ID of the release note to be summarized
+     * @return a ResponseEntity containing the summary of the release note
+     */
+    @Operation(summary = "Summarize release note", description = "Generates a summary of the release note with the given ID using AI")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Summary generated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid request parameters"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @GetMapping("/summarize-releasenote/{releaseNoteId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> summarizeReleaseNote(@PathVariable long releaseNoteId) {
+        String summary = aiService.summarizeReleaseNote(releaseNoteId);
+        return ResponseEntity.ok(summary);
+    }
 }

@@ -29,7 +29,8 @@
         "undo": "Angre",
         "showGeneralChanges": "Vis generelle endringer",
         "confirm": "Bekreft",
-        "summarize": "Oppsummer"
+        "summarize": "Oppsummer",
+        "updateRange": "Oppdater fra/til"
     },
     "title": {
         "title": "Tittel",
@@ -45,7 +46,10 @@
         "changeNotes": "Endringsnotater",
         "releaseNotes": "Utgivelsesnotater",
         "allocated": "Tildelt",
-        "visibility": "Synlig for alle"
+        "visibility": "Synlig for alle",
+        "from": "Fra",
+        "to": "Til",
+        "addFromRepository": "Legg til fra repository"
     },
     "toast": {
         "changeNoteDeleted": "Endringsnotat slettet",
@@ -76,8 +80,8 @@
         "translationSuccess": "Endringsnotat oversatt",
         "copySuccess": "Innhold kopiert til utklippstavle",
         "copyError": "Det oppsto en feil under kopiering til utklippstavle",
-        "summarizeSuccess": "Endringsnotat oppsummert",
-        "summarizeError": "Det oppsto en feil under oppsummering av endringsnotat"
+        "summarizeSuccess": "Oppsummert",
+        "summarizeError": "Det oppsto en feil under oppsummering"
     },
     "deletePrompt": {
         "title": "Er du sikker på at du vil slette?",
@@ -148,6 +152,9 @@
     "changeNoteEdit": {
         "viewableByEveryone": "Hvis denne er krysset av, vil dette endringsnotatet være synlig for alle. Dette kan føre til at sensitiv informasjon blir eksponert. Er du sikker på at du vil gjøre dette endringsnotatet synlig for alle?",
         "viewableByEveryoneTitle": "Endringsnotat synlighet"
+    },
+    "changeNote": {
+        "noReference": "Ingen referanse oppgitt"
     },
     "tooltip": {
         "noCommits": "Ingen tilknyttede git commits"

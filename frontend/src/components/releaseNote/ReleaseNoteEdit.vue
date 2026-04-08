@@ -1,20 +1,22 @@
 <script setup lang="ts">
 import { useUpdateReleaseNote } from '@/api/release-note-api';
 import { EditReleaseNoteSchema } from '@/schemas';
-import { type ChangeNote, type ReleaseNote } from '@/utils/types';
+import type { GitRepository, ChangeNote, ReleaseNote } from '@/utils/types';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { toast } from 'vue-sonner';
 import { Button } from '../ui/button';
-import { ArrowLeft, Ban, Save } from 'lucide-vue-next';
+import { ArrowLeft, Ban, Save, Sparkles } from 'lucide-vue-next';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../ui/breadcrumb';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
 import MultiselectChangeNotes from '../MultiselectChangeNotes.vue';
 import SelectChangeNotes from '../SelectChangeNotes.vue';
 import { useGetChangeNotes } from '@/api/change-note-api';
+import SelectGitRepository from '../SelectGitRepository.vue';
+import { useSummarizeReleaseNote } from '@/api/ai-api';
 
 const { t } = useI18n();
 
@@ -30,18 +32,14 @@ const changeNoteIdsWithinReleaseNote = ref<number[]>(releaseNote.changeNotes?.ma
 
 const { data: availableChangeNotes } = useGetChangeNotes()
 
+const gitRepository = ref<GitRepository | null>(null)
+const params = computed(() => {
+  return { gitRepositoryIds: gitRepository.value?.id ? gitRepository.value?.id.toString() : '' }
+});
+const { data: currentGitRepositoryChangeNotes } = useGetChangeNotes(params)
+
 const fromChangeNote = ref<ChangeNote | null>(null);
 const toChangeNote = ref<ChangeNote | null>(null);
-
-const onFromChangeNoteUpdate = (value: ChangeNote | null) => {
-  fromChangeNote.value = value;
-  onChangeNoteRangeChange();
-}
-
-const onToChangeNoteUpdate = (value: ChangeNote | null) => {
-  toChangeNote.value = value;
-  onChangeNoteRangeChange();
-}
 
 const onChangeNotesUpdate = (value: number[]) => {
   changeNoteIdsWithinReleaseNote.value = value;
@@ -49,22 +47,46 @@ const onChangeNotesUpdate = (value: number[]) => {
   toChangeNote.value = null;
 }
 
-const onChangeNoteRangeChange = () => {
+const onChangeNoteRangeChange = (gitRepositoryId: number) => {
   const fromChangeNoteValue = fromChangeNote.value
   const toChangeNoteValue = toChangeNote.value
   const fromIndex = availableChangeNotes.value?.findIndex((cn) => cn.id === fromChangeNoteValue?.id) ?? -1;
   const toIndex = availableChangeNotes.value?.findIndex((cn) => cn.id === toChangeNoteValue?.id) ?? -1;
 
-  if (fromChangeNoteValue !== null && toChangeNoteValue !== null && fromIndex !== -1 && toIndex !== -1) {
-    changeNoteIdsWithinReleaseNote.value = availableChangeNotes.value?.map(cn => cn.id).slice(fromIndex,toIndex + 1) ?? []
-  } else if (fromChangeNoteValue !== null && toChangeNoteValue === null && fromIndex !== -1) {
-    changeNoteIdsWithinReleaseNote.value = availableChangeNotes.value?.map(cn => cn.id).slice(fromIndex) ?? []  
-  } else if (fromChangeNoteValue === null && toChangeNoteValue !== null && toIndex !== -1) {
-    changeNoteIdsWithinReleaseNote.value = availableChangeNotes.value?.map(cn => cn.id).slice(0,toIndex + 1) ?? []
-  } else {
-    changeNoteIdsWithinReleaseNote.value = []
+  if (gitRepositoryId !== -1) { // remove old change notes on the same repository before adding new range
+    changeNoteIdsWithinReleaseNote.value = changeNoteIdsWithinReleaseNote.value.filter(id => {
+      const cn = availableChangeNotes.value?.find(cn => cn.id === id)
+      return cn?.gitRepositoryId !== gitRepositoryId
+    })
   }
+
+  let newChangeNoteIds: number[];
+  if (fromChangeNoteValue !== null && toChangeNoteValue !== null && fromIndex !== -1 && toIndex !== -1) {
+    newChangeNoteIds = availableChangeNotes.value?.map(cn => cn.id).slice(fromIndex, toIndex + 1) ?? []  
+  } else if (fromChangeNoteValue !== null && toChangeNoteValue === null && fromIndex !== -1) {
+    newChangeNoteIds = availableChangeNotes.value?.map(cn => cn.id).slice(fromIndex) ?? []  
+  } else if (fromChangeNoteValue === null && toChangeNoteValue !== null && toIndex !== -1) {
+    newChangeNoteIds = availableChangeNotes.value?.map(cn => cn.id).slice(0, toIndex + 1) ?? []
+  } else {
+    newChangeNoteIds = []
+  }
+
+  changeNoteIdsWithinReleaseNote.value = [...new Set([...(changeNoteIdsWithinReleaseNote.value ?? []), ...newChangeNoteIds])];
 }
+
+const summarizeReleaseNote = useSummarizeReleaseNote({
+  onSuccess: (summary) => {
+    if (summary === undefined) {
+      toast.error(t('toast.summarizeError'));
+    } else {
+      form.setFieldValue('summary', summary);
+      toast.success(t('toast.summarizeSuccess'));
+    }
+  },
+  onError: () => {
+    toast.error(t('toast.summarizeError'));
+  }
+})
 
 const form = useForm({
   validationSchema: toTypedSchema(EditReleaseNoteSchema),
@@ -147,7 +169,15 @@ const [summary] = form.defineField('summary');
                 <Input class="w-full" v-model="tag" :placeholder="t('placeholder.title')" />
               </div>
             </div>
-            <div data-pdf-exclude class="flex gap-4">
+            <div data-pdf-exclude class="flex gap-4 mt-auto">
+              <Button
+                type="button"
+                @click="summarizeReleaseNote.mutate(releaseNote.id)"
+                variant="glow"
+              >
+                {{t('button.summarize')}}
+                <Sparkles />
+              </Button>
               <Button 
                 class="hidden md:flex" variant="outline"
                 @click="onCancel">{{ t('button.cancel') }}
@@ -171,10 +201,21 @@ const [summary] = form.defineField('summary');
           <div class="flex flex-col gap-1">
             <h1 class="text-2xl">{{ t('title.changeNotes') }}</h1>
             <MultiselectChangeNotes @update:model-value="onChangeNotesUpdate" v-model="changeNoteIdsWithinReleaseNote" />
-            <h2>{{ t('title.from') }}</h2>
-            <SelectChangeNotes @update:model-value="onFromChangeNoteUpdate" v-model="fromChangeNote" />
-            <h2>{{ t('title.to') }}</h2>
-            <SelectChangeNotes @update:model-value="onToChangeNoteUpdate" v-model="toChangeNote" />
+            <h2 class="text-xl">{{ t('title.addFromRepository') }}</h2>
+            <div class="flex flex-row justify-between">
+              <SelectGitRepository v-model="gitRepository" />
+              <div class="flex flex-row gap-2">
+                <h2 class="text-lg">{{ t('title.from') }}</h2>
+                <SelectChangeNotes :change-notes="currentGitRepositoryChangeNotes ?? []" v-model="fromChangeNote" />
+              </div>
+              <div class="flex flex-row gap-2">
+                <h2 class="text-lg">{{ t('title.to') }}</h2>
+                <SelectChangeNotes :change-notes="currentGitRepositoryChangeNotes ?? []" v-model="toChangeNote" />
+              </div>
+              <Button type="button" variant="outline" @click.stop="onChangeNoteRangeChange(gitRepository?.id ?? -1)">{{ t('button.updateRange') }}</Button>
+              
+            </div>
+            
           </div>
         </div>
       </div>

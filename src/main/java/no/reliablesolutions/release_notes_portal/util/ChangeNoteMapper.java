@@ -26,7 +26,8 @@ public class ChangeNoteMapper {
         changeNote.getFeature() != null ? FeatureDTO.fromFeature(changeNote.getFeature()) : null,
         changeNote.getCustomer() != null ? CustomerDTO.fromCustomer(changeNote.getCustomer()) : null,
         changeNote.isPublished(),
-        null
+        null,
+        changeNote.getGitRepository() != null ? changeNote.getGitRepository().getId() : null
       );
     } else {
       return new ChangeNoteDTO(
@@ -40,7 +41,8 @@ public class ChangeNoteMapper {
         changeNote.getFeature() != null ? FeatureDTO.fromFeature(changeNote.getFeature()) : null,
         changeNote.getCustomer() != null ? CustomerDTO.fromCustomer(changeNote.getCustomer()) : null,
         changeNote.isPublished(),
-        changeNote.isViewableByEveryone()
+        changeNote.isViewableByEveryone(),
+        changeNote.getGitRepository() != null ? changeNote.getGitRepository().getId() : null
       );
     }
   }

@@ -1,6 +1,8 @@
 package no.reliablesolutions.release_notes_portal.service;
 
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
@@ -17,6 +19,7 @@ import no.reliablesolutions.release_notes_portal.exception.LocaleNotSupportedExc
 public class AiService {
     private final ChatClient.Builder builder;
     private final ChangeNoteService changeNoteService;
+    private final ReleaseNoteService releaseNoteService;
     private final DiffService diffService;
     private final GitRepositoryService gitRepositoryService;
     private final Logger logger = LoggerFactory.getLogger(AiService.class);
@@ -64,16 +67,45 @@ public class AiService {
      */
     public String summarizeChangeNote(long changeNoteId) {
       GitCommitHashAndPreviousGitCommitHash commits = changeNoteService.getGitCommitHashAndPreviousGitCommitHash(changeNoteId);
-      if (commits == null) {
-        throw new ChangeNoteHasNoGitCommitsException(changeNoteId);
+      if (commits == null || commits.getGitCommitHash() == null || commits.getPreviousGitCommitHash() == null) {
+        logger.warn("Change note with ID {} is missing associated git commits. Skipping summarization for this change note.", changeNoteId);
+        return "";
       }
       GitRepository gitRepository = gitRepositoryService.getGitRepositoryForChangeNote(changeNoteId);
       String diffString = diffService.getDiffString(commits.getGitCommitHash(), commits.getPreviousGitCommitHash(), gitRepository);
 
       String masterPrompt = "You are working on a release note application. Summarize the git following git diff. Only highlight changes relevant for end users. Only talk about changes, no introduction. Do not mention anything that is not relevant for the end user when using the application. Only return the summary, without any explainations, additional information, comments, preamble or formatting.";
 
-      return builder.build().prompt().system(masterPrompt)
+      return diffString.trim().isEmpty() ? "" : builder.build().prompt().system(masterPrompt)
                 .user(diffString)
+                .call()
+                .content();
+    }
+
+    /**
+     * Summarizes the release note with the given ID using an AI model. The summary is generated based on the change notes within the release note.
+     * @param releaseNoteId the ID of the release note to be summarized
+     * @return a summary of the release note
+     */
+    public String summarizeReleaseNote(long releaseNoteId) {
+        StringBuilder releaseNoteDiffs = new StringBuilder();
+        List<Long> changeNoteIds = changeNoteService.getChangeNotesIdsByReleaseNoteId(releaseNoteId);
+        for (Long changeNoteId : changeNoteIds) {
+            GitCommitHashAndPreviousGitCommitHash commits = changeNoteService.getGitCommitHashAndPreviousGitCommitHash(changeNoteId);
+            if (commits == null || commits.getGitCommitHash() == null || commits.getPreviousGitCommitHash() == null) {
+                logger.warn("Change note with ID {} is missing associated git commits. Skipping summarization for this change note.", changeNoteId);
+                continue;
+            }
+            GitRepository gitRepository = gitRepositoryService.getGitRepositoryForChangeNote(changeNoteId);
+            String diffString = diffService.getDiffString(commits.getGitCommitHash(), commits.getPreviousGitCommitHash(), gitRepository);
+            releaseNoteDiffs.append(diffString).append("\n");
+        }
+        String masterPrompt = "You are working on a release note application. Summarize the git following git diffs for a release note. Only highlight changes relevant for end users. Only talk about changes, no introduction. Do not mention anything that is not relevant for the end user when using the application. Only return the summary, without any explainations, additional information, comments, preamble or formatting.";
+
+        String releaseNoteDiffsString = releaseNoteDiffs.toString().trim();
+
+        return releaseNoteDiffsString.isEmpty() ? "" : builder.build().prompt().system(masterPrompt)
+                .user(releaseNoteDiffsString)
                 .call()
                 .content();
     }

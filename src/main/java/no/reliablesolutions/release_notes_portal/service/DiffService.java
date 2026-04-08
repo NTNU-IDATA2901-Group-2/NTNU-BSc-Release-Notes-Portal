@@ -2,7 +2,6 @@ package no.reliablesolutions.release_notes_portal.service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
@@ -30,8 +29,8 @@ class DiffService {
    * @param repositoryDirectoriesPath the base path where local git repositories are stored, injected from application properties
    */
   public DiffService(
-    @Value("${REPOSITORY_DIRECTORIES_PATH:repository_directory}") String repositoryDirectoriesPath,
-    @Value("${CHANGE_NOTE_DIRECTORY:change_note_directory}") String changeNoteDirectory
+    @Value("${REPOSITORY_DIRECTORIES_PATH}") String repositoryDirectoriesPath,
+    @Value("${CHANGE_NOTE_DIRECTORY}") String changeNoteDirectory
   ) {
     this.repositoryDirectoriesPath = repositoryDirectoriesPath;
     this.changeNoteDirectory = changeNoteDirectory;
@@ -80,6 +79,7 @@ class DiffService {
       }
       diffStringBuilder.append(outputStream.toString());
     } catch (Exception e) {
+      logger.error("Error generating diff string for commit {} and previous commit {} in repository {}: {}", commitHash, previousCommitHash, gitRepository.getName(), e.getMessage());
       throw new DiffStringGenerationException("Error generating diff string: " + e.getMessage());
     }
 

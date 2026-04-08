@@ -10,7 +10,8 @@ export interface ChangeNote {
     customer: Customer,
     published: boolean,
     archived: boolean,
-    viewableByEveryone: boolean
+    viewableByEveryone: boolean,
+    gitRepositoryId?: number
 }
 
 export interface PersistChangeNoteDTO {

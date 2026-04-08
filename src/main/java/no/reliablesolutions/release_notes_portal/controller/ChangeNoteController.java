@@ -78,6 +78,7 @@ public class ChangeNoteController {
     @ModelAttribute ChangeNoteFilterOptionsDTO filterOptions
     ) {
     List<ChangeNoteDTO> changeNotes = changeNoteService.getAllChangeNotes(filterOptions);
+    logger.info("Retrieved {} change notes with filters: {}", changeNotes.size(), filterOptions);
     return ResponseEntity.ok(changeNotes);
   }
 
