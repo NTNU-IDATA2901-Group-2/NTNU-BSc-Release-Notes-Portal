@@ -88,6 +88,12 @@ public class ProductService {
     productRepository.delete(product);
   }
 
+  /**
+   * Retrieves a list of products that match the given name, ignoring case.
+   *
+   * @param product the name of the product to search for
+   * @return a list of products that match the given name
+   */
   public List<Product> getProductByName(String product) {
     return productRepository.findAllByNameIgnoreCase(product);
   }

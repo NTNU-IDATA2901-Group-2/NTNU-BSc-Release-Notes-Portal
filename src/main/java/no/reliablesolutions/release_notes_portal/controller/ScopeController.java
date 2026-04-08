@@ -24,6 +24,9 @@ import no.reliablesolutions.release_notes_portal.dto.CreateTagDTO;
 import no.reliablesolutions.release_notes_portal.dto.ScopeDTO;
 import no.reliablesolutions.release_notes_portal.service.ScopeService;
 
+/**
+ * Controller for managing scope endpoints.
+ */
 @Tag(name = "Scopes", description = "Endpoints for managing scopes")
 @RestController
 @AllArgsConstructor
@@ -31,11 +34,16 @@ import no.reliablesolutions.release_notes_portal.service.ScopeService;
 public class ScopeController {
   private final ScopeService scopeService;
   private final Logger logger = LoggerFactory.getLogger(ScopeController.class);
-  
+
+  /**
+   * Endpoint for retrieving a list of all scopes.
+   *
+   * @return a ResponseEntity containing a list of all scopes
+   */
   @Operation(summary = "Get all scopes", description = "Retrieves a list of all scopes")
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "200", description = "Scopes retrieved successfully"),
-    @ApiResponse(responseCode = "500", description = "Internal server error")
+      @ApiResponse(responseCode = "200", description = "Scopes retrieved successfully"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @GetMapping("")
   public ResponseEntity<List<ScopeDTO>> getAllScopes() {
@@ -43,11 +51,17 @@ public class ScopeController {
     return ResponseEntity.ok(scopeService.getAllScopes());
   }
 
+  /**
+   * Endpoint for retrieving details of a specific scope by its ID.
+   *
+   * @param id the ID of the scope to be retrieved
+   * @return a ResponseEntity containing the details of the requested scope
+   */
   @Operation(summary = "Get scope by ID", description = "Retrieves details of a specific scope by its ID")
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "200", description = "Scope retrieved successfully"),
-    @ApiResponse(responseCode = "404", description = "Scope not found"),
-    @ApiResponse(responseCode = "500", description = "Internal server error")
+      @ApiResponse(responseCode = "200", description = "Scope retrieved successfully"),
+      @ApiResponse(responseCode = "404", description = "Scope not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @GetMapping("/{id}")
   public ResponseEntity<ScopeDTO> getScopeById(@PathVariable Long id) {
@@ -55,11 +69,17 @@ public class ScopeController {
     return ResponseEntity.ok(scopeService.getScopeById(id));
   }
 
+  /**
+   * Endpoint for creating a new scope with the provided details.
+   *
+   * @param scopeDetails the details of the scope to be created
+   * @return a ResponseEntity containing the ID of the created scope
+   */
   @Operation(summary = "Create scope", description = "Creates a new scope with provided details")
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "201", description = "Scope created successfully"),
-    @ApiResponse(responseCode = "400", description = "Invalid request payload"),
-    @ApiResponse(responseCode = "500", description = "Internal server error")
+      @ApiResponse(responseCode = "201", description = "Scope created successfully"),
+      @ApiResponse(responseCode = "400", description = "Invalid request payload"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PostMapping("")
   public ResponseEntity<Long> createScope(@Valid @RequestBody CreateTagDTO scopeDetails) {
@@ -68,11 +88,18 @@ public class ScopeController {
     return ResponseEntity.ok(createdScope);
   }
 
+  /**
+   * Endpoint for updating an existing scope with new details.
+   *
+   * @param id the ID of the scope to be updated
+   * @param scopeDetails the new details of the scope
+   * @return a ResponseEntity containing the updated scope details
+   */
   @Operation(summary = "Update scope", description = "Updates an existing scope with new details")
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "200", description = "Scope updated successfully"),
-    @ApiResponse(responseCode = "404", description = "Scope not found"),
-    @ApiResponse(responseCode = "500", description = "Internal server error")
+      @ApiResponse(responseCode = "200", description = "Scope updated successfully"),
+      @ApiResponse(responseCode = "404", description = "Scope not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PutMapping("/{id}")
   public ResponseEntity<String> updateScope(@PathVariable Long id, @RequestBody @Valid CreateTagDTO scopeDetails) {
@@ -81,11 +108,17 @@ public class ScopeController {
     return ResponseEntity.ok("Updated scope with ID: " + id);
   }
 
+  /**
+   * Endpoint for deleting an existing scope by its ID.
+   *
+   * @param id the ID of the scope to be deleted
+   * @return a ResponseEntity indicating the success of the delete operation
+   */
   @Operation(summary = "Delete scope", description = "Deletes an existing scope by its ID")
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "200", description = "Scope deleted successfully"),
-    @ApiResponse(responseCode = "404", description = "Scope not found"),
-    @ApiResponse(responseCode = "500", description = "Internal server error")
+      @ApiResponse(responseCode = "200", description = "Scope deleted successfully"),
+      @ApiResponse(responseCode = "404", description = "Scope not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @DeleteMapping("/{id}")
   public ResponseEntity<String> deleteScope(@PathVariable Long id) {

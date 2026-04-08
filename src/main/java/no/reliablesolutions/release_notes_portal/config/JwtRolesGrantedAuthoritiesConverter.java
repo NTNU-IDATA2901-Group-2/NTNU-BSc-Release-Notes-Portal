@@ -10,8 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 /**
- * Custom converter to extract Keycloak realm roles from the JWT and convert
- * them to Spring Security authorities
+ * Custom converter for mapping jwt roles and groups to Spring Security granted authorities.
  */
 public class JwtRolesGrantedAuthoritiesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
   private static final String ROLES_CLAIM = "roles";
