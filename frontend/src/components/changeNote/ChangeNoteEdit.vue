@@ -14,12 +14,13 @@ import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';
 import { useI18n } from 'vue-i18n';
 import Checkbox from '../ui/checkbox/Checkbox.vue';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import DialogPrompt from '../DialogPrompt.vue';
 import { useSummarizeChangeNote } from '@/api/ai-api';
 import Tooltip from '../ui/tooltip/Tooltip.vue';
 import TooltipTrigger from '../ui/tooltip/TooltipTrigger.vue';
 import TooltipContent from '../ui/tooltip/TooltipContent.vue';
+import { onBeforeRouteLeave } from 'vue-router';
 
 const props = defineProps<{
   changeNote: ChangeNote;
@@ -113,6 +114,23 @@ const summarizeChangeNote = useSummarizeChangeNote({
 const hasCommits = useGetHasCommits(props.changeNote.id);
 const disableSummarizeButton = computed(() => hasCommits.isPending.value || hasCommits.isError.value || hasCommits.data.value !== true);  
 
+// Warn user of unsaved changes when trying to leave the page
+const beforeUnloadListener = (event: BeforeUnloadEvent) => {
+     event.preventDefault();
+    ;(event as unknown as { returnValue: string }).returnValue = ''
+}
+
+onBeforeRouteLeave(() => {
+    return globalThis.confirm(t('changeNoteEdit.cancelDescription')) === true;
+})
+
+onMounted(() => {
+    globalThis.addEventListener('beforeunload', beforeUnloadListener);
+})
+
+onBeforeUnmount(() => {
+    globalThis.removeEventListener('beforeunload', beforeUnloadListener);
+})
 </script>
 
 <template>

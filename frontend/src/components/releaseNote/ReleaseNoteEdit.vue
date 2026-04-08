@@ -4,7 +4,7 @@ import { EditReleaseNoteSchema } from '@/schemas';
 import { type ChangeNote, type ReleaseNote } from '@/utils/types';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
-import { ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { toast } from 'vue-sonner';
 import { Button } from '../ui/button';
@@ -16,6 +16,7 @@ import MultiselectChangeNotes from '../MultiselectChangeNotes.vue';
 import SelectChangeNotes from '../SelectChangeNotes.vue';
 import { useGetChangeNotes } from '@/api/change-note-api';
 import DialogPrompt from '../DialogPrompt.vue';
+import { onBeforeRouteLeave } from 'vue-router';
 
 const { t } = useI18n();
 
@@ -108,6 +109,24 @@ const updateReleaseNoteMutation = useUpdateReleaseNote({
 
 const [tag] = form.defineField('tag');
 const [summary] = form.defineField('summary');
+
+// Warn user of unsaved changes when trying to leave the page
+const beforeUnloadListener = (event: BeforeUnloadEvent) => {
+     event.preventDefault();
+    ;(event as unknown as { returnValue: string }).returnValue = ''
+}
+
+onBeforeRouteLeave(() => {
+    return globalThis.confirm(t('changeNoteEdit.cancelDescription')) === true;
+})
+
+onMounted(() => {
+    globalThis.addEventListener('beforeunload', beforeUnloadListener);
+})
+
+onBeforeUnmount(() => {
+    globalThis.removeEventListener('beforeunload', beforeUnloadListener);
+})
 </script>
 
 
