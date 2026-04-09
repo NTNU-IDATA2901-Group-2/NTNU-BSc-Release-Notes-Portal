@@ -1,13 +1,17 @@
 meta {
-  name: patch_archive_1
+  name: positive_get_all_filter_productIds
   type: http
-  seq: 15
+  seq: 16
 }
 
-patch {
-  url: {{baseurl}}/releasenotes/{{release_id_1}}/archive
+get {
+  url: {{baseurl}}/releasenotes?productIds=1,2
   body: none
   auth: inherit
+}
+
+params:query {
+  productIds: 1,2
 }
 
 headers {
@@ -16,6 +20,7 @@ headers {
 
 assert {
   res.status: eq 200
+  res.body.length: eq 2
 }
 
 settings {

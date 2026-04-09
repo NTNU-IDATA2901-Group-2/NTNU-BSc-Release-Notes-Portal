@@ -1,17 +1,17 @@
 meta {
-  name: get_all_filter_tag
+  name: positive_get_all_filter_productId
   type: http
-  seq: 10
+  seq: 15
 }
 
 get {
-  url: {{baseurl}}/releasenotes?query=1.
+  url: {{baseurl}}/releasenotes?productIds=1
   body: none
   auth: inherit
 }
 
 params:query {
-  query: 1.
+  productIds: 1
 }
 
 headers {

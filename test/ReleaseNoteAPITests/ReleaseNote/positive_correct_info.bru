@@ -1,7 +1,7 @@
 meta {
-  name: get_valid
+  name: positive_correct_info
   type: http
-  seq: 8
+  seq: 6
 }
 
 get {
@@ -16,9 +16,9 @@ headers {
 
 assert {
   res.status: eq 200
-  res.body.changeNotes: length 2
-  res.body.tag: eq v1.0.0
-  res.body.summary: eq Initial release with core features
+  res.body.id: eq {{release_id_1}}
+  res.body.tag: eq "v1.0.0"
+  res.body.summary: eq "Initial release with core features"
   res.body.published: eq false
 }
 

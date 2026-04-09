@@ -1,11 +1,11 @@
 meta {
-  name: get_all
+  name: negative_patch_archive_invalid_id
   type: http
-  seq: 7
+  seq: 23
 }
 
-get {
-  url: {{baseurl}}/releasenotes
+patch {
+  url: {{baseurl}}/releasenotes/-100000/archive
   body: none
   auth: inherit
 }
@@ -15,8 +15,7 @@ headers {
 }
 
 assert {
-  res.status: eq 200
-  res.body.length: eq 2
+  res.status: eq 404
 }
 
 settings {

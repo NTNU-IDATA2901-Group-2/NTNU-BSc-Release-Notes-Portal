@@ -1,17 +1,17 @@
 meta {
-  name: get_all_filter_summary
+  name: positive_get_all_filter_published
   type: http
-  seq: 12
+  seq: 13
 }
 
 get {
-  url: {{baseurl}}/releasenotes?query=big
+  url: {{baseurl}}/releasenotes?published=true
   body: none
   auth: inherit
 }
 
 params:query {
-  query: big
+  published: true
 }
 
 headers {

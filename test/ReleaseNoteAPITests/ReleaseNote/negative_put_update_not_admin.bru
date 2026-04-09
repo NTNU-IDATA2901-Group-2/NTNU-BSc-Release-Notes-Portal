@@ -1,17 +1,13 @@
 meta {
-  name: put_update_invalid_id
+  name: negative_put_update_not_admin
   type: http
-  seq: 20
+  seq: 17
 }
 
 put {
-  url: {{baseurl}}/releasenotes/-99999
+  url: {{baseurl}}/releasenotes/{{release_id_2}}
   body: json
   auth: inherit
-}
-
-headers {
-  X-Test-Role: Admin
 }
 
 body:json {
@@ -19,13 +15,12 @@ body:json {
     "changeNoteIds": [],
     "tag": "updated",
     "summary": "updated",
-    "published": true,
-    "createdAt": 0
+    "published": true
   }
 }
 
 assert {
-  res.status: eq 404
+  res.status: eq 403
 }
 
 settings {

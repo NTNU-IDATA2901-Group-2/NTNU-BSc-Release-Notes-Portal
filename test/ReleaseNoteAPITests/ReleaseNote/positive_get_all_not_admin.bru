@@ -1,7 +1,7 @@
 meta {
-  name: get_all_should_exclude_patched
+  name: positive_get_all_not_admin
   type: http
-  seq: 30
+  seq: 10
 }
 
 get {
@@ -10,13 +10,9 @@ get {
   auth: inherit
 }
 
-headers {
-  X-Test-Role: Admin
-}
-
 assert {
   res.status: eq 200
-  res.body.length: eq 0
+  res.body.length: eq 1
 }
 
 settings {

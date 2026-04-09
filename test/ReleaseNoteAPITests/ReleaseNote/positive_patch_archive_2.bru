@@ -1,11 +1,11 @@
 meta {
-  name: patch_archive_invalid_id
+  name: positive_patch_archive_2
   type: http
-  seq: 16
+  seq: 26
 }
 
 patch {
-  url: {{baseurl}}/releasenotes/-100000/archive
+  url: {{baseurl}}/releasenotes/{{release_id_2}}/archive
   body: none
   auth: inherit
 }
@@ -15,7 +15,7 @@ headers {
 }
 
 assert {
-  res.status: eq 404
+  res.status: eq 200
 }
 
 settings {

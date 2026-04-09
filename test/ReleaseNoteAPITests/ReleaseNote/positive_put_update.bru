@@ -1,12 +1,12 @@
 meta {
-  name: get_updated
+  name: positive_put_update
   type: http
   seq: 19
 }
 
-get {
+put {
   url: {{baseurl}}/releasenotes/{{release_id_2}}
-  body: none
+  body: json
   auth: inherit
 }
 
@@ -14,12 +14,17 @@ headers {
   X-Test-Role: Admin
 }
 
+body:json {
+  {
+    "changeNoteIds": [{{change_id_2}}],
+    "tag": "updated",
+    "summary": "updated",
+    "published": true
+  }
+}
+
 assert {
   res.status: eq 200
-  res.body.changeNotes: isEmpty
-  res.body.tag: eq updated
-  res.body.summary: eq updated
-  res.body.published: eq true
 }
 
 settings {

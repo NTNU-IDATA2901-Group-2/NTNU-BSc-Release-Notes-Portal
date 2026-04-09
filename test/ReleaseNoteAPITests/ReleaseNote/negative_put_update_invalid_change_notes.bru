@@ -1,0 +1,33 @@
+meta {
+  name: negative_put_update_invalid_change_notes
+  type: http
+  seq: 18
+}
+
+put {
+  url: {{baseurl}}/releasenotes/{{release_id_2}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "changeNoteIds": [-22222],
+    "tag": "updated",
+    "summary": "updated",
+    "published": true
+  }
+}
+
+assert {
+  res.status: eq 404
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
