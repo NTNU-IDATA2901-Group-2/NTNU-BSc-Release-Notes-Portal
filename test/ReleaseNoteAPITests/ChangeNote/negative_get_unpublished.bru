@@ -1,17 +1,17 @@
 meta {
-  name: get_invalid_id
+  name: negative_get_unpublished
   type: http
-  seq: 4
+  seq: 8
 }
 
 get {
-  url: {{baseurl}}/changenotes/-9999
+  url: {{baseurl}}/changenotes/{{change_id_1}}
   body: none
   auth: inherit
 }
 
 headers {
-  X-Test-Role: Admin
+  X-Test-Customers: Liddle
 }
 
 assert {

@@ -1,11 +1,11 @@
 meta {
-  name: get_invalid_id
+  name: positive_get_all_admin
   type: http
-  seq: 4
+  seq: 11
 }
 
 get {
-  url: {{baseurl}}/changenotes/-9999
+  url: {{baseurl}}/changenotes
   body: none
   auth: inherit
 }
@@ -15,7 +15,8 @@ headers {
 }
 
 assert {
-  res.status: eq 404
+  res.status: eq 200
+  res.body: length 2
 }
 
 settings {

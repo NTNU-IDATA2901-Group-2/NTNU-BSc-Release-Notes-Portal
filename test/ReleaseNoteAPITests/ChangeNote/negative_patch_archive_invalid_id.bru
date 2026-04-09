@@ -1,11 +1,11 @@
 meta {
-  name: get_invalid_id
+  name: negative_patch_archive_invalid_id
   type: http
-  seq: 4
+  seq: 43
 }
 
-get {
-  url: {{baseurl}}/changenotes/-9999
+patch {
+  url: {{baseurl}}/changenotes/-9999/archive
   body: none
   auth: inherit
 }

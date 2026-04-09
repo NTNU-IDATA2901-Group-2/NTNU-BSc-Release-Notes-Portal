@@ -1,21 +1,17 @@
 meta {
-  name: get_invalid_id
+  name: positive_patch_archive_1
   type: http
-  seq: 4
+  seq: 40
 }
 
-get {
-  url: {{baseurl}}/changenotes/-9999
+patch {
+  url: {{baseurl}}/changenotes/{{change_id_1}}/archive
   body: none
   auth: inherit
 }
 
 headers {
   X-Test-Role: Admin
-}
-
-assert {
-  res.status: eq 404
 }
 
 settings {

@@ -1,11 +1,11 @@
 meta {
-  name: get_invalid_id
+  name: positive_get_not_published_admin
   type: http
-  seq: 4
+  seq: 6
 }
 
 get {
-  url: {{baseurl}}/changenotes/-9999
+  url: {{baseurl}}/changenotes/{{change_id_2}}
   body: none
   auth: inherit
 }
@@ -15,7 +15,7 @@ headers {
 }
 
 assert {
-  res.status: eq 404
+  res.status: eq 200
 }
 
 settings {

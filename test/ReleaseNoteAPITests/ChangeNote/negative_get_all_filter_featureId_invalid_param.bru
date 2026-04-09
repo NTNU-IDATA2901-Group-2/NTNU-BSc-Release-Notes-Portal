@@ -1,0 +1,28 @@
+meta {
+  name: negative_get_all_filter_featureId_invalid_param
+  type: http
+  seq: 22
+}
+
+get {
+  url: {{baseurl}}/changenotes?featureIds=a
+  body: none
+  auth: inherit
+}
+
+params:query {
+  featureIds: a
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 400
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
