@@ -121,7 +121,7 @@ public class ChangeNoteService {
   public List<ChangeNoteDTO> getAllChangeNotes(ChangeNoteFilterOptionsDTO filterOptions) {
 
     if (filterOptions == null) {
-      filterOptions = new ChangeNoteFilterOptionsDTO(null, null, null, null, null, null, null, null);
+      filterOptions = new ChangeNoteFilterOptionsDTO(null, null, null, null, null, null, null, null, null);
     }
 
     AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
@@ -136,6 +136,7 @@ public class ChangeNoteService {
           filterOptions.query(),
           true,
           filterOptions.hasReleaseNote(),
+          filterOptions.gitRepositoryIds(),
           filterOptions.filteredIds(),
           filterOptions.customerIds(),
           filterOptions.featureIds(),
@@ -255,12 +256,13 @@ public class ChangeNoteService {
   }
 
   /**
-   * Checks if a change note has associated git commit hashes.
-   * @param changeNoteId the ID of the change note
-   * @return true if the change note has associated git commit hashes, false otherwise
+   * Checks if a list of change notes has associated git commit hashes.
+   * @param changeNoteIds the IDs of the change notes
+   * @return true if the change notes have associated git commit hashes, false otherwise
    */
-  public boolean hasCommitHash(Long changeNoteId) {
-    return changeNoteRepository.findCommitHashAndPreviousCommitHash(changeNoteId) != null;
+  public boolean hasCommitHash(List<Long> changeNoteIds) {
+    return changeNoteRepository.hasCommitHashAndPreviousCommitHash(changeNoteIds);
   }
+
 }
 

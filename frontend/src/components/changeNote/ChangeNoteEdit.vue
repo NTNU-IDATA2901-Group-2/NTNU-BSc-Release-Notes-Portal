@@ -16,7 +16,7 @@ import { useI18n } from 'vue-i18n';
 import Checkbox from '../ui/checkbox/Checkbox.vue';
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import DialogPrompt from '../DialogPrompt.vue';
-import { useSummarizeChangeNote } from '@/api/ai-api';
+import { useSummarizeChangeNotes } from '@/api/ai-api';
 import Tooltip from '../ui/tooltip/Tooltip.vue';
 import TooltipTrigger from '../ui/tooltip/TooltipTrigger.vue';
 import TooltipContent from '../ui/tooltip/TooltipContent.vue';
@@ -101,7 +101,7 @@ const onCancelViewable = () => {
     viewAbleByEveryone.value = false;
 }
 
-const summarizeChangeNote = useSummarizeChangeNote({
+const summarizeChangeNote = useSummarizeChangeNotes({
     onSuccess: (summary?: string) => {
         description.value = summary;
         toast.success(t('toast.summarizeSuccess'));
@@ -111,7 +111,7 @@ const summarizeChangeNote = useSummarizeChangeNote({
     }
 })
 
-const hasCommits = useGetHasCommits(props.changeNote.id);
+const hasCommits = useGetHasCommits([props.changeNote.id]);
 const disableSummarizeButton = computed(() => hasCommits.isPending.value || hasCommits.isError.value || hasCommits.data.value !== true);  
 
 // Warn user of unsaved changes when trying to leave the page
@@ -145,7 +145,7 @@ onBeforeUnmount(() => {
                 <Button
                     :disabled="disableSummarizeButton"
                     type="button"
-                    @click="summarizeChangeNote.mutate(props.changeNote.id)"
+                    @click="summarizeChangeNote.mutate([props.changeNote.id])"
                     variant="glow"
                 >
                     {{t('button.summarize')}}
@@ -171,7 +171,7 @@ onBeforeUnmount(() => {
                             <Button
                                 :disabled="disableSummarizeButton"
                                 type="button"
-                                @click="summarizeChangeNote.mutate(props.changeNote.id)"
+                                @click="summarizeChangeNote.mutate([props.changeNote.id])"
                                 variant="glow"
                             >
                                 {{t('button.summarize')}}

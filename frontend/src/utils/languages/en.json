@@ -31,7 +31,8 @@
         "showGeneralChanges": "Show General Changes",
         "confirm": "Confirm",
         "summarize": "Summarize",
-        "allCustomers": "All customers"
+        "allCustomers": "All customers",
+        "updateRange": "Update Range"
     },
     "title": {
         "title": "Title",
@@ -46,7 +47,11 @@
         "changeNotes": "Change Notes",
         "releaseNotes": "Release Notes",
         "allocated": "Allocated",
-        "visibility": "Visible to everyone"
+        "visibility": "Visible to everyone",
+        "from": "From",
+        "to": "To",
+        "addFromRepository": "Add from repository",
+        "fromRepository": "From repository"
     },
     "toast": {
         "changeNoteDeleted": "Change note deleted successfully",
@@ -77,8 +82,8 @@
         "translationSuccess": "Change note translated successfully",
         "copySuccess": "Content copied to clipboard",
         "copyError": "An error occurred while copying to clipboard",
-        "summarizeSuccess": "Change note summarized successfully",
-        "summarizeError": "An error occurred while summarizing the change note"
+        "summarizeSuccess": "Summarized successfully",
+        "summarizeError": "An error occurred while summarizing"
     },
     "deletePrompt": {
         "title": "Are you sure you want to delete?",
@@ -155,6 +160,9 @@
     "releaseNoteEdit": {
         "cancelTitle": "Cancel Editing",
         "cancelDescription": "Are you sure you want to cancel editing? All unsaved changes will be lost."
+    },
+    "changeNote": {
+        "noReference": "No reference provided"
     },
     "tooltip": {
         "noCommits": "No associated git commits"
