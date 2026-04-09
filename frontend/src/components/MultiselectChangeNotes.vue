@@ -12,38 +12,21 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { TagsInput, TagsInputInput, TagsInputItem, TagsInputItemDelete } from '@/components/ui/tags-input'
-import type { ChangeNote } from '@/utils/types'
 import { useGetChangeNotes } from '@/api/change-note-api'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n();
 
-const params = new URLSearchParams({ hasReleaseNote: 'false' })
-const { data: changeNotes } = useGetChangeNotes(params)
+const model = defineModel<number[]>({ required: true })
 
-const model = defineModel<ChangeNote[]>({ required: true })
+const params = computed(() => { return { filteredIds : model.value.join(',') } })
+const { data: selectedChangeNotes } = useGetChangeNotes(params)
+
+const { data: availableChangeNotes } = useGetChangeNotes()
 
 const changeNoteOptions = computed(() =>
-  (changeNotes.value ?? []).map((cn) => ({ value: cn.id, label: cn.reference })),
+  (availableChangeNotes.value ?? []).map((cn) => ({ value: cn.id, label: cn.reference })),
 )
-
-const changeNoteById = computed(() => {
-  const map = new Map<number, ChangeNote>()
-  for (const note of changeNotes.value ?? []) map.set(note.id, note)
-  return map
-})
-
-const selectedIds = computed<number[]>({
-  get: () => (model.value ?? []).map((cn) => cn.id),
-  set: (ids) => {
-    model.value = ids
-      .map((id) => changeNoteById.value.get(id))
-      .filter((cn): cn is ChangeNote => cn !== undefined)
-  },
-})
-
-const getChangeNoteLabel = (id: number) =>
-  changeNoteById.value.get(id)?.reference ?? String(id)
 
 const searchTerm = ref('')
 const open = ref(false)
@@ -84,17 +67,17 @@ onUnmounted(() => {
 
 <template>
   <Popover v-model:open="open">
-    <ListboxRoot v-model="selectedIds" highlight-on-hover multiple>
+    <ListboxRoot v-model="model" highlight-on-hover multiple>
       <PopoverAnchor ref="anchorRef" class="inline-flex w-full">
-        <TagsInput v-model="selectedIds" class="w-full">
+        <TagsInput v-model="model" class="w-full" @click="open = true">
           <TagsInputItem
-            v-for="id in selectedIds"
-            :key="id"
-            :value="id"
+            v-for="changeNote in selectedChangeNotes"
+            :key="changeNote.id"
+            :value="changeNote.id"
             class="bg-border/20 dark:bg-border p-2"
           >
-            <span class="py-0.5 px-2 text-sm rounded bg-transparent">{{ getChangeNoteLabel(id) }}</span>
-            <TagsInputItemDelete class="cursor-pointer" />
+            <span class="py-0.5 px-2 text-sm rounded bg-transparent">{{ changeNote.reference }}</span>
+            <TagsInputItemDelete @click.stop class="cursor-pointer" />
           </TagsInputItem>
 
           <ListboxFilter v-model="searchTerm" as-child>
@@ -106,7 +89,7 @@ onUnmounted(() => {
           </ListboxFilter>
 
           <PopoverTrigger as-child>
-            <Button size="icon-sm" variant="ghost" class="order-last self-start ml-auto">
+            <Button @click.stop size="icon-sm" variant="ghost" class="order-last self-start ml-auto">
               <ChevronDown class="size-3.5" />
             </Button>
           </PopoverTrigger>
@@ -119,17 +102,17 @@ onUnmounted(() => {
         @open-auto-focus.prevent
       >
         <ListboxContent
-          class="max-h-[300px] scroll-py-1 overflow-x-hidden overflow-y-auto empty:after:content-['No_options'] empty:p-1 empty:after:block"
+          class="max-h-75 scroll-py-1 overflow-x-hidden overflow-y-auto empty:after:content-['No_options'] empty:p-1 empty:after:block"
           tabindex="0"
         >
           <ListboxItem
             v-for="item in filteredChangenotes"
             :key="item.value"
             :value="item.value"
-            class="text-text-primary data-[highlighted]:bg-border/25 [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+            class="text-text-primary data-highlighted:bg-border/25 [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
             @select="() => { searchTerm = '' }"
           >
-            <span>{{ item.label }}</span>
+            <span>{{ item.label !== null ? item.label : t('changeNote.noReference') }}</span>
             <ListboxItemIndicator class="ml-auto inline-flex items-center justify-center">
               <CheckIcon />
             </ListboxItemIndicator>

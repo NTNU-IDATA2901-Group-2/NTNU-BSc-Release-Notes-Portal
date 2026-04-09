@@ -4,13 +4,14 @@ export interface ChangeNote {
     description: string,
     developerNotes: string,
     upgradeNotes: string,
-    changeSource: string,
     product: Product,
     scope: Scope,
     feature: Feature,
     customer: Customer,
     published: boolean,
-    archived: boolean
+    archived: boolean,
+    viewableByEveryone: boolean,
+    gitRepositoryId?: number
 }
 
 export interface PersistChangeNoteDTO {
@@ -18,12 +19,22 @@ export interface PersistChangeNoteDTO {
     description?: string,
     developerNotes?: string,
     upgradeNotes?: string,
-    changeSource?: string,
     productId?: number,
     scopeId?: number,
     featureId?: number,
     published?: boolean,
     customerId?: number
+}
+
+export interface GitRepository {
+    id: number,
+    name: string,
+    url: string
+}
+
+export interface PersistGitRepositoryDTO {
+    name: string,
+    url: string
 }
 
 export interface Customer {
@@ -66,11 +77,11 @@ export interface PersistChangeNoteDTO {
     description?: string,
     developerNotes?: string,
     upgradeNotes?: string,
-    changeSource?: string,
     productId?: number,
     scopeId?: number,
     featureId?: number,
-    customerId?: number
+    customerId?: number,
+    viewableByEveryone?: boolean,
 }
 
 export interface Tag {
@@ -82,4 +93,10 @@ export interface OnMutationApiCallFinished {
     onSettled?: () => void,
     onSuccess: (data?: string) => void,
     onError: () => void
+}
+
+export interface Prompt {
+    id: number,
+    name: string,
+    prompt: string
 }

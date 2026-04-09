@@ -80,5 +80,8 @@
     },
     "signIn": {
         "pleaseSignIn": "Veuillez vous connecter..."
+    },
+    "ai": {
+        "translationDisclaimer": "Cette traduction est générée par l'IA. Veuillez vérifier les faits importants."
     }
 }

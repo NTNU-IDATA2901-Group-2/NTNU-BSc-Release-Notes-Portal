@@ -1,0 +1,31 @@
+meta {
+  name: post_git-repository
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseurl}}/git-repositories
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Example Repo",
+    "url": "some_random_url"
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:post-response {
+  bru.setEnvVar("createdGitRepositoryId", res.body)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

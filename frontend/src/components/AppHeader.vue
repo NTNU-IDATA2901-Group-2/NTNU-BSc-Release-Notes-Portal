@@ -1,13 +1,12 @@
 <script setup lang="ts">
 
-import { routeNames } from '../utils/router';
+import { routeNames, router } from '../utils/router';
 import logoSvg from '../assets/solwr_logo.svg';
 import Avatar from './ui/avatar/Avatar.vue';
 import Separator from './ui/separator/Separator.vue';
-import { SunMoon } from "lucide-vue-next"
-import { LogOut } from "lucide-vue-next"
+import { GitBranch, SunMoon, LogOut, Sparkles } from "lucide-vue-next"
 import { useTheme } from '@/utils/theme';
-import keycloak, { isAuthenticated, jwtTokenDecoded } from '@/utils/keycloak';
+import keycloak, { isAuthenticated, jwtTokenDecoded, isAdmin } from '@/utils/keycloak';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import MenubarSub from './ui/menubar/MenubarSub.vue';
@@ -19,13 +18,14 @@ import MenubarMenu from './ui/menubar/MenubarMenu.vue';
 import MenubarTrigger from './ui/menubar/MenubarTrigger.vue';
 import MenubarContent from './ui/menubar/MenubarContent.vue';
 import MenubarSeparator from './ui/menubar/MenubarSeparator.vue';
+import { i18n } from '@/utils/i18n';
 
 const { theme } = useTheme()
 const { t } = useI18n()
 
 const handleLogOut = () => {
 	keycloak.logout({
-		redirectUri: `${window.location.origin}${routeNames.signIn}`
+		redirectUri: `${globalThis.location.origin}${routeNames.signIn}`
 	}).then(() => {
 	}).catch(err => {
 		console.error('Keycloak logout error:', err);
@@ -40,12 +40,23 @@ const firstLetters = computed(() => {
 	const lastName = jwtTokenDecoded.value.given_name || '';
 	return firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase();
 })
+
+const handleLocalChange = (locale : "en" | "no" | "fr") => {
+	i18n.global.locale = locale;
+  localStorage.setItem('locale', locale);
+}
+
+const handleLogoClick = () => {
+	if (isAuthenticated.value) {
+		router.push(routeNames.releaseNotes);
+	}
+}
 </script>
 
 <template>
     <header class="flex flex-col bg-background-dark-static">
 	<div class="flex items-center h-20 px-8 gap-12">
-	    <img :src="logoSvg" alt="Logo" class="w-50 h-7.5" />
+	    <img :src="logoSvg" alt="Logo" class="w-50 h-7.5 cursor-pointer" @click="handleLogoClick"/>
 	    <nav class="hidden md:flex flex-row gap-12">
 		<RouterLink v-if="isAuthenticated" class="text-md text-text-dark-static hover:underline" :to="routeNames.releaseNotes">{{ t('header.releaseNotesLink') }}</RouterLink>
 		<RouterLink v-if="isAuthenticated" class="text-md text-text-dark-static hover:underline" :to="routeNames.changeNotes">{{ t('header.changeNotesLink') }}</RouterLink>
@@ -61,7 +72,7 @@ const firstLetters = computed(() => {
 					<MenubarItem @click="theme = theme === 'dark' ? 'light' : 'dark'">
 						<div class="w-full flex gap-2">
 			    			<p class="ml-auto">{{ t('header.toggleTheme') }}</p>
-			    			<SunMoon class="text-text-dark-static"/>
+			    			<SunMoon class="text-text-primary"/>
 						</div>
 					</MenubarItem>
 					<MenubarSeparator/>
@@ -70,22 +81,38 @@ const firstLetters = computed(() => {
 							{{ t('header.language') }}
 						</MenubarSubTrigger>
 						<MenubarSubContent>
-							<MenubarItem @click="$i18n.locale = 'en'">
+							<MenubarItem @click="handleLocalChange('en')">
 								English
 							</MenubarItem>
-							<MenubarItem @click="$i18n.locale = 'no'">
+							<MenubarItem @click="handleLocalChange('no')">
 								Norsk
 							</MenubarItem>
-							<MenubarItem @click="$i18n.locale = 'fr'">
+							<MenubarItem @click="handleLocalChange('fr')">
 								Français
 							</MenubarItem>
 						</MenubarSubContent>
 					</MenubarSub>
-					<MenubarSeparator/>
+					<template v-if="isAdmin">
+						<MenubarSeparator/>
+						<MenubarItem>
+						<div class="w-full flex justify-end gap-2">
+							<RouterLink class="text-md" :to="routeNames.gitRepositories">{{ t('header.repositories') }}</RouterLink>
+							<GitBranch class="text-text-primary"/>
+						</div>
+						</MenubarItem>
+						<MenubarSeparator />
+						<MenubarItem>
+						<div class="w-full flex justify-end gap-2">
+							<RouterLink class="text-md" :to="routeNames.editPrompts">{{ t('header.editPrompts') }}</RouterLink>
+							<Sparkles class="text-text-primary"/>
+						</div>
+						</MenubarItem>
+					</template>
+					<MenubarSeparator />
 					<MenubarItem @click="handleLogOut">
 						<div class="w-full flex gap-2">
 			    			<p class="ml-auto">{{ t('header.signOut') }}</p>
-			    			<LogOut class="text-text-dark-static"/>
+			    			<LogOut class="text-text-primary"/>
 						</div>
 					</MenubarItem>
 				</MenubarContent>

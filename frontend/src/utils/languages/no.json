@@ -6,7 +6,9 @@
         "signOut": "Logg ut",
         "language": "Språk",
         "english": "Engelsk",
-        "norwegian": "Norsk"
+        "norwegian": "Norsk",
+        "repositories": "Repositorier",
+        "editPrompts": "Prompts"
     },
     "button": {
         "previous": "Forrige",
@@ -23,7 +25,14 @@
         "filter": "Filtrer",
         "search": "Søk",
         "signIn": "Logg inn",
-        "clearFilters": "Fjern filtre"
+        "clearFilters": "Fjern filtre",
+        "translate": "Oversett",
+        "undo": "Angre",
+        "showGeneralChanges": "Vis generelle endringer",
+        "confirm": "Bekreft",
+        "summarize": "Oppsummer",
+        "allCustomers": "Alle kunder",
+        "updateRange": "Oppdater fra/til"
     },
     "title": {
         "title": "Tittel",
@@ -35,7 +44,15 @@
         "developerNotes": "Utviklernotater",
         "upgradeRequirements": "Oppgraderingskrav",
         "search": "Søk",
-        "status": "Status"
+        "status": "Status",
+        "changeNotes": "Endringsnotater",
+        "releaseNotes": "Utgivelsesnotater",
+        "allocated": "Tildelt",
+        "visibility": "Synlig for alle",
+        "from": "Fra",
+        "to": "Til",
+        "addFromRepository": "Legg til fra repository",
+        "fromRepository": "Fra repository"
     },
     "toast": {
         "changeNoteDeleted": "Endringsnotat slettet",
@@ -48,6 +65,7 @@
         "changeNoteUnpublishError": "Det oppsto en feil under avpublisering av endringsnotat",
         "changeNoteUpdatedSuccess": "Endringsnotat oppdatert",
         "changeNoteUpdateError": "Det oppsto en feil under oppdatering av endringsnotat",
+        "changeNoteLoadingError": "Det oppsto en feil under innlastning av endringsnotat",
         "selectedChangeNotesPublished": "Valgte endringsnotater publisert",
         "selectedChangeNotesPublishError": "Kunne ikke publisere valgte endringsnotater",
         "releaseNoteCreated": "Utgivelsesnotat opprettet",
@@ -59,7 +77,14 @@
         "releaseNotePublishError": "Det oppsto en feil under publisering av utgivelsesnotat",
         "releaseNoteUnpublishError": "Det oppsto en feil under avpublisering av utgivelsesnotat",
         "releaseNoteUpdatedSuccess": "Utgivelsesnotat oppdatert",
-        "releaseNoteUpdateError": "Det oppsto en feil under oppdatering av utgivelsesnotat"
+        "releaseNoteUpdateError": "Det oppsto en feil under oppdatering av utgivelsesnotat",
+        "exportPdfError": "Det oppsto en feil under eksportering til PDF",
+        "translationError": "Det oppsto en feil under oversettelse av endringsnotat",
+        "translationSuccess": "Endringsnotat oversatt",
+        "copySuccess": "Innhold kopiert til utklippstavle",
+        "copyError": "Det oppsto en feil under kopiering til utklippstavle",
+        "summarizeSuccess": "Oppsummert",
+        "summarizeError": "Det oppsto en feil under oppsummering"
     },
     "deletePrompt": {
         "title": "Er du sikker på at du vil slette?",
@@ -67,7 +92,8 @@
     },
     "card": {
         "published": "Publisert",
-        "private": "Privat"
+        "private": "Privat",
+        "containsChangeNotes": "ingen endringsnotater | 1 endringsnotat | {count} endringsnotater"
     },
       "input": {
         "addChangeNotes": "Legg til endringsnotater"
@@ -94,6 +120,65 @@
         "title": "Tittel",
         "description": "Beskrivelse",
         "developerNotes": "Utviklernotater",
-        "upgradeRequirements": "Oppgraderingskrav"
+        "upgradeRequirements": "Oppgraderingskrav",
+        "noReleaseNotesFound": "Ingen utgivelsesnotater funnet",
+        "noChangeNotesFound": "Ingen endringsnotater funnet",
+        "noSummary": "Ingen oppsummering",
+        "noChangeNotesAdded": "Ingen endringsnotater lagt til",
+        "noTitle": "Ingen tittel",
+        "noDescription": "Ingen beskrivelse"
+    },
+    "repositories": {
+        "title": "Git Repositorier",
+        "addRepository": "Legg til",
+        "url": "Url",
+        "name": "Navn",
+        "remove": "Fjern",
+        "id": "Id",
+        "namePlaceholder": "Repository navn",
+        "urlPlaceholder": "Git klone url",
+        "deleteSuccess": "Repository fjernet",
+        "deleteError": "Det oppsto en feil under fjerning av repository",
+        "createSuccess": "Repository lagt til",
+        "createError": "Det oppsto en feil under tillegg av repository",
+        "nameRequired": "Navn er påkrevd",
+        "urlRequired": "URL er påkrevd",
+        "error": "Det oppsto en feil under innlastning av repositoryer",
+        "syncAll": "Synkroniser alle repositoryer",
+        "syncSuccess": "Repositoryer synkronisert",
+        "syncError": "Det oppsto en feil under synkronisering av repositoryer",
+        "sync": "Synkroniser"
+    },
+    "ai": {
+        "translationDisclaimer": "Oversettelsen er generert av KI. Vennligst sjekk viktige fakta."
+    },
+    "changeNoteEdit": {
+        "viewableByEveryone": "Hvis denne er krysset av, vil dette endringsnotatet være synlig for alle. Dette kan føre til at sensitiv informasjon blir eksponert. Er du sikker på at du vil gjøre dette endringsnotatet synlig for alle?",
+        "viewableByEveryoneTitle": "Endringsnotat synlighet",
+        "cancelTitle": "Avbryt redigering",
+        "cancelDescription": "Er du sikker på at du vil avbryte redigeringen? Alle ikke lagrede endringer vil gå tapt."
+    },
+    "releaseNoteEdit": {
+        "cancelTitle": "Avbryt redigering",
+        "cancelDescription": "Er du sikker på at du vil avbryte redigeringen? Alle ikke lagrede endringer vil gå tapt."
+    },
+    "changeNote": {
+        "noReference": "Ingen referanse oppgitt"
+    },
+    "tooltip": {
+        "noCommits": "Ingen tilknyttede git commits"
+    },
+    "prompts": {
+        "translationPrompt": "Oversettelsesprompt",
+        "changeNoteSummaryPrompt": "Oppsummeringsprompt for endringsnotat",
+        "releaseNoteSummaryPrompt": "Oppsummeringsprompt for utgivelsesnotat",
+        "editPrompts": "Rediger prompts",
+        "translationPromptPlaceholder": "Skriv inn prompten som skal brukes for KI-oversettelse",
+        "changeNoteSummaryPromptPlaceholder": "Skriv inn prompten som skal brukes for KI-oppsummering av endringsnotater",
+        "releaseNoteSummaryPromptPlaceholder": "Skriv inn prompten som skal brukes for KI-oppsummering av utgivelsesnotater",
+        "errorLoadingPrompts": "Det oppsto en feil under innlastning av prompts",
+        "promptPlaceholder": "Skriv inn prompten",
+        "saveSuccess": "Prompts oppdatert",
+        "saveError": "Det oppsto en feil under oppdatering av prompts"
     }
 }

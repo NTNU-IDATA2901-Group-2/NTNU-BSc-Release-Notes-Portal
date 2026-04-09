@@ -69,7 +69,7 @@ const getReleaseNote = async (id: string): Promise<ReleaseNote> => {
  */
 const getReleaseNotes = async (params?: URLSearchParams): Promise<ReleaseNote[]> => {
   console.log("Fetching release notes with params:", params?.toString());
-  const response = await api.get(`releasenotes`, { params})
+  const response = await api.get(`releasenotes`, { params });
   return response.data as ReleaseNote[];
 }
 

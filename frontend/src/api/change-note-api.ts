@@ -1,7 +1,7 @@
 import type { ChangeNote, OnMutationApiCallFinished, PersistChangeNoteDTO } from "@/utils/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import api from "./api";
-import type { Ref } from "vue";
+import { unref, type MaybeRef, type Ref } from "vue";
 
 
 /**
@@ -89,7 +89,7 @@ export const useCreateChangeNote = (onFinished: OnMutationApiCallFinished) => {
   },
   onSettled: () => onFinished.onSettled?.(),
 })
-} 
+}
 
 /**
  * Creates a new change note. The function returns the ID of the newly created change note.
@@ -208,9 +208,9 @@ const getChangeNote = async (id: string): Promise<ChangeNote> => {
  * @returns An array of change note data that matches the provided search parameters.
  * @throws An error if the API request to retrieve the change notes fails.
  */
-export const useGetChangeNotes = (searchParams: Ref<Record<string, string>> | URLSearchParams) => useQuery<ChangeNote[]>({  
+export const useGetChangeNotes = (searchParams?: Ref<Record<string, string>> | URLSearchParams) => useQuery<ChangeNote[]>({  
   queryKey: ['changeNotes', searchParams],
-  queryFn: () => getChangeNotes(new URLSearchParams(searchParams instanceof URLSearchParams ? searchParams : searchParams.value)),
+  queryFn: () => getChangeNotes(new URLSearchParams(searchParams instanceof URLSearchParams ? searchParams : searchParams?.value)),
 });
 
 
@@ -222,7 +222,29 @@ export const useGetChangeNotes = (searchParams: Ref<Record<string, string>> | UR
  * @throws An error if the API request to retrieve the change notes fails.
  */
 export const getChangeNotes = async (params?: URLSearchParams) => {
-  console.log("Fetching change notes with params:", params?.toString());
   const response = await api.get(`changenotes`, { params });
   return response.data as ChangeNote[];
 }
+
+/**
+ * Checks if a list of change notes has any associated Git commits.
+ * @param changeNoteIds An array of IDs of the change notes to check.
+ * @returns A promise resolving to a boolean indicating whether the change notes have commits.
+ */
+const getHasCommits = async (changeNoteIds: number[]): Promise<boolean> => {
+  if (changeNoteIds.length === 0) {
+    return false; // no need to send request
+  }
+  const response = await api.get(`changenotes/has-commits/${changeNoteIds.join(',')}`);
+  return response.data as boolean;
+}
+
+/**
+ * Retrieves a boolean indicating whether a list of change notes has any associated Git commits.
+ * @param changeNoteIds An array of IDs of the change notes to check.
+ * @returns A boolean indicating whether the change notes have commits.
+ */
+export const useGetHasCommits = (changeNoteIds: MaybeRef<number[]>) => useQuery<boolean>({
+  queryKey: ['changeNote', changeNoteIds, 'hasCommits'],
+  queryFn: () => getHasCommits(unref(changeNoteIds)),
+})

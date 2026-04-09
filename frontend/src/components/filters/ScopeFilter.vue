@@ -10,7 +10,7 @@ const { t } = useI18n();
 
 <template>
     <div class="flex gap-3 flex-col mt-4">
-      <h4 class="text-lg">{{ t('title.scope') }}</h4>
+      <h4 class="text-xl">{{ t('title.scope') }}</h4>
       <p v-if="isLoading">{{ t('loading.filter') }}</p>
       <p v-else-if="isError">{{ t('loadingError.scopes') }}</p>
       <FilterListItem v-else v-for="scope in scopes" :key="scope.id" :query-key="'scopeIds'" :value="scope.id.toString()" :label="scope.name"/>

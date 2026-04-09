@@ -12,9 +12,22 @@ export const EditChangeNoteSchema = z.object({
   description: z.string().optional(),
   developerNotes: z.string().optional(),
   upgradeNotes: z.string().optional(),
-  changeSource: z.string().optional(),
   productId: z.number().optional(),
   scopeId: z.number().optional(),
   featureId: z.number().optional(),
   customerId: z.number().optional(),
+  viewableByEveryone: z.boolean().optional(),
+})
+
+export const CreateGitRepositorySchema = z.object({
+  name: z.string().min(1, { message: "Required" }),
+  url: z.string().min(1, { message: "Required" }),
+})
+
+export const UpdatePromptsSchema = z.object({
+  prompts: z.array(z.object({
+    id: z.number(),
+    name: z.string(),
+    prompt: z.string(),
+  }))
 })

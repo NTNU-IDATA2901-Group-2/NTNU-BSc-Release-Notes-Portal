@@ -5,14 +5,20 @@ import Spinner from '@/components/ui/spinner/Spinner.vue';
 import { ArrowLeft } from "lucide-vue-next"
 import { ref } from 'vue';
 import { useGetChangeNote } from '@/api/change-note-api';
-import ChangeNoteEdit from '@/components/ChangeNote/ChangeNoteEdit.vue';
-import ChangeNoteDetail from '@/components/ChangeNote/ChangeNoteDetail.vue';
+import ChangeNoteEdit from '@/components/changeNote/ChangeNoteEdit.vue';
+import ChangeNoteDetail from '@/components/changeNote/ChangeNoteDetail.vue';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../components/ui/breadcrumb';
 import { useI18n } from 'vue-i18n';
+import { router } from '@/utils/router';
 
 const route = useRoute();
 
 const isEditing = ref(route.query.edit === 'true');
+
+if (route.query.edit !== undefined) {
+  delete route.query.edit;
+  router.replace({ query: route.query });
+}
 
 const { t } = useI18n();
 
@@ -23,14 +29,14 @@ const { isPending, isFetching, isError, data: changeNote } = useGetChangeNote(id
 
 <template>
   <div class="flex flex-col items-center px-4 mb-20">
-    <div class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10 flex items-center gap-4">
+    <div class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10 flex  items-center gap-4">
       <Button variant="outline" class="" @click="$router.back()">
         <ArrowLeft />{{ t('button.previous') }}
       </Button>
       <Breadcrumb class="text-text-primary">
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/change-notes">Change Notes</BreadcrumbLink>
+            <BreadcrumbLink href="/change-notes">{{ t('title.changeNotes') }}</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -49,7 +55,7 @@ const { isPending, isFetching, isError, data: changeNote } = useGetChangeNote(id
     <div v-else-if="isPending || isFetching">
       <Spinner />
     </div>
-    <h1 v-else-if="isError">{{ t('loadingError.changeNote') }}</h1>
+    <h1 v-else-if="isError">{{ t('toast.changeNoteLoadingError') }}</h1>
 
   </div>
 </template>
