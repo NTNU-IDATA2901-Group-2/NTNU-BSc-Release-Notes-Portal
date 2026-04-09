@@ -14,6 +14,10 @@ params:query {
   productIds: 1
 }
 
+headers {
+  X-Test-Role: Admin
+}
+
 assert {
   res.status: eq 200
   res.body.length: eq 1
