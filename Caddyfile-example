@@ -1,0 +1,9 @@
+app.app.local {
+  tls internal
+  reverse_proxy app:8080
+}
+
+auth.app.local {
+  tls internal
+  reverse_proxy keycloak:8080
+}

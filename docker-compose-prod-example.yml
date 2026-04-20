@@ -1,0 +1,66 @@
+services:
+  caddy:
+    image: caddy:2
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+      - keycloak
+
+  app:
+    image: ghcr.io/ntnu-idata2901-group-2/ntnu-bsc-release-notes-portal:latest
+    depends_on:
+      db:
+        condition: service_started
+    expose:
+      - "8080"
+    environment:
+      - CORS_ALLOWED_ORIGINS=
+      - KC_URL=
+      - KC_ISSUER_URL=
+      - KC_JWK_SET_URI=
+      - KC_CLIENT_ID=
+      - KC_REALM=
+      - DB_USERNAME=
+      - DB_PASSWORD=
+      - DB_DATABASE=
+      - DB_URL=
+      - OPENAI_URL=
+      - OPENAI_API_KEY=
+      - OPENAI_MODEL=
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.5.2
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME:
+      KC_BOOTSTRAP_ADMIN_PASSWORD:
+      KC_HOSTNAME: https://auth.app.local
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY_HEADERS: xforwarded
+    entrypoint: ["/opt/keycloak/bin/kc.sh", "start"]
+    expose:
+      - "8080"
+    volumes:
+      - keycloak_data:/opt/keycloak/release-notes-data
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER:
+      POSTGRES_PASSWORD:
+      POSTGRES_DB:
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/release-notes-data
+
+volumes:
+  db_data:
+  keycloak_data:
+  caddy_data:
+  caddy_config:
