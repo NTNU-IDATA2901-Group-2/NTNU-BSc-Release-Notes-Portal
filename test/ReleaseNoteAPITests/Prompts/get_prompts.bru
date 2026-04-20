@@ -10,9 +10,13 @@ get {
   auth: inherit
 }
 
+headers {
+  X-Test-Role: Admin
+}
+
 assert {
   res.status: eq 200
-  res.body.length: eq 3
+  res.body.length: eq 2
   : eq
 }
 

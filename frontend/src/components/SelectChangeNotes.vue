@@ -6,29 +6,32 @@ import SelectGroup from './ui/select/SelectGroup.vue';
 import SelectItem from './ui/select/SelectItem.vue';
 import SelectTrigger from './ui/select/SelectTrigger.vue';
 import SelectValue from './ui/select/SelectValue.vue';
-import { useGetChangeNotes } from '@/api/change-note-api';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
-const model = defineModel<ChangeNote | null>({ required: true, default: null })
+const props = defineProps<{
+  changeNotes: ChangeNote[];
+  disabled?: boolean;
+  placeholder: string;
+}>()
 
-const { data: availableChangeNotes } = useGetChangeNotes()
+const model = defineModel<ChangeNote | null>({ required: true, default: null })
 
 </script>
 
 <template>
-  <Select v-model="model">
+  <Select :disabled="props.disabled" v-model="model">
     <SelectTrigger class="w-45">
-      <SelectValue placeholder="Select a fruit" />
+      <SelectValue/>
     </SelectTrigger>
     <SelectContent>
       <SelectGroup>
         <SelectItem :value="null">
-          {{ t('none') }}
+          {{ props.placeholder }}
         </SelectItem>
-        <SelectItem v-for="changeNote in availableChangeNotes" :key="changeNote.id" :value=changeNote>
-          {{ changeNote.reference }}
+        <SelectItem v-for="changeNote in changeNotes" :key="changeNote.id" :value=changeNote>
+          {{ changeNote.reference ?? t('changeNote.noReference') }}
         </SelectItem>
       </SelectGroup>
     </SelectContent>

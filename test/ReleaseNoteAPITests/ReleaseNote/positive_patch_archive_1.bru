@@ -1,0 +1,24 @@
+meta {
+  name: positive_patch_archive_1
+  type: http
+  seq: 24
+}
+
+patch {
+  url: {{baseurl}}/releasenotes/{{release_id_1}}/archive
+  body: none
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

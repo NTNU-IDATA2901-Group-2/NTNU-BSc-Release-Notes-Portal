@@ -1,0 +1,33 @@
+meta {
+  name: negative_put_update_not_admin
+  type: http
+  seq: 34
+}
+
+put {
+  url: {{baseurl}}/changenotes/{{change_id_1}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "reference" : "reference 1",
+    "description": "This is what changed",
+    "developerNotes": "Hello dev",
+    "upgradeNotes": "Upgrade if you want to",
+    "customerId": 1,
+    "featureId": 1,
+    "scopeId": 1,
+    "productId": 1
+  }
+}
+
+assert {
+  res.status: eq 403
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

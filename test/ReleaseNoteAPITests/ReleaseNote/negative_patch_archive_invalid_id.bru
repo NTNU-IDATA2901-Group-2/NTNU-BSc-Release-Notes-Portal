@@ -1,0 +1,24 @@
+meta {
+  name: negative_patch_archive_invalid_id
+  type: http
+  seq: 23
+}
+
+patch {
+  url: {{baseurl}}/releasenotes/-100000/archive
+  body: none
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 404
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

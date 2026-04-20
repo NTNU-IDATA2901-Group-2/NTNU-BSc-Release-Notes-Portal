@@ -10,11 +10,15 @@ put {
   auth: inherit
 }
 
+headers {
+  X-Test-Role: Admin
+}
+
 body:json {
   [
       {
         "id": 1,
-        "name": "Change Note Summary",
+        "name": "Change Notes Summary",
         "prompt": "test"
       }
     ]

@@ -1,13 +1,17 @@
 meta {
   name: get_all_should_exclude_patched
   type: http
-  seq: 25
+  seq: 30
 }
 
 get {
   url: {{baseurl}}/releasenotes
   body: none
   auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
 }
 
 assert {

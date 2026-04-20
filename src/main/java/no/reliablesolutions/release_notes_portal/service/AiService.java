@@ -2,7 +2,13 @@ package no.reliablesolutions.release_notes_portal.service;
 
 import java.util.List;
 
+import java.util.List;
 
+
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
@@ -24,26 +30,28 @@ public class AiService {
     private final GitRepositoryService gitRepositoryService;
     private final PromptRepository promptRepository;
 
+    private final Logger logger = LoggerFactory.getLogger(AiService.class);
+    
     /**
-     * <h1>Translates the given text to the specified locale using an AI model.</h1>
-     * <h2>Supported Locales:</h2>
-     * <ul>
-     *   <li>en - English</li>
-     *   <li>no - Norwegian Bokmål</li>
-     *   <li>fr - French</li>
-     * </ul>
-     * 
-     * @param locale the target locale for translation (e.g., "en", "no", "fr")
-     * @param text the text to be translated
-     * @return the translated text
-     * @throws IllegalArgumentException if locale or text is null or empty
-     * @throws LocaleNotSupportedException if the specified locale is not supported
-     */
+    * <h1>Translates the given text to the specified locale using an AI model.</h1>
+    * <h2>Supported Locales:</h2>
+    * <ul>
+    *   <li>en - English</li>
+    *   <li>no - Norwegian Bokmål</li>
+    *   <li>fr - French</li>
+    * </ul>
+    * 
+    * @param locale the target locale for translation (e.g., "en", "no", "fr")
+    * @param text the text to be translated
+    * @return the translated text
+    * @throws IllegalArgumentException if locale or text is null or empty
+    * @throws LocaleNotSupportedException if the specified locale is not supported
+    */
     public String translate(String locale, String text) {
         if (locale == null || locale.isEmpty() || text == null || text.isEmpty()) {
             throw new IllegalArgumentException("Locale and text must not be null or empty");
         }
-
+        
         String lang = "";
         switch (locale) {
             case "en" -> lang = "English";
@@ -63,30 +71,36 @@ public class AiService {
                 .call()
                 .content();
     }
-
+    
     /**
-     * Summarizes the change note with the given ID using an AI model. The summary is generated based on the git diff of the change note.
-     * @param changeNoteId the ID of the change note to be summarized
-     * @return a summary of the change note
-     */
-    public String summarizeChangeNote(long changeNoteId) {
-      GitCommitHashAndPreviousGitCommitHash commits = changeNoteService.getGitCommitHashAndPreviousGitCommitHash(changeNoteId);
-      if (commits == null) {
-        throw new ChangeNoteHasNoGitCommitsException(changeNoteId);
-      }
-      GitRepository gitRepository = gitRepositoryService.getGitRepositoryForChangeNote(changeNoteId);
-      String diffString = diffService.getDiffString(commits.getGitCommitHash(), commits.getPreviousGitCommitHash(), gitRepository);
+    * Summarizes the change notes with the given IDs using an AI model. The summary is generated based on the git diff of the change notes.
+    * @param changeNoteIds the IDs of the change notes to be summarized
+    * @return a summary of the change notes
+    */
+    public String summarizeChangeNote(List<Long> changeNoteIds) {
+        StringBuilder diffs = new StringBuilder();
+        for (Long changeNoteId : changeNoteIds) {
+            GitCommitHashAndPreviousGitCommitHash commits = changeNoteService.getGitCommitHashAndPreviousGitCommitHash(changeNoteId);
+            if (commits == null || commits.getGitCommitHash() == null || commits.getPreviousGitCommitHash() == null) {
+                logger.warn("Change note with ID {} is missing associated git commits. Skipping summarization for this change note.", changeNoteId);
+                continue;
+            }
+            GitRepository gitRepository = gitRepositoryService.getGitRepositoryForChangeNote(changeNoteId);
+            String diffString = diffService.getDiffString(commits.getGitCommitHash(), commits.getPreviousGitCommitHash(), gitRepository);
+            diffs.append(diffString).append("\n");
+        }
+        String diffsString = diffs.toString().trim();
+        
+        Prompt summarizeChangeNotePrompt = promptRepository.findByName("Change Notes Summary");
 
-      Prompt summarizeChangeNotePrompt = promptRepository.findByName("Change Note Summary");
-
-      if (summarizeChangeNotePrompt == null) {
-          throw new IllegalStateException("Summarize change note prompt not found in database");
-      }
-
-      return builder.build().prompt().system(summarizeChangeNotePrompt.getName())
-                .user(diffString)
-                .call()
-                .content();
+        if (summarizeChangeNotePrompt == null) {
+            throw new IllegalStateException("Summarize change note prompt not found in database");
+        }
+        
+        return diffsString.isEmpty() ? "" : builder.build().prompt().system(summarizeChangeNotePrompt.getPrompt())
+        .user(diffsString)
+        .call()
+        .content();
     }
 
     /**

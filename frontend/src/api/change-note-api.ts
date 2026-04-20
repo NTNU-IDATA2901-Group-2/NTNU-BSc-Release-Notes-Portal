@@ -1,7 +1,7 @@
 import type { ChangeNote, OnMutationApiCallFinished, PersistChangeNoteDTO } from "@/utils/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import api from "./api";
-import type { Ref } from "vue";
+import { unref, type MaybeRef, type Ref } from "vue";
 
 
 /**
@@ -24,9 +24,8 @@ export const usePublishChangeNote = (id: number, publish: boolean, onFinished: O
   return useMutation<boolean, unknown, boolean>({
     mutationFn: (publish: boolean) => publishChangeNote(id, publish),
     onSettled: () => onFinished.onSettled?.(),
-    onSuccess: (data) => {
-      console.log(`Change note ${publish ? 'published' : 'unpublished'} with ID:`, data);
-      queryClient.invalidateQueries({ queryKey: ['changeNote', `${id}`] });
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ['changeNote'] })
       onFinished.onSuccess();
     },
     onError: () => {
@@ -227,21 +226,24 @@ export const getChangeNotes = async (params?: URLSearchParams) => {
 }
 
 /**
- * Checks if a change note has any associated Git commits.
- * @param changeNoteId The ID of the change note to check.
- * @returns A promise resolving to a boolean indicating whether the change note has commits.
+ * Checks if a list of change notes has any associated Git commits.
+ * @param changeNoteIds An array of IDs of the change notes to check.
+ * @returns A promise resolving to a boolean indicating whether the change notes have commits.
  */
-const getHasCommits = async (changeNoteId: number): Promise<boolean> => {
-  const response = await api.get(`changenotes/${changeNoteId}/has-commits`);
+const getHasCommits = async (changeNoteIds: number[]): Promise<boolean> => {
+  if (changeNoteIds.length === 0) {
+    return false; // no need to send request
+  }
+  const response = await api.get(`changenotes/has-commits/${changeNoteIds.join(',')}`);
   return response.data as boolean;
 }
 
 /**
- * Retrieves a boolean indicating whether a change note has any associated Git commits.
- * @param changeNoteId The ID of the change note to check.
- * @returns A boolean indicating whether the change note has commits.
+ * Retrieves a boolean indicating whether a list of change notes has any associated Git commits.
+ * @param changeNoteIds An array of IDs of the change notes to check.
+ * @returns A boolean indicating whether the change notes have commits.
  */
-export const useGetHasCommits = (changeNoteId: number) => useQuery<boolean>({
-  queryKey: ['changeNote', changeNoteId, 'hasCommits'],
-  queryFn: () => getHasCommits(changeNoteId),
+export const useGetHasCommits = (changeNoteIds: MaybeRef<number[]>) => useQuery<boolean>({
+  queryKey: ['changeNote', changeNoteIds, 'hasCommits'],
+  queryFn: () => getHasCommits(unref(changeNoteIds)),
 })

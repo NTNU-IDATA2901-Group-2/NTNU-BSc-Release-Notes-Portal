@@ -4,5 +4,4 @@ INSERT INTO customer (name) VALUES ('Liddle'),('MaksiMatt'), ('Whalemart'), ('Co
 INSERT INTO scope (name) VALUES ('Patch'), ('Minor'), ('Major');
 INSERT INTO prompt (name, prompt) VALUES
 ('Translation Prompt', ''),
-('Release Note Summary', ''),
-('Change Note Summary', '');
+('Change Notes Summary', '');

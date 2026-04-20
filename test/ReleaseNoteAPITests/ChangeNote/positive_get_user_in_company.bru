@@ -1,0 +1,24 @@
+meta {
+  name: positive_get_user_in_company
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseurl}}/changenotes/{{change_id_2}}
+  body: none
+  auth: inherit
+}
+
+headers {
+  X-Test-Customers: MaksiMatt
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

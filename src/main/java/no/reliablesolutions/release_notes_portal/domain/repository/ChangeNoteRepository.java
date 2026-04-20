@@ -60,11 +60,13 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
         (:#{#filterOptions.featureIds} IS NULL OR c.feature.id IN :#{#filterOptions.featureIds}) AND
         (:#{#filterOptions.scopeIds} IS NULL OR c.scope.id IN :#{#filterOptions.scopeIds}) AND
         (:#{#filterOptions.productIds} IS NULL OR c.product.id IN :#{#filterOptions.productIds}) AND
+        (:#{#filterOptions.gitRepositoryIds} IS NULL OR c.gitRepository.id IN :#{#filterOptions.gitRepositoryIds}) AND
         ((:#{#filterOptions.query} IS NULL OR :#{#filterOptions.query} = '') OR
         LOWER(c.reference) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
         LOWER(c.description) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
         LOWER(c.developerNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
         LOWER(c.upgradeNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%'))
+      ORDER BY CASE WHEN c.gitCommitTimestamp IS NULL THEN c.creationTimestamp ELSE c.gitCommitTimestamp END DESC
       """)
   public List<ChangeNote> findByArchivedFalseAndMatchingFilterParameters(
       @Param("filterOptions") ChangeNoteFilterOptionsDTO filterOptions);
@@ -117,11 +119,13 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
       AND (:#{#filterOptions.featureIds} IS NULL OR c.feature.id IN :#{#filterOptions.featureIds})
       AND (:#{#filterOptions.scopeIds} IS NULL OR c.scope.id IN :#{#filterOptions.scopeIds})
       AND (:#{#filterOptions.productIds} IS NULL OR c.product.id IN :#{#filterOptions.productIds})
+      AND (:#{#filterOptions.gitRepositoryIds} IS NULL OR c.gitRepository.id IN :#{#filterOptions.gitRepositoryIds}) 
       AND ((:#{#filterOptions.query} IS NULL OR :#{#filterOptions.query} = '')
       OR LOWER(c.reference) LIKE LOWER('%' || :#{#filterOptions.query} || '%')
       OR LOWER(c.description) LIKE LOWER('%' || :#{#filterOptions.query} || '%')
       OR LOWER(c.developerNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%')
       OR LOWER(c.upgradeNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%'))
+      ORDER BY CASE WHEN c.gitCommitTimestamp IS NULL THEN c.creationTimestamp ELSE c.gitCommitTimestamp END DESC
       """)
   public List<ChangeNote> findForCustomerNamesMatchingFilterParameters(
       @Param("customerNames") List<String> customerNames,
@@ -152,4 +156,21 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
         AND c.gitCommitHash IS NOT NULL
       """)
   public GitCommitHashAndPreviousGitCommitHash findCommitHashAndPreviousCommitHash(Long changeNoteId);
+
+
+  @Query("""
+      SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END
+      FROM ChangeNote c
+      WHERE c.id IN :changeNoteIds
+        AND c.archived = false
+        AND c.gitCommitHash IS NOT NULL
+        AND EXISTS (SELECT 1
+        FROM ChangeNote c2 
+        WHERE c2.gitRepository.id = c.gitRepository.id 
+          AND c2.gitCommitTimestamp IS NOT NULL
+          AND c2.gitCommitTimestamp < c.gitCommitTimestamp
+          AND c2.archived = false)
+      """)
+  public boolean hasCommitHashAndPreviousCommitHash(List<Long> changeNoteIds);
+
 }

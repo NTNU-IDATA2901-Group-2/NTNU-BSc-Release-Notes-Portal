@@ -1,0 +1,28 @@
+meta {
+  name: negative_get_all_filter_ReleaseNote_invalid_input
+  type: http
+  seq: 33
+}
+
+get {
+  url: {{baseurl}}/changenotes?hasReleaseNote=invalid
+  body: none
+  auth: inherit
+}
+
+params:query {
+  hasReleaseNote: invalid
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 400
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,13 +1,17 @@
 meta {
   name: post_release_note
   type: http
-  seq: 3
+  seq: 30
 }
 
 post {
   url: {{baseurl}}/releasenotes
   body: json
   auth: none
+}
+
+headers {
+  X-Test-Role: Admin
 }
 
 body:json {

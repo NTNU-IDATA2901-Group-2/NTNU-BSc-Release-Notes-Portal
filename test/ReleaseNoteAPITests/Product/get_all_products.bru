@@ -10,6 +10,10 @@ get {
   auth: inherit
 }
 
+headers {
+  X-Test-Role: Admin
+}
+
 script:post-response {
   bru.setEnvVar("product_count", res.body.length)
 }

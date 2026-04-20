@@ -1,5 +1,7 @@
 package no.reliablesolutions.release_notes_portal.controller;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -56,20 +58,20 @@ public class AiController {
     }
 
     /**
-     * Summarizes the change note with the given ID.
-     * @param changeNoteId the ID of the change note to be summarized
-     * @return a ResponseEntity containing the summary of the change note
+     * Summarizes the change notes with the given IDs.
+     * @param changeNoteIds the IDs of the change notes to be summarized
+     * @return a ResponseEntity containing the summary of the change notes
      */
-    @Operation(summary = "Summarize change note", description = "Generates a summary of the change note with the given ID using AI")
+    @Operation(summary = "Summarize change notes", description = "Generates a summary of the change notes with the given IDs using AI")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Summary generated successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid request parameters"),
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @GetMapping("/summarize-changenote/{changeNoteId}")
+    @GetMapping("/summarize-changenotes/{changeNoteIds}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> summarizeChangeNote(@PathVariable long changeNoteId) {
-        String summary = aiService.summarizeChangeNote(changeNoteId);
+    public ResponseEntity<String> summarizeChangeNotes(@PathVariable List<Long> changeNoteIds) {
+        String summary = aiService.summarizeChangeNote(changeNoteIds);
         return ResponseEntity.ok(summary);
     }
 
@@ -96,4 +98,5 @@ public class AiController {
         aiService.updatePrompts(prompts);
         return ResponseEntity.ok().build();
     }
+
 }

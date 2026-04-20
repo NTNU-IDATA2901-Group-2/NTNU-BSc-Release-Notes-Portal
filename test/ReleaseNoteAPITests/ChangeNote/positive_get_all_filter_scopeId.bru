@@ -1,0 +1,30 @@
+meta {
+  name: positive_get_all_filter_scopeId
+  type: http
+  seq: 19
+}
+
+get {
+  url: {{baseurl}}/changenotes?scopeIds=2
+  body: none
+  auth: inherit
+}
+
+params:query {
+  scopeIds: 2
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.body[0].id: eq {{change_id_2}}
+  res.body: length 1
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

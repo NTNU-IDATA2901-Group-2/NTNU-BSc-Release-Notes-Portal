@@ -14,5 +14,6 @@ public record ChangeNoteDTO(
     FeatureDTO feature,
     CustomerDTO customer,
     boolean published,
-    Boolean viewableByEveryone) {
+    Boolean viewableByEveryone,
+    Long gitRepositoryId) {
 }

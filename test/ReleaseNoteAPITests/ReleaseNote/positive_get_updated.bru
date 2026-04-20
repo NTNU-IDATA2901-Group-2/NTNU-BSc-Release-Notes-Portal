@@ -1,0 +1,28 @@
+meta {
+  name: positive_get_updated
+  type: http
+  seq: 20
+}
+
+get {
+  url: {{baseurl}}/releasenotes/{{release_id_2}}
+  body: none
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 200
+  res.body.changeNotes: length 1
+  res.body.tag: eq updated
+  res.body.summary: eq updated
+  res.body.published: eq true
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

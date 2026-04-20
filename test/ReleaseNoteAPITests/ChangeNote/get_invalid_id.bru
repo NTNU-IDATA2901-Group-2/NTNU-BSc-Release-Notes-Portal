@@ -1,13 +1,17 @@
 meta {
   name: get_invalid_id
   type: http
-  seq: 5
+  seq: 4
 }
 
 get {
   url: {{baseurl}}/changenotes/-9999
   body: none
   auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
 }
 
 assert {

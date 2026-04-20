@@ -1,0 +1,28 @@
+meta {
+  name: negative_get_all_filter_published_invalid_param
+  type: http
+  seq: 24
+}
+
+get {
+  url: {{baseurl}}/changenotes?published=invalid
+  body: none
+  auth: inherit
+}
+
+params:query {
+  published: invalid
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 400
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

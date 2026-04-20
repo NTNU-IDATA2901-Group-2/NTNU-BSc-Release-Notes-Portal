@@ -1,0 +1,34 @@
+meta {
+  name: positive_check_changenote_update
+  type: http
+  seq: 38
+}
+
+get {
+  url: {{baseurl}}/changenotes/{{change_id_1}}
+  body: none
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 200
+  res.body.reference: eq "updated reference"
+  res.body.description: eq "updated description"
+  res.body.developerNotes: eq "updated dev notes"
+  res.body.upgradeNotes: eq "updated upgrade notes"
+  res.body.product.id: eq 2
+  res.body.scope.id: eq 2
+  res.body.feature.id: eq 2
+  res.body.customer.id: eq 2
+  res.body.viewableByEveryone: eq true
+  res.body.published: eq true
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
