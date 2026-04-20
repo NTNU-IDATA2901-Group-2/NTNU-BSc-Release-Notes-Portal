@@ -10,6 +10,10 @@ delete {
   auth: inherit
 }
 
+headers {
+  X-Test-Role: Admin
+}
+
 assert {
   res.status: eq 200
 }

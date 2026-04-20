@@ -1,0 +1,24 @@
+meta {
+  name: negative_get_patched
+  type: http
+  seq: 25
+}
+
+get {
+  url: {{baseurl}}/releasenotes/{{release_id_1}}
+  body: none
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 404
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

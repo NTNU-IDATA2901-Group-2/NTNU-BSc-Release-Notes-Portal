@@ -1,0 +1,30 @@
+meta {
+  name: positive_get_all_filter_reference
+  type: http
+  seq: 13
+}
+
+get {
+  url: {{baseurl}}/changenotes?query=eferenc
+  body: none
+  auth: inherit
+}
+
+params:query {
+  query: eferenc
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.body[0].id: eq {{change_id_1}}
+  res.body: length 1
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

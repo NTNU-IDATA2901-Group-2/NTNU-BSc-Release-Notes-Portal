@@ -1,0 +1,37 @@
+meta {
+  name: negative_post_auth
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseurl}}/changenotes
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "reference" : "reference 1",
+    "description": "This is what changed",
+    "developerNotes": "Hello dev",
+    "upgradeNotes": "Upgrade if you want to",
+    "customerId": 1,
+    "featureId": 1,
+    "scopeId": 1,
+    "productId": 1
+  }
+}
+
+assert {
+  res.status: eq 403
+}
+
+script:post-response {
+  bru.setEnvVar("change_id_1", res.body)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

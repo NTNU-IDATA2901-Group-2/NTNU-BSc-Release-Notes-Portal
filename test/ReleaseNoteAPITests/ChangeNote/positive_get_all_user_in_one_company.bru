@@ -1,0 +1,25 @@
+meta {
+  name: positive_get_all_user_in_one_company
+  type: http
+  seq: 12
+}
+
+get {
+  url: {{baseurl}}/changenotes
+  body: none
+  auth: inherit
+}
+
+headers {
+  X-Test-Customers: Maksimatt
+}
+
+assert {
+  res.status: eq 200
+  res.body: length 1
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

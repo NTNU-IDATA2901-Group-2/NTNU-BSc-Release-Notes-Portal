@@ -1,0 +1,28 @@
+meta {
+  name: positive_patch_publish
+  type: http
+  seq: 37
+}
+
+patch {
+  url: {{baseurl}}/changenotes/{{change_id_1}}/publish?publish=true
+  body: none
+  auth: inherit
+}
+
+params:query {
+  publish: true
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

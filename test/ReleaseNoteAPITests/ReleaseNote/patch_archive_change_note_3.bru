@@ -1,13 +1,17 @@
 meta {
   name: patch_archive_change_note_3
   type: http
-  seq: 24
+  seq: 29
 }
 
 patch {
   url: {{baseurl}}/changenotes/{{change_id_3}}/archive
   body: none
   auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
 }
 
 assert {
