@@ -1,0 +1,38 @@
+meta {
+  name: positive_put_update_reference
+  type: http
+  seq: 35
+}
+
+put {
+  url: {{baseurl}}/changenotes/{{change_id_1}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "reference" : "updated reference",
+    "description": "updated description",
+    "developerNotes": "updated dev notes",
+    "upgradeNotes": "updated upgrade notes",
+    "customerId": 2,
+    "featureId": 2,
+    "scopeId": 2,
+    "productId": 2,
+    "viewableByEveryone": true
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

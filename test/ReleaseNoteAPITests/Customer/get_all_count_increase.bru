@@ -5,9 +5,17 @@ meta {
 }
 
 get {
-  url: {{baseurl}}/customers
+  url: {{baseurl}}/customers?X-Test-Role=Admin
   body: none
   auth: inherit
+}
+
+params:query {
+  X-Test-Role: Admin
+}
+
+headers {
+  X-Test-Role: Admin
 }
 
 assert {

@@ -1,0 +1,28 @@
+meta {
+  name: negative_get_all_filter_scopeId_invalid_param
+  type: http
+  seq: 20
+}
+
+get {
+  url: {{baseurl}}/changenotes?scopeIds=a
+  body: none
+  auth: inherit
+}
+
+params:query {
+  scopeIds: a
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 400
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

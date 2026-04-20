@@ -194,8 +194,7 @@ export const usePublishReleaseNote = (onFinished: OnMutationApiCallFinished) => 
     },
     onSettled: () => onFinished.onSettled?.(),
     onSuccess: () => {
-      console.log(`Release note with ID ${publishId} has been ${publishValue ? 'published' : 'unpublished'}.`);
-      queryClient.invalidateQueries({ queryKey: ['releaseNote', publishId] });
+      queryClient.invalidateQueries({ queryKey: ['releaseNote'] });
       onFinished.onSuccess();
     },
     onError: () => {

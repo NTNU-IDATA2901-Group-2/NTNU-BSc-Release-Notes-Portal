@@ -1,0 +1,20 @@
+meta {
+  name: positive_patch_archive_1
+  type: http
+  seq: 40
+}
+
+patch {
+  url: {{baseurl}}/changenotes/{{change_id_1}}/archive
+  body: none
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

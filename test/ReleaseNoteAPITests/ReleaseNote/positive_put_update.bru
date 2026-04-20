@@ -1,0 +1,33 @@
+meta {
+  name: positive_put_update
+  type: http
+  seq: 19
+}
+
+put {
+  url: {{baseurl}}/releasenotes/{{release_id_2}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "changeNoteIds": [{{change_id_2}}],
+    "tag": "updated",
+    "summary": "updated",
+    "published": true
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

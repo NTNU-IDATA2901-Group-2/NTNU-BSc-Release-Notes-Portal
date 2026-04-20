@@ -1,0 +1,24 @@
+meta {
+  name: negative_get_user_not_in_company
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseurl}}/changenotes/{{change_id_2}}
+  body: none
+  auth: inherit
+}
+
+headers {
+  X-Test-Customers: Liddle
+}
+
+assert {
+  res.status: eq 404
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -10,6 +10,10 @@ get {
   auth: inherit
 }
 
+headers {
+  X-Test-Role: Admin
+}
+
 assert {
   res.body: isJson
   res.body.id: eq {{feature_create_feature}}

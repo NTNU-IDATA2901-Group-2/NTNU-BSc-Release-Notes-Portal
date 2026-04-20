@@ -1,0 +1,30 @@
+meta {
+  name: positive_get_all_filter_developerNotes
+  type: http
+  seq: 15
+}
+
+get {
+  url: {{baseurl}}/changenotes?query=hello de
+  body: none
+  auth: inherit
+}
+
+params:query {
+  query: hello de
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.body[0].id: eq {{change_id_1}}
+  res.body: length 1
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

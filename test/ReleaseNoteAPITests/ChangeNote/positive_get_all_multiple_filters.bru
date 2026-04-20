@@ -1,0 +1,30 @@
+meta {
+  name: positive_get_all_multiple_filters
+  type: http
+  seq: 28
+}
+
+get {
+  url: {{baseurl}}/changenotes?customerIds=1&productIds=2
+  body: none
+  auth: inherit
+}
+
+params:query {
+  customerIds: 1
+  productIds: 2
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.body: length 0
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

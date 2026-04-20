@@ -24,9 +24,8 @@ export const usePublishChangeNote = (id: number, publish: boolean, onFinished: O
   return useMutation<boolean, unknown, boolean>({
     mutationFn: (publish: boolean) => publishChangeNote(id, publish),
     onSettled: () => onFinished.onSettled?.(),
-    onSuccess: (data) => {
-      console.log(`Change note ${publish ? 'published' : 'unpublished'} with ID:`, data);
-      queryClient.invalidateQueries({ queryKey: ['changeNote', `${id}`] });
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ['changeNote'] })
       onFinished.onSuccess();
     },
     onError: () => {
