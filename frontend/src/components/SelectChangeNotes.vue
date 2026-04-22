@@ -21,7 +21,7 @@ const model = defineModel<ChangeNote | null>({ required: true, default: null })
 </script>
 
 <template>
-  <Select :disabled="props.disabled" v-model="model">
+  <Select :disabled="props.disabled || props.changeNotes === undefined || props.changeNotes.length === 0" v-model="model">
     <SelectTrigger class="w-45">
       <SelectValue/>
     </SelectTrigger>

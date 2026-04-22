@@ -25,6 +25,7 @@ import SelectValue from '../ui/select/SelectValue.vue';
 import SelectContent from '../ui/select/SelectContent.vue';
 import SelectGroup from '../ui/select/SelectGroup.vue';
 import SelectItem from '../ui/select/SelectItem.vue';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
 const props = defineProps<{
   releaseNote: ReleaseNote;
@@ -346,8 +347,17 @@ const customerFilter = ref<number>(-1);
                 <div class="flex items-center gap-4">
                   <RouterLink class="text-2xl dark:text-text-dark-static text-text-light-static hover:underline" :to="`${routeNames.changeNotes}/${change.id}`">{{ change.reference }}</RouterLink>
 
-                  <Badge v-if="change.customer" :variant="'outline'">{{ change.customer.name }}</Badge>
+                  <Tooltip v-if="change.customer">
+                    <TooltipTrigger as-child>
+                      <Badge v-if="change.customer" :variant="'outline'">{{ change.customer.name }}</Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        {{ t('title.customer') }}
+                    </TooltipContent>
+                  </Tooltip>
+                  
                 </div>
+                <p v-if="change.viewableByEveryone" class="text-text-primary/50">{{ t('changeNote.changeNoteViewableByEveryone') }}</p>
                 <div>
                   <div class="flex justify-between align-center">
                     <div>

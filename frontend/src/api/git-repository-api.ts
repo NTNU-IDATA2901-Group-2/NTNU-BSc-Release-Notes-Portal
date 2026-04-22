@@ -120,6 +120,7 @@ export const useSyncAllRepositories = (onFinished: OnMutationApiCallFinished) =>
         mutationFn: () => syncAllRepositories(),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['git-repositories'] });
+            queryClient.invalidateQueries({ queryKey: ['changeNotes']})
             onFinished.onSuccess();
         },
         onError: () => {
@@ -153,6 +154,7 @@ export const useSyncRepository = (onFinished: OnMutationApiCallFinished) => {
         mutationFn: (id: number) => syncRepository(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['git-repositories'] });
+            queryClient.invalidateQueries({ queryKey: ['changeNotes']})
             onFinished.onSuccess();
         },
         onError: () => {

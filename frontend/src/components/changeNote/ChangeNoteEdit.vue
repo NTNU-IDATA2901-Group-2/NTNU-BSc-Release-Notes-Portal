@@ -220,7 +220,7 @@ onBeforeUnmount(() => {
             <TagSelect mode="customer" v-model="customerId"/>
         </div>
         </div>
-        <div v-if="customerId !== -1" class="flex flex-col gap-2">
+        <div v-if="customerId !== -1 && customerId !== undefined" class="flex flex-col gap-2">
             <h1 class="text-lg">{{ t('title.visibility') }}</h1>
             <Checkbox v-model="viewAbleByEveryone" @click="onViewableChecked"/>
         </div>

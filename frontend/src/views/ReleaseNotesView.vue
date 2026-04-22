@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useGetReleaseNotes } from '@/api/release-note-api';
+import { useCreateReleaseNote, useGetReleaseNotes } from '@/api/release-note-api';
 import ReleaseNoteCard from '@/components/ReleaseNoteCard.vue';
 import Button from '@/components/ui/button/Button.vue';
 import { InputGroup, InputGroupInput } from '@/components/ui/input-group';
 import Separator from '@/components/ui/separator/Separator.vue';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
-import { ListFilterPlus, Search } from 'lucide-vue-next';
+import { FilePlus, ListFilterPlus, Search } from 'lucide-vue-next';
 import { computed, provide, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ScrollArea from '@/components/ui/scroll-area/ScrollArea.vue';
@@ -14,6 +14,7 @@ import PublicPrivateFilter from '@/components/filters/PublicPrivateFilter..vue';
 import { useRouter } from 'vue-router';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 import { isAdmin } from '@/utils/keycloak';
+import { toast } from 'vue-sonner';
 
 const { t } = useI18n();
 
@@ -42,6 +43,17 @@ const onSearch = () => {
   searchParams.value = { ...searchParams.value, query: search.value };
 }
 
+// Creation of release note
+const createReleaseNoteMutation = useCreateReleaseNote({
+  onSuccess: (data?: string) => {
+    router.push(`/release-notes/${data}?edit=true`);
+    toast.success(t('toast.releaseNoteCreated'));
+  },
+  onError: () => {
+    toast.error(t('toast.releaseNoteCreateError'))
+  }
+})
+
 </script>
 
 <template>
@@ -67,7 +79,7 @@ const onSearch = () => {
         <div class="flex flex-col w-full gap-4 max-w-4xl">
           <div class="w-full flex flex-col md:flex-row-reverse justify-center md:justify-end gap-2">
 
-            <div class="flex gap-2 w-full">
+            <div class="flex gap-2 w-full flex-wrap sm:flex-nowrap">
               <InputGroup>
                 <InputGroupInput 
                   :placeholder="t('button.search')" @keyup.enter="onSearch"
@@ -76,6 +88,12 @@ const onSearch = () => {
                   <Search />
                 </Button>
               </InputGroup>
+              <Button 
+                variant="solidaccent"
+                @click="createReleaseNoteMutation.mutate([])">
+                {{ t('button.createReleaseNote') }}
+                <FilePlus />
+              </Button>
               <DrawerTrigger as-child>
                 <Button variant="outline" class="flex md:hidden">
                   <p>{{ t('button.filter') }}</p>
