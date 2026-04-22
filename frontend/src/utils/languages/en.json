@@ -146,7 +146,9 @@
         "syncAll": "Sync all repositories",
         "syncSuccess": "Repositories synchronized successfully",
         "syncError": "An error occurred while synchronizing repositories",
-        "sync": "Synchronize"
+        "sync": "Synchronize",
+        "noGitRepositories": "No git repositories available, please add a repository on the repositories page",
+        "noChangeNotesInRepository": "No change notes found in the selected repository"
     },
     "ai": {
         "translationDisclaimer": "This translation is AI generated. Please check important facts."
