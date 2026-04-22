@@ -177,7 +177,6 @@ onBeforeUnmount(() => {
             </DropdownMenu>
           </div>
         </div>
-
         <div class="flex justify-between">
         <p v-if="changeNote.description" v-html="md.render(translatedDescription ?? changeNote.description ?? '')"></p>
         <p v-else class="text-text-primary/50">{{ t('placeholder.noDescription') }}</p>
@@ -192,6 +191,7 @@ onBeforeUnmount(() => {
           <Badge v-if="changeNote.feature" class="h-6">{{ changeNote.feature.name }}</Badge>
           <Badge v-if="changeNote.customer" class="h-6">{{ changeNote.customer.name }}</Badge>
         </div>
+        <p v-if="changeNote.viewableByEveryone" class="text-text-primary/50">{{ t('changeNote.changeNoteViewableByEveryone') }}</p>
       </div>
       <Separator class="w-full h-2" />
       <div class="flex flex-col w-full text-xl gap-10">

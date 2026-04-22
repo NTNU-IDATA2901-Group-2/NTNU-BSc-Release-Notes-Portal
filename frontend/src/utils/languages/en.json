@@ -162,7 +162,8 @@
         "cancelDescription": "Are you sure you want to cancel editing? All unsaved changes will be lost."
     },
     "changeNote": {
-        "noReference": "No reference provided"
+        "noReference": "No reference provided",
+        "changeNoteViewableByEveryone": "This change note is viewable to all users when published."
     },
     "tooltip": {
         "noCommits": "No associated git commits"

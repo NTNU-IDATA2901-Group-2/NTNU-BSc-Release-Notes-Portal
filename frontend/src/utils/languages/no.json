@@ -163,7 +163,8 @@
         "cancelDescription": "Er du sikker på at du vil avbryte redigeringen? Alle ikke lagrede endringer vil gå tapt."
     },
     "changeNote": {
-        "noReference": "Ingen referanse oppgitt"
+        "noReference": "Ingen referanse oppgitt",
+        "changeNoteViewableByEveryone": "Dette endringsnotatet er synlig for alle brukere når det er publisert."
     },
     "tooltip": {
         "noCommits": "Ingen tilknyttede git commits"

@@ -348,6 +348,7 @@ const customerFilter = ref<number>(-1);
 
                   <Badge v-if="change.customer" :variant="'outline'">{{ change.customer.name }}</Badge>
                 </div>
+                <p v-if="change.viewableByEveryone" class="text-text-primary/50">{{ t('changeNote.changeNoteViewableByEveryone') }}</p>
                 <div>
                   <div class="flex justify-between align-center">
                     <div>
