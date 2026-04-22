@@ -16,7 +16,7 @@
         "save": "Lagre",
         "cancel": "Avbryt",
         "delete": "Slett",
-        "export": "Eksporter",
+        "export": "Eksporter PDF",
         "publish": "Publiser",
         "unpublish": "Avpubliser",
         "none": "Ingen",
@@ -147,7 +147,9 @@
         "syncAll": "Synkroniser alle repositoryer",
         "syncSuccess": "Repositoryer synkronisert",
         "syncError": "Det oppsto en feil under synkronisering av repositoryer",
-        "sync": "Synkroniser"
+        "sync": "Synkroniser",
+        "noGitRepositories": "Ingen git repositoryer tilgjengelig, vennligst legg til en repository på repositorysiden",
+        "noChangeNotesInRepository": "Ingen change notes funnet i den valgte repositoryen"
     },
     "ai": {
         "translationDisclaimer": "Oversettelsen er generert av KI. Vennligst sjekk viktige fakta."
@@ -163,7 +165,8 @@
         "cancelDescription": "Er du sikker på at du vil avbryte redigeringen? Alle ikke lagrede endringer vil gå tapt."
     },
     "changeNote": {
-        "noReference": "Ingen referanse oppgitt"
+        "noReference": "Ingen referanse oppgitt",
+        "changeNoteViewableByEveryone": "Dette endringsnotatet er synlig for alle brukere når det er publisert."
     },
     "tooltip": {
         "noCommits": "Ingen tilknyttede git commits"

@@ -150,15 +150,15 @@ const onSearch = () => {
                 {{ t('button.publish') }}
                 <Eye />
               </Button>
-              <Button variant="outline" @click="createChangeNoteMutation.mutate">
-                {{ t('button.createChangeNote') }}
-                <LayersPlus />
-              </Button>
               <Button 
-                variant="solidaccent"
+                variant="outline"
                 @click="createReleaseNoteMutation.mutate(selectedChangeNotes)">
                 {{ t('button.createReleaseNote') }}
                 <FilePlus />
+              </Button>
+              <Button variant="solidaccent" @click="createChangeNoteMutation.mutate">
+                {{ t('button.createChangeNote') }}
+                <LayersPlus />
               </Button>
             </div>
 
