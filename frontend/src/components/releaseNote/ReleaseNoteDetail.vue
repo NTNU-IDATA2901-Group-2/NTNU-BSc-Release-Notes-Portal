@@ -344,7 +344,7 @@ const customerFilter = ref<number>(-1);
               >
               <div v-if="shouldShowChangeNote(change)" class="flex flex-col gap-2">
                 <div class="flex items-center gap-4">
-                  <RouterLink class="text-2xl text-text-dark-static hover:underline" :to="`${routeNames.changeNotes}/${change.id}`">{{ change.reference }}</RouterLink>
+                  <RouterLink class="text-2xl dark:text-text-dark-static text-text-light-static hover:underline" :to="`${routeNames.changeNotes}/${change.id}`">{{ change.reference }}</RouterLink>
 
                   <Badge v-if="change.customer" :variant="'outline'">{{ change.customer.name }}</Badge>
                 </div>
