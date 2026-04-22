@@ -35,7 +35,8 @@ const handleCheckboxClick = (event: Event) => {
             <Checkbox v-model="selected" :disabled="false" />
           </div>
 
-          <h3 class="text-xl">{{ changeNote.reference }}</h3>
+          <h3 v-if="changeNote.reference" class="text-xl">{{ changeNote.reference}}</h3>
+          <h3 v-else class="text-xl text-text-primary/50">{{ t('placeholder.noTitle') }}</h3>
 
           <Tooltip v-if="changeNote.customer">
             <TooltipTrigger as-child>
