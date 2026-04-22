@@ -16,15 +16,15 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteHasNoGitCommitsException;
+import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.CustomerNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.DiffStringGenerationException;
-import no.reliablesolutions.release_notes_portal.exception.FeatureNotFoundException;
-import no.reliablesolutions.release_notes_portal.exception.ProductNotFoundException;
-import no.reliablesolutions.release_notes_portal.exception.ScopeNotFoundException;
-import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.FailedSyncGitChangeNotesException;
 import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityException;
+import no.reliablesolutions.release_notes_portal.exception.FeatureNotFoundException;
+import no.reliablesolutions.release_notes_portal.exception.ProductNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
+import no.reliablesolutions.release_notes_portal.exception.ScopeNotFoundException;
 
 /**
  * Global exception handler for the application. Catches specific exceptions thrown by controllers and services, logs the events, and returns appropriate HTTP responses with messages.
@@ -198,6 +198,17 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
     logger.warn("Invalid argument: {}", e.getMessage());
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument: " + e.getMessage());
+  }
+
+  /**
+   * Handles the case where an illegal state is encountered. Logs the event and returns a 500 response with a message indicating that there is an illegal state.
+   * @param e the exception containing details about the illegal state
+   * @return a ResponseEntity with a 500 status and a message indicating that there is an illegal state
+   */
+  @ExceptionHandler(value = {IllegalStateException.class})
+  public ResponseEntity<String> handleIllegalStateException(IllegalStateException e) {
+    logger.warn("Illegal state: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Illegal internal server state");
   }
 
   /**

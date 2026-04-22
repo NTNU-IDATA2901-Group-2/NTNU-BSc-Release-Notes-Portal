@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +34,7 @@ import no.reliablesolutions.release_notes_portal.util.ChangeNoteFileHandler;
  * This class is responsible for synchronizing change notes from Git repositories. It will clone or pull the repositories, check for new commits, and create change notes from any new change note files found in the commits.
  */
 @Component
+@Profile("!ci")
 public class SyncGitChangeNotes implements CommandLineRunner {
   
   private final Logger logger = LoggerFactory.getLogger(SyncGitChangeNotes.class);
@@ -40,20 +42,19 @@ public class SyncGitChangeNotes implements CommandLineRunner {
   private final ChangeNoteService changeNoteService;
   private final ChangeNoteFileHandler changeNoteFileHandler;
   
-  private final String repositoryDirectoriesPath;
+  // local directory for git repositories, relative to the application working directory
+  public static final String REPOSITORY_DIRECTORIES_PATH = "git_repositories";
   private final String changeNoteDirectory;
 
   public SyncGitChangeNotes(
     GitRepositoryRepository gitRepositoryRepository,
     ChangeNoteService changeNoteService,
     ChangeNoteFileHandler changeNoteFileHandler,
-    @Value("${REPOSITORY_DIRECTORIES_PATH:repository_directories_path}") String repositoryDirectoriesPath,
-    @Value("${CHANGE_NOTE_DIRECTORY:change_note_directory}") String changeNoteDirectory
+    @Value("${CHANGE_NOTE_DIRECTORY}") String changeNoteDirectory
   ) {
     this.gitRepositoryRepository = gitRepositoryRepository;
     this.changeNoteService = changeNoteService;
     this.changeNoteFileHandler = changeNoteFileHandler;
-    this.repositoryDirectoriesPath = repositoryDirectoriesPath;
     this.changeNoteDirectory = changeNoteDirectory;
   }
 
@@ -90,13 +91,13 @@ public class SyncGitChangeNotes implements CommandLineRunner {
       throw new IllegalArgumentException("Git repository cannot be null");
     }
 
-    File repositoriesDirectory = new File(repositoryDirectoriesPath);
+    File repositoriesDirectory = new File(REPOSITORY_DIRECTORIES_PATH);
     if (!repositoriesDirectory.exists()) {
       repositoriesDirectory.mkdirs();
     }
 
-    logger.info("Updating Git repository: {}", gitRepository.getName());
-    File repositoryDirectory = new File(gitRepository.getLocalPath(repositoryDirectoriesPath));
+    logger.info("Updating Git repository {} using change note directory: {}", gitRepository.getName(), changeNoteDirectory);
+    File repositoryDirectory = new File(gitRepository.getLocalPath(REPOSITORY_DIRECTORIES_PATH));
     prepareGitRepository(gitRepository, repositoryDirectory);
     syncFromGitRepository(gitRepository, repositoryDirectory);
   }
@@ -259,12 +260,14 @@ public class SyncGitChangeNotes implements CommandLineRunner {
         List<DiffEntry> diffEntries = diffFormatter.scan(parentCommit.getTree(), commit.getTree());
         List<File> newChangeNoteFiles = diffEntries.stream()
           .filter(diffEntry -> diffEntry.getChangeType() == DiffEntry.ChangeType.ADD)
-          .filter(diffEntry -> diffEntry.getNewPath().startsWith(changeNoteDirectory + File.separator))
+          .filter(diffEntry -> diffEntry.getNewPath().startsWith(changeNoteDirectory + "/"))
           .filter(diffEntry -> diffEntry.getNewPath().endsWith(".yaml") || diffEntry.getNewPath().endsWith(".yml"))
           .map(diffEntry -> new File(repositoryDirectory, diffEntry.getNewPath()))
           .toList();
 
-        if (!newChangeNoteFiles.isEmpty()) {
+        if (newChangeNoteFiles.isEmpty()) {
+          logger.debug("No new change note files found in commit {} with message '{}'", commit.getName(), commit.getShortMessage());
+        } else {
           if (newChangeNoteFiles.size() > 1) {
             logger.warn("Found multiple new change note files for commit {}: {}. Only the first will be processed", commit.getName(), newChangeNoteFiles.stream().map(File::getPath).toList());
           }

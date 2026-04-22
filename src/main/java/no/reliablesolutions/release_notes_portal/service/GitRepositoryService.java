@@ -2,6 +2,7 @@ package no.reliablesolutions.release_notes_portal.service;
 
 import java.util.List;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
@@ -17,7 +18,7 @@ import no.reliablesolutions.release_notes_portal.runner.SyncGitChangeNotes;
 @AllArgsConstructor
 public class GitRepositoryService {
     private final GitRepositoryRepository gitRepositoryRepository;
-    private final SyncGitChangeNotes syncGitChangeNotes;
+    private final ObjectProvider<SyncGitChangeNotes> syncGitChangeNotesProvider;
 
     /**
      * Creates a new Git repository based on the provided CreateGitRepositoryDTO.
@@ -45,6 +46,7 @@ public class GitRepositoryService {
      */
     public void deleteGitRepository(long id) {
         gitRepositoryRepository.findById(id).orElseThrow(() -> new GitRepositoryNotFoundException(id));
+        gitRepositoryRepository.clearGitRepositoryReferencesById(id);
         gitRepositoryRepository.deleteById(id);
     }
 
@@ -78,6 +80,10 @@ public class GitRepositoryService {
      */
     public void syncGitRepositories() {
         try {
+            SyncGitChangeNotes syncGitChangeNotes = syncGitChangeNotesProvider.getIfAvailable();
+            if (syncGitChangeNotes == null) {
+                throw new IllegalStateException("SyncGitChangeNotes is not available. Cannot sync Git repositories.");
+            }
             syncGitChangeNotes.run();
         } catch (Exception e) {
             throw new FailedSyncGitChangeNotesException(e.getMessage());
@@ -93,6 +99,11 @@ public class GitRepositoryService {
     public void syncGitRepository(long id) {
         try {
             GitRepository gitRepository = gitRepositoryRepository.findById(id).orElseThrow(() -> new GitRepositoryNotFoundException(id));
+
+            SyncGitChangeNotes syncGitChangeNotes = syncGitChangeNotesProvider.getIfAvailable();
+            if (syncGitChangeNotes == null) {
+                throw new IllegalStateException("SyncGitChangeNotes is not available. Cannot sync Git repository.");
+            }
             syncGitChangeNotes.syncGitRepository(gitRepository);
         } catch (GitRepositoryNotFoundException e) {
             throw e; // rethrow to handle in global exception handler

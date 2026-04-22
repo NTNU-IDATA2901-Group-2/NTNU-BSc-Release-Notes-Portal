@@ -13,26 +13,26 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
 import no.reliablesolutions.release_notes_portal.exception.DiffStringGenerationException;
+import no.reliablesolutions.release_notes_portal.runner.SyncGitChangeNotes;
 
 @Service
+@Profile("!ci")
 class DiffService {
 
   private final Logger logger = LoggerFactory.getLogger(DiffService.class);
-  private final String repositoryDirectoriesPath;
   private final String changeNoteDirectory;
   /**
    * Constructor for DiffService.
    * @param repositoryDirectoriesPath the base path where local git repositories are stored, injected from application properties
    */
   public DiffService(
-    @Value("${REPOSITORY_DIRECTORIES_PATH:repository_directories_path}") String repositoryDirectoriesPath,
-    @Value("${CHANGE_NOTE_DIRECTORY:change_note_directory}") String changeNoteDirectory
+    @Value("${CHANGE_NOTE_DIRECTORY}") String changeNoteDirectory
   ) {
-    this.repositoryDirectoriesPath = repositoryDirectoriesPath;
     this.changeNoteDirectory = changeNoteDirectory;
   }
 
@@ -54,7 +54,7 @@ class DiffService {
       throw new IllegalArgumentException("Git repository cannot be null");
     }
 
-    File repositoryDirectory = new File(gitRepository.getLocalPath(repositoryDirectoriesPath));
+    File repositoryDirectory = new File(gitRepository.getLocalPath(SyncGitChangeNotes.REPOSITORY_DIRECTORIES_PATH));
     if (!repositoryDirectory.exists()) {
       throw new IllegalArgumentException("Repository directory does not exist: " + repositoryDirectory.getAbsolutePath());
     }

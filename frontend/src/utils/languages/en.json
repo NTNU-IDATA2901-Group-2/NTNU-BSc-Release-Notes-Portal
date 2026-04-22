@@ -146,7 +146,9 @@
         "syncAll": "Sync all repositories",
         "syncSuccess": "Repositories synchronized successfully",
         "syncError": "An error occurred while synchronizing repositories",
-        "sync": "Synchronize"
+        "sync": "Synchronize",
+        "deleteTitle": "Delete Repository",
+        "deleteDescription": "Are you sure you want to delete this repository? Any related change notes will be unlinked. This action cannot be undone."
     },
     "ai": {
         "translationDisclaimer": "This translation is AI generated. Please check important facts."

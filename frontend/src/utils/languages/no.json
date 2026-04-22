@@ -147,7 +147,9 @@
         "syncAll": "Synkroniser alle repositoryer",
         "syncSuccess": "Repositoryer synkronisert",
         "syncError": "Det oppsto en feil under synkronisering av repositoryer",
-        "sync": "Synkroniser"
+        "sync": "Synkroniser",
+        "deleteTitle": "Slett Repository",
+        "deleteDescription": "Er du sikker på at du vil slette dette repositoryet? Alle relaterte endringsnotater vil bli frakoblet. Denne handlingen kan ikke angres."
     },
     "ai": {
         "translationDisclaimer": "Oversettelsen er generert av KI. Vennligst sjekk viktige fakta."
