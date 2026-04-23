@@ -149,7 +149,9 @@
         "syncError": "Det oppsto en feil under synkronisering av repositoryer",
         "sync": "Synkroniser",
         "noGitRepositories": "Ingen git repositoryer tilgjengelig, vennligst legg til en repository på repositorysiden",
-        "noChangeNotesInRepository": "Ingen change notes funnet i den valgte repositoryen"
+        "noChangeNotesInRepository": "Ingen change notes funnet i den valgte repositoryen",
+        "deleteTitle": "Slett Repository",
+        "deleteDescription": "Er du sikker på at du vil slette dette repositoryet? Alle relaterte endringsnotater vil bli frakoblet. Denne handlingen kan ikke angres."
     },
     "ai": {
         "translationDisclaimer": "Oversettelsen er generert av KI. Vennligst sjekk viktige fakta."

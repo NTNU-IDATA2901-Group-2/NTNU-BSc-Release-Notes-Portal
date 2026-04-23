@@ -2,22 +2,17 @@ package no.reliablesolutions.release_notes_portal.service;
 
 import java.util.List;
 
-import java.util.List;
-
-
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
 import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
-import no.reliablesolutions.release_notes_portal.dto.GitCommitHashAndPreviousGitCommitHash;
-import no.reliablesolutions.release_notes_portal.exception.ChangeNoteHasNoGitCommitsException;
 import no.reliablesolutions.release_notes_portal.domain.entity.Prompt;
 import no.reliablesolutions.release_notes_portal.domain.repository.PromptRepository;
+import no.reliablesolutions.release_notes_portal.dto.GitCommitHashAndPreviousGitCommitHash;
 import no.reliablesolutions.release_notes_portal.dto.PromptDTO;
 import no.reliablesolutions.release_notes_portal.exception.LocaleNotSupportedException;
 
@@ -26,7 +21,7 @@ import no.reliablesolutions.release_notes_portal.exception.LocaleNotSupportedExc
 public class AiService {
     private final ChatClient.Builder builder;
     private final ChangeNoteService changeNoteService;
-    private final DiffService diffService;
+    private final ObjectProvider<DiffService> diffServiceProvider;
     private final GitRepositoryService gitRepositoryService;
     private final PromptRepository promptRepository;
 
@@ -79,6 +74,13 @@ public class AiService {
     */
     public String summarizeChangeNote(List<Long> changeNoteIds) {
         StringBuilder diffs = new StringBuilder();
+        DiffService diffService = diffServiceProvider.getIfAvailable();
+
+        if (diffService == null) {
+            logger.error("DiffService bean is not available. Cannot summarize change notes.");
+            throw new IllegalStateException("DiffService is not available");
+        }
+
         for (Long changeNoteId : changeNoteIds) {
             GitCommitHashAndPreviousGitCommitHash commits = changeNoteService.getGitCommitHashAndPreviousGitCommitHash(changeNoteId);
             if (commits == null || commits.getGitCommitHash() == null || commits.getPreviousGitCommitHash() == null) {

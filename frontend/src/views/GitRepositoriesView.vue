@@ -10,6 +10,8 @@ import { TableCell, Table, TableHeader, TableRow, TableHead, TableBody } from '@
 import { RefreshCw, Trash2 } from 'lucide-vue-next';
 import { toast } from 'vue-sonner';
 import { useDeleteGitRepository, useGetGitRepositories, usePersistGitRepository, useSyncAllRepositories, useSyncRepository } from '@/api/git-repository-api';
+import DialogPrompt from '@/components/DialogPrompt.vue';
+import { ref } from 'vue';
 
 const { t } = useI18n();
 
@@ -42,8 +44,12 @@ const deleteGitRepositoryMutation = useDeleteGitRepository({
     }
 })
 
-const onDeleteRepository = (id: number) => {
-    deleteGitRepositoryMutation.mutate(id);
+const onDeleteRepository = (id: number | null) => {
+    if (id === null) {
+        console.warn("Attempted to delete Git repository with null id");
+    } else {
+        deleteGitRepositoryMutation.mutate(id);
+    }
 }
 
 const syncAllRepositoriesMutation = useSyncAllRepositories({
@@ -68,10 +74,23 @@ const onSyncRepository = (id: number) => {
     syncGitRepositoryMutation.mutate(id);
 }
 
+const showConfirmDeletePrompt = ref(false);
+
+const repositoryIdToDelete = ref<number | null>(null);
+
 </script>
 
 <template>
-    <div class="flex flex-col items-center mt-20">
+    <DialogPrompt
+        :open="showConfirmDeletePrompt"
+        mode="delete"
+        @update:open="showConfirmDeletePrompt = false"
+        @cancel="showConfirmDeletePrompt = false; repositoryIdToDelete = null"
+        @confirm="onDeleteRepository(repositoryIdToDelete)"
+        :title-key="'repositories.deleteTitle'"
+        :description-key="'repositories.deleteDescription'"
+    />
+    <div class="flex flex-col items-center mt-20 w-full">
         <div class="flex flex-col gap-8">
             <div class="flex flex-row justify-between">
                 <h1 class="text-xl">{{ t('repositories.title') }}</h1>
@@ -130,7 +149,7 @@ const onSyncRepository = (id: number) => {
                         </Button>
                     </TableCell>
                     <TableCell class="text-text-primary text-center">
-                        <Button class="self-right" variant="destructive" size="sm" @click="onDeleteRepository(repo.id)">
+                        <Button class="self-right" variant="destructive" size="sm" @click="repositoryIdToDelete = repo.id; showConfirmDeletePrompt = true">
                             <Trash2 />
                         </Button>
                     </TableCell>

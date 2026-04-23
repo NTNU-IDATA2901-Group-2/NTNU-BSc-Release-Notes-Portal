@@ -148,7 +148,9 @@
         "syncError": "An error occurred while synchronizing repositories",
         "sync": "Synchronize",
         "noGitRepositories": "No git repositories available, please add a repository on the repositories page",
-        "noChangeNotesInRepository": "No change notes found in the selected repository"
+        "noChangeNotesInRepository": "No change notes found in the selected repository",
+        "deleteTitle": "Delete Repository",
+        "deleteDescription": "Are you sure you want to delete this repository? Any related change notes will be unlinked. This action cannot be undone."
     },
     "ai": {
         "translationDisclaimer": "This translation is AI generated. Please check important facts."
