@@ -47,7 +47,6 @@ Main variables used by the backend and compose:
 | `DB_USERNAME` / `DB_PASSWORD` / `DB_DATABASE` | PostgreSQL credentials |
 | `DB_URL` | JDBC URL for Spring datasource |
 | `OPENAI_URL` / `OPENAI_API_KEY` / `OPENAI_MODEL` | AI integration settings. During development the Groq API was used. This requires signing up to acquire an API key. |
-| `REPOSITORY_DIRECTORIES_PATH` | Base path for local git repository integrations |
 | `CHANGE_NOTE_DIRECTORY` | Relative/child change note directory used by git features |
 
 ## Development Mode (dev)
