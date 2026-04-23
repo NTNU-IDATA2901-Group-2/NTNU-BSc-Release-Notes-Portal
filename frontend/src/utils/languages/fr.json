@@ -6,7 +6,9 @@
         "signOut": "Se déconnecter",
         "language": "Langue",
         "english": "Anglais",
-        "norwegian": "Norvégien"
+        "norwegian": "Norvégien",
+        "repositories": "Dépôts",
+        "editPrompts": "Invites"
     },
     "button": {
         "previous": "Précédent",
@@ -23,7 +25,14 @@
         "search": "Rechercher",
         "filter": "Filtrer",
         "signIn": "Se connecter",
-        "clearFilters": "Effacer les filtres"
+        "clearFilters": "Effacer les filtres",
+        "translate": "Traduire",
+        "undo": "Annuler",
+        "showGeneralChanges": "Afficher les modifications générales",
+        "confirm": "Confirmer",
+        "summarize": "Résumer",
+        "allCustomers": "Tous les clients",
+        "updateRange": "Mettre à jour la plage"
     },
     "title": {
         "title": "Titre",
@@ -33,24 +42,48 @@
         "feature": "Fonctionnalité",
         "customer": "Client",
         "developerNotes": "Notes du développeur",
-        "upgradeRequirements": "Exigences de mise à niveau"
+        "upgradeRequirements": "Exigences de mise à niveau",
+        "status": "Statut",
+        "changeNotes": "Notes de modification",
+        "releaseNotes": "Notes de version",
+        "allocated": "Attribué",
+        "visibility": "Visible par tous",
+        "from": "De",
+        "to": "À",
+        "addFromRepository": "Ajouter depuis le dépôt",
+        "fromRepository": "Depuis le dépôt"
     },
     "toast": {
         "changeNoteDeleted": "Note de modification supprimée avec succès",
         "changeNoteDeleteError": "Une erreur est survenue lors de la suppression de la note de modification",
+        "changeNoteCreated": "Note de modification créée avec succès",
+        "changeNoteCreateError": "Une erreur est survenue lors de la création de la note de modification",
         "changeNotePublished": "Note de modification publiée avec succès",
         "changeNoteUnpublished": "Note de modification dépubliée avec succès",
         "changeNotePublishError": "Une erreur est survenue lors de la publication de la note de modification",
         "changeNoteUnpublishError": "Une erreur est survenue lors de la dépublication de la note de modification",
         "changeNoteUpdatedSuccess": "Note de modification mise à jour avec succès",
+        "changeNoteUpdateError": "Une erreur est survenue lors de la mise à jour de la note de modification",
+        "changeNoteLoadingError": "Une erreur est survenue lors du chargement de la note de modification",
         "selectedChangeNotesPublished": "Notes de modification sélectionnées publiées avec succès",
+        "selectedChangeNotesPublishError": "Les notes de modification sélectionnées n'ont pas pu être publiées",
+        "releaseNoteCreated": "Note de version créée avec succès",
+        "releaseNoteCreateError": "Une erreur est survenue lors de la création de la note de version",
         "releaseNoteDeletedSuccess": "Note de version supprimée avec succès",
         "releaseNoteDeleteError": "Une erreur est survenue lors de la suppression de la note de version",
         "releaseNotePublished": "Note de version publiée avec succès",
         "releaseNoteUnpublished": "Note de version dépubliée avec succès",
         "releaseNotePublishError": "Une erreur est survenue lors de la publication de la note de version",
         "releaseNoteUnpublishError": "Une erreur est survenue lors de la dépublication de la note de version",
-        "releaseNoteUpdatedSuccess": "Note de version mise à jour avec succès"
+        "releaseNoteUpdatedSuccess": "Note de version mise à jour avec succès",
+        "releaseNoteUpdateError": "Une erreur est survenue lors de la mise à jour de la note de version",
+        "exportPdfError": "Une erreur est survenue lors de l'exportation en PDF",
+        "translationError": "Une erreur est survenue lors de la traduction de la note de modification",
+        "translationSuccess": "Note de modification traduite avec succès",
+        "copySuccess": "Contenu copié dans le presse-papiers",
+        "copyError": "Une erreur est survenue lors de la copie dans le presse-papiers",
+        "summarizeSuccess": "Résumé avec succès",
+        "summarizeError": "Une erreur est survenue lors du résumé"
     },
     "deletePrompt": {
         "title": "Êtes-vous sûr de vouloir supprimer ?",
@@ -58,9 +91,10 @@
     },
     "card": {
         "published": "Publié",
-        "private": "Privé"
+        "private": "Privé",
+        "containsChangeNotes": "aucune note de modification | 1 note de modification | {count} notes de modification"
     },
-      "input": {
+    "input": {
         "addChangeNotes": "Ajouter des notes de modification"
     },
     "loadingError": {
@@ -83,5 +117,39 @@
     },
     "ai": {
         "translationDisclaimer": "Cette traduction est générée par l'IA. Veuillez vérifier les faits importants."
+    },
+    "placeholder": {
+        "title": "Titre",
+        "description": "Description",
+        "developerNotes": "Notes du développeur",
+        "upgradeRequirements": "Exigences de mise à niveau",
+        "noReleaseNotesFound": "Aucune note de version trouvée",
+        "noChangeNotesFound": "Aucune note de modification trouvée",
+        "noSummary": "Aucun résumé fourni",
+        "noChangeNotesAdded": "Aucune note de modification ajoutée",
+        "noTitle": "Aucun titre",
+        "noDescription": "Aucune description"
+    },
+    "repositories": {
+        "title": "Dépôts Git",
+        "addRepository": "Ajouter un dépôt",
+        "url": "Url",
+        "name": "Nom",
+        "remove": "Supprimer",
+        "id": "Id",
+        "namePlaceholder": "Nom du dépôt",
+        "urlPlaceholder": "URL de clonage Git",
+        "deleteSuccess": "Dépôt supprimé avec succès",
+        "deleteError": "Une erreur est survenue lors de la suppression du dépôt",
+        "createSuccess": "Dépôt ajouté avec succès",
+        "createError": "Une erreur est survenue lors de l'ajout du dépôt",
+        "nameRequired": "Le nom est requis",
+        "urlRequired": "L'URL est requise",
+        "error": "Une erreur est survenue lors du chargement des dépôts",
+        "syncAll": "Synchroniser tous les dépôts",
+        "syncSuccess": "Dépôts synchronisés avec succès",
+        "syncError": "Une erreur est survenue lors de la synchronisation des dépôts",
+        "sync": "Synchroniser",
+        "noGitRepositories": "Aucun dépôt Git disponible, veuillez ajouter un dépôt sur la page des dépôts"
     }
 }
