@@ -29,7 +29,6 @@ const authenticated = await keycloak.init({
   checkLoginIframe: false,
 })
 
-console.log("Keycloak initialized:", authenticated);
 app.use(router)
 app.mount("#app");
 
