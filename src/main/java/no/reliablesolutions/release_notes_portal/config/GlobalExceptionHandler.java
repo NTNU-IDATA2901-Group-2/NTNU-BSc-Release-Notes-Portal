@@ -258,7 +258,7 @@ public class GlobalExceptionHandler {
 
   /**
    * Handles the case where authorization is denied. Logs the event and returns a 403 response with a message indicating that authorization was denied.
-  *
+   *
    * @param e the exception containing details about the authorization denial
    * @return a ResponseEntity with a 403 status and a message indicating that authorization was denied
    */

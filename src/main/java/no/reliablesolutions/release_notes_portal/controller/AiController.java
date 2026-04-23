@@ -3,34 +3,31 @@ package no.reliablesolutions.release_notes_portal.controller;
 import java.util.List;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import no.reliablesolutions.release_notes_portal.dto.PromptDTO;
 import no.reliablesolutions.release_notes_portal.service.AiService;
-
-import java.util.List;
-
-import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-
-import org.springframework.web.bind.annotation.RequestBody;
 
  
 /**
  * Controller for handling AI related endpoints
  */
+@Tag(name = "AI", description = "Endpoints for AI functionalities")
 @RequestMapping("/api/ai")
 @RestController
 @AllArgsConstructor
@@ -79,8 +76,13 @@ public class AiController {
      * Retrieves all AI prompts.
      * @return a ResponseEntity containing a list of PromptDTOs representing all AI prompts
      */
-    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Get all AI prompts", description = "Retrieves all AI prompts")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Prompts retrieved successfully"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/prompts")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<PromptDTO>> getAllPrompts() {
         logger.info("Getting all prompts");
         return ResponseEntity.ok(aiService.getPrompts());
@@ -91,8 +93,14 @@ public class AiController {
      * @param prompts a list of PromptDTOs representing the prompts to be updated, where each PromptDTO should contain an ID that corresponds to an existing prompt in the database
      * @return a ResponseEntity indicating the success of the update operation
      */
-    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Update AI prompts", description = "Updates the AI prompts based on the provided list of PromptDTOs")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Prompts updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid request body"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PutMapping("/prompts")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> updatePrompts(@RequestBody List<PromptDTO> prompts) {
         logger.info("Updating prompts");
         aiService.updatePrompts(prompts);
