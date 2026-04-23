@@ -12,8 +12,6 @@ import lombok.AllArgsConstructor;
 import no.reliablesolutions.release_notes_portal.dto.PromptDTO;
 import no.reliablesolutions.release_notes_portal.service.AiService;
 
-import java.util.List;
-
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -79,8 +77,8 @@ public class AiController {
      * Retrieves all AI prompts.
      * @return a ResponseEntity containing a list of PromptDTOs representing all AI prompts
      */
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/prompts")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<PromptDTO>> getAllPrompts() {
         logger.info("Getting all prompts");
         return ResponseEntity.ok(aiService.getPrompts());
@@ -91,8 +89,8 @@ public class AiController {
      * @param prompts a list of PromptDTOs representing the prompts to be updated, where each PromptDTO should contain an ID that corresponds to an existing prompt in the database
      * @return a ResponseEntity indicating the success of the update operation
      */
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/prompts")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> updatePrompts(@RequestBody List<PromptDTO> prompts) {
         logger.info("Updating prompts");
         aiService.updatePrompts(prompts);

@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -288,5 +289,16 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleNonTransientAiException(NonTransientAiException e) {
     logger.warn("Non-transient AI exception: {}", e.getMessage());
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Non-transient AI exception: " + e.getMessage());
+  }
+
+  /**
+   * Handles the case where a request method is not supported. Logs the event and returns a 400 response with a message indicating the unsupported request method.
+   * @param e the exception containing details about the unsupported request method
+   * @return a ResponseEntity with a 400 status and a message indicating the unsupported request method
+   */
+  @ExceptionHandler(value = {HttpRequestMethodNotSupportedException.class})
+  public ResponseEntity<String> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+    logger.warn("Request method not supported: {}", e.getMethod());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Request method not supported: " + e.getMethod());
   }
 }

@@ -1,0 +1,30 @@
+meta {
+  name: negative_no_auth_post_customer
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseurl}}/customers
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name" : "testCustomer"
+  }
+}
+
+assert {
+  res.status: eq 403
+}
+
+script:post-response {
+  bru.setEnvVar("customer_create_customer", res.body)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

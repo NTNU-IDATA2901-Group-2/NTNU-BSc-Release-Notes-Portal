@@ -1,7 +1,7 @@
 meta {
   name: positive_get_all_filter_published
   type: http
-  seq: 13
+  seq: 14
 }
 
 get {
@@ -21,7 +21,7 @@ headers {
 assert {
   res.status: eq 200
   res.body.length: eq 1
-  res.body[0].id: eq {{release_id_2}}
+  res.body[0].id: eq {{release_id_1}}
 }
 
 settings {
