@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -82,6 +83,7 @@ public class ScopeController {
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PostMapping("")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Long> createScope(@Valid @RequestBody CreateTagDTO scopeDetails) {
     logger.info("Created scope with details: {}", scopeDetails);
     long createdScope = scopeService.createScope(scopeDetails);
@@ -102,6 +104,7 @@ public class ScopeController {
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PutMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<String> updateScope(@PathVariable Long id, @RequestBody @Valid CreateTagDTO scopeDetails) {
     ScopeDTO updatedScope = scopeService.updateScope(id, scopeDetails);
     logger.info("Updated scope with id: {} and details: {}", id, updatedScope);
@@ -121,6 +124,7 @@ public class ScopeController {
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @DeleteMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<String> deleteScope(@PathVariable Long id) {
     scopeService.deleteScope(id);
     logger.info("Deleted scope with id: {}", id);

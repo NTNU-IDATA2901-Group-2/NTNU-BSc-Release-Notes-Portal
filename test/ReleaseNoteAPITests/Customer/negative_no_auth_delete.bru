@@ -1,26 +1,17 @@
 meta {
-  name: update_with_invalid_info
+  name: negative_no_auth_delete
   type: http
-  seq: 10
+  seq: 11
 }
 
-put {
+delete {
   url: {{baseurl}}/customers/{{customer_create_customer}}
-  body: json
+  body: none
   auth: inherit
 }
 
-headers {
-  X-Test-Role: Admin
-}
-
-body:json {
-  {
-  }
-}
-
 assert {
-  res.status: eq 500
+  res.status: eq 403
 }
 
 settings {

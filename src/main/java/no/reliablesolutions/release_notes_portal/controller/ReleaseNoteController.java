@@ -147,8 +147,8 @@ public class ReleaseNoteController {
       @ApiResponse(responseCode = "404", description = "Release note not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
-  @PreAuthorize("hasRole('ADMIN')")
   @PutMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<ReleaseNoteDTO> updateReleaseNote(@PathVariable long id,
       @RequestBody CreateReleaseNoteDTO createReleaseNoteDTO) {
     ReleaseNoteDTO releaseNote = releaseNoteService.updateReleaseNote(id, createReleaseNoteDTO);

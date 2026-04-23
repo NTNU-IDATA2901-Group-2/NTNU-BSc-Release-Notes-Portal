@@ -1,17 +1,13 @@
 meta {
-  name: post_scope_without_body
+  name: negative_no_auth_post
   type: http
-  seq: 4
+  seq: 3
 }
 
 post {
   url: {{baseurl}}/scopes
-  body: none
+  body: json
   auth: inherit
-}
-
-headers {
-  X-Test-Role: Admin
 }
 
 body:json {
@@ -21,7 +17,7 @@ body:json {
 }
 
 assert {
-  res.status: eq 400
+  res.status: eq 403
 }
 
 settings {
