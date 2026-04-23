@@ -222,6 +222,7 @@ export const useGetChangeNotes = (searchParams?: Ref<Record<string, string>> | U
  */
 export const getChangeNotes = async (params?: URLSearchParams) => {
   const response = await api.get(`changenotes`, { params });
+  console.log("Fetched change notes with params:", params?.toString(), "Response data:", response.data);
   return response.data as ChangeNote[];
 }
 
