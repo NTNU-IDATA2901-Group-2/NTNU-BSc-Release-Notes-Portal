@@ -38,7 +38,7 @@ public class ProductController {
   private final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
   /**
-   * Endpoint for creating a new product with the provided details.
+   * Creates a new product with the provided details.
    * 
    * @param productDTO the details of the product to be created
    * @return a ResponseEntity containing the ID of the created product
@@ -57,7 +57,7 @@ public class ProductController {
   }
 
   /**
-   * Endpoint for retrieving a list of all products.
+   * Retrieves a list of all products.
    * 
    * @return a ResponseEntity containing a list of all products
    */
@@ -74,7 +74,7 @@ public class ProductController {
   }
 
   /**
-   * Endpoint for retrieving details of a specific product by its ID.
+   * Retrieves details of a specific product by its ID.
    * 
    * @param id the ID of the product to be retrieved
    * @return a ResponseEntity containing the details of the requested product
@@ -83,6 +83,7 @@ public class ProductController {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Product retrieved successfully"),
       @ApiResponse(responseCode = "404", description = "Product not found"),
+      @ApiResponse(responseCode = "400", description = "Invalid request variable"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @GetMapping("/{id}")
@@ -93,7 +94,7 @@ public class ProductController {
   }
 
   /**
-   * Endpoint for updating an existing product with new details.
+   * Updates an existing product with new details.
    * 
    * @param id         the ID of the product to be updated
    * @param productDTO the new details of the product
@@ -103,6 +104,7 @@ public class ProductController {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Product updated successfully"),
       @ApiResponse(responseCode = "404", description = "Product not found"),
+      @ApiResponse(responseCode = "400", description = "Invalid request payload"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PutMapping("/{id}")
@@ -113,7 +115,7 @@ public class ProductController {
   }
 
   /**
-   * Endpoint for deleting an existing product by its ID.
+   * Deletes an existing product by its ID.
    * 
    * @param id the ID of the product to be deleted
    * @return a ResponseEntity indicating the success of the delete operation
@@ -122,6 +124,7 @@ public class ProductController {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Product deleted successfully"),
       @ApiResponse(responseCode = "404", description = "Product not found"),
+      @ApiResponse(responseCode = "400", description = "Invalid request payload"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @DeleteMapping("/{id}")
