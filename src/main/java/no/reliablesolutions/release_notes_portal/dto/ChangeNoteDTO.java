@@ -15,5 +15,6 @@ public record ChangeNoteDTO(
     CustomerDTO customer,
     boolean published,
     Boolean viewableByEveryone,
-    Long gitRepositoryId) {
+    Long gitRepositoryId,
+    String gitCommitHash) {
 }

@@ -11,7 +11,8 @@ export interface ChangeNote {
     published: boolean,
     archived: boolean,
     viewableByEveryone: boolean,
-    gitRepositoryId?: number
+    gitRepositoryId?: number,
+    gitCommitHash?: string,
 }
 
 export interface PersistChangeNoteDTO {
