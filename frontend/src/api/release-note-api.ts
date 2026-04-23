@@ -15,6 +15,11 @@ const createReleaseNote = async (changeNoteIds: number[]) => {
   return response.data as number;
 }
 
+/**
+ * Custom hook for creating a new release note and handling the API call lifecycle.
+ * @param onFinished An object containing callback functions to be called when the API call is finished, successful, or encounters an error.
+ * @returns A mutation object that can be used to trigger the creation of a new release note.
+ */
 export const useCreateReleaseNote = (onFinished: OnMutationApiCallFinished) => {
   const queryClient = useQueryClient();
   return useMutation<number, unknown, number[]>({
@@ -33,10 +38,9 @@ export const useCreateReleaseNote = (onFinished: OnMutationApiCallFinished) => {
 }
 
 /**
- * Retrieves a release note by its ID.
+ * Custom hook for retrieving a release note by its ID.
  * 
  * @param id The ID of the release note to retrieve.
- * @throws An error if the API request to retrieve the release note fails or if the provided ID is invalid.
  * @returns A promise that resolves to the release note data retrieved from the API.
  */
 export const useGetReleaseNote = (id: string) => useQuery<ReleaseNote>({
@@ -64,19 +68,19 @@ const getReleaseNote = async (id: string): Promise<ReleaseNote> => {
 /**
  * Retrieves a list of all release notes from the API.
  * 
+ * @param params Optional URL search parameters to filter the release notes.
  * @throws An error if the API request to retrieve the release notes fails.
  * @returns A promise that resolves to an array of release note data retrieved from the API.
  */
 const getReleaseNotes = async (params?: URLSearchParams): Promise<ReleaseNote[]> => {
-  console.log("Fetching release notes with params:", params?.toString());
   const response = await api.get(`releasenotes`, { params });
   return response.data as ReleaseNote[];
 }
 
 /**
- * Retrieves a list of all release notes.
+ * Custom hook for retrieving a list of all release notes with optional search parameters.
  * 
- * @throws An error if the API request to retrieve the release notes fails.
+ * @param searchParams A reactive reference to an object containing search parameters to filter the release notes.
  * @returns A promise that resolves to an array of release note data retrieved from the API.
  */
 export const useGetReleaseNotes = (searchParams: Ref<Record<string, string>>) => useQuery<ReleaseNote[]>({
@@ -86,12 +90,11 @@ export const useGetReleaseNotes = (searchParams: Ref<Record<string, string>>) =>
 
 
 /**
- * Archives a release note by its ID. Returns a promise that resolves to true if the release note was successfully archived.
+ * Custom hook for archiving a release note by its ID and handling the API call lifecycle.
  * 
  * @param id The ID of the release note to be archived.
  * @param onFinished An object containing callback functions to be called when the API call is finished, successful, or encounters an error.
  * @returns A promise that resolves to true if the release note was successfully archived.
- * @throws An error if the API request to archive the release note fails.
  */
 export const useArchiveReleaseNote = (id: string, onFinished: OnMutationApiCallFinished) => {
   const queryClient = useQueryClient()
@@ -113,14 +116,21 @@ export const useArchiveReleaseNote = (id: string, onFinished: OnMutationApiCallF
 }
 
 /**
- * Updates a release note by its ID with the provided release note data. Returns a promise that resolves when the release note is successfully updated.
+ * Updates a release note by its ID with the provided release note data.
  * @param id The ID of the release note to be updated.
  * @param releaseNoteData The updated release note data to be sent in the API request.
+ * @returns A promise that resolves to data representing the updated release note if the update is successful.
  */
 const updateReleaseNote = async (id: number, releaseNoteData: PersistReleaseNoteDTO): Promise<void> => {
-  await api.put(`releasenotes/${id}`, releaseNoteData);
+  const response = await api.put(`releasenotes/${id}`, releaseNoteData);
+  return response.data;
 }
 
+/**
+ * Custom hook for updating a release note by its ID and handling the API call lifecycle.
+ * @param onFinished An object containing callback functions to be called when the API call is finished, successful, or encounters an error.
+ * @returns A mutation object that can be used to trigger the update of a release note.
+ */
 export const useUpdateReleaseNote = (onFinished: OnMutationApiCallFinished) => {
   const queryClient = useQueryClient();
   interface MutationVariables {
@@ -176,6 +186,11 @@ const publishReleaseNote = async (id: number, publish: boolean): Promise<void> =
   await api.patch(`releasenotes/${id}/publish?publish=${publish}`);
 }
 
+/**
+ * Custom hook for publishing or unpublishing a release note by its ID and handling the API call lifecycle.
+ * @param onFinished An object containing callback functions to be called when the API call is finished, successful, or encounters an error.
+ * @returns A mutation object that can be used to trigger the publishing or unpublishing of a release note.
+ */
 export const usePublishReleaseNote = (onFinished: OnMutationApiCallFinished) => {
   const queryClient = useQueryClient();
 

@@ -3,10 +3,9 @@ import { useQuery } from "@tanstack/vue-query";
 import api from "./api";
 
 /**
- * Retrieves a list of all products.
+ * Custom hook for retrieving a list of all products.
  * 
  * @returns An array of product data retrieved from the API.
- * @throws An error if the API request to retrieve the products fails.
  */
 export const useGetProducts = () => useQuery({
   queryKey: ['products'],
@@ -16,7 +15,6 @@ export const useGetProducts = () => useQuery({
 /**
  * Retrieves a list of all products from the API.
  * 
- * @returns An array of product data retrieved from the API.
  * @throws An error if the API request to retrieve the products fails.
  * @returns A promise that resolves to an array of product data retrieved from the API.
  */
