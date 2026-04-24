@@ -102,7 +102,7 @@ export const useArchiveReleaseNote = (id: string, onFinished: OnMutationApiCallF
   return useMutation<number, void>({
   mutationFn: () => archiveReleaseNote(id),
   onSettled: () => onFinished.onSettled?.(),
-  onSuccess: (data) => {
+  onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['releaseNotes'] });
     onFinished.onSuccess();
   },

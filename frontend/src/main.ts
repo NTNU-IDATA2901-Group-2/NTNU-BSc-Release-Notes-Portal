@@ -22,7 +22,7 @@ app.use(VueQueryPlugin, {
 )
 app.use(i18n)
 
-const authenticated = await keycloak.init({
+await keycloak.init({
   onLoad: "check-sso",
   flow: "standard",
   pkceMethod: "S256",

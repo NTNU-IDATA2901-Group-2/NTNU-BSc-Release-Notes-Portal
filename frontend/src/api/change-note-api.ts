@@ -138,7 +138,7 @@ export const useArchiveChangeNote = (id: number, onFinished: OnMutationApiCallFi
   return useMutation<boolean>({
     mutationFn: () => archiveChangeNote(id),
     onSettled: () => onFinished.onSettled?.(),
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
       onFinished.onSuccess();
     },
