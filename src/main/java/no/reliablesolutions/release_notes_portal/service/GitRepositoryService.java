@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
 import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
+import no.reliablesolutions.release_notes_portal.domain.repository.ChangeNoteRepository;
 import no.reliablesolutions.release_notes_portal.domain.repository.GitRepositoryRepository;
 import no.reliablesolutions.release_notes_portal.dto.CreateGitRepositoryDTO;
 import no.reliablesolutions.release_notes_portal.exception.FailedSyncGitChangeNotesException;
@@ -19,6 +20,7 @@ import no.reliablesolutions.release_notes_portal.runner.SyncGitChangeNotes;
 public class GitRepositoryService {
     private final GitRepositoryRepository gitRepositoryRepository;
     private final ObjectProvider<SyncGitChangeNotes> syncGitChangeNotesProvider;
+    private final ChangeNoteRepository changeNoteRepository;
 
     /**
      * Creates a new Git repository based on the provided CreateGitRepositoryDTO.
@@ -46,7 +48,7 @@ public class GitRepositoryService {
      */
     public void deleteGitRepository(long id) {
         gitRepositoryRepository.findById(id).orElseThrow(() -> new GitRepositoryNotFoundException(id));
-        gitRepositoryRepository.clearGitRepositoryReferencesById(id);
+        changeNoteRepository.clearGitRepositoryReferencesById(id);
         gitRepositoryRepository.deleteById(id);
     }
 

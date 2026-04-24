@@ -6,6 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import no.reliablesolutions.release_notes_portal.domain.entity.Feature;
 
+/**
+ * Repository for managing Feature entities.
+ */
 public interface FeatureRepository extends JpaRepository<Feature, Long> {
 
   /**

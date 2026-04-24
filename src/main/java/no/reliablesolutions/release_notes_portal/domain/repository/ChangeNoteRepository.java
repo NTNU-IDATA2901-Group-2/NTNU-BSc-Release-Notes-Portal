@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import jakarta.transaction.Transactional;
 import no.reliablesolutions.release_notes_portal.domain.entity.ChangeNote;
 import no.reliablesolutions.release_notes_portal.dto.ChangeNoteFilterOptionsDTO;
 import no.reliablesolutions.release_notes_portal.dto.GitCommitHashAndPreviousGitCommitHash;
@@ -182,4 +184,17 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
       """)
   public boolean hasCommitHashAndPreviousCommitHash(List<Long> changeNoteIds);
 
+  /**
+   * Clears all references to the Git repository with the specified ID from any associated change notes.
+   *
+   * @param gitRepositoryId the ID of the Git repository for which to clear references
+   */
+  @Query("""
+      UPDATE ChangeNote c
+      SET c.gitRepository = null
+      WHERE c.gitRepository.id = :gitRepositoryId
+      """)
+  @Transactional
+  @Modifying
+  void clearGitRepositoryReferencesById(long gitRepositoryId);
 }
