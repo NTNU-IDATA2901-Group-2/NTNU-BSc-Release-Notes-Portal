@@ -226,7 +226,7 @@ onBeforeUnmount(() => {
             </TooltipContent>
           </Tooltip>
         </div>
-        <Tooltip v-if="changeNote.customer">
+        <Tooltip v-if="changeNote.gitCommitHash && isAdmin">
           <TooltipTrigger as-child>
             <p :onclick="() => handleCopy(changeNote.gitCommitHash)" class="cursor-pointer text-text-primary/50">{{ changeNote.gitCommitHash }}</p>
           </TooltipTrigger>
