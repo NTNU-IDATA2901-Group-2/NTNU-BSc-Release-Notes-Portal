@@ -16,6 +16,9 @@ import no.reliablesolutions.release_notes_portal.dto.GitCommitHashAndPreviousGit
 import no.reliablesolutions.release_notes_portal.dto.PromptDTO;
 import no.reliablesolutions.release_notes_portal.exception.LocaleNotSupportedException;
 
+/**
+ * Service class for handling AI-related operations, such as translating text and summarizing change notes.
+ */
 @Service
 @AllArgsConstructor
 public class AiService {

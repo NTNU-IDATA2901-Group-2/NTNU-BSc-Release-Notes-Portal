@@ -26,6 +26,9 @@ import no.reliablesolutions.release_notes_portal.util.ChangeNoteMapper;
 
 import no.reliablesolutions.release_notes_portal.dto.GitCommitHashAndPreviousGitCommitHash;
 
+/**
+ * Service class for managing change notes, including creating, updating, retrieving, and publishing change notes.
+ */
 @Service
 @AllArgsConstructor
 public class ChangeNoteService {
@@ -36,8 +39,7 @@ public class ChangeNoteService {
   private final CustomerRepository customerRepository;
 
   /**
-   * Creates a new change note based on the provided DTO. Validates and sets all
-   * related entities before saving.
+   * Creates a new change note based on the provided DTO. Empty fields in the provided DTO remains as default.
    * 
    * @param changeNoteDTO the DTO containing details for the new change note
    * @return the ID of the created change note
@@ -84,12 +86,17 @@ public class ChangeNoteService {
     return changeNoteRepository.save(changeNote).getId();
   }
 
+  /**
+   * Updates change note if exists, otherwise saves the provided change note as a new entry in the repository.
+   * 
+   * @param changeNote change note to be updated or added
+   */
   public void updateChangeNote(ChangeNote changeNote) {
     changeNoteRepository.save(changeNote);
   }
 
   /**
-   * Archives a change note
+   * Archives a change note by ID
    * 
    * @param id the ID of the change note to archive
    * @throws ChangeNoteNotFoundException if no change note with the given ID
@@ -106,17 +113,10 @@ public class ChangeNoteService {
    * on query, published status, customer ID, feature ID, scope ID, and product
    * ID.
    * 
-   * @param query          optional filter for searching change notes by reference, description, developer notes or upgrade notes
-   * @param published      optional filter for published status
-   * @param hasReleaseNote optional filter for change notes that have an
-   *                       associated release note
-   * @param customerIds    optional filter for customer ID
-   * @param featureIds     optional filter for feature ID
-   * @param scopeIds       optional filter for scope ID
-   * @param productIds     optional filter for product ID
+   * @param filterOptions Optional filterOptions dto containing filter parameters such as query, published status, customer ID, feature ID, scope ID, and product ID.
    * 
    * @return a list of all change notes that match the provided filters, mapped to
-   *         ChangeNoteDTOs
+   *         ChangeNoteDTOs. If no filter is provided, returns all change notes accessible to the current user.
    */
   public List<ChangeNoteDTO> getAllChangeNotes(ChangeNoteFilterOptionsDTO filterOptions) {
 
@@ -156,12 +156,12 @@ public class ChangeNoteService {
   }
 
   /**
-   * Retrieves a specific change note by its ID.
+   * Retrieves a specific change note by its ID. Takes in to account the access scope of the current user to determine if the change note is viewable.
    * 
    * @param id the ID of the change note to retrieve
-   * @return a DTO representing the change note
+   * @return ChangeNoteDTO representing the change note
    * @throws ChangeNoteNotFoundException if no change note with the given ID
-   *                                     exists
+   *                                     exists and is accessible to the current user
    */
   public ChangeNoteDTO getChangeNoteById(long id) {
     AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
@@ -186,7 +186,7 @@ public class ChangeNoteService {
    * @param id                  the ID of the change note to update
    * @param createChangeNoteDTO the DTO containing updated details for the change
    *                            note
-   * @return a DTO representing the updated change note
+   * @return ChangeNoteDTO representing the updated change note
    * @throws ChangeNoteNotFoundException if no change note with the given ID
    *                                     exists
    */
@@ -234,9 +234,10 @@ public class ChangeNoteService {
   }
 
   /**
-   * Publishes a change note by setting its published status to true.
+   * Alters the published status of a change note by ID to the provided state.
    * 
-   * @param id the ID of the change note to publish
+   * @param id the ID of the change note to change the published status of
+   * @param publish a boolean indicating whether to publish (true) or private (false)
    * @throws ChangeNoteNotFoundException if no change note with the given ID
    *                                     exists
    */
@@ -248,6 +249,7 @@ public class ChangeNoteService {
 
   /**
    * Retrieves the git commit hash and the previous git commit hash for a given change note ID.
+   *
    * @param changeNoteId the ID of the change note
    * @return the commit hashes
    */
@@ -256,7 +258,8 @@ public class ChangeNoteService {
   }
 
   /**
-   * Checks if a list of change notes has associated git commit hashes.
+   * Checks if a list of change notes all have associated git commit hashes.
+   *
    * @param changeNoteIds the IDs of the change notes
    * @return true if the change notes have associated git commit hashes, false otherwise
    */
