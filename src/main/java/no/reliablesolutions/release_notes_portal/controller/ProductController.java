@@ -41,7 +41,7 @@ public class ProductController {
    * Creates a new product with the provided details.
    * 
    * @param productDTO the details of the product to be created
-   * @return a ResponseEntity containing the ID of the created product
+   * @return ResponseEntity containing the ID of the created product
    */
   @Operation(summary = "Create product", description = "Creates a new product with provided details")
   @ApiResponses(value = {
@@ -59,7 +59,7 @@ public class ProductController {
   /**
    * Retrieves a list of all products.
    * 
-   * @return a ResponseEntity containing a list of all products
+   * @return ResponseEntity containing a list of all products
    */
   @Operation(summary = "Get all products", description = "Retrieves a list of all products")
   @ApiResponses(value = {
@@ -77,7 +77,7 @@ public class ProductController {
    * Retrieves details of a specific product by its ID.
    * 
    * @param id the ID of the product to be retrieved
-   * @return a ResponseEntity containing the details of the requested product
+   * @return ResponseEntity containing the details of the requested product
    */
   @Operation(summary = "Get product by ID", description = "Retrieves details of a specific product by its ID")
   @ApiResponses(value = {
@@ -96,9 +96,9 @@ public class ProductController {
   /**
    * Updates an existing product with new details.
    * 
-   * @param id         the ID of the product to be updated
+   * @param id the ID of the product to be updated
    * @param productDTO the new details of the product
-   * @return a ResponseEntity containing the updated product details
+   * @return ResponseEntity containing the updated product details
    */
   @Operation(summary = "Update product", description = "Updates an existing product with new details")
   @ApiResponses(value = {
@@ -115,10 +115,10 @@ public class ProductController {
   }
 
   /**
-   * Deletes an existing product by its ID.
+   * Deletes an existing product by a given ID.
    * 
    * @param id the ID of the product to be deleted
-   * @return a ResponseEntity indicating the success of the delete operation
+   * @return ResponseEntity indicating the success of the delete operation
    */
   @Operation(summary = "Delete product", description = "Deletes an existing product by its ID")
   @ApiResponses(value = {

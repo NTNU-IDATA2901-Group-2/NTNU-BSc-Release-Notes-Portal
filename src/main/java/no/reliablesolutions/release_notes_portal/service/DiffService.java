@@ -19,14 +19,19 @@ import org.springframework.stereotype.Service;
 import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
 import no.reliablesolutions.release_notes_portal.exception.DiffStringGenerationException;
 
+/**
+ * Service for generating diff strings between git commits.
+ * This service is only active in non-CI profiles, as it relies on local git repositories being available.
+ */
 @Service
 @Profile("!ci")
 class DiffService {
-
   private final Logger logger = LoggerFactory.getLogger(DiffService.class);
   private final String changeNoteDirectory;
+
   /**
    * Constructor for DiffService.
+   *
    * @param repositoryDirectoriesPath the base path where local git repositories are stored, injected from application properties
    */
   public DiffService(
@@ -37,6 +42,7 @@ class DiffService {
 
   /**
    * Generates a diff string between two commits for a given git repository.
+   *
    * @param commitHash the hash of the new commit
    * @param previousCommitHash the hash of the previous commit
    * @param gitRepository the git repository for which the diff is to be generated

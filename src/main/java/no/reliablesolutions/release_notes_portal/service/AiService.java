@@ -16,6 +16,9 @@ import no.reliablesolutions.release_notes_portal.dto.GitCommitHashAndPreviousGit
 import no.reliablesolutions.release_notes_portal.dto.PromptDTO;
 import no.reliablesolutions.release_notes_portal.exception.LocaleNotSupportedException;
 
+/**
+ * Service class for handling AI-related operations, such as translating text and summarizing change notes.
+ */
 @Service
 @AllArgsConstructor
 public class AiService {
@@ -28,7 +31,7 @@ public class AiService {
     private final Logger logger = LoggerFactory.getLogger(AiService.class);
     
     /**
-    * <h1>Translates the given text to the specified locale using an AI model.</h1>
+    * <h1>Translates the given text to the specified locale</h1>
     * <h2>Supported Locales:</h2>
     * <ul>
     *   <li>en - English</li>
@@ -69,8 +72,9 @@ public class AiService {
     
     /**
     * Summarizes the change notes with the given IDs using an AI model. The summary is generated based on the git diff of the change notes.
+    *
     * @param changeNoteIds the IDs of the change notes to be summarized
-    * @return a summary of the change notes
+    * @return a string summarizing the contents of the change notes
     */
     public String summarizeChangeNote(List<Long> changeNoteIds) {
         StringBuilder diffs = new StringBuilder();
@@ -106,7 +110,8 @@ public class AiService {
     }
 
     /**
-     * Retrieves all prompts from the database and converts them to PromptDTOs.
+     * Retrieves all prompts from the database as PromptDTOs.
+     *
      * @return a list of PromptDTOs representing the prompts stored in the database
      */
     public List<PromptDTO> getPrompts() {
@@ -116,7 +121,7 @@ public class AiService {
     /**
      * Updates the prompts in the database based on the provided list of PromptDTOs.
      * Each PromptDTO should contain an ID that corresponds to an existing prompt in the database.
-     * The method will update the name and prompt fields of each corresponding Prompt entity in the database.
+     *
      * @param prompts a list of PromptDTOs containing the updated prompt information
      */
     public void updatePrompts(List<PromptDTO> prompts) {

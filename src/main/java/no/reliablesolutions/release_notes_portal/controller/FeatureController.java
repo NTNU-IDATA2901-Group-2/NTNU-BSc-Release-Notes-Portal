@@ -41,7 +41,7 @@ public class FeatureController {
    * Endpoint for creating a new feature with the provided details.
    * 
    * @param featureDTO the details of the feature to be created
-   * @return a ResponseEntity containing the ID of the created feature
+   * @return ResponseEntity containing the ID of the created feature
    */
 	@Operation(summary = "Create feature", description = "Creates a new feature with provided details")
 	@ApiResponses(value = {
@@ -59,7 +59,7 @@ public class FeatureController {
   /**
    * Endpoint for retrieving a list of all features.
    * 
-   * @return a ResponseEntity containing a list of all features
+   * @return ResponseEntity containing a list of all features
    */
 	@Operation(summary = "Get all features", description = "Retrieves a list of all features")
 	@ApiResponses(value = {
@@ -77,12 +77,13 @@ public class FeatureController {
    * Endpoint for retrieving details of a specific feature by its ID.
    * 
    * @param id the ID of the feature to be retrieved
-   * @return a ResponseEntity containing the details of the requested feature
+   * @return ResponseEntity containing the details of the requested feature
    */
 	@Operation(summary = "Get feature by ID", description = "Retrieves details of a specific feature by its ID")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Feature retrieved successfully"),
 		@ApiResponse(responseCode = "404", description = "Feature not found"),
+    @ApiResponse(responseCode = "400", description = "Invalid request variable"),
 		@ApiResponse(responseCode = "500", description = "Internal server error")
 	})
 	@GetMapping("/{id}")
@@ -97,12 +98,13 @@ public class FeatureController {
    * 
    * @param id the ID of the feature to be updated
    * @param featureDTO the new details of the feature
-   * @return a ResponseEntity containing the updated feature details
+   * @return ResponseEntity containing the updated feature details
    */
 	@Operation(summary = "Update feature", description = "Updates an existing feature with new details")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Feature updated successfully"),
 		@ApiResponse(responseCode = "404", description = "Feature not found"),
+    @ApiResponse(responseCode = "400", description = "Invalid request payload"),
 		@ApiResponse(responseCode = "500", description = "Internal server error")
 	})
 	@PutMapping("/{id}")
@@ -116,12 +118,13 @@ public class FeatureController {
    * Endpoint for deleting an existing feature by its ID.
    * 
    * @param id the ID of the feature to be deleted
-   * @return a ResponseEntity indicating the success of the delete operation
+   * @return ResponseEntity indicating the success of the delete operation
    */
 	@Operation(summary = "Delete feature", description = "Deletes an existing feature by its ID")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Feature deleted successfully"),
 		@ApiResponse(responseCode = "404", description = "Feature not found"),
+		@ApiResponse(responseCode = "400", description = "Invalid request variable"),
 		@ApiResponse(responseCode = "500", description = "Internal server error")
 	})
 	@DeleteMapping("/{id}")
