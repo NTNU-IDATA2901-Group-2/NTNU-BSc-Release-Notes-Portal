@@ -15,6 +15,7 @@ const translate = async (text: string, locale: string) => {
 
 /**
  * Custom hook for translating text using the AI translation API.
+ * 
  * @param onFinished An object containing callback functions to handle the success, error, and settled states of the mutation.
  * @return A mutation object that can be used to trigger the translation process and manage its state.
  */
@@ -37,6 +38,7 @@ export const useTranslate = (onFinished: OnMutationApiCallFinished) => {
 
 /**
  * Retrieves all AI prompts from the backend API.
+ * 
  * @returns a promise that resolves to an array of Prompt objects representing all AI prompts
  */
 export const useGetPrompts = () => useQuery({
@@ -48,6 +50,7 @@ export const useGetPrompts = () => useQuery({
 
 /**
  * Updates the AI prompts by sending a PUT request to the backend API with the provided list of Prompt objects. Each Prompt object should contain an ID that corresponds to an existing prompt.
+ * 
  * @param prompts a list of Prompt objects representing the prompts to be updated, where each Prompt object should contain an ID that corresponds to an existing prompt
  * @returns a promise that resolves when the update operation is complete
  * @throws an error if the API request fails
@@ -59,6 +62,7 @@ const updatePrompts = async (prompts: Prompt[]) => {
 
 /**
  * Custom hook for updating AI prompts using a provided list of Prompt objects. Each Prompt object should contain an ID that corresponds to an existing prompt.
+ * 
  * @param onFinished An object containing callback functions to handle the success, error, and settled states of the mutation.
  * @returns a mutation object that can be used to trigger the update process and manage its state.
  */
@@ -83,6 +87,7 @@ export const useUpdatePrompts = (onFinished: OnMutationApiCallFinished) => {
 
 /**
  * Retrieves all AI prompts from the backend API.
+ * 
  * @returns a promise that resolves to an array of Prompt objects representing all AI prompts
  * @throws an error if the API request fails
  */
@@ -93,6 +98,7 @@ export const getPrompts = async () => {
 
 /**
  * Summarizes change notes using the AI summarization API.
+ * 
  * @param changeNoteIds an array of IDs of the change notes to be summarized
  * @returns a promise that resolves to the summarized text of the change notes
  * @throws an error if the API request fails
@@ -104,6 +110,7 @@ const summarizeChangeNotes = async (changeNoteIds: number[]) => {
 
 /**
  * Custom hook for summarizing change notes using the AI summarization API.
+ * 
  * @param onFinished An object containing callback functions to handle the success, error, and settled states of the mutation.
  * @returns A mutation object that can be used to trigger the summarization process.
  */

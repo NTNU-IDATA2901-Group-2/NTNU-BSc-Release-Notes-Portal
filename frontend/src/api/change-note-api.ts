@@ -21,6 +21,7 @@ const publishChangeNote = async (changeNoteId: number, publish: boolean): Promis
 
 /**
  * Custom hook for publishing or unpublishing a change note.
+ * 
  * @param id the ID of the change note to be published or unpublished
  * @param publish a boolean indicating whether to publish (true) or unpublish (false) the change note
  * @param onFinished an object containing callback functions to handle the success, error, and settled states of the mutation
@@ -51,6 +52,7 @@ const publishChangeNotes = async (ids: number[], publish: boolean): Promise<bool
 
 /**
  * Custom hook for publishing or unpublishing multiple change notes.
+ * 
  * @param ids an array of IDs of the change notes to be published or unpublished
  * @param publish a boolean indicating whether to publish (true) or unpublish (false) the change notes
  * @param onFinished an object containing callback functions to handle the success, error, and settled states of the mutation
@@ -126,6 +128,7 @@ const archiveChangeNote = async (changeNoteId: number) => {
 
 /**
  * Custom hook for archiving a change note.
+ * 
  * @param id The ID of the change note to be archived.
  * @param onFinished An object containing callback functions to handle the success, error, and settled states of the mutation.
  * @returns a mutation object that can be used to trigger the archiving process and manage its state.
@@ -168,6 +171,7 @@ const updateChangeNote = async (changeNoteId: number | undefined, changeNoteData
 
 /**
  * Custom hook for updating a change note by its ID.
+ * 
  * @param onFinished An object containing callback functions to handle the success, error, and settled states of the mutation.
  * @returns a mutation object that can be used to trigger the update process and manage its state.
  */
@@ -245,6 +249,7 @@ const getChangeNotes = async (params?: URLSearchParams) => {
 
 /**
  * Checks if a list of change notes has any associated Git commits.
+ * 
  * @param changeNoteIds An array of IDs of the change notes to check.
  * @returns A promise resolving to a boolean indicating whether the change notes have commits.
  * @throws An error if the API request to check for commits fails.
@@ -259,6 +264,7 @@ const getHasCommits = async (changeNoteIds: number[]): Promise<boolean> => {
 
 /**
  * Custom hook for checking if a list of change notes has any associated Git commits.
+ * 
  * @param changeNoteIds An array of IDs of the change notes to check.
  * @returns A boolean indicating whether the change notes have commits.
  */

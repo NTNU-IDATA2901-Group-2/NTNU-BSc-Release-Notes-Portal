@@ -17,6 +17,7 @@ const createReleaseNote = async (changeNoteIds: number[]) => {
 
 /**
  * Custom hook for creating a new release note and handling the API call lifecycle.
+ * 
  * @param onFinished An object containing callback functions to be called when the API call is finished, successful, or encounters an error.
  * @returns A mutation object that can be used to trigger the creation of a new release note.
  */
@@ -115,6 +116,7 @@ export const useArchiveReleaseNote = (id: string, onFinished: OnMutationApiCallF
 
 /**
  * Updates a release note by its ID with the provided release note data.
+ * 
  * @param id The ID of the release note to be updated.
  * @param releaseNoteData The updated release note data to be sent in the API request.
  * @returns A promise that resolves to data representing the updated release note if the update is successful.
@@ -126,6 +128,7 @@ const updateReleaseNote = async (id: number, releaseNoteData: PersistReleaseNote
 
 /**
  * Custom hook for updating a release note by its ID and handling the API call lifecycle.
+ * 
  * @param onFinished An object containing callback functions to be called when the API call is finished, successful, or encounters an error.
  * @returns A mutation object that can be used to trigger the update of a release note.
  */
@@ -174,6 +177,7 @@ const archiveReleaseNote = async (id: string): Promise<number> => {
 
 /**
  * Publishes or unpublishes a release note by its ID.
+ * 
  * @param id The ID of the release note to be published or unpublished.
  * @param publish Whether to publish (true) or unpublish (false) the release note.
  * @return A promise that resolves when the release note is successfully published or unpublished.
@@ -185,6 +189,7 @@ const publishReleaseNote = async (id: number, publish: boolean): Promise<void> =
 
 /**
  * Custom hook for publishing or unpublishing a release note by its ID and handling the API call lifecycle.
+ * 
  * @param onFinished An object containing callback functions to be called when the API call is finished, successful, or encounters an error.
  * @returns A mutation object that can be used to trigger the publishing or unpublishing of a release note.
  */

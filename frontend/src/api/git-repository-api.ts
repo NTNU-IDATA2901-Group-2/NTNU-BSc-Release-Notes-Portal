@@ -4,6 +4,7 @@ import api from "./api";
 
 /**
  * Custom hook for retrieving a list of all git repositories.
+ * 
  * @returns a list of all git repositories.
  */
 export const useGetGitRepositories = () => useQuery({
