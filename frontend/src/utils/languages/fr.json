@@ -150,6 +150,9 @@
         "syncSuccess": "Dépôts synchronisés avec succès",
         "syncError": "Une erreur est survenue lors de la synchronisation des dépôts",
         "sync": "Synchroniser",
-        "noGitRepositories": "Aucun dépôt Git disponible, veuillez ajouter un dépôt sur la page des dépôts"
+        "noGitRepositories": "Aucun dépôt Git disponible, veuillez ajouter un dépôt sur la page des dépôts",
+        "noChangeNotesInRepository": "Aucune note de modification trouvée dans le dépôt sélectionné",
+        "deleteTitle": "Supprimer le dépôt",
+        "deleteDescription": "Êtes-vous sûr de vouloir supprimer ce dépôt ? Toutes les notes de modification associées seront dissociées. Cette action ne peut pas être annulée."
     }
 }
