@@ -63,7 +63,9 @@ public class ChangeNoteFileHandler {
    * <li>technical-change (optional): technical notes about the change, to be viewed by developers</li>
    * <li>upgrade-requirements (optional): notes about upgrade requirements for the change</li>
    * </ul>
-   * @throws InvalidChangeNoteYamlException
+   * 
+   * @param changeNoteFile the YAML file containing the change note data
+   * @throws InvalidChangeNoteYamlException if the YAML file is empty, has invalid format, or contains invalid data types for any of the fields
    */
   public ChangeNote getChangeNoteFromFile(File changeNoteFile) throws InvalidChangeNoteYamlException {
     logger.info("Parsing change note file at {}", changeNoteFile.getPath());
