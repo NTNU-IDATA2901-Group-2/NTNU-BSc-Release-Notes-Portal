@@ -6,6 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import no.reliablesolutions.release_notes_portal.domain.entity.Product;
 
+/**
+ * Repository for managing Product entities.
+ */
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
   /**

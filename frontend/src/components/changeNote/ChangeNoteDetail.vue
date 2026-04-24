@@ -90,7 +90,6 @@ const onTranslate = async () => {
   });
   translatedDescription.value = result;
   isTranslating.value = false;
-  console.log("Translation result:", translatedDescription.value);
 }
 
 const copiedKey = ref<string | null>(null);

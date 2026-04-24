@@ -46,6 +46,14 @@ public class SyncGitChangeNotes implements CommandLineRunner {
   public static final String REPOSITORY_DIRECTORIES_PATH = "git_repositories";
   private final String changeNoteDirectory;
 
+  /**
+   * Constructor for SyncGitChangeNotes.
+   * 
+   * @param gitRepositoryRepository the repository for accessing GitRepository entities
+   * @param changeNoteService the service for managing change notes
+   * @param changeNoteFileHandler the utility for handling change note files
+   * @param changeNoteDirectory the directory within the Git repository where change note files are located, injected from environment variable, must be set
+   */
   public SyncGitChangeNotes(
     GitRepositoryRepository gitRepositoryRepository,
     ChangeNoteService changeNoteService,
@@ -97,7 +105,7 @@ public class SyncGitChangeNotes implements CommandLineRunner {
     }
 
     logger.info("Updating Git repository {} using change note directory: {}", gitRepository.getName(), changeNoteDirectory);
-    File repositoryDirectory = new File(gitRepository.getLocalPath(REPOSITORY_DIRECTORIES_PATH));
+    File repositoryDirectory = new File(gitRepository.getLocalPath());
     prepareGitRepository(gitRepository, repositoryDirectory);
     syncFromGitRepository(gitRepository, repositoryDirectory);
   }
@@ -302,6 +310,7 @@ public class SyncGitChangeNotes implements CommandLineRunner {
   
   /**
    * Wraps the call to the method for creating a ChangeNote entity from a change note file
+   *
    * @param changeNoteFile the file containing the change note, must not be null
    * @return the ChangeNote entity, or null if the file is invalid or cannot be parsed
    */
@@ -320,6 +329,7 @@ public class SyncGitChangeNotes implements CommandLineRunner {
   
   /**
    * Updates the last checked commit hash for a Git repository after processing commits for change notes. This ensures that only new commits will be processed in the next synchronization.
+   * 
    * @param gitRepository the Git repository entity, must not be null
    * @param newLastCheckedCommitId the ObjectId of the new last checked commit, must not be null
    */

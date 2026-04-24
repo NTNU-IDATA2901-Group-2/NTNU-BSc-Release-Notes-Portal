@@ -37,9 +37,9 @@ public class ScopeController {
   private final Logger logger = LoggerFactory.getLogger(ScopeController.class);
 
   /**
-   * Endpoint for retrieving a list of all scopes.
-   *
-   * @return a ResponseEntity containing a list of all scopes
+   * Retreives a list of all scopes.
+   * 
+   * @return ResponseEntity containing a list of all scopes
    */
   @Operation(summary = "Get all scopes", description = "Retrieves a list of all scopes")
   @ApiResponses(value = {
@@ -53,7 +53,7 @@ public class ScopeController {
   }
 
   /**
-   * Endpoint for retrieving details of a specific scope by its ID.
+   * Retrieves details of a specific scope by its ID.
    *
    * @param id the ID of the scope to be retrieved
    * @return a ResponseEntity containing the details of the requested scope
@@ -62,6 +62,7 @@ public class ScopeController {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Scope retrieved successfully"),
       @ApiResponse(responseCode = "404", description = "Scope not found"),
+      @ApiResponse(responseCode = "400", description = "Invalid request payload"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @GetMapping("/{id}")
@@ -71,7 +72,7 @@ public class ScopeController {
   }
 
   /**
-   * Endpoint for creating a new scope with the provided details.
+   * Creates a new scope with the provided details.
    *
    * @param scopeDetails the details of the scope to be created
    * @return a ResponseEntity containing the ID of the created scope
@@ -91,7 +92,7 @@ public class ScopeController {
   }
 
   /**
-   * Endpoint for updating an existing scope with new details.
+   * Updates an existing scope with new details.
    *
    * @param id the ID of the scope to be updated
    * @param scopeDetails the new details of the scope
@@ -101,6 +102,7 @@ public class ScopeController {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Scope updated successfully"),
       @ApiResponse(responseCode = "404", description = "Scope not found"),
+      @ApiResponse(responseCode = "400", description = "Invalid request payload"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PutMapping("/{id}")
@@ -112,7 +114,7 @@ public class ScopeController {
   }
 
   /**
-   * Endpoint for deleting an existing scope by its ID.
+   * Deletes an existing scope by its ID.
    *
    * @param id the ID of the scope to be deleted
    * @return a ResponseEntity indicating the success of the delete operation
@@ -121,6 +123,7 @@ public class ScopeController {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Scope deleted successfully"),
       @ApiResponse(responseCode = "404", description = "Scope not found"),
+      @ApiResponse(responseCode = "400", description = "Invalid request parameter"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @DeleteMapping("/{id}")

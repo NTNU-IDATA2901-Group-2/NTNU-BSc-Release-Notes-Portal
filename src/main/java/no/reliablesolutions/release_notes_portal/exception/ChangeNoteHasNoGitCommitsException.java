@@ -7,6 +7,7 @@ public class ChangeNoteHasNoGitCommitsException extends RuntimeException {
 
   /**
    * Constructor for ChangeNoteHasNoGitCommitsException.
+   *
    * @param changeNoteId the ID of the change note that has no associated git commits
    */
   public ChangeNoteHasNoGitCommitsException(long changeNoteId) {

@@ -12,6 +12,9 @@ import no.reliablesolutions.release_notes_portal.dto.ProductDTO;
 import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityException;
 import no.reliablesolutions.release_notes_portal.exception.ProductNotFoundException;
 
+/**
+ * Service for managing product-related operations.
+ */
 @Service
 @AllArgsConstructor
 public class ProductService {
@@ -22,6 +25,7 @@ public class ProductService {
    *
    * @param productDTO the DTO containing details for the new product
    * @return the ID of the created product
+   * @throws FailedToSaveEntityException if there was an error saving the product to the repository
    */
   public long createProduct(CreateTagDTO productDTO) {
     Product product = new Product();
@@ -64,6 +68,7 @@ public class ProductService {
    * @param productDTO the DTO containing updated details for the product
    * @return a DTO representing the updated product
    * @throws ProductNotFoundException if no product with the given ID exists
+   * @throws FailedToSaveEntityException if there was an error saving the updated product to the repository
    */
   public ProductDTO updateProduct(long id, CreateTagDTO productDTO) {
     Product product = productRepository.findById(id)
@@ -89,10 +94,10 @@ public class ProductService {
   }
 
   /**
-   * Retrieves a list of products that match the given name, ignoring case.
+   * Retrieves a list of products that match the given name.
    *
    * @param product the name of the product to search for
-   * @return a list of products that match the given name
+   * @return a list of products that match the given name, or an empty list if no products match
    */
   public List<Product> getProductByName(String product) {
     return productRepository.findAllByNameIgnoreCase(product);

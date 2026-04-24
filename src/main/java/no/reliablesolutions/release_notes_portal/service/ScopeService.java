@@ -12,6 +12,9 @@ import no.reliablesolutions.release_notes_portal.dto.ScopeDTO;
 import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityException;
 import no.reliablesolutions.release_notes_portal.exception.ScopeNotFoundException;
 
+/**
+ * Service for managing scope-related operations.
+ */
 @Service
 @AllArgsConstructor
 public class ScopeService {
@@ -21,6 +24,7 @@ public class ScopeService {
    *
    * @param scopeDTO the DTO containing details for the new scope
    * @return the ID of the created scope
+   * @throws FailedToSaveEntityException if there was an error saving the scope to the repository
    */
   public long createScope(CreateTagDTO scopeDTO) {
     Scope scope = new Scope();
@@ -67,6 +71,7 @@ public class ScopeService {
    * @param scopeDTO the DTO containing updated details for the scope
    * @return a DTO representing the updated scope
    * @throws ScopeNotFoundException if no scope with the given ID exists
+   * @throws FailedToSaveEntityException if there was an error saving the updated scope to the repository
    */
   public ScopeDTO updateScope(long id, CreateTagDTO scopeDTO) {
     Scope scope = scopeRepository.findById(id)

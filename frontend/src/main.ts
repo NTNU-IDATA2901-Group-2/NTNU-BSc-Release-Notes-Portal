@@ -22,14 +22,13 @@ app.use(VueQueryPlugin, {
 )
 app.use(i18n)
 
-const authenticated = await keycloak.init({
+await keycloak.init({
   onLoad: "check-sso",
   flow: "standard",
   pkceMethod: "S256",
   checkLoginIframe: false,
 })
 
-console.log("Keycloak initialized:", authenticated);
 app.use(router)
 app.mount("#app");
 

@@ -89,7 +89,7 @@ public class ChangeNoteController {
    * @return a ResponseEntity containing a list of ChangeNoteDTOs representing the
    *         filtered change notes
    */
-  @Operation(summary = "Get all change notes, with optional filters", description = "Retrieves a list of all change notes with optional filters for query, published status, has release note, customer, feature, scope, and product")
+  @Operation(summary = "Get all change notes, with optional filters", description = "Retrieves a list of all change notes with optional filters")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Change notes retrieved successfully"),
       @ApiResponse(responseCode = "500", description = "Internal server error")

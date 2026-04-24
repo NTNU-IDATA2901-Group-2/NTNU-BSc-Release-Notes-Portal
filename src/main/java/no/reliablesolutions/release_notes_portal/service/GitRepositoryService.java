@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
 import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
+import no.reliablesolutions.release_notes_portal.domain.repository.ChangeNoteRepository;
 import no.reliablesolutions.release_notes_portal.domain.repository.GitRepositoryRepository;
 import no.reliablesolutions.release_notes_portal.dto.CreateGitRepositoryDTO;
 import no.reliablesolutions.release_notes_portal.exception.FailedSyncGitChangeNotesException;
@@ -14,11 +15,15 @@ import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityExc
 import no.reliablesolutions.release_notes_portal.exception.GitRepositoryNotFoundException;
 import no.reliablesolutions.release_notes_portal.runner.SyncGitChangeNotes;
 
+/**
+ * Service class for managing Git repositories, including creating, deleting, updating, and synchronizing repositories.
+ */
 @Service
 @AllArgsConstructor
 public class GitRepositoryService {
     private final GitRepositoryRepository gitRepositoryRepository;
     private final ObjectProvider<SyncGitChangeNotes> syncGitChangeNotesProvider;
+    private final ChangeNoteRepository changeNoteRepository;
 
     /**
      * Creates a new Git repository based on the provided CreateGitRepositoryDTO.
@@ -46,7 +51,7 @@ public class GitRepositoryService {
      */
     public void deleteGitRepository(long id) {
         gitRepositoryRepository.findById(id).orElseThrow(() -> new GitRepositoryNotFoundException(id));
-        gitRepositoryRepository.clearGitRepositoryReferencesById(id);
+        changeNoteRepository.clearGitRepositoryReferencesById(id);
         gitRepositoryRepository.deleteById(id);
     }
 
@@ -92,6 +97,7 @@ public class GitRepositoryService {
 
     /**
      * Synchronizes a specific Git repository by ID by running SyncGitChangeNotes for that repository.
+     *
      * @param id the ID of the Git repository to synchronize
      * @throws FailedSyncGitChangeNotesException if syncing Git change notes fails
      * @throws GitRepositoryNotFoundException if the Git repository with the specified ID is not found
@@ -112,6 +118,12 @@ public class GitRepositoryService {
         }
     }
 
+    /**
+     * Retrieves the Git repository associated with a specific change note ID.
+     *
+     * @param changeNoteId the ID of the change note for which to retrieve the associated Git repository
+     * @return the Git repository associated with the specified change note ID, or null if no repository is associated
+     */
     public GitRepository getGitRepositoryForChangeNote(long changeNoteId) {
       return gitRepositoryRepository.findByChangeNoteId(changeNoteId);
     }

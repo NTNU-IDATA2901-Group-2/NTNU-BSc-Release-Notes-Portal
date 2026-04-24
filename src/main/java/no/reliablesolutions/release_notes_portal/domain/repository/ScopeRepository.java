@@ -6,6 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import no.reliablesolutions.release_notes_portal.domain.entity.Scope;
 
+/**
+ * Repository for managing Scope entities.
+ */
 public interface ScopeRepository extends JpaRepository<Scope, Long> {
   
   /**
