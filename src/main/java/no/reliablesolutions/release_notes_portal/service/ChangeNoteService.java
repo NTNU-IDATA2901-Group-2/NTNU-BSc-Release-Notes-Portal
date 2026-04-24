@@ -21,7 +21,6 @@ import no.reliablesolutions.release_notes_portal.exception.ProductNotFoundExcept
 import no.reliablesolutions.release_notes_portal.exception.ScopeNotFoundException;
 import no.reliablesolutions.release_notes_portal.util.AccessScope;
 import no.reliablesolutions.release_notes_portal.util.AccessScopeFactory;
-import no.reliablesolutions.release_notes_portal.util.AuthenticationUtil;
 import no.reliablesolutions.release_notes_portal.util.ChangeNoteMapper;
 
 import no.reliablesolutions.release_notes_portal.dto.GitCommitHashAndPreviousGitCommitHash;
@@ -166,7 +165,7 @@ public class ChangeNoteService {
   public ChangeNoteDTO getChangeNoteById(long id) {
     AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
     
-    boolean isAdmin = AuthenticationUtil.isAdmin();
+    boolean isAdmin = accessScope.isAdmin();
     if (!isAdmin) {
       ChangeNote changeNote = changeNoteRepository.findForCustomerByIdAndArchivedFalse(id, accessScope.getCustomerGroups()).orElseThrow(() -> new ChangeNoteNotFoundException(id));
 
