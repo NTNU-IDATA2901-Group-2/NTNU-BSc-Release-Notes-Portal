@@ -83,7 +83,6 @@ const { mutate: publishChangeNoteMutation } = usePublishChangeNotes([], true, {
 })
 
 const handlePublish = () => {
-  console.log('Publish button clicked. Selected change note IDs:', selectedChangeNotes.value);
   publishChangeNoteMutation({ ids: selectedChangeNotes.value, publish: true });
   selectedChangeNotes.value = [];
 }
@@ -146,19 +145,19 @@ const onSearch = () => {
         <div class="flex flex-col w-full gap-4 max-w-4xl">
           <div class="w-full flex flex-col md:flex-row-reverse justify-center md:justify-end gap-2">
             <div class="flex justify-center gap-2 flex-wrap md:flex-nowrap" v-if="isAdmin">
-              <Button variant="outline" @click="handlePublish">
+              <Button variant="outline" :disabled="selectedChangeNotes.length == 0" @click="handlePublish">
                 {{ t('button.publish') }}
                 <Eye />
               </Button>
-              <Button variant="outline" @click="createChangeNoteMutation.mutate">
-                {{ t('button.createChangeNote') }}
-                <LayersPlus />
-              </Button>
               <Button 
-                variant="solidaccent"
+                variant="outline"
                 @click="createReleaseNoteMutation.mutate(selectedChangeNotes)">
                 {{ t('button.createReleaseNote') }}
                 <FilePlus />
+              </Button>
+              <Button variant="solidaccent" @click="createChangeNoteMutation.mutate">
+                {{ t('button.createChangeNote') }}
+                <LayersPlus />
               </Button>
             </div>
 

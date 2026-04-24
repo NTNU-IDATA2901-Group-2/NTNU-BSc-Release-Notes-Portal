@@ -1,0 +1,26 @@
+meta {
+  name: negative_no_auth_update
+  type: http
+  seq: 8
+}
+
+put {
+  url: {{baseurl}}/products/{{product_create_product}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name" : "ChangedTest"
+  }
+}
+
+assert {
+  res.status: eq 403
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -27,12 +27,12 @@ public class ReleaseNote {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-    @ManyToMany
-    @JoinTable(
-      name = "release_note_change_note",
-      joinColumns = @JoinColumn(name = "release_note_id"),
-      inverseJoinColumns = @JoinColumn(name = "change_note_id")
-    )
+  @ManyToMany
+  @JoinTable(
+    name = "release_note_change_note",
+    joinColumns = @JoinColumn(name = "release_note_id"),
+    inverseJoinColumns = @JoinColumn(name = "change_note_id")
+  )
   private List<ChangeNote> changeNotes;
 
   private String tag = "";

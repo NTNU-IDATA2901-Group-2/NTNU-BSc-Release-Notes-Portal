@@ -5,6 +5,9 @@ import org.springframework.data.jpa.repository.Query;
 
 import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
 
+/**
+ * Repository for managing GitRepository entities.
+ */
 public interface GitRepositoryRepository extends JpaRepository<GitRepository, Long> {
 
   /**
@@ -21,5 +24,4 @@ public interface GitRepositoryRepository extends JpaRepository<GitRepository, Lo
       """)
   GitRepository findByChangeNoteId(long changeNoteId);
 
-    
 }

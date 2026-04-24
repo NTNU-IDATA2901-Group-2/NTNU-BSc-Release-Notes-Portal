@@ -7,6 +7,7 @@ public class DiffStringGenerationException extends RuntimeException {
   
   /**
    * Constructor for DiffStringGenerationException.
+   *
    * @param message the detail message for the exception
    */
   public DiffStringGenerationException(String message) {

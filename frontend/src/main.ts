@@ -22,21 +22,19 @@ app.use(VueQueryPlugin, {
 )
 app.use(i18n)
 
-const authenticated = await keycloak.init({
+await keycloak.init({
   onLoad: "check-sso",
   flow: "standard",
   pkceMethod: "S256",
   checkLoginIframe: false,
 })
 
-console.log("Keycloak initialized:", authenticated);
-// Idk if this is the best way to do this, but it ensures router is not used before keycloak is initialized to prevent sync issues with auth state.
 app.use(router)
 app.mount("#app");
 
-// Remove the hash from the URL as it is not needed after initialization and can cause issues with routing.
 await router.isReady()
 
+// Remove hash from URL as it is used for authentication and should not be visible to the user
 if (globalThis.location.hash) {
   const url = new URL(globalThis.location.href);
   url.hash = '';

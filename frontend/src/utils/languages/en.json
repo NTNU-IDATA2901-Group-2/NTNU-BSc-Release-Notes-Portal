@@ -16,7 +16,7 @@
         "save": "Save",
         "cancel": "Cancel",
         "delete": "Delete",
-        "export": "Export",
+        "export": "Export PDF",
         "publish": "Publish",
         "unpublish": "Unpublish",
         "none": "None",
@@ -146,7 +146,11 @@
         "syncAll": "Sync all repositories",
         "syncSuccess": "Repositories synchronized successfully",
         "syncError": "An error occurred while synchronizing repositories",
-        "sync": "Synchronize"
+        "sync": "Synchronize",
+        "noGitRepositories": "No git repositories available, please add a repository on the repositories page",
+        "noChangeNotesInRepository": "No change notes found in the selected repository",
+        "deleteTitle": "Delete Repository",
+        "deleteDescription": "Are you sure you want to delete this repository? Any related change notes will be unlinked. This action cannot be undone."
     },
     "ai": {
         "translationDisclaimer": "This translation is AI generated. Please check important facts."
@@ -162,7 +166,8 @@
         "cancelDescription": "Are you sure you want to cancel editing? All unsaved changes will be lost."
     },
     "changeNote": {
-        "noReference": "No reference provided"
+        "noReference": "No reference provided",
+        "changeNoteViewableByEveryone": "This change note is viewable to all users when published."
     },
     "tooltip": {
         "noCommits": "No associated git commits"

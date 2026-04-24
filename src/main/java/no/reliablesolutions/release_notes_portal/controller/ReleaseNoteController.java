@@ -29,7 +29,7 @@ import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteDTO;
 import no.reliablesolutions.release_notes_portal.service.ReleaseNoteService;
 
 /**
- * Controller for managing release notes. Provides endpoints for creating,
+ * Controller for managing release notes. Provides methods for creating,
  * archiving, retrieving, and updating release notes.
  */
 @Tag(name = "Release Notes", description = "Endpoints for managing release notes")
@@ -54,7 +54,7 @@ public class ReleaseNoteController {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "201", description = "Release note created successfully"),
       @ApiResponse(responseCode = "404", description = "Related entity not found"),
-      @ApiResponse(responseCode = "400", description = "Bad request"),
+      @ApiResponse(responseCode = "400", description = "Invalid request payload"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PostMapping("")
@@ -77,12 +77,12 @@ public class ReleaseNoteController {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Release note archived successfully"),
       @ApiResponse(responseCode = "404", description = "Release note not found"),
+      @ApiResponse(responseCode = "400", description = "Invalid request variable"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PatchMapping("/{id}/archive")
   @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<String> archiveReleaseNote(
-      @Parameter(name = "id", description = "ID of the release note to be archived", required = true) @PathVariable long id) {
+  public ResponseEntity<String> archiveReleaseNote(@PathVariable long id) {
     releaseNoteService.archiveReleaseNote(id);
     logger.info("Release note archived with id: {}", id);
     return ResponseEntity.ok().body("Release note archived successfully");
@@ -98,6 +98,7 @@ public class ReleaseNoteController {
   @Operation(summary = "Get all release notes, with optional filters", description = "Retrieves a list of all release notes with optional filters")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Release notes retrieved successfully"),
+      @ApiResponse(responseCode = "400", description = "Invalid request variable"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @GetMapping("")
@@ -115,18 +116,17 @@ public class ReleaseNoteController {
    * Retrieves details of a specific non-archived release note by its ID.
    *
    * @param id the ID of the release note to be retrieved
-   * @return a ResponseEntity with a 200 status and a ReleaseNoteDTO in the body
-   *         if found
+   * @return ResponseEntity with ReleaseNoteDTO in the body if found
    */
   @Operation(summary = "Get release note by ID", description = "Retrieves details of a specific release note by its ID")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Release note retrieved successfully"),
       @ApiResponse(responseCode = "404", description = "Release note not found"),
+      @ApiResponse(responseCode = "400", description = "Invalid request variable"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @GetMapping("/{id}")
-  public ResponseEntity<ReleaseNoteDTO> getReleaseNoteById(
-      @Parameter(name = "id", description = "ID of the release note to be retrieved", required = true) @PathVariable long id) {
+  public ResponseEntity<ReleaseNoteDTO> getReleaseNoteById(@PathVariable long id) {
     ReleaseNoteDTO releaseNote = releaseNoteService.getReleaseNoteById(id);
     logger.info("Retrieved release note with id: {}", id);
     return ResponseEntity.ok(releaseNote);
@@ -145,10 +145,11 @@ public class ReleaseNoteController {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Release note updated successfully"),
       @ApiResponse(responseCode = "404", description = "Release note not found"),
+      @ApiResponse(responseCode = "400", description = "Invalid request payload"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
-  @PreAuthorize("hasRole('ADMIN')")
   @PutMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<ReleaseNoteDTO> updateReleaseNote(@PathVariable long id,
       @RequestBody CreateReleaseNoteDTO createReleaseNoteDTO) {
     ReleaseNoteDTO releaseNote = releaseNoteService.updateReleaseNote(id, createReleaseNoteDTO);
@@ -159,11 +160,16 @@ public class ReleaseNoteController {
   /**
    * Publishes an existing release note by its ID. Privates release note if
    * publish is false.
+   * 
+   * @param id the ID of the release note to be published
+   * @param publish a boolean indicating whether to publish (true) or private (false)
+   * @return a ResponseEntity with the ID of the published release note in the body
    */
   @Operation(summary = "Publish release note", description = "Publishes an existing release note by its ID. Privates release note if publish is false.")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Release note published successfully"),
       @ApiResponse(responseCode = "404", description = "Release note not found"),
+      @ApiResponse(responseCode = "400", description = "Invalid request variable"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PatchMapping("/{id}/publish")

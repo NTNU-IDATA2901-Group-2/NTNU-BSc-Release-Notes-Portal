@@ -3,10 +3,9 @@ import { useQuery } from "@tanstack/vue-query";
 import api from "./api";
 
 /**
- * Retrieves a list of all features.
+ * Custom hook for retrieving a list of all features.
  * 
  * @returns An array of feature data retrieved from the API.
- * @throws An error if the API request to retrieve the features fails.
  */
 export const useGetFeatures = () => useQuery({
   queryKey: ['features'],

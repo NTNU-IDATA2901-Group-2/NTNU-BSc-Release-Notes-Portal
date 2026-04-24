@@ -21,6 +21,7 @@ import md from '@/utils/markdown-it';
 import { useTranslate } from '@/api/ai-api';
 import Button from '../ui/button/Button.vue';
 import Spinner from '../ui/spinner/Spinner.vue';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
 const { t, locale } = useI18n();
 
@@ -89,7 +90,6 @@ const onTranslate = async () => {
   });
   translatedDescription.value = result;
   isTranslating.value = false;
-  console.log("Translation result:", translatedDescription.value);
 }
 
 const copiedKey = ref<string | null>(null);
@@ -103,11 +103,12 @@ const resetCopiedState = () => {
   }
 };
 
-const handleCopy = (text: string | null | undefined, key: string) => {
+const handleCopy = (text: string | null | undefined, key?: string) => {
   if (!props.changeNote) return;
 
   navigator.clipboard.writeText(text ?? '')
     .then(() => {
+      if (key) {
       copiedKey.value = key;
       if (copyResetTimeout) {
         clearTimeout(copyResetTimeout);
@@ -115,7 +116,8 @@ const handleCopy = (text: string | null | undefined, key: string) => {
       copyResetTimeout = setTimeout(() => {
         copiedKey.value = null;
         copyResetTimeout = null;
-      }, 5000);
+      }, 3000);
+    }
       toast.success(t('toast.copySuccess'));
     })
     .catch((err) => {
@@ -177,7 +179,6 @@ onBeforeUnmount(() => {
             </DropdownMenu>
           </div>
         </div>
-
         <div class="flex justify-between">
         <p v-if="changeNote.description" v-html="md.render(translatedDescription ?? changeNote.description ?? '')"></p>
         <p v-else class="text-text-primary/50">{{ t('placeholder.noDescription') }}</p>
@@ -186,12 +187,54 @@ onBeforeUnmount(() => {
         </Button>
         </div>
         <p v-if="hasTranslation" class="text-text-primary/50 text-right">{{ t('ai.translationDisclaimer') }}</p>
+        <div class="flex justify-between">
         <div class="flex flex-wrap gap-4">
-          <Badge v-if="changeNote.product" class="h-6">{{ changeNote.product.name }}</Badge>
-          <Badge v-if="changeNote.scope" class="h-6">{{ changeNote.scope.name }}</Badge>
-          <Badge v-if="changeNote.feature" class="h-6">{{ changeNote.feature.name }}</Badge>
-          <Badge v-if="changeNote.customer" class="h-6">{{ changeNote.customer.name }}</Badge>
+          <Tooltip v-if="changeNote.product">
+            <TooltipTrigger as-child>
+              <Badge  class="h-6">{{ changeNote.product.name }}</Badge>
+            </TooltipTrigger>
+            <TooltipContent>
+                {{ t('title.product') }}
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip v-if="changeNote.scope">
+            <TooltipTrigger as-child>
+              <Badge  class="h-6">{{ changeNote.scope.name }}</Badge>
+            </TooltipTrigger>
+            <TooltipContent>
+                {{ t('title.scope') }}
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip v-if="changeNote.feature">
+            <TooltipTrigger as-child>
+              <Badge  class="h-6">{{ changeNote.feature.name }}</Badge>
+            </TooltipTrigger>
+            <TooltipContent>
+                {{ t('title.feature') }}
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip v-if="changeNote.customer">
+            <TooltipTrigger as-child>
+              <Badge  class="h-6">{{ changeNote.customer.name }}</Badge>
+            </TooltipTrigger>
+            <TooltipContent>
+                {{ t('title.customer') }}
+            </TooltipContent>
+          </Tooltip>
         </div>
+        <Tooltip v-if="changeNote.gitCommitHash && isAdmin">
+          <TooltipTrigger as-child>
+            <p :onclick="() => handleCopy(changeNote.gitCommitHash)" class="cursor-pointer text-text-primary/50">{{ changeNote.gitCommitHash }}</p>
+          </TooltipTrigger>
+          <TooltipContent>
+              Git commit hash
+          </TooltipContent>
+        </Tooltip>
+        </div>
+        <p v-if="changeNote.viewableByEveryone" class="text-text-primary/50">{{ t('changeNote.changeNoteViewableByEveryone') }}</p>
       </div>
       <Separator class="w-full h-2" />
       <div class="flex flex-col w-full text-xl gap-10">

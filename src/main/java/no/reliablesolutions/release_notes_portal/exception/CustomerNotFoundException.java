@@ -11,6 +11,7 @@ public class CustomerNotFoundException extends RuntimeException {
 
   /**
    * Constructs a new CustomerNotFoundException with the specified customer ID.
+   *
    * @param customerId the ID of the customer that was not found
    */
   public CustomerNotFoundException(Long customerId) {
@@ -20,6 +21,7 @@ public class CustomerNotFoundException extends RuntimeException {
 
   /**
    * Constructs a new CustomerNotFoundException with the specified customer name.
+   *
    * @param name the name of the customer that was not found
    */
   public CustomerNotFoundException(String name) {

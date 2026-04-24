@@ -19,7 +19,9 @@ const { t } = useI18n();
     <div
       class="flex flex-col p-4 gap-2 h-30 overflow-hidden text-wrap rounded-lg hover:bg-text-primary/10 transition-colors">
       <div class="flex flex-row justify-between">
-        <h3 class="text-xl">{{ releaseNote.tag }}</h3>
+        <h3 v-if="releaseNote.tag" class="text-xl">{{ releaseNote.tag }}</h3>
+        <h3 v-else class="text-xl text-text-primary/50">{{ t('placeholder.noTitle') }}</h3>
+
         <Badge v-if="isAdmin" :variant="releaseNote.published ? 'success' : 'destructive'">{{ releaseNote.published
           ? t('card.published') : t('card.private') }}</Badge>
       </div>

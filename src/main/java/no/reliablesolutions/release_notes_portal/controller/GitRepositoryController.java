@@ -18,6 +18,7 @@ import no.reliablesolutions.release_notes_portal.dto.CreateGitRepositoryDTO;
 import no.reliablesolutions.release_notes_portal.service.GitRepositoryService;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,10 +37,10 @@ public class GitRepositoryController {
   private final Logger logger = LoggerFactory.getLogger(GitRepositoryController.class);
 
   /**
-   * Endpoint for creating a new Git repository with the provided details.
+   * Creates a new Git repository with the provided details.
    * 
    * @param entity the details of the Git repository to be created
-   * @return a ResponseEntity containing the ID of the created Git repository
+   * @return ResponseEntity containing the ID of the created Git repository
    */
   @Operation(summary = "Create Git repository", description = "Creates a new Git repository with provided details")
   @ApiResponses(value = {
@@ -48,6 +49,7 @@ public class GitRepositoryController {
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PostMapping("")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Long> postMethodName(@RequestBody CreateGitRepositoryDTO entity) {
     long id = gitRepositoryService.createGitRepository(entity);
     logger.info("Git repository created with id: {}", id);
@@ -55,18 +57,20 @@ public class GitRepositoryController {
   }
 
   /**
-   * Endpoint for deleting an existing Git repository by ID.
+   * Deletes an existing Git repository by ID.
    * 
    * @param id the ID of the Git repository to be deleted
-   * @return a ResponseEntity indicating the success of the delete operation
+   * @return ResponseEntity indicating the success of the delete operation
    */
   @Operation(summary = "Delete Git repository", description = "Deletes an existing Git repository by ID")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Git repository deleted successfully"),
       @ApiResponse(responseCode = "404", description = "Git repository not found"),
+      @ApiResponse(responseCode = "400", description = "Invalid request variable"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @DeleteMapping("")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<String> deleteGitRepository(@RequestParam long id) {
     gitRepositoryService.deleteGitRepository(id);
     logger.info("Git repository deleted with id: {}", id);
@@ -74,9 +78,9 @@ public class GitRepositoryController {
   }
 
   /**
-   * Endpoint for retrieving a list of all Git repositories.
+   * Retrieves a list of all Git repositories.
    * 
-   * @return a ResponseEntity containing a list of all Git repositories
+   * @return ResponseEntity containing a list of all Git repositories
    */
   @Operation(summary = "Get all Git repositories", description = "Retrieves a list of all Git repositories")
   @ApiResponses(value = {
@@ -84,6 +88,7 @@ public class GitRepositoryController {
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @GetMapping("")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<List<GitRepository>> getAllGitRepositories() {
     List<GitRepository> gitRepositories = gitRepositoryService.getAllGitRepositories();
     return ResponseEntity.ok(gitRepositories);
@@ -92,7 +97,7 @@ public class GitRepositoryController {
   /**
    * Triggers synchronization of Git repositories.
    * 
-   * @return a response entity indicating the result of the synchronization
+   * @return ResponseEntity indicating the result of the synchronization
    *         operation
    */
   @Operation(summary = "Sync Git repositories", description = "Syncs Git repositories with external source")
@@ -101,6 +106,7 @@ public class GitRepositoryController {
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PostMapping("/sync")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<String> syncAllRepositories() {
     gitRepositoryService.syncGitRepositories();
     logger.info("Git repositories synced successfully");
@@ -111,16 +117,18 @@ public class GitRepositoryController {
    * Triggers synchronization of a specific Git repository by ID.
    * 
    * @param id the ID of the Git repository to synchronize
-   * @return a response entity indicating the result of the synchronization
+   * @return ResponseEntity indicating the result of the synchronization
    *         operation
    */
   @Operation(summary = "Sync Git repository", description = "Syncs a specific Git repository with external source")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Git repository synced successfully"),
       @ApiResponse(responseCode = "404", description = "Git repository not found"),
+      @ApiResponse(responseCode = "400", description = "Invalid request variable"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PostMapping("/sync/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<String> syncGitRepository(@PathVariable long id) {
     gitRepositoryService.syncGitRepository(id);
     logger.info("Git repository with id {} synced successfully", id);

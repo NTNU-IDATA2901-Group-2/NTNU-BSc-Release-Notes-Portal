@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,15 +17,15 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteHasNoGitCommitsException;
+import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.CustomerNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.DiffStringGenerationException;
-import no.reliablesolutions.release_notes_portal.exception.FeatureNotFoundException;
-import no.reliablesolutions.release_notes_portal.exception.ProductNotFoundException;
-import no.reliablesolutions.release_notes_portal.exception.ScopeNotFoundException;
-import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.FailedSyncGitChangeNotesException;
 import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityException;
+import no.reliablesolutions.release_notes_portal.exception.FeatureNotFoundException;
+import no.reliablesolutions.release_notes_portal.exception.ProductNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
+import no.reliablesolutions.release_notes_portal.exception.ScopeNotFoundException;
 
 /**
  * Global exception handler for the application. Catches specific exceptions thrown by controllers and services, logs the events, and returns appropriate HTTP responses with messages.
@@ -201,6 +202,17 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * Handles the case where an illegal state is encountered. Logs the event and returns a 500 response with a message indicating that there is an illegal state.
+   * @param e the exception containing details about the illegal state
+   * @return a ResponseEntity with a 500 status and a message indicating that there is an illegal state
+   */
+  @ExceptionHandler(value = {IllegalStateException.class})
+  public ResponseEntity<String> handleIllegalStateException(IllegalStateException e) {
+    logger.warn("Illegal state: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Illegal internal server state");
+  }
+
+  /**
    * Handles the case where an entity failed to save. Logs the event and returns a 500 response with a message.
    * @param e the exception containing details about the failure to save the entity
    * @return a ResponseEntity with a 500 status and a message indicating the failure to save the entity
@@ -247,7 +259,7 @@ public class GlobalExceptionHandler {
 
   /**
    * Handles the case where authorization is denied. Logs the event and returns a 403 response with a message indicating that authorization was denied.
-  *
+   *
    * @param e the exception containing details about the authorization denial
    * @return a ResponseEntity with a 403 status and a message indicating that authorization was denied
    */
@@ -277,5 +289,16 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleNonTransientAiException(NonTransientAiException e) {
     logger.warn("Non-transient AI exception: {}", e.getMessage());
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Non-transient AI exception: " + e.getMessage());
+  }
+
+  /**
+   * Handles the case where a request method is not supported. Logs the event and returns a 400 response with a message indicating the unsupported request method.
+   * @param e the exception containing details about the unsupported request method
+   * @return a ResponseEntity with a 400 status and a message indicating the unsupported request method
+   */
+  @ExceptionHandler(value = {HttpRequestMethodNotSupportedException.class})
+  public ResponseEntity<String> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+    logger.warn("Request method not supported: {}", e.getMethod());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Request method not supported: " + e.getMethod());
   }
 }

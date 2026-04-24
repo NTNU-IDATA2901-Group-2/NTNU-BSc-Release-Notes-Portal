@@ -16,14 +16,34 @@ public class ReleaseNoteMapper {
   }
 
   /**
-   * Maps a ReleaseNote entity to a ReleaseNoteDTO, including or excluding certain fields based on the user's access scope.
+   * Maps a ReleaseNote entity to a ReleaseNoteDTO, including or excluding certain
+   * fields based on the user's access scope.
+   * 
    * @param releaseNote the ReleaseNote entity to be mapped
-   * @param accessScope the AccessScope of the user, which determines which fields are included in the resulting ReleaseNoteDTO
-   * @return a ReleaseNoteDTO representing the given ReleaseNote entity, with fields included or excluded based on the user's access scope
+   * @param accessScope the AccessScope of the user, which determines which fields
+   *                    are included in the resulting ReleaseNoteDTO
+   * @return a ReleaseNoteDTO representing the given ReleaseNote entity, with
+   *         fields included or excluded based on the user's access scope
    */
   public static ReleaseNoteDTO toDTO(ReleaseNote releaseNote, AccessScope accessScope) {
+    List<String> customerGroups = accessScope.getCustomerGroups();
     List<ChangeNoteDTO> changeNoteDTOs = releaseNote.getChangeNotes()
         .stream()
+        .filter(changeNote -> {
+          if (accessScope.isAdmin()) {
+            return true;
+          }
+
+          if (!changeNote.isPublished()) {
+            return false;
+          }
+
+          if (!changeNote.isViewableByEveryone() && changeNote.getCustomer() != null) {
+            return customerGroups.contains(changeNote.getCustomer().getName().toUpperCase());
+          }
+          
+          return true;
+        })
         .map(changeNote -> ChangeNoteMapper.toDTO(changeNote, accessScope))
         .toList();
 

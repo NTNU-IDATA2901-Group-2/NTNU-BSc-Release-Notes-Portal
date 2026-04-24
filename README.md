@@ -1,165 +1,184 @@
-# Release Notes Portal
+# Release Notes Portal 
 
-A web application for viewing, creating, editing, and publishing release notes. The project consists of a **Spring Boot** backend (Java) and a **Vue 3 / TypeScript** frontend (Vite + Tailwind CSS), with **Keycloak** for authentication and **PostgreSQL** as the database.
+Release Notes Portal is a full-stack application for creating and publishing release notes.
 
----
+- Backend: Spring Boot 4 (Java 25)
+- Frontend: Vue 3 + TypeScript + Vite
+- Auth: Keycloak
+- Database: PostgreSQL
 
-## Table of Contents
+This project supports three runtime modes:
 
-- [Prerequisites](#prerequisites)
-- [Environment Setup](#environment-setup)
-- [Running in Development Mode](#running-in-development-mode)
-- [Running in Production Mode](#running-in-production-mode)
-- [Running in CI Mode](#running-in-ci-mode)
-
----
+- dev (local development)
+- ci (automated/local CI-like runs)
+- prod (containerized deployment behind Caddy)
 
 ## Prerequisites
 
-| Tool | Minimum version |
-|------|-----------------|
+| Tool | Version |
+|---|---|
 | Java | 25 |
 | Maven | 3.9+ |
 | Node.js | 20+ |
 | pnpm | 10+ |
-| Docker & Docker Compose | latest |
-
----
+| Docker + Docker Compose | Recent version |
 
 ## Environment Setup
 
-Copy the provided example environment file and fill in the values:
+Create your environment file:
 
 ```bash
 cp .env.example .env
 ```
 
-The `.env` file is used by both Docker Compose and the Spring Boot backend. The default values in `.env.example` work out of the box for local development.
+Fill all values in `.env` before starting the app.
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `KC_USERNAME` | Keycloak admin username | `admin` |
-| `KC_PASSWORD` | Keycloak admin password | `admin` |
-| `KC_PORT` | Keycloak port | `8081` |
-| `KC_REALM` | Keycloak realm name | `my_realm` |
-| `DB_USERNAME` | PostgreSQL username | `postgres` |
-| `DB_PASSWORD` | PostgreSQL password | `postgres` |
-| `DB_DATABASE` | PostgreSQL database name | `db_name` |
-| `DB_PORT` | PostgreSQL port | `5432` |
-| `DB_HOST` | PostgreSQL host | `localhost` |
-| `DB_URL` | Full JDBC URL (auto-composed) | — |
+Main variables used by the backend and compose:
 
----
+| Variable | Purpose |
+|---|---|
+| `CORS_ALLOWED_ORIGINS` | Comma-separated origins allowed for `/api/**` |
+| `KC_USERNAME` / `KC_PASSWORD` | Keycloak bootstrap admin account |
+| `KC_URL` | Keycloak base URL used by frontend/backend config |
+| `KC_ISSUER_URL` | JWT issuer URL used by Spring Security |
+| `KC_JWK_SET_URI` | JWK endpoint used to validate tokens |
+| `KC_CLIENT_ID` | Keycloak client id used by frontend |
+| `KC_REALM` | Keycloak realm name |
+| `DB_USERNAME` / `DB_PASSWORD` / `DB_DATABASE` | PostgreSQL credentials |
+| `DB_URL` | JDBC URL for Spring datasource |
+| `OPENAI_URL` / `OPENAI_API_KEY` / `OPENAI_MODEL` | AI integration settings. During development the Groq API was used. This requires signing up to acquire an API key. |
+| `CHANGE_NOTE_DIRECTORY` | Relative/child change note directory used by git features |
 
-## Running in Development Mode
+## Development Mode (dev)
 
-Development mode uses the `dev` Spring profile. The backend automatically starts the Docker Compose services (PostgreSQL + Keycloak) on launch via the `spring-boot-docker-compose` integration, so no manual `docker compose` command is needed.
+The default Spring profile is `dev`.
 
-### Backend
+### 1) Start backend (main dev command)
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-- The `dev` profile is active by default (see `application.properties`).
-- Docker Compose (`docker-compose.yml`) is started automatically, bringing up PostgreSQL and Keycloak.
-- The database is seeded with `data.sql` and `data-dev.sql`.
-- The API is available at `http://localhost:8080`.
+What happens:
 
-### Frontend
+- `spring-boot-docker-compose` automatically starts services from `docker-compose.yml`.
+- PostgreSQL and Keycloak are started for you.
+- `data.sql` and `data-dev.sql` are loaded.
+- Backend is available on `http://localhost:8080`.
 
-```bash
-cd frontend
-pnpm install
-pnpm run dev
-```
+### 2) Set up Keycloak realm and client
 
-The Vite dev server starts at `http://localhost:5173` with hot module replacement (HMR) and proxies API requests to the backend.
+After first startup, configure Keycloak (required in dev):
 
----
+1. Open `http://localhost:8081` and log in with `KC_USERNAME` / `KC_PASSWORD`.
+2. Import the test realm file `dev-realm.json` from the project root.
+3. Ensure the imported realm name matches `KC_REALM` (or update env values accordingly).
+4. If needed, verify the client matching `KC_CLIENT_ID` exists and is configured for browser login flow (standard flow + PKCE for SPA usage).
+5. Verify redirect URI for frontend dev server, for example `http://localhost:5173/*`.
+6. Verify web origin for frontend dev server, for example `http://localhost:5173`.
+7. Create a user for test purposes and assign roles under the `release-note` client: at minimum `Admin`, and customer roles when required.
 
-## Running in Production Mode
-
-In production mode the Spring Boot backend serves the frontend as static content. The frontend must be **compiled and copied into the backend's static resources folder** before packaging, so that a single JAR file contains and serves the entire application.
-
-### Frontend
-
-Build the optimized static files:
+### 3) Start frontend
 
 ```bash
 cd frontend
 pnpm install
-pnpm build
+pnpm dev
 ```
 
-Copy the compiled output into the backend's static resources folder so the backend can serve it:
+Frontend runs on `http://localhost:5173`.
+
+Important note: in dev, the frontend uses `http://localhost:8080/api/` directly (no Vite proxy is configured).
+
+## Production Mode (prod)
+
+Use the provided production compose example, as requested by this project setup.
+
+### 1) Prepare files
 
 ```bash
-cp -r frontend/dist/* src/main/resources/static/
+cp docker-compose-prod-example.yml docker-compose-prod.yml
+cp Caddyfile-example Caddyfile
 ```
 
-### Backend
+Then edit `docker-compose-prod.yml` and fill in all empty environment values.
 
-Package and run the application:
+### 2) Prepare local hostnames for reverse proxy
+
+The default Caddy config uses:
+
+- `app.app.local` for the app
+- `auth.app.local` for Keycloak
+
+Add them to your hosts file (for local testing):
+
+```text
+127.0.0.1 app.app.local
+127.0.0.1 auth.app.local
+```
+
+### 3) Run production stack
 
 ```bash
-./mvnw clean package -DskipTests
-java -jar target/*.jar --spring.profiles.active=prod
+docker compose -f docker-compose-prod.yml up -d
 ```
 
-The application is available at `http://localhost:8080`. The backend serves both the API and the compiled frontend from the same port.
+Production notes:
 
-> **Note:** The `prod` profile (`application-prod.properties`) reads database credentials from `.env` and never seeds test data. Make sure your `.env` is configured with the correct production values before starting.
+- Caddy is the reverse proxy and uses self-signed certificates via `tls internal`.
+- Browser/security tools may warn until trust is configured for the local CA.
+- App should be reachable at `https://app.app.local`.
+- Keycloak should be reachable at `https://auth.app.local`.
 
----
+## CI Mode (ci)
 
-## Running in CI Mode
+CI profile is for automated runs and local CI-like testing.
 
-CI mode is designed for automated pipelines. It uses an **in-memory H2 database** (no external services required) and seeds it with `data-ci.sql`.
+Behavior:
 
-The full CI pipeline (lint → build → test) is defined in `.github/workflows/build-test-push.yml` and runs automatically on pushes and pull requests to `main` and `dev`.
+- Uses in-memory H2 database.
+- Disables Docker Compose integration (`spring.docker.compose.enabled=false`).
+- Seeds with `data-ci.sql`.
+- Uses CI security config that permits requests and supports test role headers.
 
-To replicate the CI steps locally:
-
-### Frontend
-
-Lint and build the frontend:
+Run locally:
 
 ```bash
 cd frontend
 pnpm install
 pnpm eslint
 pnpm build
-```
-
-Copy the compiled output into the backend's static resources folder:
-
-```bash
+cd ..
+mkdir -p src/main/resources/static
 cp -r frontend/dist/* src/main/resources/static/
-```
-
-### Backend
-
-Package and start the application with the CI profile:
-
-```bash
 ./mvnw clean package
 java -jar target/*.jar --spring.profiles.active=ci
 ```
 
-The CI profile (`application-ci.properties`) disables Docker Compose integration and uses an in-memory H2 database, so no external services are needed.
-
-### API Tests
-
-Install [Bruno CLI](https://docs.usebruno.com/bru-cli/overview) if not already installed:
+Run API tests with Bruno:
 
 ```bash
 npm install -g @usebruno/cli
-```
-
-Then run the tests:
-
-```bash
 cd test/ReleaseNoteAPITests
 bru run --env Local
 ```
+
+## Useful Endpoints
+
+- App/API base in dev: `http://localhost:8080`
+- Frontend dev server: `http://localhost:5173`
+- Public frontend runtime config endpoint (dev/prod): `GET /api/public/config`
+- OpenAPI UI: `http://localhost:8080/swagger-ui/index.html`
+
+## Build Artifact Notes
+
+The production Docker image expects a prebuilt Spring Boot JAR in `target/`.
+
+If you package manually for prod, build frontend first and copy `frontend/dist` into `src/main/resources/static` before creating the JAR, so the backend serves the frontend assets.
+
+
+## Authors
+
+- Kristian Nærum Garder
+- Stian Øye Jenssen
+- Ludvik Lund-Hole

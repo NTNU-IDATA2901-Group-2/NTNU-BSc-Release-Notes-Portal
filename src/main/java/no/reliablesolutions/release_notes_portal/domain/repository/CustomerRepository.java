@@ -1,13 +1,15 @@
 package no.reliablesolutions.release_notes_portal.domain.repository;
 
-import java.util.Optional;
-
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import no.reliablesolutions.release_notes_portal.domain.entity.Customer;
 
+/**
+ * Repository for managing Customer entities.
+ */
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
   /**

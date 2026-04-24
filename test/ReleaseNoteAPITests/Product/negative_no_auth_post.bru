@@ -1,0 +1,26 @@
+meta {
+  name: negative_no_auth_post
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseurl}}/products
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name" : "testProduct"
+  }
+}
+
+assert {
+  res.status: eq 403
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

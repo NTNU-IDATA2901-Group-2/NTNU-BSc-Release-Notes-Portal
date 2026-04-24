@@ -25,6 +25,7 @@ import SelectValue from '../ui/select/SelectValue.vue';
 import SelectContent from '../ui/select/SelectContent.vue';
 import SelectGroup from '../ui/select/SelectGroup.vue';
 import SelectItem from '../ui/select/SelectItem.vue';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
 const props = defineProps<{
   releaseNote: ReleaseNote;
@@ -316,17 +317,17 @@ const customerFilter = ref<number>(-1);
             </div>
             <div>
               <Select data-pdf-exclude v-model="customerFilter">
-                <SelectTrigger class="w-42">
-                  <SelectValue placeholder="Filter by customer"/>
+                <SelectTrigger data-pdf-exclude class="w-42">
+                  <SelectValue data-pdf-exclude placeholder="Filter by customer"/>
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem :value=-1 class="text-text-primary/50">
+                <SelectContent data-pdf-exclude>
+                  <SelectGroup data-pdf-exclude>
+                    <SelectItem data-pdf-exclude :value=-1 class="text-text-primary/50">
                       {{ t('button.allCustomers') }}
                     </SelectItem>
                   </SelectGroup>
-                  <SelectGroup>
-                    <SelectItem v-for="customer in uniqueCustomers" :key="customer.id" :value="customer.id">
+                  <SelectGroup data-pdf-exclude>
+                    <SelectItem data-pdf-exclude v-for="customer in uniqueCustomers" :key="customer.id" :value="customer.id">
                       {{ customer.name }}
                     </SelectItem>
                   </SelectGroup>
@@ -342,16 +343,27 @@ const customerFilter = ref<number>(-1);
             <template
               v-for="change in translatedChangeNotes ?? releaseNote.changeNotes" :key="change.id"
               >
-              <div v-if="shouldShowChangeNote(change)">
+              <div v-if="shouldShowChangeNote(change)" class="flex flex-col gap-2">
                 <div class="flex items-center gap-4">
-                  <RouterLink class="text-2xl text-text-dark-static hover:underline" :to="`${routeNames.changeNotes}/${change.id}`">{{ change.reference }}</RouterLink>
+                  <RouterLink class="text-2xl dark:text-text-dark-static text-text-light-static hover:underline" :to="`${routeNames.changeNotes}/${change.id}`">{{ change.reference }}</RouterLink>
 
-                  <Badge v-if="change.customer" :variant="'outline'">{{ change.customer.name }}</Badge>
+                  <Tooltip v-if="change.customer">
+                    <TooltipTrigger as-child>
+                      <Badge v-if="change.customer" :variant="'outline'">{{ change.customer.name }}</Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        {{ t('title.customer') }}
+                    </TooltipContent>
+                  </Tooltip>
+                  
                 </div>
+                <p v-if="change.viewableByEveryone" class="text-text-primary/50">{{ t('changeNote.changeNoteViewableByEveryone') }}</p>
                 <div>
-                  <h3 class="text-xl" data-pdf-exclude>{{ t('title.description') }}</h3>
-                  <div class="flex justify-between">
-                    <p class="ml-4" v-if="change.description" v-html="md.render(change.description)"></p>
+                  <div class="flex justify-between align-center">
+                    <div>
+                      <h3 class="text-xl" data-pdf-exclude>{{ t('title.description') }}</h3>
+                      <p class="ml-4" v-if="change.description" v-html="md.render(change.description)"></p>
+                    </div>
                     <Button data-pdf-exclude variant="outline" size="icon-sm" @click="handleCopy(hasTranslation ? translatedChangeNotes?.find(c => c.id === change.id)?.description ?? '' : change.description ?? '', `change-${change.id}`)">
                       <component :is="copiedKey === `change-${change.id}` ? Check : Copy" />
                     </Button>

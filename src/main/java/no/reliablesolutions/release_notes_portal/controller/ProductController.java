@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,10 +39,10 @@ public class ProductController {
   private final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
   /**
-   * Endpoint for creating a new product with the provided details.
+   * Creates a new product with the provided details.
    * 
    * @param productDTO the details of the product to be created
-   * @return a ResponseEntity containing the ID of the created product
+   * @return ResponseEntity containing the ID of the created product
    */
   @Operation(summary = "Create product", description = "Creates a new product with provided details")
   @ApiResponses(value = {
@@ -50,6 +51,7 @@ public class ProductController {
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PostMapping("")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<String> createProduct(@Valid @RequestBody CreateTagDTO productDTO) {
     long id = productService.createProduct(productDTO);
     logger.info("Product created with id: {}", id);
@@ -57,9 +59,9 @@ public class ProductController {
   }
 
   /**
-   * Endpoint for retrieving a list of all products.
+   * Retrieves a list of all products.
    * 
-   * @return a ResponseEntity containing a list of all products
+   * @return ResponseEntity containing a list of all products
    */
   @Operation(summary = "Get all products", description = "Retrieves a list of all products")
   @ApiResponses(value = {
@@ -74,15 +76,16 @@ public class ProductController {
   }
 
   /**
-   * Endpoint for retrieving details of a specific product by its ID.
+   * Retrieves details of a specific product by its ID.
    * 
    * @param id the ID of the product to be retrieved
-   * @return a ResponseEntity containing the details of the requested product
+   * @return ResponseEntity containing the details of the requested product
    */
   @Operation(summary = "Get product by ID", description = "Retrieves details of a specific product by its ID")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Product retrieved successfully"),
       @ApiResponse(responseCode = "404", description = "Product not found"),
+      @ApiResponse(responseCode = "400", description = "Invalid request variable"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @GetMapping("/{id}")
@@ -93,19 +96,21 @@ public class ProductController {
   }
 
   /**
-   * Endpoint for updating an existing product with new details.
+   * Updates an existing product with new details.
    * 
-   * @param id         the ID of the product to be updated
+   * @param id the ID of the product to be updated
    * @param productDTO the new details of the product
-   * @return a ResponseEntity containing the updated product details
+   * @return ResponseEntity containing the updated product details
    */
   @Operation(summary = "Update product", description = "Updates an existing product with new details")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Product updated successfully"),
       @ApiResponse(responseCode = "404", description = "Product not found"),
+      @ApiResponse(responseCode = "400", description = "Invalid request payload"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PutMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<ProductDTO> updateProduct(@PathVariable long id, @Valid @RequestBody CreateTagDTO productDTO) {
     ProductDTO product = productService.updateProduct(id, productDTO);
     logger.info("Updated product with id: {}", id);
@@ -113,18 +118,20 @@ public class ProductController {
   }
 
   /**
-   * Endpoint for deleting an existing product by its ID.
+   * Deletes an existing product by a given ID.
    * 
    * @param id the ID of the product to be deleted
-   * @return a ResponseEntity indicating the success of the delete operation
+   * @return ResponseEntity indicating the success of the delete operation
    */
   @Operation(summary = "Delete product", description = "Deletes an existing product by its ID")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Product deleted successfully"),
       @ApiResponse(responseCode = "404", description = "Product not found"),
+      @ApiResponse(responseCode = "400", description = "Invalid request payload"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @DeleteMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<String> deleteProduct(@PathVariable long id) {
     productService.deleteProduct(id);
     logger.info("Deleted product with id: {}", id);
