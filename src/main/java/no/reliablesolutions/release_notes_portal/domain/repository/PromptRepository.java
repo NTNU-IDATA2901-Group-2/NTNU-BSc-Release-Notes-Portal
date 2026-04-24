@@ -6,6 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import no.reliablesolutions.release_notes_portal.domain.entity.Prompt;
 
+/**
+ * Repository for managing Prompt entities.
+ */
 public interface PromptRepository extends JpaRepository<Prompt, Long> {
   /**
    * Finds all prompts ordered by name in ascending order.
