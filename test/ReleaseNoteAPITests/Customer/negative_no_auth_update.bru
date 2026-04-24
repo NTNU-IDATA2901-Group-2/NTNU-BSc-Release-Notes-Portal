@@ -1,17 +1,13 @@
 meta {
-  name: update_with_valid_info
+  name: negative_no_auth_update
   type: http
-  seq: 7
+  seq: 8
 }
 
 put {
   url: {{baseurl}}/customers/{{customer_create_customer}}
   body: json
   auth: inherit
-}
-
-headers {
-  X-Test-Role: Admin
 }
 
 body:json {
@@ -21,7 +17,7 @@ body:json {
 }
 
 assert {
-  res.status: eq 200
+  res.status: eq 403
 }
 
 settings {

@@ -41,7 +41,8 @@ public class ChangeNoteMapper {
           changeNote.getCustomer() != null ? CustomerDTO.fromCustomer(changeNote.getCustomer()) : null,
           changeNote.isPublished(),
           null,
-          changeNote.getGitRepository() != null ? changeNote.getGitRepository().getId() : null);
+          changeNote.getGitRepository() != null ? changeNote.getGitRepository().getId() : null,
+          changeNote.getGitCommitHash());
     } else {
       return new ChangeNoteDTO(
           changeNote.getId(),
@@ -55,7 +56,8 @@ public class ChangeNoteMapper {
           changeNote.getCustomer() != null ? CustomerDTO.fromCustomer(changeNote.getCustomer()) : null,
           changeNote.isPublished(),
           changeNote.isViewableByEveryone(),
-          changeNote.getGitRepository() != null ? changeNote.getGitRepository().getId() : null);
+          changeNote.getGitRepository() != null ? changeNote.getGitRepository().getId() : null,
+          changeNote.getGitCommitHash());
     }
   }
 }

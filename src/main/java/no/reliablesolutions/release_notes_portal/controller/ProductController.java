@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,6 +51,7 @@ public class ProductController {
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PostMapping("")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<String> createProduct(@Valid @RequestBody CreateTagDTO productDTO) {
     long id = productService.createProduct(productDTO);
     logger.info("Product created with id: {}", id);
@@ -108,6 +110,7 @@ public class ProductController {
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PutMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<ProductDTO> updateProduct(@PathVariable long id, @Valid @RequestBody CreateTagDTO productDTO) {
     ProductDTO product = productService.updateProduct(id, productDTO);
     logger.info("Updated product with id: {}", id);
@@ -128,6 +131,7 @@ public class ProductController {
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @DeleteMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<String> deleteProduct(@PathVariable long id) {
     productService.deleteProduct(id);
     logger.info("Deleted product with id: {}", id);

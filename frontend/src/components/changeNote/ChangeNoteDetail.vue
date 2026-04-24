@@ -103,11 +103,12 @@ const resetCopiedState = () => {
   }
 };
 
-const handleCopy = (text: string | null | undefined, key: string) => {
+const handleCopy = (text: string | null | undefined, key?: string) => {
   if (!props.changeNote) return;
 
   navigator.clipboard.writeText(text ?? '')
     .then(() => {
+      if (key) {
       copiedKey.value = key;
       if (copyResetTimeout) {
         clearTimeout(copyResetTimeout);
@@ -115,7 +116,8 @@ const handleCopy = (text: string | null | undefined, key: string) => {
       copyResetTimeout = setTimeout(() => {
         copiedKey.value = null;
         copyResetTimeout = null;
-      }, 5000);
+      }, 3000);
+    }
       toast.success(t('toast.copySuccess'));
     })
     .catch((err) => {
@@ -185,8 +187,8 @@ onBeforeUnmount(() => {
         </Button>
         </div>
         <p v-if="hasTranslation" class="text-text-primary/50 text-right">{{ t('ai.translationDisclaimer') }}</p>
+        <div class="flex justify-between">
         <div class="flex flex-wrap gap-4">
-
           <Tooltip v-if="changeNote.product">
             <TooltipTrigger as-child>
               <Badge  class="h-6">{{ changeNote.product.name }}</Badge>
@@ -222,6 +224,15 @@ onBeforeUnmount(() => {
                 {{ t('title.customer') }}
             </TooltipContent>
           </Tooltip>
+        </div>
+        <Tooltip v-if="changeNote.gitCommitHash && isAdmin">
+          <TooltipTrigger as-child>
+            <p :onclick="() => handleCopy(changeNote.gitCommitHash)" class="cursor-pointer text-text-primary/50">{{ changeNote.gitCommitHash }}</p>
+          </TooltipTrigger>
+          <TooltipContent>
+              Git commit hash
+          </TooltipContent>
+        </Tooltip>
         </div>
         <p v-if="changeNote.viewableByEveryone" class="text-text-primary/50">{{ t('changeNote.changeNoteViewableByEveryone') }}</p>
       </div>

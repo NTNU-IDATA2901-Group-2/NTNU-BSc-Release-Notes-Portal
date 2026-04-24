@@ -1,21 +1,17 @@
 meta {
-  name: get_products_by_id_not
+  name: negative_no_auth_delete
   type: http
-  seq: 14
+  seq: 11
 }
 
-get {
+delete {
   url: {{baseurl}}/products/{{product_create_product}}
   body: none
   auth: inherit
 }
 
-headers {
-  X-Test-Role: Admin
-}
-
 assert {
-  res.status: eq 404
+  res.status: eq 403
 }
 
 settings {

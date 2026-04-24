@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,6 +51,7 @@ public class CustomerController {
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PostMapping("")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<String> createCustomer(@Valid @RequestBody CreateTagDTO customerDTO) {
     long id = customerService.createCustomer(customerDTO);
     logger.info("Customer created with id: {}", id);
@@ -109,6 +111,7 @@ public class CustomerController {
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @PutMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<CustomerDTO> updateCustomer(@PathVariable long id,
       @Valid @RequestBody CreateTagDTO customerDTO) {
     CustomerDTO customer = customerService.updateCustomer(id, customerDTO);
@@ -129,6 +132,7 @@ public class CustomerController {
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @DeleteMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<String> deleteCustomer(@PathVariable long id) {
     customerService.deleteCustomer(id);
     logger.info("Deleted customer with id: {}", id);
