@@ -14,6 +14,9 @@ import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityExc
 import no.reliablesolutions.release_notes_portal.exception.GitRepositoryNotFoundException;
 import no.reliablesolutions.release_notes_portal.runner.SyncGitChangeNotes;
 
+/**
+ * Service class for managing Git repositories, including creating, deleting, updating, and synchronizing repositories.
+ */
 @Service
 @AllArgsConstructor
 public class GitRepositoryService {
@@ -92,6 +95,7 @@ public class GitRepositoryService {
 
     /**
      * Synchronizes a specific Git repository by ID by running SyncGitChangeNotes for that repository.
+     *
      * @param id the ID of the Git repository to synchronize
      * @throws FailedSyncGitChangeNotesException if syncing Git change notes fails
      * @throws GitRepositoryNotFoundException if the Git repository with the specified ID is not found
@@ -112,6 +116,12 @@ public class GitRepositoryService {
         }
     }
 
+    /**
+     * Retrieves the Git repository associated with a specific change note ID.
+     *
+     * @param changeNoteId the ID of the change note for which to retrieve the associated Git repository
+     * @return the Git repository associated with the specified change note ID, or null if no repository is associated
+     */
     public GitRepository getGitRepositoryForChangeNote(long changeNoteId) {
       return gitRepositoryRepository.findByChangeNoteId(changeNoteId);
     }
