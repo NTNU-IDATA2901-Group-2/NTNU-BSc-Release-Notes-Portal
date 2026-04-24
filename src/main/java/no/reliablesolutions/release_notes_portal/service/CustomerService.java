@@ -12,6 +12,9 @@ import no.reliablesolutions.release_notes_portal.dto.CustomerDTO;
 import no.reliablesolutions.release_notes_portal.exception.CustomerNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityException;
 
+/**
+ * Service for managing customer-related operations.
+ */
 @Service
 @AllArgsConstructor
 public class CustomerService {
@@ -22,6 +25,7 @@ public class CustomerService {
    *
    * @param customerDTO the DTO containing details for the new customer
    * @return the ID of the created customer
+   * @throws FailedToSaveEntityException if there was an error saving the customer to the repository
    */
   public long createCustomer(CreateTagDTO customerDTO) {
     Customer customer = new Customer();
@@ -36,7 +40,7 @@ public class CustomerService {
   /**
    * Retrieves all customers from the repository.
    *
-   * @return a list of all customers
+   * @return a list of all customers as CustomerDTOs
    */
   public List<CustomerDTO> getAllCustomers() {
     return customerRepository.findAll().stream()
@@ -48,7 +52,7 @@ public class CustomerService {
    * Retrieves a specific customer by its ID.
    *
    * @param id the ID of the customer to retrieve
-   * @return a DTO representing the customer
+   * @return CustomerDTO representing the customer
    * @throws CustomerNotFoundException if no customer with the given ID exists
    */
   public CustomerDTO getCustomerById(long id) {
@@ -62,7 +66,7 @@ public class CustomerService {
    *
    * @param id the ID of the customer to update
    * @param customerDTO the DTO containing updated details for the customer
-   * @return a DTO representing the updated customer
+   * @return CustomerDTO representing the updated customer
    * @throws CustomerNotFoundException if no customer with the given ID exists
    */
   public CustomerDTO updateCustomer(long id, CreateTagDTO customerDTO) {
@@ -88,6 +92,13 @@ public class CustomerService {
     customerRepository.delete(customer);
   }
 
+
+  /**
+   * Retrieves a list of customers that match the provided name.
+   * 
+   * @param customer the name to search for
+   * @return A list of customers that match the provided name. If no customers match, returns an empty list.
+   */
   public List<Customer> getCustomerByName(String customer) {
     return customerRepository.findAllByNameIgnoreCase(customer);
   }
