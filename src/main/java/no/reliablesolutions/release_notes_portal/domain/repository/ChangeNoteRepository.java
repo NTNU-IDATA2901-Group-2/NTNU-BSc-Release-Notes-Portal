@@ -11,11 +11,32 @@ import no.reliablesolutions.release_notes_portal.domain.entity.ChangeNote;
 import no.reliablesolutions.release_notes_portal.dto.ChangeNoteFilterOptionsDTO;
 import no.reliablesolutions.release_notes_portal.dto.GitCommitHashAndPreviousGitCommitHash;
 
+/**
+ * Repository for managing ChangeNote entities.
+ */
 public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
+
+  /**
+   * Finds all non-archived change notes.
+   * @return a list of all non-archived change notes
+   */
   List<ChangeNote> findByArchivedFalse();
 
+  /**
+   * Finds a non-archived change note by its ID.
+   *
+   * @param id the ID of the change note to find
+   * @return an Optional containing the found change note, or an empty Optional if no non-archived change note with the given ID exists
+   */
   Optional<ChangeNote> findByIdAndArchivedFalse(Long id);
 
+  /**
+   * Finds a non-archived change note by its ID, if it is viewable by everyone or associated with a customer whose name is in the provided list.
+   *
+   * @param id the ID of the change note to find
+   * @param customerNames a list of customer names to filter by (case-insensitive)
+   * @return an Optional containing the found change note, or an empty Optional if no matching change note is found
+   */
   @Query("""
       SELECT c
       FROM ChangeNote c
@@ -70,23 +91,6 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
       """)
   public List<ChangeNote> findByArchivedFalseAndMatchingFilterParameters(
       @Param("filterOptions") ChangeNoteFilterOptionsDTO filterOptions);
-
-  /**
-   * Finds all non-archived change notes that are viewable by everyone or
-   * associated with a customer whose name is in the provided list.
-   * 
-   * @param customerNames a list of customer names to filter by (case-insensitive)
-   * @return a list of all non-archived change notes that are viewable by everyone
-   *         or associated with a customer whose name is in the provided list
-   */
-  @Query("""
-      SELECT c
-      FROM ChangeNote c
-      LEFT JOIN c.customer customer
-      WHERE c.archived = false
-      AND (customer IS NULL OR UPPER( customer.name ) IN :customerNames)
-      """)
-  public List<ChangeNote> findForCustomerNames(List<String> customerNames);
 
   /**
    * Finds all non-archived change notes that are viewable by everyone or
@@ -158,6 +162,11 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
   public GitCommitHashAndPreviousGitCommitHash findCommitHashAndPreviousCommitHash(Long changeNoteId);
 
 
+  /**
+   * Checks if any of the change notes with the specified IDs are not archived, have a Git commit hash, and have a previous Git commit hash.
+   * @param changeNoteIds a list of change note IDs to check
+   * @return true if any of the specified change notes meet the criteria, false otherwise
+   */
   @Query("""
       SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END
       FROM ChangeNote c
