@@ -83,7 +83,6 @@ const { mutate: publishChangeNoteMutation } = usePublishChangeNotes([], true, {
 })
 
 const handlePublish = () => {
-  console.log('Publish button clicked. Selected change note IDs:', selectedChangeNotes.value);
   publishChangeNoteMutation({ ids: selectedChangeNotes.value, publish: true });
   selectedChangeNotes.value = [];
 }

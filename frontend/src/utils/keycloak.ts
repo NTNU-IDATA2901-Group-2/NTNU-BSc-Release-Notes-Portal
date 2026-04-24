@@ -43,7 +43,6 @@ keycloak.onTokenExpired = () => {
     .updateToken(30)
     .then((refreshed) => {
       if (refreshed) {
-        console.log('Token refreshed');
         isAuthenticated.value = true;
       } else {
         console.warn('Token not refreshed, user is no longer authenticated');

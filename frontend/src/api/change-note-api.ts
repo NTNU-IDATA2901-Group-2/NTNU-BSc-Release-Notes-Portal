@@ -67,7 +67,6 @@ export const usePublishChangeNotes = (ids: number[], publish: boolean, onFinishe
     mutationFn: (variables: MutationVariables) => publishChangeNotes(variables.ids, variables.publish),
     onSettled: () => onFinished.onSettled?.(),
     onSuccess: () => {
-      console.log(`Change notes ${publish ? 'published' : 'unpublished'} with IDs:`, ids);
       queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
       onFinished.onSuccess();
     },
@@ -91,7 +90,6 @@ export const useCreateChangeNote = (onFinished: OnMutationApiCallFinished) => {
   return useMutation<number>({
   mutationFn: () => createChangeNote(),
   onSuccess: (data) => {
-    console.log("Change note created with ID:", data);
     onFinished.onSuccess(data.toString());
     queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
   },
@@ -138,7 +136,6 @@ export const useArchiveChangeNote = (id: number, onFinished: OnMutationApiCallFi
     mutationFn: () => archiveChangeNote(id),
     onSettled: () => onFinished.onSettled?.(),
     onSuccess: (data) => {
-      console.log("Change note archived with ID:", data);
       queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
       onFinished.onSuccess();
     },
@@ -190,7 +187,6 @@ export const useUpdateChangeNote = (onFinished: OnMutationApiCallFinished) => {
     },
     onSettled: () => onFinished.onSettled?.(),
     onSuccess: () => {
-      console.log("Change note updated with ID:", updateId);
       queryClient.invalidateQueries({ queryKey: ['changeNote', `${updateId}`] });
       onFinished.onSuccess();
     },

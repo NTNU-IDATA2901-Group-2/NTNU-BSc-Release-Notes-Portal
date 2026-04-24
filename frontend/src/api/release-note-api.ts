@@ -26,7 +26,6 @@ export const useCreateReleaseNote = (onFinished: OnMutationApiCallFinished) => {
     mutationFn: (changeNoteIds: number[]) => createReleaseNote(changeNoteIds),
     onSettled: () => onFinished.onSettled?.(),
     onSuccess: (data) => {
-      console.log("Release note created with ID:", data);
       queryClient.invalidateQueries({ queryKey: ['releaseNotes'] });
       onFinished.onSuccess(data.toString());
     },
@@ -103,7 +102,6 @@ export const useArchiveReleaseNote = (id: string, onFinished: OnMutationApiCallF
   mutationFn: () => archiveReleaseNote(id),
   onSettled: () => onFinished.onSettled?.(),
   onSuccess: (data) => {
-    console.log("Release note archived with ID:", data);
     queryClient.invalidateQueries({ queryKey: ['releaseNotes'] });
     onFinished.onSuccess();
   },
@@ -147,7 +145,6 @@ export const useUpdateReleaseNote = (onFinished: OnMutationApiCallFinished) => {
     },
     onSettled: () => onFinished.onSettled?.(),
     onSuccess: () => {
-      console.log("Release note updated with ID:", updateId);
       queryClient.invalidateQueries({ queryKey: ['releaseNote', `${updateId}`] });
       onFinished.onSuccess();
     },
