@@ -7,6 +7,7 @@ public class FailedSyncGitChangeNotesException extends RuntimeException {
 
   /**
    * Constructs a new FailedSyncGitChangeNotesException with the specified detail message.
+   *
    * @param message the detail message explaining the reason for the failure
    */
   public FailedSyncGitChangeNotesException(String message) {
