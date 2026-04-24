@@ -97,7 +97,7 @@ public class SyncGitChangeNotes implements CommandLineRunner {
     }
 
     logger.info("Updating Git repository {} using change note directory: {}", gitRepository.getName(), changeNoteDirectory);
-    File repositoryDirectory = new File(gitRepository.getLocalPath(REPOSITORY_DIRECTORIES_PATH));
+    File repositoryDirectory = new File(gitRepository.getLocalPath());
     prepareGitRepository(gitRepository, repositoryDirectory);
     syncFromGitRepository(gitRepository, repositoryDirectory);
   }

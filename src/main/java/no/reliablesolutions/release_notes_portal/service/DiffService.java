@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
 import no.reliablesolutions.release_notes_portal.exception.DiffStringGenerationException;
-import no.reliablesolutions.release_notes_portal.runner.SyncGitChangeNotes;
 
 @Service
 @Profile("!ci")
@@ -54,7 +53,7 @@ class DiffService {
       throw new IllegalArgumentException("Git repository cannot be null");
     }
 
-    File repositoryDirectory = new File(gitRepository.getLocalPath(SyncGitChangeNotes.REPOSITORY_DIRECTORIES_PATH));
+    File repositoryDirectory = new File(gitRepository.getLocalPath());
     if (!repositoryDirectory.exists()) {
       throw new IllegalArgumentException("Repository directory does not exist: " + repositoryDirectory.getAbsolutePath());
     }
