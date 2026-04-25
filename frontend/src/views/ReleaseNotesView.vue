@@ -88,7 +88,8 @@ const createReleaseNoteMutation = useCreateReleaseNote({
                   <Search />
                 </Button>
               </InputGroup>
-              <Button 
+              <Button
+                v-if="isAdmin" 
                 variant="solidaccent"
                 @click="createReleaseNoteMutation.mutate([])">
                 {{ t('button.createReleaseNote') }}
