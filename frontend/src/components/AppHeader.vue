@@ -36,8 +36,8 @@ const firstLetters = computed(() => {
 	if (!isAuthenticated.value) return '';
 	if (!jwtTokenDecoded.value) return '';
 
-	const firstName = jwtTokenDecoded.value.family_name || '';
-	const lastName = jwtTokenDecoded.value.given_name || '';
+	const firstName = jwtTokenDecoded.value.given_name || '';
+	const lastName = jwtTokenDecoded.value.family_name || '';
 	return firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase();
 })
 
