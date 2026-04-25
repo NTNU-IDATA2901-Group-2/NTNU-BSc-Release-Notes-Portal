@@ -172,7 +172,8 @@
     "tooltip": {
         "noCommits": "Aucun commit git associé",
         "publishedNote": "Les non-administrateurs peuvent voir cette note",
-        "privateNote": "Seuls les administrateurs peuvent voir cette note"
+        "privateNote": "Seuls les administrateurs peuvent voir cette note",
+        "explainSummarize": "Utilisez les diffs git associés pour résumer"
     },
     "prompts": {
         "translationPrompt": "Prompt de traduction",

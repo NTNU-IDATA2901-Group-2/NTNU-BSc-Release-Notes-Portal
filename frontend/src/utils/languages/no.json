@@ -173,7 +173,8 @@
     "tooltip": {
         "noCommits": "Ingen tilknyttede git commits",
         "publishedNote": "Ikke-administratorer kan se dette notatet",
-        "privateNote": "Bare administratorer kan se dette notatet"
+        "privateNote": "Bare administratorer kan se dette notatet",
+        "explainSummarize": "Bruk tilknyttede git diffs for å oppsummere"
     },
     "prompts": {
         "translationPrompt": "Oversettelsesprompt",

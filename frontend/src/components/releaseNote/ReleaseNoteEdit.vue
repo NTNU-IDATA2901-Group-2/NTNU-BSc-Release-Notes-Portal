@@ -229,6 +229,9 @@ onBeforeUnmount(() => {
                 <TooltipContent v-if="disableSummarizeButton">
                   {{ t('tooltip.noCommits') }}
                 </TooltipContent>
+                <TooltipContent v-else>
+                  {{ t('tooltip.explainSummarize') }}
+                </TooltipContent>
               </Tooltip>
               <Button type="button" variant="outline" @click="onCancel">{{ t('button.cancel') }}
                 <Ban />
