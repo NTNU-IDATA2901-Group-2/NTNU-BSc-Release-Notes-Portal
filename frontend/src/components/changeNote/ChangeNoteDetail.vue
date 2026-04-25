@@ -142,10 +142,19 @@ onBeforeUnmount(() => {
             <h1 v-if="changeNote.reference" class="text-3xl max-w-60 whitespace-nowrap overflow-hidden">{{
               changeNote.reference }}</h1>
             <h1 v-else class="text-3xl text-text-primary/50">{{ t('placeholder.noTitle') }}</h1>
-            <Badge 
-              v-if="isAdmin" class="h-6"
-              :variant="changeNote.published ? 'success' : 'destructive'">{{ changeNote.published ?
-                'Published' : 'Private' }}</Badge>
+            <Tooltip v-if="isAdmin">
+              <TooltipTrigger as-child>
+                <Badge 
+                  v-if="isAdmin" class="h-6"
+                  :variant="changeNote.published ? 'success' : 'destructive'"
+                >
+                  {{ changeNote.published ? t('card.published') : t('card.private') }}
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                  {{ changeNote.published ? t('tooltip.publishedNote') : t('tooltip.privateNote') }}
+              </TooltipContent>
+            </Tooltip>
           </div>
           <div class="flex gap-4 justify-center items-center">
             <Button :disabled="isTranslating" v-if="!(locale === 'en')" variant="glow" @click="onTranslate">{{hasTranslation ? t('button.undo') : t('button.translate') }}

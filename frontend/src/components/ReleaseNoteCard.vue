@@ -5,6 +5,9 @@ import type { ReleaseNote } from '@/utils/types';
 import { RouterLink } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { isAdmin } from '@/utils/keycloak';
+import Tooltip from './ui/tooltip/Tooltip.vue';
+import TooltipTrigger from './ui/tooltip/TooltipTrigger.vue';
+import TooltipContent from './ui/tooltip/TooltipContent.vue';
 
 const props = defineProps<PrimitiveProps & {
   releaseNote: ReleaseNote,
@@ -22,8 +25,19 @@ const { t } = useI18n();
         <h3 v-if="releaseNote.tag" class="text-xl">{{ releaseNote.tag }}</h3>
         <h3 v-else class="text-xl text-text-primary/50">{{ t('placeholder.noTitle') }}</h3>
 
-        <Badge v-if="isAdmin" :variant="releaseNote.published ? 'success' : 'destructive'">{{ releaseNote.published
-          ? t('card.published') : t('card.private') }}</Badge>
+        <Tooltip v-if="isAdmin">
+          <TooltipTrigger as-child>
+            <Badge 
+              data-pdf-exclude  class="h-6"
+              :variant="releaseNote.published ? 'success' : 'destructive'"
+            >
+              {{ releaseNote.published ? t('card.published') : t('card.private') }}
+            </Badge>
+          </TooltipTrigger>
+          <TooltipContent>
+              {{ releaseNote.published ? t('tooltip.publishedNote') : t('tooltip.privateNote') }}
+          </TooltipContent>
+        </Tooltip>
       </div>
       <p>{{ t('card.containsChangeNotes', { count: releaseNote.changeNotes.length }) }}</p>
     </div>

@@ -49,11 +49,19 @@ const handleCheckboxClick = (event: Event) => {
           </Tooltip>
 
         </div>
-        <div>
-          <Badge v-if="isAdmin" :variant="changeNote.published ? 'success' : 'destructive'">{{
-            changeNote.published
-              ? t('card.published') : t('card.private') }}</Badge>
-        </div>
+        <Tooltip v-if="isAdmin">
+          <TooltipTrigger as-child>
+            <Badge 
+              v-if="isAdmin" class="h-6"
+              :variant="changeNote.published ? 'success' : 'destructive'"
+            >
+              {{ changeNote.published ? t('card.published') : t('card.private') }}
+            </Badge>
+          </TooltipTrigger>
+          <TooltipContent>
+              {{ changeNote.published ? t('tooltip.publishedNote') : t('tooltip.privateNote') }}
+          </TooltipContent>
+        </Tooltip>
       </div>
 
 

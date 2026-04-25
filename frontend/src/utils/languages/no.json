@@ -20,8 +20,8 @@
         "publish": "Publiser",
         "unpublish": "Avpubliser",
         "none": "Ingen",
-        "createChangeNote": "Opprett Endringsnotat",
-        "createReleaseNote": "Opprett Utgivelsesnotat",
+        "createChangeNote": "Opprett endringsnotat",
+        "createReleaseNote": "Opprett utgivelsesnotat",
         "filter": "Filtrer",
         "search": "Søk",
         "signIn": "Logg inn",
@@ -111,7 +111,7 @@
     },
     "notFound": {
         "resourceNotFound": "Ressursen du prøver å få tilgang til har enten blitt flyttet, eller eksisterer ikke.",
-        "404": "404 - Not Found"
+        "404": "404 - Ikke funnet"
     },
     "signIn": {
         "pleaseSignIn": "Vennligst logg inn"
@@ -149,7 +149,7 @@
         "syncError": "Det oppsto en feil under synkronisering av repositoryer",
         "sync": "Synkroniser",
         "noGitRepositories": "Ingen git repositoryer tilgjengelig, vennligst legg til en repository på repositorysiden",
-        "noChangeNotesInRepository": "Ingen change notes funnet i den valgte repositoryen",
+        "noChangeNotesInRepository": "Ingen endringsnotater funnet i den valgte repositoryen",
         "deleteTitle": "Slett Repository",
         "deleteDescription": "Er du sikker på at du vil slette dette repositoryet? Alle relaterte endringsnotater vil bli frakoblet. Denne handlingen kan ikke angres."
     },
@@ -168,10 +168,12 @@
     },
     "changeNote": {
         "noReference": "Ingen referanse oppgitt",
-        "changeNoteViewableByEveryone": "Dette endringsnotatet er synlig for alle brukere når det er publisert."
+        "changeNoteViewableByEveryone": "Dette endringsnotatet er synlig for alle kunder når det er publisert."
     },
     "tooltip": {
-        "noCommits": "Ingen tilknyttede git commits"
+        "noCommits": "Ingen tilknyttede git commits",
+        "publishedNote": "Ikke-administratorer kan se dette notatet",
+        "privateNote": "Bare administratorer kan se dette notatet"
     },
     "prompts": {
         "translationPrompt": "Oversettelsesprompt",
