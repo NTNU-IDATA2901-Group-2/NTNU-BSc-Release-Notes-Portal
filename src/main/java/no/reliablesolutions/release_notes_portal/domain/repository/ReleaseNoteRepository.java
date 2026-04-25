@@ -7,6 +7,9 @@ import org.springframework.data.jpa.repository.Query;
 
 import no.reliablesolutions.release_notes_portal.domain.entity.ReleaseNote;
 
+/**
+ * Repository for managing ReleaseNote entities.
+ */
 public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> {
 
   /**
@@ -41,6 +44,7 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
    *                   fields (case-insensitive).
    * @param published  The filter for published status
    * @param productIds The list of product IDs to filter by.
+   * @param customerGroups The list of customer groups to filter by (case-insensitive).
    */
   @Query("""
       SELECT r

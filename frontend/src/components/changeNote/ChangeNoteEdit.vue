@@ -21,6 +21,7 @@ import Tooltip from '../ui/tooltip/Tooltip.vue';
 import TooltipTrigger from '../ui/tooltip/TooltipTrigger.vue';
 import TooltipContent from '../ui/tooltip/TooltipContent.vue';
 import { onBeforeRouteLeave } from 'vue-router';
+import { Spinner } from '../ui/spinner';
 
 const props = defineProps<{
   changeNote: ChangeNote;
@@ -101,6 +102,8 @@ const onCancelViewable = () => {
     viewAbleByEveryone.value = false;
 }
 
+const loadingSummary = ref(false);
+
 const summarizeChangeNote = useSummarizeChangeNotes({
     onSuccess: (summary?: string) => {
         description.value = summary;
@@ -108,8 +111,16 @@ const summarizeChangeNote = useSummarizeChangeNotes({
     },
     onError: () => {
         toast.error(t('toast.summarizeError'));
+    },
+    onSettled: () => {
+        loadingSummary.value = false;
     }
 })
+
+const onSummarize = () => {
+    loadingSummary.value = true;
+    summarizeChangeNote.mutate([props.changeNote.id]);
+}
 
 const hasCommits = useGetHasCommits([props.changeNote.id]);
 const disableSummarizeButton = computed(() => hasCommits.isPending.value || hasCommits.isError.value || hasCommits.data.value !== true);  
@@ -143,15 +154,15 @@ onBeforeUnmount(() => {
         <div class="flex flex-col gap-1 w-full">
             <div class="flex sm:hidden ml-auto gap-4">
                 <Button
-                    :disabled="disableSummarizeButton"
+                    :disabled="disableSummarizeButton || loadingSummary"
                     type="button"
-                    @click="summarizeChangeNote.mutate([props.changeNote.id])"
+                    @click="onSummarize"
                     variant="glow"
                 >
                     {{t('button.summarize')}}
-                    <Sparkles />
+                    <Spinner size="sm" v-if="loadingSummary" class="h-4 dark:text-text-primary"/>
+                    <Sparkles v-else/>
                 </Button>
-            
                 <Button type="button" @click="onCancel" variant="outline">
                     {{ t('button.cancel') }}
                     <Ban />
@@ -169,13 +180,14 @@ onBeforeUnmount(() => {
                     <TooltipTrigger as-child>
                         <div class = "inline-flex">
                             <Button
-                                :disabled="disableSummarizeButton"
+                                :disabled="disableSummarizeButton  || loadingSummary"
                                 type="button"
-                                @click="summarizeChangeNote.mutate([props.changeNote.id])"
+                                @click="onSummarize"
                                 variant="glow"
                             >
                                 {{t('button.summarize')}}
-                                <Sparkles />
+                                <Spinner v-if="loadingSummary" class="h-4 dark:text-text-primary" />
+                                <Sparkles v-else />
                             </Button>
                         </div>
                     </TooltipTrigger>

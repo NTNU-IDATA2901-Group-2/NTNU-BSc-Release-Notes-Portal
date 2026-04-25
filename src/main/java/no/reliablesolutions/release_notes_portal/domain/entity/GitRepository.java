@@ -2,7 +2,6 @@ package no.reliablesolutions.release_notes_portal.domain.entity;
 
 import java.io.File;
 
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,6 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import no.reliablesolutions.release_notes_portal.runner.SyncGitChangeNotes;
 
 /**
  * Entity representing a Git repository.
@@ -37,13 +37,12 @@ public class GitRepository {
     private String lastCheckedCommitHash;
 
     /**
-     * Returns the local path for the Git repository based on the provided base directory.
+     * Returns the local path for the Git repository.
      *
-     * @param repositoryDirectoriesPath the base directory where Git repositories are stored
      * @return the local path for this Git repository
      */
-    public String getLocalPath(String repositoryDirectoriesPath) {
-        return repositoryDirectoriesPath + File.separator + this.getName();
+    public String getLocalPath() {
+        return SyncGitChangeNotes.REPOSITORY_DIRECTORIES_PATH + File.separator + this.getName();
     }
 }
 
