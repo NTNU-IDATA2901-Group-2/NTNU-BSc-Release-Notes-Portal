@@ -242,10 +242,20 @@ const customerFilter = ref<number>(-1);
             <h1 v-if="!releaseNote.tag" class="text-4xl text-text-primary/50">{{ t('placeholder.noTitle') }}</h1>
             <h1 v-else class="text-4xl max-w-60 whitespace-nowrap overflow-hidden">{{
               releaseNote.tag }}</h1>
-            <Badge 
-              data-pdf-exclude v-if="isAdmin" class="h-6"
-              :variant="releaseNote.published ? 'success' : 'destructive'">{{
-                releaseNote.published ? 'Published' : 'Private' }}</Badge>
+              <Tooltip v-if="isAdmin">
+                <TooltipTrigger as-child>
+                  <Badge 
+                    data-pdf-exclude  class="h-6"
+                    :variant="releaseNote.published ? 'success' : 'destructive'"
+                  >
+                    {{ releaseNote.published ? t('card.published') : t('card.private') }}
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent>
+                    {{ releaseNote.published ? t('tooltip.publishedNote') : t('tooltip.privateNote') }}
+                </TooltipContent>
+              </Tooltip>
+            
           </div>
           <div data-pdf-exclude class="flex sm:gap-4">
             <Button 

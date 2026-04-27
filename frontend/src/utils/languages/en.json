@@ -167,10 +167,13 @@
     },
     "changeNote": {
         "noReference": "No reference provided",
-        "changeNoteViewableByEveryone": "This change note is viewable to all users when published."
+        "changeNoteViewableByEveryone": "This change note is viewable to all customers when published."
     },
     "tooltip": {
-        "noCommits": "No associated git commits"
+        "noCommits": "No associated git commits",
+        "publishedNote": "Non-administrators can view this note",
+        "privateNote": "Only administrators can view this note",
+        "explainSummarize": "Use associated git diffs to summarize"
     },
     "prompts": {
         "translationPrompt": "Translation Prompt",

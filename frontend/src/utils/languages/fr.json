@@ -1,14 +1,14 @@
-{
+{ 
     "header": {
         "releaseNotesLink": "Notes de version",
-        "changeNotesLink": "Notes de modification",
-        "toggleTheme": "Changer le thème",
+        "changeNotesLink": "Notes de changement",
+        "toggleTheme": "Changer de thème",
         "signOut": "Se déconnecter",
         "language": "Langue",
         "english": "Anglais",
         "norwegian": "Norvégien",
         "repositories": "Dépôts",
-        "editPrompts": "Invites"
+        "editPrompts": "Prompts"
     },
     "button": {
         "previous": "Précédent",
@@ -16,11 +16,11 @@
         "save": "Enregistrer",
         "cancel": "Annuler",
         "delete": "Supprimer",
-        "export": "Exporter PDF",
+        "export": "Exporter en PDF",
         "publish": "Publier",
         "unpublish": "Dépublier",
         "none": "Aucun",
-        "createChangeNote": "Créer une note de modification",
+        "createChangeNote": "Créer une note de changement",
         "createReleaseNote": "Créer une note de version",
         "search": "Rechercher",
         "filter": "Filtrer",
@@ -28,7 +28,7 @@
         "clearFilters": "Effacer les filtres",
         "translate": "Traduire",
         "undo": "Annuler",
-        "showGeneralChanges": "Afficher les modifications générales",
+        "showGeneralChanges": "Afficher les changements généraux",
         "confirm": "Confirmer",
         "summarize": "Résumer",
         "allCustomers": "Tous les clients",
@@ -41,12 +41,12 @@
         "scope": "Portée",
         "feature": "Fonctionnalité",
         "customer": "Client",
-        "developerNotes": "Notes du développeur",
-        "upgradeRequirements": "Exigences de mise à niveau",
+        "developerNotes": "Notes développeur",
+        "upgradeRequirements": "Prérequis de mise à niveau",
         "status": "Statut",
-        "changeNotes": "Notes de modification",
+        "changeNotes": "Notes de changement",
         "releaseNotes": "Notes de version",
-        "allocated": "Attribué",
+        "allocated": "Affecté",
         "visibility": "Visible par tous",
         "from": "De",
         "to": "À",
@@ -54,105 +54,138 @@
         "fromRepository": "Depuis le dépôt"
     },
     "toast": {
-        "changeNoteDeleted": "Note de modification supprimée avec succès",
-        "changeNoteDeleteError": "Une erreur est survenue lors de la suppression de la note de modification",
-        "changeNoteCreated": "Note de modification créée avec succès",
-        "changeNoteCreateError": "Une erreur est survenue lors de la création de la note de modification",
-        "changeNotePublished": "Note de modification publiée avec succès",
-        "changeNoteUnpublished": "Note de modification dépubliée avec succès",
-        "changeNotePublishError": "Une erreur est survenue lors de la publication de la note de modification",
-        "changeNoteUnpublishError": "Une erreur est survenue lors de la dépublication de la note de modification",
-        "changeNoteUpdatedSuccess": "Note de modification mise à jour avec succès",
-        "changeNoteUpdateError": "Une erreur est survenue lors de la mise à jour de la note de modification",
-        "changeNoteLoadingError": "Une erreur est survenue lors du chargement de la note de modification",
-        "selectedChangeNotesPublished": "Notes de modification sélectionnées publiées avec succès",
-        "selectedChangeNotesPublishError": "Les notes de modification sélectionnées n'ont pas pu être publiées",
+        "changeNoteDeleted": "Note de changement supprimée avec succès",
+        "changeNoteDeleteError": "Une erreur s'est produite lors de la suppression de la note de changement",
+        "changeNoteCreated": "Note de changement créée avec succès",
+        "changeNoteCreateError": "Une erreur s'est produite lors de la création de la note de changement",
+        "changeNotePublished": "Note de changement publiée avec succès",
+        "changeNoteUnpublished": "Note de changement dépubliée avec succès",
+        "changeNotePublishError": "Une erreur s'est produite lors de la publication de la note de changement",
+        "changeNoteUnpublishError": "Une erreur s'est produite lors de la dépublication de la note de changement",
+        "changeNoteUpdatedSuccess": "Note de changement mise à jour avec succès",
+        "changeNoteUpdateError": "Une erreur s'est produite lors de la mise à jour de la note de changement",
+        "changeNoteLoadingError": "Une erreur s'est produite lors du chargement de la note de changement",
+        "selectedChangeNotesPublished": "Les notes de changement sélectionnées ont été publiées avec succès",
+        "selectedChangeNotesPublishError": "Les notes de changement sélectionnées n'ont pas pu être publiées",
         "releaseNoteCreated": "Note de version créée avec succès",
-        "releaseNoteCreateError": "Une erreur est survenue lors de la création de la note de version",
+        "releaseNoteCreateError": "Une erreur s'est produite lors de la création de la note de version",
         "releaseNoteDeletedSuccess": "Note de version supprimée avec succès",
-        "releaseNoteDeleteError": "Une erreur est survenue lors de la suppression de la note de version",
+        "releaseNoteDeleteError": "Une erreur s'est produite lors de la suppression de la note de version",
         "releaseNotePublished": "Note de version publiée avec succès",
         "releaseNoteUnpublished": "Note de version dépubliée avec succès",
-        "releaseNotePublishError": "Une erreur est survenue lors de la publication de la note de version",
-        "releaseNoteUnpublishError": "Une erreur est survenue lors de la dépublication de la note de version",
+        "releaseNotePublishError": "Une erreur s'est produite lors de la publication de la note de version",
+        "releaseNoteUnpublishError": "Une erreur s'est produite lors de la dépublication de la note de version",
         "releaseNoteUpdatedSuccess": "Note de version mise à jour avec succès",
-        "releaseNoteUpdateError": "Une erreur est survenue lors de la mise à jour de la note de version",
-        "exportPdfError": "Une erreur est survenue lors de l'exportation en PDF",
-        "translationError": "Une erreur est survenue lors de la traduction de la note de modification",
-        "translationSuccess": "Note de modification traduite avec succès",
+        "releaseNoteUpdateError": "Une erreur s'est produite lors de la mise à jour de la note de version",
+        "exportPdfError": "Une erreur s'est produite lors de l'export en PDF",
+        "translationError": "Une erreur s'est produite lors de la traduction de la note de changement",
+        "translationSuccess": "Note de changement traduite avec succès",
         "copySuccess": "Contenu copié dans le presse-papiers",
-        "copyError": "Une erreur est survenue lors de la copie dans le presse-papiers",
-        "summarizeSuccess": "Résumé avec succès",
-        "summarizeError": "Une erreur est survenue lors du résumé"
+        "copyError": "Une erreur s'est produite lors de la copie dans le presse-papiers",
+        "summarizeSuccess": "Résumé effectué avec succès",
+        "summarizeError": "Une erreur s'est produite lors du résumé"
     },
     "deletePrompt": {
         "title": "Êtes-vous sûr de vouloir supprimer ?",
-        "description": "Cette action est irréversible."
+        "description": "Cette action ne peut pas être annulée."
     },
     "card": {
         "published": "Publié",
         "private": "Privé",
-        "containsChangeNotes": "aucune note de modification | 1 note de modification | {count} notes de modification"
+        "containsChangeNotes": "aucune note de changement | 1 note de changement | {count} notes de changement"
     },
     "input": {
-        "addChangeNotes": "Ajouter des notes de modification"
+        "addChangeNotes": "Ajouter des notes de changement"
     },
     "loadingError": {
-        "changeNotes": "Une erreur est survenue lors du chargement des notes de modification",
-        "releaseNotes": "Une erreur est survenue lors du chargement des notes de version",
-        "products": "Une erreur est survenue lors du chargement des produits",
-        "scopes": "Une erreur est survenue lors du chargement des portées",
-        "features": "Une erreur est survenue lors du chargement des fonctionnalités",
-        "customers": "Une erreur est survenue lors du chargement des clients"
+        "changeNotes": "Une erreur s'est produite lors du chargement des notes de changement",
+        "releaseNotes": "Une erreur s'est produite lors du chargement des notes de version",
+        "products": "Une erreur s'est produite lors du chargement des produits",
+        "scopes": "Une erreur s'est produite lors du chargement des portées",
+        "features": "Une erreur s'est produite lors du chargement des fonctionnalités",
+        "customers": "Une erreur s'est produite lors du chargement des clients"
     },
     "loading": {
         "filter": "Chargement du filtre..."
     },
     "notFound": {
-        "resourceNotFound": "La ressource que vous essayez d’accéder a été déplacée ou n’existe pas.",
-        "404": "404 - Non trouvé"
+        "resourceNotFound": "La ressource à laquelle vous essayez d'accéder a été déplacée ou n'existe pas.",
+        "404": "404 - Introuvable"
     },
     "signIn": {
-        "pleaseSignIn": "Veuillez vous connecter..."
-    },
-    "ai": {
-        "translationDisclaimer": "Cette traduction est générée par l'IA. Veuillez vérifier les faits importants."
+        "pleaseSignIn": "Veuillez vous connecter ..."
     },
     "placeholder": {
         "title": "Titre",
         "description": "Description",
-        "developerNotes": "Notes du développeur",
-        "upgradeRequirements": "Exigences de mise à niveau",
+        "developerNotes": "Notes développeur",
+        "upgradeRequirements": "Prérequis de mise à niveau",
         "noReleaseNotesFound": "Aucune note de version trouvée",
-        "noChangeNotesFound": "Aucune note de modification trouvée",
+        "noChangeNotesFound": "Aucune note de changement trouvée",
         "noSummary": "Aucun résumé fourni",
-        "noChangeNotesAdded": "Aucune note de modification ajoutée",
-        "noTitle": "Aucun titre",
+        "noChangeNotesAdded": "Aucune note de changement ajoutée",
+        "noTitle": "Sans titre",
         "noDescription": "Aucune description"
     },
     "repositories": {
         "title": "Dépôts Git",
         "addRepository": "Ajouter un dépôt",
-        "url": "Url",
+        "url": "URL",
         "name": "Nom",
         "remove": "Supprimer",
-        "id": "Id",
+        "id": "ID",
         "namePlaceholder": "Nom du dépôt",
         "urlPlaceholder": "URL de clonage Git",
         "deleteSuccess": "Dépôt supprimé avec succès",
-        "deleteError": "Une erreur est survenue lors de la suppression du dépôt",
+        "deleteError": "Une erreur s'est produite lors de la suppression du dépôt",
         "createSuccess": "Dépôt ajouté avec succès",
-        "createError": "Une erreur est survenue lors de l'ajout du dépôt",
+        "createError": "Une erreur s'est produite lors de l'ajout du dépôt",
         "nameRequired": "Le nom est requis",
         "urlRequired": "L'URL est requise",
-        "error": "Une erreur est survenue lors du chargement des dépôts",
+        "error": "Une erreur s'est produite lors du chargement des dépôts",
         "syncAll": "Synchroniser tous les dépôts",
         "syncSuccess": "Dépôts synchronisés avec succès",
-        "syncError": "Une erreur est survenue lors de la synchronisation des dépôts",
+        "syncError": "Une erreur s'est produite lors de la synchronisation des dépôts",
         "sync": "Synchroniser",
-        "noGitRepositories": "Aucun dépôt Git disponible, veuillez ajouter un dépôt sur la page des dépôts",
-        "noChangeNotesInRepository": "Aucune note de modification trouvée dans le dépôt sélectionné",
+        "noGitRepositories": "Aucun dépôt git disponible, veuillez ajouter un dépôt sur la page des dépôts",
+        "noChangeNotesInRepository": "Aucune note de changement trouvée dans le dépôt sélectionné",
         "deleteTitle": "Supprimer le dépôt",
-        "deleteDescription": "Êtes-vous sûr de vouloir supprimer ce dépôt ? Toutes les notes de modification associées seront dissociées. Cette action ne peut pas être annulée."
+        "deleteDescription": "Êtes-vous sûr de vouloir supprimer ce dépôt ? Toutes les notes de changement associées seront dissociées. Cette action ne peut pas être annulée."
+    },
+    "ai": {
+        "translationDisclaimer": "Cette traduction est générée par l'IA. Veuillez vérifier les informations importantes."
+    },
+    "changeNoteEdit": {
+        "viewableByEveryone": "Si cochée, cette note de changement sera visible par tous. Cette action peut entraîner l'exposition d'informations sensibles. Êtes-vous sûr de vouloir rendre cette note de changement visible par tous ?",
+        "viewableByEveryoneTitle": "Visibilité de la note de changement",
+        "cancelTitle": "Annuler la modification",
+        "cancelDescription": "Êtes-vous sûr de vouloir annuler la modification ? Toutes les modifications non enregistrées seront perdues."
+    },
+    "releaseNoteEdit": {
+        "cancelTitle": "Annuler la modification",
+        "cancelDescription": "Êtes-vous sûr de vouloir annuler la modification ? Toutes les modifications non enregistrées seront perdues."
+    },
+    "changeNote": {
+        "noReference": "Aucune référence fournie",
+        "changeNoteViewableByEveryone": "Cette note de changement est visible par tous les clients lorsqu’elle est publiée."
+    },
+    "tooltip": {
+        "noCommits": "Aucun commit git associé",
+        "publishedNote": "Les non-administrateurs peuvent voir cette note",
+        "privateNote": "Seuls les administrateurs peuvent voir cette note",
+        "explainSummarize": "Utilisez les diffs git associés pour résumer"
+    },
+    "prompts": {
+        "translationPrompt": "Prompt de traduction",
+        "changeNoteSummaryPrompt": "Prompt de résumé des notes de changement",
+        "releaseNoteSummaryPrompt": "Prompt de résumé des notes de version",
+        "editPrompts": "Modifier les prompts",
+        "translationPromptPlaceholder": "Saisissez le prompt utilisé pour la traduction IA",
+        "changeNoteSummaryPromptPlaceholder": "Saisissez le prompt utilisé pour le résumé IA des notes de changement",
+        "releaseNoteSummaryPromptPlaceholder": "Saisissez le prompt utilisé pour le résumé IA des notes de version",
+        "errorLoadingPrompts": "Une erreur s'est produite lors du chargement des prompts",
+        "promptPlaceholder": "Saisissez le prompt",
+        "saveSuccess": "Prompts mis à jour avec succès",
+        "saveError": "Une erreur s'est produite lors de la mise à jour des prompts"
     }
 }
