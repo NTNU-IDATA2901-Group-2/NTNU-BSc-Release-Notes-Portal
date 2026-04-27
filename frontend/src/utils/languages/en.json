@@ -32,7 +32,8 @@
         "confirm": "Confirm",
         "summarize": "Summarize",
         "allCustomers": "All customers",
-        "updateRange": "Update Range"
+        "updateRange": "Update Range",
+        "clearChangeNotes": "Clear change notes"
     },
     "title": {
         "title": "Title",

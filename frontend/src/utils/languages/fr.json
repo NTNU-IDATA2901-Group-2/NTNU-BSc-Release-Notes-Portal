@@ -32,7 +32,8 @@
         "confirm": "Confirmer",
         "summarize": "Résumer",
         "allCustomers": "Tous les clients",
-        "updateRange": "Mettre à jour la plage"
+        "updateRange": "Mettre à jour la plage",
+        "clearChangeNotes": "Effacer les notes de changement"
     },
     "title": {
         "title": "Titre",
