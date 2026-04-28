@@ -268,8 +268,16 @@ onBeforeUnmount(() => {
             <div class="flex flex-col gap-1">
               <h1 class="text-lg">{{ t('title.changeNotes') }}</h1>
               <MultiselectChangeNotes 
-              @update:model-value="onChangeNotesUpdate"
+                @update:model-value="onChangeNotesUpdate"
                 v-model="changeNoteIdsWithinReleaseNote" />
+              <Button
+                variant="outline"
+                type="button"
+                class="w-fit"
+                @click="changeNoteIdsWithinReleaseNote = []"
+              >
+                {{ t('button.clearChangeNotes') }}
+              </Button>
             </div>
             <div class="flex flex-col gap-1">
               <h2 class="text-xl">{{ t('title.addFromRepository') }}</h2>

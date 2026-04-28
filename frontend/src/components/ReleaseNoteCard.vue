@@ -20,9 +20,9 @@ const { t } = useI18n();
 <template>
   <RouterLink :to="`/release-notes/${releaseNote.id}`" >
     <div
-      class="flex flex-col p-4 gap-2 h-30 overflow-hidden text-wrap rounded-lg hover:bg-text-primary/10 transition-colors">
+      class="flex flex-col p-4 gap-2 h-30 overflow-hidden max-w-full text-wrap rounded-lg hover:bg-text-primary/10 transition-colors">
       <div class="flex flex-row justify-between">
-        <h3 v-if="releaseNote.tag" class="text-xl">{{ releaseNote.tag }}</h3>
+        <h3 v-if="releaseNote.tag" class="text-xl text-ellipsis overflow-hidden">{{ releaseNote.tag }}</h3>
         <h3 v-else class="text-xl text-text-primary/50">{{ t('placeholder.noTitle') }}</h3>
 
         <Tooltip v-if="isAdmin">

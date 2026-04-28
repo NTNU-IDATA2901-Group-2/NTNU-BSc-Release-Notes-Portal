@@ -136,9 +136,9 @@ onBeforeUnmount(() => {
   <DialogPrompt :open="showDeletePrompt" :mode="'delete'" :title-key="'deletePrompt.title'" :description-key="'deletePrompt.description'" @update:open="showDeletePrompt = false" @confirm="onDelete" />
     <div class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
       <div class="flex flex-col gap-4 w-full">
-        <div class="flex flex-row items-center justify-between w-full">
-          <div class="flex items-center gap-4">
-            <h1 v-if="changeNote.reference" class="text-3xl max-w-60 whitespace-nowrap overflow-hidden">{{
+        <div class="flex flex-row items-center justify-between w-full gap-4">
+          <div class="flex items-center gap-4 min-w-0">
+            <h1 v-if="changeNote.reference" class="text-3xl md:text-4xl whitespace-nowrap text-ellipsis overflow-hidden">{{
               changeNote.reference }}</h1>
             <h1 v-else class="text-3xl text-text-primary/50">{{ t('placeholder.noTitle') }}</h1>
             <Tooltip v-if="isAdmin">
@@ -236,7 +236,7 @@ onBeforeUnmount(() => {
         </div>
         <Tooltip v-if="changeNote.gitCommitHash && isAdmin">
           <TooltipTrigger as-child>
-            <p :onclick="() => handleCopy(changeNote.gitCommitHash)" class="cursor-pointer text-text-primary/50">{{ changeNote.gitCommitHash }}</p>
+            <p :onclick="() => handleCopy(changeNote.gitCommitHash)" class="cursor-pointer text-text-primary/50 text-ellipsis overflow-hidden">{{ changeNote.gitCommitHash }}</p>
           </TooltipTrigger>
           <TooltipContent>
               Git commit hash

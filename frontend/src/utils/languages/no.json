@@ -32,7 +32,8 @@
         "confirm": "Bekreft",
         "summarize": "Oppsummer",
         "allCustomers": "Alle kunder",
-        "updateRange": "Oppdater fra/til"
+        "updateRange": "Oppdater fra/til",
+        "clearChangeNotes": "Fjern endringsnotater"
     },
     "title": {
         "title": "Tittel",
