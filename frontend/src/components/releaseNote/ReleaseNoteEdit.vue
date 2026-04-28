@@ -23,6 +23,7 @@ import TooltipTrigger from '../ui/tooltip/TooltipTrigger.vue';
 import TooltipContent from '../ui/tooltip/TooltipContent.vue';
 import DialogPrompt from '../DialogPrompt.vue';
 import { useGetGitRepositories } from '@/api/git-repository-api';
+import Spinner from '../ui/spinner/Spinner.vue';
 
 const { t } = useI18n();
 
@@ -82,6 +83,8 @@ const onChangeNoteRangeChange = (gitRepositoryId: number) => {
   changeNoteIdsWithinReleaseNote.value = [...new Set([...(changeNoteIdsWithinReleaseNote.value ?? []), ...newChangeNoteIds])];
 }
 
+const loadingSummary = ref(false);
+
 const summarizeReleaseNote = useSummarizeChangeNotes({
   onSuccess: (summary) => {
     if (summary === undefined) {
@@ -93,11 +96,19 @@ const summarizeReleaseNote = useSummarizeChangeNotes({
   },
   onError: () => {
     toast.error(t('toast.summarizeError'));
+  },
+  onSettled: () => {
+    loadingSummary.value = false;
   }
 })
 
+const onSummarize = () => {
+  loadingSummary.value = true;
+  summarizeReleaseNote.mutate(changeNoteIdsWithinReleaseNote.value);
+}
+
 const hasCommits = useGetHasCommits(changeNoteIdsWithinReleaseNote);
-const disableSummarizeButton = computed(() => hasCommits.isPending.value || hasCommits.isError.value || hasCommits.data.value !== true);
+const disableSummarizeButton = computed(() => hasCommits.isPending.value || hasCommits.isError.value || hasCommits.data.value !== true || loadingSummary.value);
 
 
 const form = useForm({
@@ -193,9 +204,10 @@ onBeforeUnmount(() => {
           <div data-pdf-exclude class="flex sm:hidden gap-4 ml-auto">
             <Button 
             :disabled="disableSummarizeButton" type="button"
-              @click="summarizeReleaseNote.mutate(changeNoteIdsWithinReleaseNote)" variant="glow">
+              @click="onSummarize" variant="glow">
               {{ t('button.summarize') }}
-              <Sparkles />
+              <Spinner size="sm" v-if="loadingSummary" class="h-4 dark:text-text-primary"/>
+              <Sparkles v-else/>
             </Button>
             <Button type="button" class="" variant="outline" @click="onCancel">{{ t('button.cancel')
               }}
@@ -219,15 +231,19 @@ onBeforeUnmount(() => {
                   <div class="inline-flex">
                     <Button 
                     :disabled="disableSummarizeButton" type="button"
-                      @click="summarizeReleaseNote.mutate(changeNoteIdsWithinReleaseNote)"
+                      @click="onSummarize"
                       variant="glow">
                       {{ t('button.summarize') }}
-                      <Sparkles />
+                      <Spinner size="sm" v-if="loadingSummary" class="h-4 dark:text-text-primary"/>
+                      <Sparkles v-else/>
                     </Button>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent v-if="disableSummarizeButton">
                   {{ t('tooltip.noCommits') }}
+                </TooltipContent>
+                <TooltipContent v-else>
+                  {{ t('tooltip.explainSummarize') }}
                 </TooltipContent>
               </Tooltip>
               <Button type="button" variant="outline" @click="onCancel">{{ t('button.cancel') }}
@@ -252,8 +268,16 @@ onBeforeUnmount(() => {
             <div class="flex flex-col gap-1">
               <h1 class="text-lg">{{ t('title.changeNotes') }}</h1>
               <MultiselectChangeNotes 
-              @update:model-value="onChangeNotesUpdate"
+                @update:model-value="onChangeNotesUpdate"
                 v-model="changeNoteIdsWithinReleaseNote" />
+              <Button
+                variant="outline"
+                type="button"
+                class="w-fit"
+                @click="changeNoteIdsWithinReleaseNote = []"
+              >
+                {{ t('button.clearChangeNotes') }}
+              </Button>
             </div>
             <div class="flex flex-col gap-1">
               <h2 class="text-xl">{{ t('title.addFromRepository') }}</h2>

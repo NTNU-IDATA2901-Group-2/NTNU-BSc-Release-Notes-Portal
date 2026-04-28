@@ -29,13 +29,13 @@ const handleCheckboxClick = (event: Event) => {
     <div
       class="flex flex-col p-4 gap-2 h-30 overflow-hidden text-wrap rounded-lg hover:bg-text-primary/10 transition-colors">
       <div class="flex justify-between">
-        <div class="flex gap-4 items-center">
+        <div class="flex gap-4 items-center min-w-0">
 
           <div @click="handleCheckboxClick" class="flex items-center" v-if="isAdmin">
             <Checkbox v-model="selected" :disabled="false" />
           </div>
 
-          <h3 v-if="changeNote.reference" class="text-xl">{{ changeNote.reference}}</h3>
+          <h3 v-if="changeNote.reference" class="text-xl whitespace-nowrap overflow-hidden text-ellipsis">{{ changeNote.reference}}</h3>
           <h3 v-else class="text-xl text-text-primary/50">{{ t('placeholder.noTitle') }}</h3>
 
           <Tooltip v-if="changeNote.customer">
@@ -49,11 +49,19 @@ const handleCheckboxClick = (event: Event) => {
           </Tooltip>
 
         </div>
-        <div>
-          <Badge v-if="isAdmin" :variant="changeNote.published ? 'success' : 'destructive'">{{
-            changeNote.published
-              ? t('card.published') : t('card.private') }}</Badge>
-        </div>
+        <Tooltip v-if="isAdmin">
+          <TooltipTrigger as-child>
+            <Badge 
+              v-if="isAdmin" class="h-6"
+              :variant="changeNote.published ? 'success' : 'destructive'"
+            >
+              {{ changeNote.published ? t('card.published') : t('card.private') }}
+            </Badge>
+          </TooltipTrigger>
+          <TooltipContent>
+              {{ changeNote.published ? t('tooltip.publishedNote') : t('tooltip.privateNote') }}
+          </TooltipContent>
+        </Tooltip>
       </div>
 
 

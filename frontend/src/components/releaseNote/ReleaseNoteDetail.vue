@@ -237,17 +237,28 @@ const customerFilter = ref<number>(-1);
       ref="releaseNoteRef"
       class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
       <div class="flex flex-col gap-4 w-full">
-        <div class="flex flex-row items-center justify-between w-full">
-          <div class="flex items-center sm:gap-4">
+        <div class="flex flex-row items-center justify-between max-w-full gap-4">
+          <div class="flex items-center gap-4 min-w-0">
             <h1 v-if="!releaseNote.tag" class="text-4xl text-text-primary/50">{{ t('placeholder.noTitle') }}</h1>
-            <h1 v-else class="text-4xl max-w-60 whitespace-nowrap overflow-hidden">{{
-              releaseNote.tag }}</h1>
-            <Badge 
-              data-pdf-exclude v-if="isAdmin" class="h-6"
-              :variant="releaseNote.published ? 'success' : 'destructive'">{{
-                releaseNote.published ? 'Published' : 'Private' }}</Badge>
+            <h1 v-else class="text-3xl md:text-4xl whitespace-nowrap text-ellipsis overflow-hidden">{{
+              releaseNote.tag }}
+            </h1>
+            <Tooltip v-if="isAdmin">
+              <TooltipTrigger as-child>
+                <Badge 
+                  data-pdf-exclude  class="h-6 w-fit"
+                  :variant="releaseNote.published ? 'success' : 'destructive'"
+                >
+                  {{ releaseNote.published ? t('card.published') : t('card.private') }}
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                  {{ releaseNote.published ? t('tooltip.publishedNote') : t('tooltip.privateNote') }}
+              </TooltipContent>
+            </Tooltip>
+            
           </div>
-          <div data-pdf-exclude class="flex sm:gap-4">
+          <div data-pdf-exclude class="flex sm:gap-4 w-fit">
             <Button 
               type="button" v-if="!(locale === 'en')" variant="glow" @click="onTranslate"
               :disabled="isTranslating" class="inline-flex items-center gap-2">

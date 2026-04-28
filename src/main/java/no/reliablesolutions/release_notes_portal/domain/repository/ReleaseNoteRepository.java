@@ -32,6 +32,7 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
         ((:query IS NULL OR :query = '') OR
         LOWER(r.tag) LIKE LOWER('%' || :query || '%') OR
         LOWER(r.summary) LIKE LOWER('%' || :query || '%'))
+      ORDER BY r.createdAt DESC
       """)
   public List<ReleaseNote> findByArchivedFalseAndMatchingFilterParameters(String query, Boolean published,
       List<Long> productIds);
@@ -57,6 +58,7 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
         ((:query IS NULL OR :query = '') OR
         LOWER(r.tag) LIKE LOWER('%' || :query || '%') OR
         LOWER(r.summary) LIKE LOWER('%' || :query || '%'))
+      ORDER BY r.createdAt DESC
       """)
   public List<ReleaseNote> findByArchivedFalseAndMatchingFilterParametersForCustomers(String query, Boolean published,
       List<Long> productIds, List<String> customerGroups);
