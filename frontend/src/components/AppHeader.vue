@@ -94,18 +94,18 @@ const handleLogoClick = () => {
 					</MenubarSub>
 					<template v-if="isAdmin">
 						<MenubarSeparator/>
-						<MenubarItem>
-						<div class="w-full flex justify-end gap-2">
-							<RouterLink class="text-md" :to="routeNames.gitRepositories">{{ t('header.repositories') }}</RouterLink>
-							<GitBranch class="text-text-primary"/>
-						</div>
+						<MenubarItem @click="router.push(routeNames.gitRepositories)">
+							<div class="w-full flex justify-end gap-2">
+								<p class="text-md">{{ t('header.repositories') }}</p>
+								<GitBranch class="text-text-primary"/>
+							</div>
 						</MenubarItem>
 						<MenubarSeparator />
-						<MenubarItem>
-						<div class="w-full flex justify-end gap-2">
-							<RouterLink class="text-md" :to="routeNames.editPrompts">{{ t('header.editPrompts') }}</RouterLink>
-							<Sparkles class="text-text-primary"/>
-						</div>
+						<MenubarItem @click="router.push(routeNames.editPrompts)">
+							<div class="w-full flex justify-end gap-2">
+								<p class="text-md">{{ t('header.editPrompts') }}</p>
+								<Sparkles class="text-text-primary"/>
+							</div>
 						</MenubarItem>
 					</template>
 					<MenubarSeparator />
