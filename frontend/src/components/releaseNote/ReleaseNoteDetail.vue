@@ -75,12 +75,11 @@ const publishReleaseNoteMutation = usePublishReleaseNote({
   }
 })
 
-const releaseNoteRef = ref<HTMLDivElement>();
-
 const handleExport = () => {
   if (!releaseNote) return;
   try {
-    exportToPdf(releaseNote.tag, releaseNoteRef);
+    const filteredChangeNotes = (translatedChangeNotes.value ?? releaseNote.changeNotes).filter(shouldShowChangeNote);
+    exportToPdf(releaseNote.tag, releaseNote.summary, filteredChangeNotes);
   } catch (error) {
     console.error('Error exporting to PDF:', error);
     toast.error(t('toast.exportPdfError'));
@@ -189,18 +188,12 @@ const uniqueCustomers = computed(() => {
 })
 
 const shouldShowChangeNote = (change: ChangeNote) => {
-  if (generalReleasesChecked.value && change.customer === null) {
-    return true;
-  } else if (!generalReleasesChecked.value && change.customer === null) {
-    return false;
+  if (change.customer === null) {
+    return generalReleasesChecked.value;
   }
 
   if (customerFilter.value === -1) {
     return true;
-  }
-
-  if (change.customer === null) {
-    return false;
   }
 
   if (change.customer.id === customerFilter.value) {
@@ -234,7 +227,6 @@ const customerFilter = ref<number>(-1);
     </div>
 
     <div 
-      ref="releaseNoteRef"
       class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
       <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-row items-center justify-between max-w-full gap-4">
@@ -246,7 +238,7 @@ const customerFilter = ref<number>(-1);
             <Tooltip v-if="isAdmin">
               <TooltipTrigger as-child>
                 <Badge 
-                  data-pdf-exclude  class="h-6 w-fit"
+                  class="h-6 w-fit"
                   :variant="releaseNote.published ? 'success' : 'destructive'"
                 >
                   {{ releaseNote.published ? t('card.published') : t('card.private') }}
@@ -258,7 +250,7 @@ const customerFilter = ref<number>(-1);
             </Tooltip>
             
           </div>
-          <div data-pdf-exclude class="flex sm:gap-4 w-fit">
+          <div class="flex sm:gap-4 w-fit">
             <Button 
               type="button" v-if="!(locale === 'en')" variant="glow" @click="onTranslate"
               :disabled="isTranslating" class="inline-flex items-center gap-2">
@@ -309,7 +301,7 @@ const customerFilter = ref<number>(-1);
         <p v-if="releaseNote.summary" v-html="md.render(translatedSummary ?? releaseNote.summary)">
         </p>
         <p class="text-text-primary/50" v-else>{{ t('placeholder.noSummary') }}</p>
-        <Button data-pdf-exclude class="size-fit" variant="outline" @click="handleCopy(hasTranslation ? translatedSummary ?? '' : releaseNote.summary, 'summary')">
+        <Button class="size-fit" variant="outline" @click="handleCopy(hasTranslation ? translatedSummary ?? '' : releaseNote.summary, 'summary')">
           <component :is="copiedKey === 'summary' ? Check : Copy" />
         </Button>
         </div>
@@ -323,22 +315,22 @@ const customerFilter = ref<number>(-1);
           <h2 class="text-3xl">{{ t('title.changeNotes') }}</h2>
           <div class="flex flex-row items-center gap-4">
             <div class="flex gap-2">
-              <p data-pdf-exclude>{{ t('button.showGeneralChanges') }}</p>
-              <Checkbox data-pdf-exclude v-model="generalReleasesChecked" class="cursor-pointer"/>
+              <p>{{ t('button.showGeneralChanges') }}</p>
+              <Checkbox v-model="generalReleasesChecked" class="cursor-pointer"/>
             </div>
             <div>
-              <Select data-pdf-exclude v-model="customerFilter">
-                <SelectTrigger data-pdf-exclude class="w-42">
-                  <SelectValue data-pdf-exclude placeholder="Filter by customer"/>
+              <Select v-model="customerFilter">
+                <SelectTrigger class="w-42">
+                  <SelectValue placeholder="Filter by customer"/>
                 </SelectTrigger>
-                <SelectContent data-pdf-exclude>
-                  <SelectGroup data-pdf-exclude>
-                    <SelectItem data-pdf-exclude :value=-1 class="text-text-primary/50">
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem :value=-1 class="text-text-primary/50">
                       {{ t('button.allCustomers') }}
                     </SelectItem>
                   </SelectGroup>
-                  <SelectGroup data-pdf-exclude>
-                    <SelectItem data-pdf-exclude v-for="customer in uniqueCustomers" :key="customer.id" :value="customer.id">
+                  <SelectGroup>
+                    <SelectItem v-for="customer in uniqueCustomers" :key="customer.id" :value="customer.id">
                       {{ customer.name }}
                     </SelectItem>
                   </SelectGroup>
@@ -372,21 +364,21 @@ const customerFilter = ref<number>(-1);
                 <div>
                   <div class="flex justify-between align-center">
                     <div>
-                      <h3 class="text-xl" data-pdf-exclude>{{ t('title.description') }}</h3>
+                      <h3 class="text-xl">{{ t('title.description') }}</h3>
                       <p class="ml-4" v-if="change.description" v-html="md.render(change.description)"></p>
                     </div>
-                    <Button data-pdf-exclude variant="outline" size="icon-sm" @click="handleCopy(hasTranslation ? translatedChangeNotes?.find(c => c.id === change.id)?.description ?? '' : change.description ?? '', `change-${change.id}`)">
+                    <Button variant="outline" size="icon-sm" @click="handleCopy(hasTranslation ? translatedChangeNotes?.find(c => c.id === change.id)?.description ?? '' : change.description ?? '', `change-${change.id}`)">
                       <component :is="copiedKey === `change-${change.id}` ? Check : Copy" />
                     </Button>
                   </div>
-                  <p v-if="hasTranslation" class="text-text-primary/50 text-right" data-pdf-exclude>{{
+                  <p v-if="hasTranslation" class="text-text-primary/50 text-right">{{
                     t('ai.translationDisclaimer') }}</p>
                 </div>
-                <div v-if="change.developerNotes" data-pdf-exclude>
+                <div v-if="change.developerNotes">
                   <h3 class="text-xl">{{ t('title.developerNotes') }}</h3>
                   <p class="ml-4" v-html="md.render(change.developerNotes)"></p>
                 </div>
-                <div v-if="change.upgradeNotes" data-pdf-exclude>
+                <div v-if="change.upgradeNotes">
                   <h3 class="text-xl">{{ t('title.upgradeRequirements') }}</h3>
                   <p class="ml-4" v-html="md.render(change.upgradeNotes)"></p>
                 </div>
