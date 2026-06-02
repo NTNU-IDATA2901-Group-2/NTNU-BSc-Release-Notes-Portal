@@ -1,4 +1,7 @@
 {
+    "pdf": {
+        "generated": "Generert"
+    },
     "header": {
         "releaseNotesLink": "Utgivelsesnotater",
         "changeNotesLink": "Endringsnotater",

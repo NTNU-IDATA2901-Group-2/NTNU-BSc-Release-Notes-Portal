@@ -1,5 +1,6 @@
 import solwrLogo from '@/assets/solwr_logo.svg?raw';
 import md from './markdown-it';
+import { i18n } from './i18n';
 import type { ChangeNote } from './types';
 import pdfMake from "pdfmake/build/pdfmake";
 import vfs from "pdfmake/build/vfs_fonts";
@@ -162,9 +163,21 @@ function markdownToContent(text: string): Content[] {
  * developer notes and upgrade requirements, which are internal-only.
  */
 export async function exportToPdf(releaseNoteTag: string, releaseNoteSummary: string, changeNotes: ChangeNote[]) {
+  const now = new Date();
+  const generatedDate = [
+    String(now.getDate()).padStart(2, '0'),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    now.getFullYear(),
+  ].join('.');
+
   const content: Content[] = [
     { svg: blackLogo, width: 160, margin: [0, 0, 0, 24], alignment: 'right' },
-    { text: releaseNoteTag, style: 'tag' },
+    {
+      columns: [
+        { text: releaseNoteTag, style: 'tag' },
+        { text: `${i18n.global.t('pdf.generated')}: ${generatedDate}`, style: 'generated' },
+      ],
+    },
   ];
 
   if (releaseNoteSummary) {
@@ -191,6 +204,7 @@ export async function exportToPdf(releaseNoteTag: string, releaseNoteSummary: st
     content,
     styles: {
       tag: { fontSize: 24, bold: true, margin: [0, 0, 0, 8] },
+      generated: { fontSize: 10, color: '#666666', alignment: 'right', margin: [0, 8, 0, 0] },
       reference: { fontSize: 16, margin: [0, 16, 0, 4] },
       customer: { fontSize: 12, italics: true, color: '#666666' },
     },

@@ -1,4 +1,7 @@
-{ 
+{
+    "pdf": {
+        "generated": "Généré"
+    },
     "header": {
         "releaseNotesLink": "Notes de version",
         "changeNotesLink": "Notes de changement",
