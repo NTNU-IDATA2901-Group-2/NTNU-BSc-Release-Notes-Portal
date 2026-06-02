@@ -13,6 +13,7 @@ export interface ChangeNote {
     viewableByEveryone: boolean,
     gitRepositoryId?: number,
     gitCommitHash?: string,
+    relatedReleaseNoteIds?: number[]
 }
 
 export interface PersistChangeNoteDTO {

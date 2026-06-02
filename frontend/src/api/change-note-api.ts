@@ -158,7 +158,7 @@ export const useArchiveChangeNote = (id: number, onFinished: OnMutationApiCallFi
  * @return A promise that resolves when the change note is successfully updated.
  * @throws An error if the API request to update the change note fails.
  */
-const updateChangeNote = async (changeNoteId: number | undefined, changeNoteData: PersistChangeNoteDTO | undefined): Promise<void> => {
+const updateChangeNote = async (changeNoteId: string | undefined, changeNoteData: PersistChangeNoteDTO | undefined): Promise<void> => {
   if (changeNoteId === undefined) {
     console.error("Change note ID is undefined. Cannot update change note.");
   } else if (changeNoteData === undefined) {
@@ -178,20 +178,28 @@ const updateChangeNote = async (changeNoteId: number | undefined, changeNoteData
 export const useUpdateChangeNote = (onFinished: OnMutationApiCallFinished) => {
   const queryClient = useQueryClient();
   interface MutationVariables {
-    id: number;
+    id: string;
+    relatedReleaseNoteIds?: string[];
     dto: PersistChangeNoteDTO;
   }
 
-  let updateId: number | undefined;
-
+  let updateId: string | undefined;
+  let releaseNoteIds: string[] | undefined;
   return useMutation<void, unknown, MutationVariables>({
-    mutationFn: ({ id, dto }: MutationVariables) => {
+    mutationFn: ({ id, relatedReleaseNoteIds, dto }: MutationVariables) => {
       updateId = id;
+      releaseNoteIds = relatedReleaseNoteIds;
       return updateChangeNote(id, dto)
     },
     onSettled: () => onFinished.onSettled?.(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['changeNote', `${updateId}`] });
+      queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
+      if (releaseNoteIds !== undefined) {
+        releaseNoteIds.forEach((id) => {
+          queryClient.invalidateQueries({ queryKey: ['releaseNote', id] });
+        });
+      }
       onFinished.onSuccess();
     },
     onError: () => {

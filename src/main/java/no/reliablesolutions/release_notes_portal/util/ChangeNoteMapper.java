@@ -42,7 +42,8 @@ public class ChangeNoteMapper {
           changeNote.isPublished(),
           null,
           changeNote.getGitRepository() != null ? changeNote.getGitRepository().getId() : null,
-          changeNote.getGitCommitHash());
+          changeNote.getGitCommitHash(),
+          changeNote.getReleaseNotes().stream().map(rn -> rn.getId()).toList());
     } else {
       return new ChangeNoteDTO(
           changeNote.getId(),
@@ -57,7 +58,8 @@ public class ChangeNoteMapper {
           changeNote.isPublished(),
           changeNote.isViewableByEveryone(),
           changeNote.getGitRepository() != null ? changeNote.getGitRepository().getId() : null,
-          changeNote.getGitCommitHash());
+          changeNote.getGitCommitHash(),
+          changeNote.getReleaseNotes().stream().map(rn -> rn.getId()).toList());
     }
   }
 }
