@@ -36,7 +36,7 @@ const model = defineModel<ChangeNote | null>({ required: true, default: null })
           :key="changeNote.id"
           :value=changeNote
         >
-          <span :class="changeNote.reference ? '' : 'text-text-primary/50'">
+          <span :class="(changeNote.reference || changeNote.title) ? '' : 'text-text-primary/50'">
             {{ getLabelFromChangeNote(changeNote) ?? t('placeholder.noTitle') }}
           </span>
         </SelectItem>

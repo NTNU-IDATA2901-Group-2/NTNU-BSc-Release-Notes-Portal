@@ -40,16 +40,16 @@ const viewAbleByEveryone = ref(props.changeNote.viewableByEveryone);
 const { handleSubmit, defineField } = useForm({
   validationSchema: toTypedSchema(EditChangeNoteSchema),
   initialValues: {
-    title: props.changeNote.title,
-    reference: props.changeNote.reference,
-    description: props.changeNote.description,
+    title: props.changeNote.title ?? '',
+    reference: props.changeNote.reference ?? '',
+    description: props.changeNote.description ?? '',
     productId: props.changeNote.product?.id,
     scopeId: props.changeNote.scope?.id,
     featureId: props.changeNote.feature?.id,
     customerId: props.changeNote.customer?.id,
-    developerNotes: props.changeNote.developerNotes,
-    upgradeNotes: props.changeNote.upgradeNotes,
-    viewableByEveryone: props.changeNote.viewableByEveryone,
+    developerNotes: props.changeNote.developerNotes ?? '',
+    upgradeNotes: props.changeNote.upgradeNotes ?? '',
+    viewableByEveryone: props.changeNote.viewableByEveryone ?? false,
 }
 });
 
@@ -83,6 +83,9 @@ const onSubmit = handleSubmit((values : PersistChangeNoteDTO) => {
     values.customerId = values.customerId === -1 ? undefined : values.customerId;
     values.viewableByEveryone = values.customerId === -1 ? undefined : viewAbleByEveryone.value;
     updateChangeNoteMutation.mutate({ id: props.changeNote.id.toString(), relatedReleaseNoteIds: props.changeNote.relatedReleaseNoteIds?.map(String), dto: values });
+}, ({ errors }) => {
+    console.error('Change note edit validation failed', errors);
+    toast.error(t('toast.changeNoteUpdateError'));
 });
 
 const onCancel = () => {

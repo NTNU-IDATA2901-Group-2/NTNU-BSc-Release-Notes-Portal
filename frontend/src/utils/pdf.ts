@@ -16,7 +16,7 @@ type Token = ReturnType<typeof md.parse>[number];
 
 // Font sizes for headings authored inside markdown content. `#` (h1) renders
 // larger than `##`, and every level below `##` collapses to the `##` size.
-// Both stay below the change note reference (16) so a `#` in the markdown can
+// Both stay below the change note title (16) so a `#` in the markdown can
 // never outrank the structure around it.
 const MARKDOWN_H1_SIZE = 13;
 const MARKDOWN_H2_SIZE = 11;
@@ -154,13 +154,15 @@ function markdownToContent(text: string): Content[] {
  * Exports a release note to a downloaded PDF file.
  *
  * The document leads with the release note's tag and summary, followed by the
- * change notes grouped under their feature. Feature groups appear in the order
- * their feature is first encountered, and change notes without a feature are
- * listed last. Each change note shows its title, reference and description, and
- * when tied to a customer the customer name is shown next to the reference.
- * Change notes without a title or reference fall back to localized placeholders.
- * The summary and description are authored in markdown and rendered with
- * matching headings, lists and emphasis.
+ * change notes grouped together by feature. Groups appear in the order their
+ * feature is first encountered, and change notes without a feature are listed
+ * last. Within each feature the notes are further grouped by customer, with
+ * customerless notes at the bottom. Each change note leads with a heading
+ * line — "Title (reference)"
+ * followed by the feature name when present — then the customer on its own line
+ * and the description beneath. Change notes without a title or reference fall
+ * back to localized placeholders. The summary and description are authored in
+ * markdown and rendered with matching headings, lists and emphasis.
  *
  * This PDF is customer-facing, so it deliberately omits the change notes'
  * developer notes and upgrade requirements, which are internal-only.
@@ -189,50 +191,76 @@ export async function exportToPdf(releaseNoteTag: string, releaseNoteSummary: st
 
   // Group change notes by feature, preserving the order in which features are
   // first seen. Notes without a feature are collected separately and rendered
-  // last, after all feature groups.
-  const featureGroups = new Map<number, { name: string; notes: ChangeNote[] }>();
+  // last, after all feature groups. The feature is shown on each note rather
+  // than as a separate group heading.
+  const featureGroups = new Map<number, ChangeNote[]>();
   const featurelessNotes: ChangeNote[] = [];
   for (const changeNote of changeNotes ?? []) {
     if (changeNote.feature) {
       const group = featureGroups.get(changeNote.feature.id);
       if (group) {
-        group.notes.push(changeNote);
+        group.push(changeNote);
       } else {
-        featureGroups.set(changeNote.feature.id, { name: changeNote.feature.name, notes: [changeNote] });
+        featureGroups.set(changeNote.feature.id, [changeNote]);
       }
     } else {
       featurelessNotes.push(changeNote);
     }
   }
 
+  // Within a feature, order notes so those sharing a customer are contiguous
+  // (in first-seen order), with customerless notes placed at the bottom.
+  const orderByCustomer = (notes: ChangeNote[]): ChangeNote[] => {
+    const customerGroups = new Map<number, ChangeNote[]>();
+    const customerlessNotes: ChangeNote[] = [];
+    for (const note of notes) {
+      if (note.customer) {
+        const group = customerGroups.get(note.customer.id);
+        if (group) {
+          group.push(note);
+        } else {
+          customerGroups.set(note.customer.id, [note]);
+        }
+      } else {
+        customerlessNotes.push(note);
+      }
+    }
+    return [...[...customerGroups.values()].flat(), ...customerlessNotes];
+  };
+
   const renderChangeNote = (changeNote: ChangeNote): Content => {
     const titleText = changeNote.title || i18n.global.t('pdf.noTitle');
     const referenceText = changeNote.reference || i18n.global.t('pdf.noReference');
 
-    const reference: Content[] = [{ text: referenceText, bold: true }];
-    if (changeNote.customer) {
-      reference.push({ text: `  ${changeNote.customer.name}`, style: 'customer' });
+    // The heading line reads "Title (reference)", with the feature name
+    // appended when the note has one.
+    const heading: ContentText[] = [
+      { text: titleText, style: 'title' },
+      { text: ` (${referenceText})`, style: 'reference' },
+    ];
+    if (changeNote.feature) {
+      heading.push({ text: ` ${changeNote.feature.name}`, style: 'feature' });
     }
 
-    // Group each change note's title, reference and description into one
-    // unbreakable block so a note is never split across a page boundary.
-    const note: Content[] = [
-      { text: titleText, style: 'title' },
-      { text: reference, style: 'reference' },
-    ];
-    if (changeNote.description) {
-      note.push({ stack: markdownToContent(changeNote.description), margin: [12, 0, 0, 8] });
+    // Group each change note into one unbreakable block so a note is never
+    // split across a page boundary: the heading line, an optional customer line
+    // and the markdown description beneath.
+    const note: Content[] = [{ text: heading, margin: [0, 0, 0, 4] }];
+    if (changeNote.customer) {
+      note.push({ text: changeNote.customer.name, style: 'customer' });
     }
-    return { stack: note, unbreakable: true };
+    if (changeNote.description) {
+      note.push({ stack: markdownToContent(changeNote.description), margin: [12, 4, 0, 8] });
+    }
+    return { stack: note, unbreakable: true, margin: [0, 16, 0, 0] };
   };
 
   for (const group of featureGroups.values()) {
-    content.push({ text: group.name, style: 'feature' });
-    for (const changeNote of group.notes) {
+    for (const changeNote of orderByCustomer(group)) {
       content.push(renderChangeNote(changeNote));
     }
   }
-  for (const changeNote of featurelessNotes) {
+  for (const changeNote of orderByCustomer(featurelessNotes)) {
     content.push(renderChangeNote(changeNote));
   }
 
@@ -242,10 +270,10 @@ export async function exportToPdf(releaseNoteTag: string, releaseNoteSummary: st
     styles: {
       tag: { fontSize: 24, bold: true, margin: [0, 0, 0, 8] },
       generated: { fontSize: 10, color: '#666666', alignment: 'right', margin: [0, 8, 0, 0] },
-      feature: { fontSize: 19, bold: true, margin: [0, 24, 0, 4] },
-      title: { fontSize: 16, bold: true, margin: [0, 16, 0, 2] },
-      reference: { fontSize: 12, margin: [0, 0, 0, 4] },
+      title: { fontSize: 16, bold: true },
+      reference: { fontSize: 12, bold: true },
       customer: { fontSize: 12, italics: true, color: '#666666' },
+      feature: { fontSize: 12, bold: true, color: '#666666' },
     },
     defaultStyle: { font: 'Roboto' },
   };
