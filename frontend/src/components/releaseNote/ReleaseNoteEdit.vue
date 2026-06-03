@@ -179,18 +179,18 @@ onBeforeUnmount(() => {
     :description-key="'releaseNoteEdit.cancelDescription'" @update:open="cancelDialogOpen = false"
     @confirm="cancelEdit" />
   <div class="flex flex-col w-full items-center px-4 mb-20">
-    <div class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10 flex items-center gap-4">
-      <Button variant="outline" class="" @click="$router.back()">
+    <div class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10 flex items-center gap-4 max-w-[calc(100%-2rem)] lg:max-w-[calc(100%-5rem)]">
+      <Button variant="outline" class="shrink-0" @click="$router.back()">
         <ArrowLeft />{{ t('button.previous') }}
       </Button>
-      <Breadcrumb class="text-text-primary">
-        <BreadcrumbList>
-          <BreadcrumbItem>
+      <Breadcrumb class="text-text-primary min-w-0">
+        <BreadcrumbList class="min-w-0">
+          <BreadcrumbItem class="shrink-0">
             <BreadcrumbLink href="/">{{ t('title.releaseNotes') }}</BreadcrumbLink>
           </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            {{ releaseNote?.tag }}
+          <BreadcrumbSeparator class="shrink-0" />
+          <BreadcrumbItem class="min-w-0">
+            <span class="truncate">{{ releaseNote?.tag }}</span>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
