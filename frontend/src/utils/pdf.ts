@@ -153,11 +153,14 @@ function markdownToContent(text: string): Content[] {
 /**
  * Exports a release note to a downloaded PDF file.
  *
- * The document leads with the release note's tag and summary, followed by each
- * change note listed with its reference and description. When a change note is
- * tied to a customer, the customer name is shown next to the reference. The
- * summary and description are authored in markdown and rendered with matching
- * headings, lists and emphasis.
+ * The document leads with the release note's tag and summary, followed by the
+ * change notes grouped under their feature. Feature groups appear in the order
+ * their feature is first encountered, and change notes without a feature are
+ * listed last. Each change note shows its title, reference and description, and
+ * when tied to a customer the customer name is shown next to the reference.
+ * Change notes without a title or reference fall back to localized placeholders.
+ * The summary and description are authored in markdown and rendered with
+ * matching headings, lists and emphasis.
  *
  * This PDF is customer-facing, so it deliberately omits the change notes'
  * developer notes and upgrade requirements, which are internal-only.
@@ -184,19 +187,53 @@ export async function exportToPdf(releaseNoteTag: string, releaseNoteSummary: st
     content.push({ stack: markdownToContent(releaseNoteSummary), margin: [0, 0, 0, 24] });
   }
 
+  // Group change notes by feature, preserving the order in which features are
+  // first seen. Notes without a feature are collected separately and rendered
+  // last, after all feature groups.
+  const featureGroups = new Map<number, { name: string; notes: ChangeNote[] }>();
+  const featurelessNotes: ChangeNote[] = [];
   for (const changeNote of changeNotes ?? []) {
-    const reference: Content[] = [{ text: changeNote.reference, bold: true }];
+    if (changeNote.feature) {
+      const group = featureGroups.get(changeNote.feature.id);
+      if (group) {
+        group.notes.push(changeNote);
+      } else {
+        featureGroups.set(changeNote.feature.id, { name: changeNote.feature.name, notes: [changeNote] });
+      }
+    } else {
+      featurelessNotes.push(changeNote);
+    }
+  }
+
+  const renderChangeNote = (changeNote: ChangeNote): Content => {
+    const titleText = changeNote.title || i18n.global.t('pdf.noTitle');
+    const referenceText = changeNote.reference || i18n.global.t('pdf.noReference');
+
+    const reference: Content[] = [{ text: referenceText, bold: true }];
     if (changeNote.customer) {
       reference.push({ text: `  ${changeNote.customer.name}`, style: 'customer' });
     }
 
-    // Group each change note's reference and description into one unbreakable
-    // block so a note is never split across a page boundary.
-    const note: Content[] = [{ text: reference, style: 'reference' }];
+    // Group each change note's title, reference and description into one
+    // unbreakable block so a note is never split across a page boundary.
+    const note: Content[] = [
+      { text: titleText, style: 'title' },
+      { text: reference, style: 'reference' },
+    ];
     if (changeNote.description) {
       note.push({ stack: markdownToContent(changeNote.description), margin: [12, 0, 0, 8] });
     }
-    content.push({ stack: note, unbreakable: true });
+    return { stack: note, unbreakable: true };
+  };
+
+  for (const group of featureGroups.values()) {
+    content.push({ text: group.name, style: 'feature' });
+    for (const changeNote of group.notes) {
+      content.push(renderChangeNote(changeNote));
+    }
+  }
+  for (const changeNote of featurelessNotes) {
+    content.push(renderChangeNote(changeNote));
   }
 
   const documentDefinition: TDocumentDefinitions = {
@@ -205,7 +242,9 @@ export async function exportToPdf(releaseNoteTag: string, releaseNoteSummary: st
     styles: {
       tag: { fontSize: 24, bold: true, margin: [0, 0, 0, 8] },
       generated: { fontSize: 10, color: '#666666', alignment: 'right', margin: [0, 8, 0, 0] },
-      reference: { fontSize: 16, margin: [0, 16, 0, 4] },
+      feature: { fontSize: 19, bold: true, margin: [0, 24, 0, 4] },
+      title: { fontSize: 16, bold: true, margin: [0, 16, 0, 2] },
+      reference: { fontSize: 12, margin: [0, 0, 0, 4] },
       customer: { fontSize: 12, italics: true, color: '#666666' },
     },
     defaultStyle: { font: 'Roboto' },

@@ -1,6 +1,8 @@
 {
     "pdf": {
-        "generated": "Généré"
+        "generated": "Généré",
+        "noTitle": "Aucun titre",
+        "noReference": "Aucune référence"
     },
     "header": {
         "releaseNotesLink": "Notes de version",

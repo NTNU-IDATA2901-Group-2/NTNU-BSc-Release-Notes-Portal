@@ -1,6 +1,8 @@
 {
     "pdf": {
-        "generated": "Generert"
+        "generated": "Generert",
+        "noTitle": "Ingen tittel",
+        "noReference": "Ingen referanse"
     },
     "header": {
         "releaseNotesLink": "Utgivelsesnotater",
