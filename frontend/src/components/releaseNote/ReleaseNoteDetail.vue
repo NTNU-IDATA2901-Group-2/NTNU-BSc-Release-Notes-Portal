@@ -87,9 +87,13 @@ const handleExport = () => {
   }
 }
 
+let hasToastedSuccess = false
 const translateMutation = useTranslate({
   onSuccess: () => {
-    toast.success(t('toast.translationSuccess'));
+    if (!hasToastedSuccess) {
+      toast.success(t('toast.releaseNoteTranslationSuccess'));
+      hasToastedSuccess = true;
+    }
   },
   onError: () => {
     toast.error(t('toast.translationError'));
@@ -119,7 +123,7 @@ const onTranslate = async () => {
 
   if (releaseNote.changeNotes) {
     releaseNote.changeNotes.forEach(async (changeNote, index) => {
-      const result = await translateMutation.mutateAsync({
+      const result = !changeNote.description ? "" : await translateMutation.mutateAsync({
         text: changeNote.description,
         locale: locale.value,
       });
@@ -136,6 +140,7 @@ const onTranslate = async () => {
 
   hasTranslation.value = true;
   isTranslating.value = false;
+  hasToastedSuccess = false;
 }
 
 const generalReleasesChecked = ref(true);
@@ -221,7 +226,7 @@ const customerFilter = ref<number>(-1);
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            {{ releaseNote?.tag }}
+            {{ releaseNote?.tag ?? t('placeholder.noTitle')}}
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -230,16 +235,16 @@ const customerFilter = ref<number>(-1);
     <div 
       class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
       <div class="flex flex-col gap-4 w-full">
-        <div class="flex flex-row items-center justify-between max-w-full gap-4">
-          <div class="flex items-center gap-4 min-w-0">
-            <h1 v-if="!releaseNote.tag" class="text-4xl text-text-primary/50">{{ t('placeholder.noTitle') }}</h1>
-            <h1 v-else class="text-3xl md:text-4xl whitespace-nowrap text-ellipsis overflow-hidden">{{
-              releaseNote.tag }}
-            </h1>
+        <div class="flex flex-col sm:flex-row items-start justify-between max-w-full gap-4">
+          <h1 v-if="!releaseNote.tag" class="text-4xl text-text-primary/50">{{ t('placeholder.noTitle') }}</h1>
+          <h1 v-else class="text-3xl md:text-4xl whitespace-nowrap text-ellipsis overflow-hidden">{{
+            releaseNote.tag }}
+          </h1>
+          <div class="flex sm:gap-4 w-full sm:w-auto sm:grow items-center">
             <Tooltip v-if="isAdmin">
               <TooltipTrigger as-child>
                 <Badge 
-                  class="h-6 w-fit"
+                  class="h-6 w-fit mr-auto"
                   :variant="releaseNote.published ? 'success' : 'destructive'"
                 >
                   {{ releaseNote.published ? t('card.published') : t('card.private') }}
@@ -249,9 +254,6 @@ const customerFilter = ref<number>(-1);
                   {{ releaseNote.published ? t('tooltip.publishedNote') : t('tooltip.privateNote') }}
               </TooltipContent>
             </Tooltip>
-            
-          </div>
-          <div class="flex sm:gap-4 w-fit">
             <Button 
               type="button" v-if="!(locale === 'en')" variant="glow" @click="onTranslate"
               :disabled="isTranslating" class="inline-flex items-center gap-2">
