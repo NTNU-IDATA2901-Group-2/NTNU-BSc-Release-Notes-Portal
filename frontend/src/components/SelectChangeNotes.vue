@@ -7,6 +7,7 @@ import SelectItem from './ui/select/SelectItem.vue';
 import SelectTrigger from './ui/select/SelectTrigger.vue';
 import SelectValue from './ui/select/SelectValue.vue';
 import { useI18n } from 'vue-i18n';
+import { getLabelFromChangeNote } from '@/utils/change-note.ts';
 
 const { t } = useI18n();
 
@@ -30,8 +31,14 @@ const model = defineModel<ChangeNote | null>({ required: true, default: null })
         <SelectItem :value="null">
           {{ props.placeholder }}
         </SelectItem>
-        <SelectItem v-for="changeNote in changeNotes" :key="changeNote.id" :value=changeNote>
-          {{ changeNote.reference ?? t('changeNote.noReference') }}
+        <SelectItem
+          v-for="changeNote in changeNotes"
+          :key="changeNote.id"
+          :value=changeNote
+        >
+          <span :class="changeNote.reference ? '' : 'text-text-primary/50'">
+            {{ getLabelFromChangeNote(changeNote) ?? t('placeholder.noTitle') }}
+          </span>
         </SelectItem>
       </SelectGroup>
     </SelectContent>

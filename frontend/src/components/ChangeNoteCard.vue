@@ -6,6 +6,7 @@ import { Checkbox } from './ui/checkbox';
 import { useI18n } from 'vue-i18n';
 import { isAdmin } from '@/utils/keycloak';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { openJiraTicket } from '@/utils/jira.ts';
 
 const props = defineProps<PrimitiveProps & {
   changeNote: ChangeNote
@@ -35,7 +36,7 @@ const handleCheckboxClick = (event: Event) => {
             <Checkbox v-model="selected" :disabled="false" />
           </div>
 
-          <h3 v-if="changeNote.reference" class="text-xl whitespace-nowrap overflow-hidden text-ellipsis">{{ changeNote.reference}}</h3>
+          <h3 v-if="changeNote.title" class="text-xl whitespace-nowrap overflow-hidden text-ellipsis">{{ changeNote.title }}</h3>
           <h3 v-else class="text-xl text-text-primary/50">{{ t('placeholder.noTitle') }}</h3>
 
           <Tooltip v-if="changeNote.customer">
@@ -47,6 +48,20 @@ const handleCheckboxClick = (event: Event) => {
               {{ t('title.customer') }}
             </TooltipContent>
           </Tooltip>
+          <Tooltip v-if="isAdmin && changeNote.reference">
+              <TooltipTrigger as-child>
+                <Badge 
+                  class="h-6 hover:cursor-pointer hover:underline"
+                  variant="outline"
+                  @click.stop.prevent="() => openJiraTicket(changeNote.reference)"
+                >
+                  {{ changeNote.reference }}
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                  {{ t('tooltip.reference') }}
+              </TooltipContent>
+            </Tooltip>
 
         </div>
         <Tooltip v-if="isAdmin">

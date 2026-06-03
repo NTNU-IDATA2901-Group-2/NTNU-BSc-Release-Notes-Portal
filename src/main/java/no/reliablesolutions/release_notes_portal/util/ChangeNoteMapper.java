@@ -31,6 +31,7 @@ public class ChangeNoteMapper {
     if (!accessScope.isAdmin()) {
       return new ChangeNoteDTO(
           changeNote.getId(),
+          changeNote.getTitle(),
           changeNote.getReference(),
           changeNote.getDescription(),
           null,
@@ -47,6 +48,7 @@ public class ChangeNoteMapper {
     } else {
       return new ChangeNoteDTO(
           changeNote.getId(),
+          changeNote.getTitle(),
           changeNote.getReference(),
           changeNote.getDescription(),
           changeNote.getDeveloperNotes(),

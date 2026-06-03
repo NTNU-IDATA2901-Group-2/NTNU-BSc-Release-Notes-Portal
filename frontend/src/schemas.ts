@@ -8,6 +8,7 @@ export const EditReleaseNoteSchema = z.object({
 })
 
 export const EditChangeNoteSchema = z.object({
+  title: z.string().optional(),
   reference: z.string().optional(),
   description: z.string().optional(),
   developerNotes: z.string().optional(),

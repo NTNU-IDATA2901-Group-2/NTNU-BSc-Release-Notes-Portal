@@ -55,7 +55,8 @@
         "from": "De",
         "to": "À",
         "addFromRepository": "Ajouter depuis le dépôt",
-        "fromRepository": "Depuis le dépôt"
+        "fromRepository": "Depuis le dépôt",
+        "reference": "Référence"
     },
     "toast": {
         "changeNoteDeleted": "Note de changement supprimée avec succès",
@@ -129,7 +130,8 @@
         "noSummary": "Aucun résumé fourni",
         "noChangeNotesAdded": "Aucune note de changement ajoutée",
         "noTitle": "Sans titre",
-        "noDescription": "Aucune description"
+        "noDescription": "Aucune description",
+        "reference": "Référence"
     },
     "repositories": {
         "title": "Dépôts Git",
@@ -139,7 +141,7 @@
         "remove": "Supprimer",
         "id": "ID",
         "namePlaceholder": "Nom du dépôt",
-        "urlPlaceholder": "URL de clonage Git",
+        "urlPlaceholder": "URL de clonage Git (HTTP)",
         "deleteSuccess": "Dépôt supprimé avec succès",
         "deleteError": "Une erreur s'est produite lors de la suppression du dépôt",
         "createSuccess": "Dépôt ajouté avec succès",
@@ -177,7 +179,8 @@
         "noCommits": "Aucun commit git associé",
         "publishedNote": "Les non-administrateurs peuvent voir cette note",
         "privateNote": "Seuls les administrateurs peuvent voir cette note",
-        "explainSummarize": "Utilisez les diffs git associés pour résumer"
+        "explainSummarize": "Utilisez les diffs git associés pour résumer",
+        "reference": "Ouvrir le ticket Jira associé"
     },
     "prompts": {
         "translationPrompt": "Prompt de traduction",

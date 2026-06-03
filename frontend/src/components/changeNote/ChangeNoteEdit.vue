@@ -40,6 +40,7 @@ const viewAbleByEveryone = ref(props.changeNote.viewableByEveryone);
 const { handleSubmit, defineField } = useForm({
   validationSchema: toTypedSchema(EditChangeNoteSchema),
   initialValues: {
+    title: props.changeNote.title,
     reference: props.changeNote.reference,
     description: props.changeNote.description,
     productId: props.changeNote.product?.id,
@@ -52,6 +53,7 @@ const { handleSubmit, defineField } = useForm({
 }
 });
 
+const [title] = defineField('title');
 const [reference] = defineField('reference');
 const [description] = defineField('description');
 const [productId] = defineField('productId');
@@ -174,7 +176,7 @@ onBeforeUnmount(() => {
             </div>
             <h1 class="text-lg">{{ t('title.title') }}</h1>
             <div class="flex gap-4">
-            <Input class="w-45" v-model="reference" :placeholder="t('placeholder.title')" />
+            <Input class="w-45" v-model="title" :placeholder="t('placeholder.title')" />
             <div class="hidden sm:flex ml-auto gap-4">
                 <Tooltip>
                     <TooltipTrigger as-child>
@@ -210,6 +212,11 @@ onBeforeUnmount(() => {
         </div>
         </div>
         
+        </div>
+
+        <div class="flex flex-col gap-1">
+            <h1 class="text-lg">{{ t('title.reference') }}</h1>
+            <Input :placeholder="t('placeholder.reference')" class="w-45" v-model="reference"/>
         </div>
 
         <div class="flex flex-col gap-1">

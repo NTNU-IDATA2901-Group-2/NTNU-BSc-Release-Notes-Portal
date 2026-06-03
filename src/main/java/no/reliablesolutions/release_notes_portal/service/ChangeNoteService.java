@@ -192,6 +192,7 @@ public class ChangeNoteService {
   public ChangeNoteDTO updateChangeNote(long id, CreateChangeNoteDTO createChangeNoteDTO) {
     ChangeNote changeNote = changeNoteRepository.findById(id).orElseThrow(() -> new ChangeNoteNotFoundException(id));
 
+    changeNote.setTitle(createChangeNoteDTO.title());
     changeNote.setReference(createChangeNoteDTO.reference());
     changeNote.setDescription(createChangeNoteDTO.description());
     changeNote.setDeveloperNotes(createChangeNoteDTO.developerNotes());

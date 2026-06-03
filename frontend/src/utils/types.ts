@@ -1,5 +1,6 @@
 export interface ChangeNote {
     id: number,
+    title: string,
     reference: string,
     description: string,
     developerNotes: string,
@@ -17,6 +18,7 @@ export interface ChangeNote {
 }
 
 export interface PersistChangeNoteDTO {
+    title?: string,
     reference?: string,
     description?: string,
     developerNotes?: string,
@@ -75,6 +77,7 @@ export interface PersistReleaseNoteDTO {
 }
 
 export interface PersistChangeNoteDTO {
+    title?: string,
     reference?: string,
     description?: string,
     developerNotes?: string,

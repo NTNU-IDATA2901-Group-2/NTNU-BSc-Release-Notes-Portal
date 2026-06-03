@@ -30,6 +30,9 @@ public class ConfigController {
   @Value("${KC_CLIENT_ID}")
   private String kcClientId;
 
+  @Value("${JIRA_BASE_URL}")
+  private String jiraBaseUrl;
+
   /**
    * Endpoint to retrieve public configuration values for the frontend, such as
    * Keycloak settings.
@@ -46,7 +49,8 @@ public class ConfigController {
     Map<String, String> env = Map.of(
         "KC_URL", kcUrl,
         "KC_REALM", kcRealm,
-        "KC_CLIENT_ID", kcClientId);
+        "KC_CLIENT_ID", kcClientId,
+        "JIRA_BASE_URL", jiraBaseUrl);
 
     return ResponseEntity.ok(env);
   }

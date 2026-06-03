@@ -26,6 +26,7 @@ import SelectContent from '../ui/select/SelectContent.vue';
 import SelectGroup from '../ui/select/SelectGroup.vue';
 import SelectItem from '../ui/select/SelectItem.vue';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
+import { openJiraTicket } from '@/utils/jira.ts';
 
 const props = defineProps<{
   releaseNote: ReleaseNote;
@@ -348,7 +349,7 @@ const customerFilter = ref<number>(-1);
               >
               <div v-if="shouldShowChangeNote(change)" class="flex flex-col gap-2">
                 <div class="flex items-center gap-4">
-                  <RouterLink class="text-2xl dark:text-text-dark-static text-text-light-static hover:underline" :to="`${routeNames.changeNotes}/${change.id}`">{{ change.reference }}</RouterLink>
+                  <RouterLink class="text-2xl dark:text-text-dark-static text-text-light-static hover:underline" :to="`${routeNames.changeNotes}/${change.id}`">{{ change.title || t('placeholder.noTitle') }}</RouterLink>
 
                   <Tooltip v-if="change.customer">
                     <TooltipTrigger as-child>
@@ -356,6 +357,21 @@ const customerFilter = ref<number>(-1);
                     </TooltipTrigger>
                     <TooltipContent>
                         {{ t('title.customer') }}
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip v-if="isAdmin && change.reference">
+                    <TooltipTrigger as-child>
+                      <Badge 
+                        class="h-6 hover:cursor-pointer hover:underline"
+                        variant="outline"
+                        @click="() => openJiraTicket(change.reference)"
+                      >
+                        {{ change.reference }}
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        {{ t('tooltip.reference') }}
                     </TooltipContent>
                   </Tooltip>
                   

@@ -56,7 +56,8 @@
         "from": "Fra",
         "to": "Til",
         "addFromRepository": "Legg til fra repository",
-        "fromRepository": "Fra repository"
+        "fromRepository": "Fra repository",
+        "reference": "Referanse"
     },
     "toast": {
         "changeNoteDeleted": "Endringsnotat slettet",
@@ -130,7 +131,8 @@
         "noSummary": "Ingen oppsummering",
         "noChangeNotesAdded": "Ingen endringsnotater lagt til",
         "noTitle": "Ingen tittel",
-        "noDescription": "Ingen beskrivelse"
+        "noDescription": "Ingen beskrivelse",
+        "reference": "Referanse"
     },
     "repositories": {
         "title": "Git Repositorier",
@@ -140,7 +142,7 @@
         "remove": "Fjern",
         "id": "Id",
         "namePlaceholder": "Repository navn",
-        "urlPlaceholder": "Git klone url",
+        "urlPlaceholder": "Git klone url (HTTP)",
         "deleteSuccess": "Repository fjernet",
         "deleteError": "Det oppsto en feil under fjerning av repository",
         "createSuccess": "Repository lagt til",
@@ -178,7 +180,8 @@
         "noCommits": "Ingen tilknyttede git commits",
         "publishedNote": "Ikke-administratorer kan se dette notatet",
         "privateNote": "Bare administratorer kan se dette notatet",
-        "explainSummarize": "Bruk tilknyttede git diffs for å oppsummere"
+        "explainSummarize": "Bruk tilknyttede git diffs for å oppsummere",
+        "reference": "Åpne den tilknyttede Jira-saken"
     },
     "prompts": {
         "translationPrompt": "Oversettelsesprompt",

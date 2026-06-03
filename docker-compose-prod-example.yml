@@ -33,6 +33,7 @@ services:
       - OPENAI_URL=
       - OPENAI_API_KEY=
       - OPENAI_MODEL=
+      - JIRA_BASE_URL=
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.5.2

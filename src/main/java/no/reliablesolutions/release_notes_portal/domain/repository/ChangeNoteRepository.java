@@ -53,18 +53,7 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
    * Finds all non-archived change notes that match the provided filter
    * parameters.
    * 
-   * @param query          optional filter for searching change notes by
-   *                       reference, description, developer notes or upgrade
-   *                       notes
-   * @param published      optional filter for published status
-   * @param hasReleaseNote optional filter for change notes that have an
-   *                       associated release note
-   * @param filteredIds    optional filter for specific change note IDs
-   * @param customerIds    optional filter for customer ID
-   * @param featureIds     optional filter for feature ID
-   * @param scopeIds       optional filter for scope ID
-   * @param productIds     optional filter for product ID
-   * 
+   * @param filterOptions the filter options to apply to the search
    * @return a list of all non-archived change notes that match the provided
    *         filters
    */
@@ -85,6 +74,7 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
         (:#{#filterOptions.productIds} IS NULL OR c.product.id IN :#{#filterOptions.productIds}) AND
         (:#{#filterOptions.gitRepositoryIds} IS NULL OR c.gitRepository.id IN :#{#filterOptions.gitRepositoryIds}) AND
         ((:#{#filterOptions.query} IS NULL OR :#{#filterOptions.query} = '') OR
+        LOWER(c.title) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
         LOWER(c.reference) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
         LOWER(c.description) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
         LOWER(c.developerNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
@@ -127,6 +117,7 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
       AND (:#{#filterOptions.productIds} IS NULL OR c.product.id IN :#{#filterOptions.productIds})
       AND (:#{#filterOptions.gitRepositoryIds} IS NULL OR c.gitRepository.id IN :#{#filterOptions.gitRepositoryIds}) 
       AND ((:#{#filterOptions.query} IS NULL OR :#{#filterOptions.query} = '')
+      OR LOWER(c.title) LIKE LOWER('%' || :#{#filterOptions.query} || '%')
       OR LOWER(c.reference) LIKE LOWER('%' || :#{#filterOptions.query} || '%')
       OR LOWER(c.description) LIKE LOWER('%' || :#{#filterOptions.query} || '%')
       OR LOWER(c.developerNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%')

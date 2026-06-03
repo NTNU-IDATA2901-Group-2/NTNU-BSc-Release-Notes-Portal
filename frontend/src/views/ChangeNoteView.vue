@@ -10,6 +10,7 @@ import ChangeNoteDetail from '@/components/changeNote/ChangeNoteDetail.vue';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../components/ui/breadcrumb';
 import { useI18n } from 'vue-i18n';
 import { router } from '@/utils/router';
+import { getLabelFromChangeNote } from '@/utils/change-note';
 
 const route = useRoute();
 
@@ -40,7 +41,7 @@ const { isPending, isFetching, isError, data: changeNote } = useGetChangeNote(id
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            {{ changeNote?.reference }}
+            {{ (changeNote && getLabelFromChangeNote(changeNote)) ?? t('placeholder.noTitle') }}
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>

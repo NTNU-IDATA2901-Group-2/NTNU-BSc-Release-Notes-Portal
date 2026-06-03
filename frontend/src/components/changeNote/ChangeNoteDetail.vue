@@ -22,6 +22,7 @@ import { useTranslate } from '@/api/ai-api';
 import Button from '../ui/button/Button.vue';
 import Spinner from '../ui/spinner/Spinner.vue';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
+import { openJiraTicket } from '@/utils/jira.ts';
 
 const { t, locale } = useI18n();
 
@@ -138,9 +139,9 @@ onBeforeUnmount(() => {
       <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-row items-center justify-between w-full gap-4">
           <div class="flex items-center gap-4 min-w-0">
-            <h1 v-if="changeNote.reference" class="text-3xl md:text-4xl whitespace-nowrap text-ellipsis overflow-hidden">{{
-              changeNote.reference }}</h1>
-            <h1 v-else class="text-3xl text-text-primary/50">{{ t('placeholder.noTitle') }}</h1>
+            <h1 v-if="changeNote.title" class="text-3xl md:text-4xl whitespace-nowrap text-ellipsis overflow-hidden leading-normal">{{
+              changeNote.title }}</h1>
+            <h1 v-else class="text-3xl text-text-primary/50 leading-normal">{{ t('placeholder.noTitle') }}</h1>
             <Tooltip v-if="isAdmin">
               <TooltipTrigger as-child>
                 <Badge 
@@ -152,6 +153,20 @@ onBeforeUnmount(() => {
               </TooltipTrigger>
               <TooltipContent>
                   {{ changeNote.published ? t('tooltip.publishedNote') : t('tooltip.privateNote') }}
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip v-if="isAdmin && changeNote.reference">
+              <TooltipTrigger as-child>
+                <Badge 
+                  class="h-6 hover:cursor-pointer hover:underline"
+                  variant="outline"
+                  @click="() => openJiraTicket(changeNote.reference)"
+                >
+                  {{ changeNote.reference }}
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                  {{ t('tooltip.reference') }}
               </TooltipContent>
             </Tooltip>
           </div>

@@ -7,6 +7,7 @@ import java.util.List;
  */
 public record ChangeNoteDTO(
     long id,
+    String title,
     String reference,
     String description,
     String developerNotes,

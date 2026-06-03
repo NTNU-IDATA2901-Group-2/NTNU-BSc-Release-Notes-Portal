@@ -55,7 +55,8 @@
         "from": "From",
         "to": "To",
         "addFromRepository": "Add from repository",
-        "fromRepository": "From repository"
+        "fromRepository": "From repository",
+        "reference": "Reference"
     },
     "toast": {
         "changeNoteDeleted": "Change note deleted successfully",
@@ -129,7 +130,8 @@
         "noSummary": "No summary provided",
         "noChangeNotesAdded": "No change notes added",
         "noTitle": "No title",
-        "noDescription": "No description"
+        "noDescription": "No description",
+        "reference": "Reference"
     },
     "repositories": {
         "title": "Git Repositories",
@@ -139,7 +141,7 @@
         "remove": "Remove",
         "id": "Id",
         "namePlaceholder": "Repository name",
-        "urlPlaceholder": "Git clone url",
+        "urlPlaceholder": "Git clone url (HTTP)",
         "deleteSuccess": "Repository removed successfully",
         "deleteError": "An error occurred while removing the repository",
         "createSuccess": "Repository added successfully",
@@ -177,7 +179,8 @@
         "noCommits": "No associated git commits",
         "publishedNote": "Non-administrators can view this note",
         "privateNote": "Only administrators can view this note",
-        "explainSummarize": "Use associated git diffs to summarize"
+        "explainSummarize": "Use associated git diffs to summarize",
+        "reference": "Open the related Jira ticket"
     },
     "prompts": {
         "translationPrompt": "Translation Prompt",

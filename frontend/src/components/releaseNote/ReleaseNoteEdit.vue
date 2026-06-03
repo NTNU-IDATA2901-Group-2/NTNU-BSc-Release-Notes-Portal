@@ -45,7 +45,7 @@ const gitRepository = ref<GitRepository | null>(null)
 const params = computed(() => {
   return { gitRepositoryIds: gitRepository.value?.id ? gitRepository.value?.id.toString() : '' }
 });
-const { data: currentGitRepositoryChangeNotes } = useGetChangeNotes(params)
+const { data: currentGitRepositoryChangeNotes, isFetched: isCurrentGitRepositoryChangeNotesFetched } = useGetChangeNotes(params)
 
 const fromChangeNote = ref<ChangeNote | null>(null);
 const toChangeNote = ref<ChangeNote | null>(null);
@@ -298,7 +298,9 @@ onBeforeUnmount(() => {
                   @click.stop="onChangeNoteRangeChange(gitRepository?.id ?? -1)">{{
                     t('button.updateRange') }}</Button>
               </div>
-              <p v-if="gitRepository !== null && (currentGitRepositoryChangeNotes === undefined || currentGitRepositoryChangeNotes.length === 0)">{{ t('repositories.noChangeNotesInRepository') }}</p>
+              <p v-if="gitRepository !== null && !currentGitRepositoryChangeNotes?.length && isCurrentGitRepositoryChangeNotesFetched">
+                {{ t('repositories.noChangeNotesInRepository') }}
+              </p>
             </div>
           </div>
         </div>
