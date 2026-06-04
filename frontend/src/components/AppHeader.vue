@@ -121,9 +121,9 @@ const handleLogoClick = () => {
 	</div>
 	<Separator/>
 	<div class="md:hidden">
-	    <nav class="flex items-center justify-between px-12 h-12">
-		<RouterLink class="text-lg text-text-dark-static" :to="routeNames.releaseNotes">{{ t('header.releaseNotesLink') }}</RouterLink>
-		<RouterLink class="text-lg text-text-dark-static" :to="routeNames.changeNotes">{{ t('header.changeNotesLink') }}</RouterLink>
+	    <nav class="flex items-center justify-between px-6 h-12">
+		<RouterLink class="text-md text-text-dark-static" :to="routeNames.releaseNotes">{{ t('header.releaseNotesLink') }}</RouterLink>
+		<RouterLink class="text-md text-text-dark-static" :to="routeNames.changeNotes">{{ t('header.changeNotesLink') }}</RouterLink>
 	    </nav>
 	    <Separator/>
 	</div>
