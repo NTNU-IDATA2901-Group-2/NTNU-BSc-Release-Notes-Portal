@@ -1,19 +1,27 @@
 package no.reliablesolutions.release_notes_portal.service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
+import no.reliablesolutions.release_notes_portal.domain.entity.ChangeNote;
 import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
+import no.reliablesolutions.release_notes_portal.domain.entity.ReleaseNote;
 import no.reliablesolutions.release_notes_portal.domain.repository.ChangeNoteRepository;
 import no.reliablesolutions.release_notes_portal.domain.repository.GitRepositoryRepository;
+import no.reliablesolutions.release_notes_portal.domain.repository.ReleaseNoteRepository;
 import no.reliablesolutions.release_notes_portal.dto.CreateGitRepositoryDTO;
 import no.reliablesolutions.release_notes_portal.exception.FailedSyncGitChangeNotesException;
 import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityException;
 import no.reliablesolutions.release_notes_portal.exception.GitRepositoryNotFoundException;
+import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.runner.SyncGitChangeNotes;
+import no.reliablesolutions.release_notes_portal.util.ReleaseNoteCommitHandler;
 
 /**
  * Service class for managing Git repositories, including creating, deleting, updating, and synchronizing repositories.
@@ -24,6 +32,8 @@ public class GitRepositoryService {
     private final GitRepositoryRepository gitRepositoryRepository;
     private final ObjectProvider<SyncGitChangeNotes> syncGitChangeNotesProvider;
     private final ChangeNoteRepository changeNoteRepository;
+    private final ReleaseNoteRepository releaseNoteRepository;
+    private final ReleaseNoteCommitHandler commitHandler;
 
     /**
      * Creates a new Git repository based on the provided CreateGitRepositoryDTO.
@@ -127,4 +137,37 @@ public class GitRepositoryService {
     public GitRepository getGitRepositoryForChangeNote(long changeNoteId) {
       return gitRepositoryRepository.findByChangeNoteId(changeNoteId);
     }
+
+
+  /**
+   * Commits a release note to every Git repository associated with its change notes,
+   * plus any additional repositories explicitly requested.
+   *
+   * @param id the id of the release note to commit
+   * @param additionalGitRepositoryIds ids of extra repositories to commit to
+   * @throws ReleaseNoteNotFoundException if the release note does not exist or is archived
+   * @throws GitRepositoryNotFoundException if an additional repository id does not exist
+   */
+  public boolean commitReleaseNoteToGit(long id, List<Long> additionalGitRepositoryIds) {
+    Optional<ReleaseNote> releaseNoteOptional = releaseNoteRepository.findById(id);
+
+    if (releaseNoteOptional.isEmpty() || Boolean.TRUE.equals(releaseNoteOptional.get().getArchived())) {
+      throw new ReleaseNoteNotFoundException(id);
+    }
+    ReleaseNote releaseNote = releaseNoteOptional.get();
+    
+    Set<GitRepository> gitRepositories = new HashSet<>();
+    additionalGitRepositoryIds.forEach(repoId -> {
+      GitRepository gitRepository = gitRepositoryRepository.findById(repoId)
+          .orElseThrow(() -> new GitRepositoryNotFoundException(repoId));
+      gitRepositories.add(gitRepository);
+    });
+    releaseNote.getChangeNotes().forEach(changeNote -> {
+      GitRepository gitRepository = gitRepositoryRepository.findByChangeNoteId(changeNote.getId());
+      if (gitRepository != null) {
+        gitRepositories.add(gitRepository);
+      }
+    });
+    return commitHandler.commitReleaseNoteToGit(releaseNote);
+  }
 }

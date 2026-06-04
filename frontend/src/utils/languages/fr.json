@@ -38,7 +38,8 @@
         "summarize": "Résumer",
         "allCustomers": "Tous les clients",
         "updateRange": "Mettre à jour la plage",
-        "clearChangeNotes": "Effacer les notes de changement"
+        "clearChangeNotes": "Effacer les notes de changement",
+        "commitToGit": "Valider sur Git"
     },
     "title": {
         "title": "Titre",
@@ -91,11 +92,17 @@
         "copySuccess": "Contenu copié dans le presse-papiers",
         "copyError": "Une erreur s'est produite lors de la copie dans le presse-papiers",
         "summarizeSuccess": "Résumé effectué avec succès",
-        "summarizeError": "Une erreur s'est produite lors du résumé"
+        "summarizeError": "Une erreur s'est produite lors du résumé",
+        "commitToGitSuccess": "Note de version validée sur Git avec succès",
+        "commitToGitError": "Une erreur s'est produite lors de la validation de la note de version sur Git"
     },
     "deletePrompt": {
         "title": "Êtes-vous sûr de vouloir supprimer ?",
         "description": "Cette action ne peut pas être annulée."
+    },
+    "commitPrompt": {
+        "title": "Êtes-vous sûr de vouloir valider sur Git ?",
+        "description": "Cette action ne peut pas être annulée. Cette note de version sera associée aux notes de changement suivantes dans Git :"
     },
     "card": {
         "published": "Publié",

@@ -38,7 +38,8 @@
         "summarize": "Summarize",
         "allCustomers": "All customers",
         "updateRange": "Update Range",
-        "clearChangeNotes": "Clear change notes"
+        "clearChangeNotes": "Clear change notes",
+        "commitToGit": "Commit to Git"
     },
     "title": {
         "title": "Title",
@@ -91,11 +92,17 @@
         "copySuccess": "Content copied to clipboard",
         "copyError": "An error occurred while copying to clipboard",
         "summarizeSuccess": "Summarized successfully",
-        "summarizeError": "An error occurred while summarizing"
+        "summarizeError": "An error occurred while summarizing",
+        "commitToGitSuccess": "Release note committed to Git successfully",
+        "commitToGitError": "An error occurred while committing the release note to Git"
     },
     "deletePrompt": {
         "title": "Are you sure you want to delete?",
         "description": "This action cannot be undone."
+    },
+    "commitPrompt": {
+        "title": "Are you sure you want to commit to Git?",
+        "description": "This action cannot be undone. This release note will be associated with the following change notes in Git:"
     },
     "card": {
         "published": "Published",

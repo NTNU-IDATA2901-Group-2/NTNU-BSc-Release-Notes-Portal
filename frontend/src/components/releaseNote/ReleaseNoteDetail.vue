@@ -8,7 +8,7 @@ import { routeNames } from '@/utils/router';
 import { toast } from 'vue-sonner';
 import { useI18n } from 'vue-i18n';
 import { isAdmin } from '@/utils/keycloak';
-import { Pencil, Trash2, Eye, EyeOff, FileDown, ArrowLeft, EllipsisVertical, Sparkles, Copy, Check } from "lucide-vue-next"
+import { Pencil, Trash2, Eye, EyeOff, FileDown, ArrowLeft, EllipsisVertical, Sparkles, Copy, Check, GitBranch } from "lucide-vue-next"
 import md from '@/utils/markdown-it';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../ui/breadcrumb';
 import { Badge } from '../ui/badge';
@@ -27,6 +27,10 @@ import SelectGroup from '../ui/select/SelectGroup.vue';
 import SelectItem from '../ui/select/SelectItem.vue';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { openJiraTicket } from '@/utils/jira.ts';
+import Textarea from '../ui/textarea/Textarea.vue';
+import ScrollArea from '../ui/scroll-area/ScrollArea.vue';
+import { getLabelFromChangeNote } from '@/utils/change-note.ts';
+import { useCommitReleaseNoteToGit } from '@/api/git-repository-api.ts';
 
 const props = defineProps<{
   releaseNote: ReleaseNote;
@@ -73,6 +77,19 @@ const publishReleaseNoteMutation = usePublishReleaseNote({
   },
   onError: () => {
     toast.error(t('toast.releaseNotePublishError'));
+  }
+})
+
+const commitPromptOpen = ref(false);
+const commitReleaseNoteToGit = useCommitReleaseNoteToGit({
+  onSuccess: () => {
+    toast.success(t('toast.commitToGitSuccess'));
+  },
+  onError: () => {
+    toast.error(t('toast.commitToGitError'));
+  },
+  onSettled: () => {
+    commitPromptOpen.value = false;
   }
 })
 
@@ -213,8 +230,26 @@ const customerFilter = ref<number>(-1);
 
 <template>
   <div class="flex flex-col w-full items-center px-4 mb-20">
-    <DialogPrompt v-model:open="deletePromptOpen" :mode="'delete'" :title-key="'deletePrompt.title'" :description-key="'deletePrompt.description'" :on-confirm="() => archiveReleaseNote()" />
-
+    <DialogPrompt
+      v-model:open="deletePromptOpen"
+      :mode="'delete'"
+      :title-key="'deletePrompt.title'"
+      :description-key="'deletePrompt.description'"
+      :on-confirm="() => archiveReleaseNote()"
+    />
+    <DialogPrompt
+      v-model:open="commitPromptOpen"
+      :mode="'confirm'"
+      :title-key="'commitPrompt.title'"
+      :description-key="'commitPrompt.description'"
+      :on-confirm="() => commitReleaseNoteToGit.mutate({ id: releaseNote.id, additionalGitRepositoryIds: [] })"
+    >
+      <ScrollArea class="max-h-60 border">
+        <p v-for="change in releaseNote.changeNotes" :key="change.id" :class="(!change.title && !change.reference) ? 'text-text-primary/50' : ''">
+          {{ getLabelFromChangeNote(change) || t('placeholder.noTitle') }}
+        </p>
+      </ScrollArea>
+    </DialogPrompt>
     <div class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10 flex items-center gap-4 max-w-[calc(100%-2rem)] lg:max-w-[calc(100%-5rem)]">
       <Button variant="outline" class="shrink-0" @click="$router.back()">
         <ArrowLeft />{{ t('button.previous') }}
@@ -236,11 +271,11 @@ const customerFilter = ref<number>(-1);
       class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
       <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-col sm:flex-row items-start justify-between max-w-full gap-4">
-          <h1 v-if="!releaseNote.tag" class="text-4xl text-text-primary/50">{{ t('placeholder.noTitle') }}</h1>
-          <h1 v-else class="text-3xl md:text-4xl truncate max-w-full">{{
+          <h1 v-if="!releaseNote.tag" class="text-4xl text-text-primary/50 leading-normal">{{ t('placeholder.noTitle') }}</h1>
+          <h1 v-else class="text-3xl md:text-4xl truncate max-w-full leading-normal">{{
             releaseNote.tag }}
           </h1>
-          <div class="flex sm:gap-4 w-full sm:w-auto sm:grow items-center">
+          <div class="flex sm:gap-4 w-full sm:w-auto sm:grow items-center self-center">
             <Tooltip v-if="isAdmin">
               <TooltipTrigger as-child>
                 <Badge 
@@ -287,6 +322,12 @@ const customerFilter = ref<number>(-1);
                     <component 
                       :is="!releaseNote.published ? Eye : EyeOff"
                       class="text-text-primary" />
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem @click="commitPromptOpen = true" v-if="isAdmin">
+                  <div class="w-full flex gap-2">
+                    <p class="ml-auto text-text-primary">{{ t('button.commitToGit') }}</p>
+                    <GitBranch class="text-text-primary" />
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem @click="handleExport">

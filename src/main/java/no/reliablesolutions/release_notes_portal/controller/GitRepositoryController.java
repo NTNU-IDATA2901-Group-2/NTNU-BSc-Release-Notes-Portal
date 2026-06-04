@@ -17,6 +17,7 @@ import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
 import no.reliablesolutions.release_notes_portal.dto.CreateGitRepositoryDTO;
 import no.reliablesolutions.release_notes_portal.service.GitRepositoryService;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -133,6 +134,34 @@ public class GitRepositoryController {
     gitRepositoryService.syncGitRepository(id);
     logger.info("Git repository with id {} synced successfully", id);
     return ResponseEntity.ok("Git repository synced successfully");
+  }
+
+  /**
+   * Commits an existing release note to Git by its ID. This will create a Git commit
+   * in each repository associated with the release note and its change notes.
+   * Additional Git repositories for commiting can be specified.
+   * @param id the id of the release note to be committed to Git
+   * @param additionalGitRepositoryIds the list of additional Git repository IDs to commit to
+   * @return a ResponseEntity with a message indicating that the release note was committed to Git successfully
+   */
+  @Operation(summary = "Commit release note to Git", description = "Commits an existing release note to Git by its ID")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Release note committed to Git successfully"),
+      @ApiResponse(responseCode = "404", description = "Release note not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
+  @PostMapping("/{id}/commit-to-git")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<String> commitReleaseNoteToGit(@PathVariable long id, @RequestBody List<Long> additionalGitRepositoryIds) {
+
+    boolean commitSuccess = gitRepositoryService.commitReleaseNoteToGit(id, additionalGitRepositoryIds);
+    if (commitSuccess) {
+      logger.info("Release note with id {} committed to Git", id);
+      return ResponseEntity.ok("Release note committed to Git successfully");
+    } else {
+      logger.error("Failed to commit release note with id {} to Git", id);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to commit release note to Git");
+    }
   }
 
 }

@@ -38,7 +38,8 @@
         "summarize": "Oppsummer",
         "allCustomers": "Alle kunder",
         "updateRange": "Oppdater fra/til",
-        "clearChangeNotes": "Fjern endringsnotater"
+        "clearChangeNotes": "Fjern endringsnotater",
+        "commitToGit": "Commit til Git"
     },
     "title": {
         "title": "Tittel",
@@ -92,11 +93,17 @@
         "copySuccess": "Innhold kopiert til utklippstavle",
         "copyError": "Det oppsto en feil under kopiering til utklippstavle",
         "summarizeSuccess": "Oppsummert",
-        "summarizeError": "Det oppsto en feil under oppsummering"
+        "summarizeError": "Det oppsto en feil under oppsummering",
+        "commitToGitSuccess": "Utgivelsesnotat committet til Git",
+        "commitToGitError": "Det oppsto en feil under committing av utgivelsesnotat til Git"
     },
     "deletePrompt": {
         "title": "Er du sikker på at du vil slette?",
         "description": "Denne handlingen kan ikke angres."
+    },
+    "commitPrompt": {
+        "title": "Er du sikker på at du vil committe til Git?",
+        "description": "Denne handlingen kan ikke angres. Dette utgivelsesnotatet vil bli knyttet til følgende endringsnotater i Git:"
     },
     "card": {
         "published": "Publisert",

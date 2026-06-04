@@ -163,3 +163,24 @@ export const useSyncRepository = (onFinished: OnMutationApiCallFinished) => {
     })
 }
 
+const commitReleaseNoteToGit = async (id: number, additionalGitRepositoryIds: number[]) => {
+    const response = await api.post(`git-repositories/${id}/commit-to-git`, additionalGitRepositoryIds);
+    return response.data;
+}
+
+export const useCommitReleaseNoteToGit = (onFinished: OnMutationApiCallFinished) => {
+    interface CommitReleaseNoteToGitVariables {
+        id: number,
+        additionalGitRepositoryIds?: number[]
+    }
+    return useMutation({
+        mutationFn: (variables: CommitReleaseNoteToGitVariables) => commitReleaseNoteToGit(variables.id, variables.additionalGitRepositoryIds),
+        onSuccess: () => onFinished.onSuccess(),
+        onError: () => {
+            console.error("Failed to commit release note to git");
+            onFinished.onError();
+        },
+        onSettled: () => onFinished.onSettled?.(),
+    })
+}
+
