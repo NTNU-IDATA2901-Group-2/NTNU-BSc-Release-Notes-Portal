@@ -28,8 +28,8 @@ const handleCheckboxClick = (event: Event) => {
   <RouterLink :to="`/change-notes/${changeNote.id}`" class="block">
 
     <div
-      class="flex flex-col p-4 gap-2 h-30 overflow-hidden text-wrap rounded-lg hover:bg-text-primary/10 transition-colors">
-      <div class="flex justify-between">
+      class="flex flex-col p-4 gap-2 min-h-30 overflow-hidden text-wrap rounded-lg hover:bg-text-primary/10 transition-colors">
+      <div class="flex justify-between gap-4">
         <div class="flex gap-4 items-center min-w-0">
 
           <div @click="handleCheckboxClick" class="flex items-center" v-if="isAdmin">
@@ -38,47 +38,38 @@ const handleCheckboxClick = (event: Event) => {
 
           <h3 v-if="changeNote.title" class="text-xl whitespace-nowrap overflow-hidden text-ellipsis">{{ changeNote.title }}</h3>
           <h3 v-else class="text-xl text-text-primary/50">{{ t('placeholder.noTitle') }}</h3>
-
-          <Tooltip v-if="changeNote.customer">
+        </div>
+        <div class="flex gap-2 items-center">
+          <Tooltip v-if="isAdmin && changeNote.reference">
             <TooltipTrigger as-child>
-              <Badge v-if="changeNote.customer" :variant="'outline'">{{ changeNote.customer.name }}
+              <Badge 
+                class="h-6 hover:cursor-pointer hover:underline"
+                variant="outline"
+                @click.stop.prevent="() => openJiraTicket(changeNote.reference)"
+              >
+                {{ changeNote.reference }}
               </Badge>
             </TooltipTrigger>
             <TooltipContent>
-              {{ t('title.customer') }}
+                {{ t('tooltip.reference') }}
             </TooltipContent>
           </Tooltip>
-          <Tooltip v-if="isAdmin && changeNote.reference">
-              <TooltipTrigger as-child>
-                <Badge 
-                  class="h-6 hover:cursor-pointer hover:underline"
-                  variant="outline"
-                  @click.stop.prevent="() => openJiraTicket(changeNote.reference)"
-                >
-                  {{ changeNote.reference }}
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent>
-                  {{ t('tooltip.reference') }}
-              </TooltipContent>
-            </Tooltip>
-
+          <Tooltip v-if="isAdmin">
+            <TooltipTrigger as-child>
+              <Badge 
+                v-if="isAdmin" class="h-6"
+                :variant="changeNote.published ? 'success' : 'destructive'"
+              >
+                {{ changeNote.published ? t('card.published') : t('card.private') }}
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent>
+                {{ changeNote.published ? t('tooltip.publishedNote') : t('tooltip.privateNote') }}
+            </TooltipContent>
+          </Tooltip>
         </div>
-        <Tooltip v-if="isAdmin">
-          <TooltipTrigger as-child>
-            <Badge 
-              v-if="isAdmin" class="h-6"
-              :variant="changeNote.published ? 'success' : 'destructive'"
-            >
-              {{ changeNote.published ? t('card.published') : t('card.private') }}
-            </Badge>
-          </TooltipTrigger>
-          <TooltipContent>
-              {{ changeNote.published ? t('tooltip.publishedNote') : t('tooltip.privateNote') }}
-          </TooltipContent>
-        </Tooltip>
+        
       </div>
-
 
       <div class="flex flex-row gap-2 mt-auto">
         <Tooltip v-if="changeNote.product">
@@ -107,6 +98,16 @@ const handleCheckboxClick = (event: Event) => {
             {{ t('title.feature') }}
           </TooltipContent>
         </Tooltip>
+        <Tooltip v-if="changeNote.customer">
+            <TooltipTrigger as-child>
+              <Badge v-if="changeNote.customer" :variant="'outline'" class="ml-auto">
+                {{ changeNote.customer.name }}
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent>
+              {{ t('title.customer') }}
+            </TooltipContent>
+          </Tooltip>
       </div>
 
     </div>

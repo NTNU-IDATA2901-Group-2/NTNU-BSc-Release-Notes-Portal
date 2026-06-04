@@ -237,7 +237,7 @@ const customerFilter = ref<number>(-1);
       <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-col sm:flex-row items-start justify-between max-w-full gap-4">
           <h1 v-if="!releaseNote.tag" class="text-4xl text-text-primary/50">{{ t('placeholder.noTitle') }}</h1>
-          <h1 v-else class="text-3xl md:text-4xl whitespace-nowrap text-ellipsis overflow-hidden">{{
+          <h1 v-else class="text-3xl md:text-4xl truncate max-w-full">{{
             releaseNote.tag }}
           </h1>
           <div class="flex sm:gap-4 w-full sm:w-auto sm:grow items-center">
