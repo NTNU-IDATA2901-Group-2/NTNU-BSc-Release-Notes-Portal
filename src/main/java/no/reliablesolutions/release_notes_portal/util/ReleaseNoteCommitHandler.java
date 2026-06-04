@@ -19,6 +19,7 @@ import org.yaml.snakeyaml.Yaml;
 import no.reliablesolutions.release_notes_portal.domain.entity.ChangeNote;
 import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
 import no.reliablesolutions.release_notes_portal.domain.entity.ReleaseNote;
+import no.reliablesolutions.release_notes_portal.runner.SyncGitChangeNotes;
 
 /**
  * Commits and pushes release notes to their associated Git repositories.
@@ -31,15 +32,19 @@ public class ReleaseNoteCommitHandler {
   
   private final Logger logger = LoggerFactory.getLogger(ReleaseNoteCommitHandler.class);
 
+  private final SyncGitChangeNotes syncGitChangeNotes;
+
   private final String releaseNoteDirectory;
   private final String githubPat;
 
   public ReleaseNoteCommitHandler(
     @Value("${RELEASE_NOTE_DIRECTORY}") String releaseNoteDirectory,
-    @Value("${GITHUB_RW_PAT}") String githubPat
+    @Value("${GITHUB_RW_PAT}") String githubPat,
+    SyncGitChangeNotes syncGitChangeNotes
   ) {
     this.releaseNoteDirectory = releaseNoteDirectory;
     this.githubPat = githubPat;
+    this.syncGitChangeNotes = syncGitChangeNotes;
   }
 
   /**
@@ -62,6 +67,13 @@ public class ReleaseNoteCommitHandler {
       .toList();
 
     for (GitRepository gitRepository : gitRepositories) {
+      try {
+        syncGitChangeNotes.syncGitRepository(gitRepository);
+      } catch (Exception e) {
+        logger.error("Failed to sync Git repository {} before committing release note: {}", gitRepository.getName(), e.getMessage());
+        success = false;
+      }
+      
       File repositoryDirectory = new File(gitRepository.getLocalPath());
       if ((!repositoryDirectory.exists() || !repositoryDirectory.isDirectory()) && !repositoryDirectory.mkdirs()) {
           logger.error("Failed to create local repository directory for Git repository {}: {}", gitRepository.getName(), repositoryDirectory.getAbsolutePath());
