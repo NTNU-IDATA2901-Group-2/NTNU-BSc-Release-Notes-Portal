@@ -35,9 +35,9 @@ import no.reliablesolutions.release_notes_portal.util.ChangeNoteFileHandler;
  */
 @Component
 @Profile("!ci")
-public class SyncGitChangeNotes implements CommandLineRunner {
+public class ChangeNotesSyncHandler implements CommandLineRunner {
   
-  private final Logger logger = LoggerFactory.getLogger(SyncGitChangeNotes.class);
+  private final Logger logger = LoggerFactory.getLogger(ChangeNotesSyncHandler.class);
   private final GitRepositoryRepository gitRepositoryRepository;
   private final ChangeNoteService changeNoteService;
   private final ChangeNoteFileHandler changeNoteFileHandler;
@@ -54,7 +54,7 @@ public class SyncGitChangeNotes implements CommandLineRunner {
    * @param changeNoteFileHandler the utility for handling change note files
    * @param changeNoteDirectory the directory within the Git repository where change note files are located, injected from environment variable, must be set
    */
-  public SyncGitChangeNotes(
+  public ChangeNotesSyncHandler(
     GitRepositoryRepository gitRepositoryRepository,
     ChangeNoteService changeNoteService,
     ChangeNoteFileHandler changeNoteFileHandler,

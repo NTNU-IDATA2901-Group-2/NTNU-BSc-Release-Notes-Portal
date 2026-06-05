@@ -9,7 +9,6 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
-import no.reliablesolutions.release_notes_portal.domain.entity.ChangeNote;
 import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
 import no.reliablesolutions.release_notes_portal.domain.entity.ReleaseNote;
 import no.reliablesolutions.release_notes_portal.domain.repository.ChangeNoteRepository;
@@ -20,8 +19,8 @@ import no.reliablesolutions.release_notes_portal.exception.FailedSyncGitChangeNo
 import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityException;
 import no.reliablesolutions.release_notes_portal.exception.GitRepositoryNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
-import no.reliablesolutions.release_notes_portal.runner.SyncGitChangeNotes;
-import no.reliablesolutions.release_notes_portal.util.ReleaseNoteCommitHandler;
+import no.reliablesolutions.release_notes_portal.runner.ChangeNotesSyncHandler;
+import no.reliablesolutions.release_notes_portal.util.ReleaseNoteSyncHandler;
 
 /**
  * Service class for managing Git repositories, including creating, deleting, updating, and synchronizing repositories.
@@ -30,10 +29,10 @@ import no.reliablesolutions.release_notes_portal.util.ReleaseNoteCommitHandler;
 @AllArgsConstructor
 public class GitRepositoryService {
     private final GitRepositoryRepository gitRepositoryRepository;
-    private final ObjectProvider<SyncGitChangeNotes> syncGitChangeNotesProvider;
+    private final ObjectProvider<ChangeNotesSyncHandler> syncGitChangeNotesProvider;
     private final ChangeNoteRepository changeNoteRepository;
     private final ReleaseNoteRepository releaseNoteRepository;
-    private final ReleaseNoteCommitHandler commitHandler;
+    private final ReleaseNoteSyncHandler releaseNoteSyncHandler;
 
     /**
      * Creates a new Git repository based on the provided CreateGitRepositoryDTO.
@@ -95,7 +94,7 @@ public class GitRepositoryService {
      */
     public void syncGitRepositories() {
         try {
-            SyncGitChangeNotes syncGitChangeNotes = syncGitChangeNotesProvider.getIfAvailable();
+            ChangeNotesSyncHandler syncGitChangeNotes = syncGitChangeNotesProvider.getIfAvailable();
             if (syncGitChangeNotes == null) {
                 throw new IllegalStateException("SyncGitChangeNotes is not available. Cannot sync Git repositories.");
             }
@@ -116,7 +115,7 @@ public class GitRepositoryService {
         try {
             GitRepository gitRepository = gitRepositoryRepository.findById(id).orElseThrow(() -> new GitRepositoryNotFoundException(id));
 
-            SyncGitChangeNotes syncGitChangeNotes = syncGitChangeNotesProvider.getIfAvailable();
+            ChangeNotesSyncHandler syncGitChangeNotes = syncGitChangeNotesProvider.getIfAvailable();
             if (syncGitChangeNotes == null) {
                 throw new IllegalStateException("SyncGitChangeNotes is not available. Cannot sync Git repository.");
             }
@@ -168,6 +167,6 @@ public class GitRepositoryService {
         gitRepositories.add(gitRepository);
       }
     });
-    return commitHandler.commitReleaseNoteToGit(releaseNote);
+    return releaseNoteSyncHandler.syncReleaseNoteToGit(releaseNote, gitRepositories.stream().toList());
   }
 }
