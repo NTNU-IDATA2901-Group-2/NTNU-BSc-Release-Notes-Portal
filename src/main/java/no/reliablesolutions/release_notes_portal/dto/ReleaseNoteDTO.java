@@ -11,5 +11,6 @@ public record ReleaseNoteDTO(
     String tag,
     String summary,
     boolean published,
-    long createdAt) {
+    long createdAt,
+    boolean syncedToGit) {
 }

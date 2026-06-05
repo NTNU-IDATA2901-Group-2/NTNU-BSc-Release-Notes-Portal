@@ -53,7 +53,8 @@ public class ReleaseNoteMapper {
         releaseNote.getTag(),
         releaseNote.getSummary(),
         releaseNote.getPublished(),
-        releaseNote.getCreatedAt());
+        releaseNote.getCreatedAt(),
+        releaseNote.getSyncedToGit());
   }
 
 }

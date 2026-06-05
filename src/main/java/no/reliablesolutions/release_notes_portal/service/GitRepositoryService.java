@@ -18,6 +18,7 @@ import no.reliablesolutions.release_notes_portal.dto.CreateGitRepositoryDTO;
 import no.reliablesolutions.release_notes_portal.exception.FailedSyncGitChangeNotesException;
 import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityException;
 import no.reliablesolutions.release_notes_portal.exception.GitRepositoryNotFoundException;
+import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteAlreadySyncedException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.runner.ChangeNotesSyncHandler;
 import no.reliablesolutions.release_notes_portal.util.ReleaseNoteSyncHandler;
@@ -154,7 +155,13 @@ public class GitRepositoryService {
       throw new ReleaseNoteNotFoundException(id);
     }
     ReleaseNote releaseNote = releaseNoteOptional.get();
-    
+    if (releaseNote.getChangeNotes().isEmpty()) {
+        throw new IllegalArgumentException("Release note with id " + id + " has no change notes to commit");
+    }
+    if (Boolean.TRUE.equals(releaseNote.getSyncedToGit())) {
+        throw new ReleaseNoteAlreadySyncedException(id);
+    }
+
     Set<GitRepository> gitRepositories = new HashSet<>();
     additionalGitRepositoryIds.forEach(repoId -> {
       GitRepository gitRepository = gitRepositoryRepository.findById(repoId)
@@ -167,6 +174,11 @@ public class GitRepositoryService {
         gitRepositories.add(gitRepository);
       }
     });
-    return releaseNoteSyncHandler.syncReleaseNoteToGit(releaseNote, gitRepositories.stream().toList());
+    boolean success = releaseNoteSyncHandler.syncReleaseNoteToGit(releaseNote, gitRepositories.stream().toList());
+    if (success) {
+      releaseNote.setSyncedToGit(true);
+      releaseNoteRepository.save(releaseNote);
+    }
+    return success;
   }
 }

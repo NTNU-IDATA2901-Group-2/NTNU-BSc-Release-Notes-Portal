@@ -30,7 +30,7 @@ import { openJiraTicket } from '@/utils/jira.ts';
 import Textarea from '../ui/textarea/Textarea.vue';
 import ScrollArea from '../ui/scroll-area/ScrollArea.vue';
 import { getLabelFromChangeNote } from '@/utils/change-note.ts';
-import { useCommitReleaseNoteToGit } from '@/api/git-repository-api.ts';
+import { useSyncReleaseNoteToGit } from '@/api/git-repository-api.ts';
 
 const props = defineProps<{
   releaseNote: ReleaseNote;
@@ -81,7 +81,7 @@ const publishReleaseNoteMutation = usePublishReleaseNote({
 })
 
 const commitPromptOpen = ref(false);
-const commitReleaseNoteToGit = useCommitReleaseNoteToGit({
+const commitReleaseNoteToGit = useSyncReleaseNoteToGit({
   onSuccess: () => {
     toast.success(t('toast.commitToGitSuccess'));
   },
@@ -324,12 +324,22 @@ const customerFilter = ref<number>(-1);
                       class="text-text-primary" />
                   </div>
                 </DropdownMenuItem>
-                <DropdownMenuItem @click="commitPromptOpen = true" v-if="isAdmin">
-                  <div class="w-full flex gap-2">
-                    <p class="ml-auto text-text-primary">{{ t('button.commitToGit') }}</p>
-                    <GitBranch class="text-text-primary" />
-                  </div>
-                </DropdownMenuItem>
+                <Tooltip>
+                  <TooltipTrigger as-child>
+                    <DropdownMenuItem
+                      @click="(!releaseNote.syncedToGit && releaseNote.changeNotes.length > 0) ? commitPromptOpen = true : null"
+                      v-if="isAdmin"
+                      :class = "releaseNote.syncedToGit || releaseNote.changeNotes.length === 0 ? 'cursor-default opacity-50 focus:bg-transparent ' : ''"
+                    >
+                      <div class="w-full flex gap-2">
+                        <p class="ml-auto text-text-primary">{{ t('button.commitToGit') }}</p>
+                        <GitBranch class="text-text-primary" />
+                      </div>
+                    </DropdownMenuItem>
+                  </TooltipTrigger>
+                  <TooltipContent v-if="releaseNote.syncedToGit">{{ t('tooltip.alreadyCommited') }}</TooltipContent>
+                  <TooltipContent v-else-if="releaseNote.changeNotes.length === 0">{{ t('tooltip.noChangeNotesToCommit') }}</TooltipContent>
+                </Tooltip>
                 <DropdownMenuItem @click="handleExport">
                   <div class="w-full flex gap-2">
                     <p class="ml-auto text-text-primary">{{ t('button.export') }}</p>

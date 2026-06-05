@@ -190,7 +190,9 @@
         "publishedNote": "Les non-administrateurs peuvent voir cette note",
         "privateNote": "Seuls les administrateurs peuvent voir cette note",
         "explainSummarize": "Utilisez les diffs git associés pour résumer",
-        "reference": "Ouvrir le ticket Jira associé"
+        "reference": "Ouvrir le ticket Jira associé",
+        "alreadyCommited": "Déjà validé sur Git",
+        "noChangeNotesToCommit": "Aucune note de changement sélectionnée à valider"
     },
     "prompts": {
         "translationPrompt": "Prompt de traduction",

@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,17 +84,18 @@ public class ReleaseNoteSyncHandler {
         List<ChangeNote> changeNotesNotInThisGitRepo = changeNotes.stream()
           .filter(changeNote -> changeNote.getGitRepository() == null || changeNote.getGitRepository().getId() != gitRepository.getId())
           .toList();
-
-        commitLocally(repositoryDirectory, releaseNote, changeNotesInThisGitRepo, changeNotesNotInThisGitRepo, gitRepository);
+        checkoutNewBranch(repositoryDirectory, releaseNote);
+        commit(repositoryDirectory, releaseNote, changeNotesInThisGitRepo, changeNotesNotInThisGitRepo, gitRepository);
         committedRepositoriesDirectories.add(repositoryDirectory);
       }
       for (File dir : committedRepositoriesDirectories) {
-        pushToRemote(dir);
+        pushToRemote(dir, releaseNote);
         pushedRepositoriesDirectories.add(dir);
       }
     } catch (Exception e) {
       logger.error("Failed to sync release note with id {} to Git: {}", releaseNote.getId(), e.getMessage());
-      revert();
+      //deletePushedBranches(pushedRepositoriesDirectories);
+      //resetLocalDirectories(committedRepositoriesDirectories);
       isSuccess = false;
     }
     return isSuccess;
@@ -115,7 +118,21 @@ public class ReleaseNoteSyncHandler {
     return releaseNoteDir;
   }
 
-  private void commitLocally(
+  private void checkoutNewBranch(File repositoryDirectory, ReleaseNote releaseNote) {
+    try (Git git = Git.open(repositoryDirectory)) {
+      String branchName = getBranchNameForReleaseNote(releaseNote);
+      git.checkout()
+        .setCreateBranch(true)
+        .setName(branchName)
+        .call();
+    } catch (Exception e) {
+      logger.error("Failed to checkout new branch for release note with id {} in Git repository at {}: {}", releaseNote.getId(), repositoryDirectory.getAbsolutePath(), e.getMessage());
+      throw new FailedSyncReleaseNoteException("Failed to checkout new branch for release note with id " + releaseNote.getId() + " in Git repository at " + repositoryDirectory.getAbsolutePath(), e);
+
+    }
+  }
+
+  private void commit(
     File repositoryDirectory,
     ReleaseNote releaseNote,
     List<ChangeNote> changeNotesInThisGitRepo,
@@ -171,13 +188,15 @@ public class ReleaseNoteSyncHandler {
     }
   }
 
-  private void pushToRemote(File releaseNoteDirectory) {
+  private void pushToRemote(File releaseNoteDirectory, ReleaseNote releaseNote) {
     if (releaseNoteDirectory == null) {
       throw new IllegalArgumentException("Repository directory must be prepared before pushing");
     }
 
     try (Git git = Git.open(releaseNoteDirectory)) {
       git.push()
+        .setRemote("origin")
+        .setRefSpecs(new RefSpec(getBranchNameForReleaseNote(releaseNote)))
         .setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubPat, ""))
         .call();
     } catch (Exception e) {
@@ -190,7 +209,10 @@ public class ReleaseNoteSyncHandler {
     //reset locally
     //delete pushed branches
   }
-    
+  
+  private String getBranchNameForReleaseNote(ReleaseNote releaseNote) {
+    return "release-note-" + releaseNote.getId();
+  }
   /**
    *     boolean success = true;
     List<ChangeNote> changeNotes = releaseNote.getChangeNotes();

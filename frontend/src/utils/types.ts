@@ -66,7 +66,8 @@ export interface ReleaseNote {
     tag: string,
     summary: string,
     published: boolean,
-    changeNotes: ChangeNote[]
+    changeNotes: ChangeNote[],
+    syncedToGit: boolean
 }
 
 export interface PersistReleaseNoteDTO {

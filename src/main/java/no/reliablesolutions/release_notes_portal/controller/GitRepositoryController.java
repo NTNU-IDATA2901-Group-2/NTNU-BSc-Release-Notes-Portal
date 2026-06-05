@@ -147,15 +147,15 @@ public class GitRepositoryController {
   @Operation(summary = "Commit release note to Git", description = "Commits an existing release note to Git by its ID")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Release note committed to Git successfully"),
+      @ApiResponse(responseCode = "400", description = "Invalid request variable or release note has no change notes"),
       @ApiResponse(responseCode = "404", description = "Release note not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
-  @PostMapping("/{id}/commit-to-git")
+  @PostMapping("/{id}/sync-to-git")
   @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<String> commitReleaseNoteToGit(@PathVariable long id, @RequestBody List<Long> additionalGitRepositoryIds) {
+  public ResponseEntity<String> syncReleaseNoteToGit(@PathVariable long id, @RequestBody List<Long> additionalGitRepositoryIds) {
 
-    boolean commitSuccess = gitRepositoryService.commitReleaseNoteToGit(id, additionalGitRepositoryIds);
-    if (commitSuccess) {
+    if (gitRepositoryService.commitReleaseNoteToGit(id, additionalGitRepositoryIds)) {
       logger.info("Release note with id {} committed to Git", id);
       return ResponseEntity.ok("Release note committed to Git successfully");
     } else {

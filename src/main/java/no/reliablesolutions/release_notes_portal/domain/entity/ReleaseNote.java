@@ -41,4 +41,5 @@ public class ReleaseNote {
   private Boolean published = false;
   private Boolean archived = false;
   private final Long createdAt = new Date().getTime();
+  private Boolean syncedToGit = false;
 }

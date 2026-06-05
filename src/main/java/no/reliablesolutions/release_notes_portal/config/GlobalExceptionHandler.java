@@ -24,6 +24,7 @@ import no.reliablesolutions.release_notes_portal.exception.FailedSyncGitChangeNo
 import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityException;
 import no.reliablesolutions.release_notes_portal.exception.FeatureNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ProductNotFoundException;
+import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteAlreadySyncedException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ScopeNotFoundException;
 
@@ -233,6 +234,18 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleReleaseNoteNotFoundException(ReleaseNoteNotFoundException e) {
     logger.warn("Release note not found: {}", e.getReleaseNoteId());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Release note with ID %d not found", e.getReleaseNoteId()));
+  }
+
+  /**
+   * Handles the case where a release note has already been synced to Git. Logs the event and returns a 400 response with a message.
+   *
+   * @param e the exception containing details about the already-synced release note
+   * @return a ResponseEntity with a 400 status and a message indicating the release note was already synced to Git
+   */
+  @ExceptionHandler(value = {ReleaseNoteAlreadySyncedException.class})
+  public ResponseEntity<String> handleReleaseNoteAlreadySyncedException(ReleaseNoteAlreadySyncedException e) {
+    logger.warn("Release note already synced to Git: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
   }
 
   /**

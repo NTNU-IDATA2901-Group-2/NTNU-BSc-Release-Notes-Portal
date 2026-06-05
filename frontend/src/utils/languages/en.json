@@ -190,7 +190,9 @@
         "publishedNote": "Non-administrators can view this note",
         "privateNote": "Only administrators can view this note",
         "explainSummarize": "Use associated git diffs to summarize",
-        "reference": "Open the related Jira ticket"
+        "reference": "Open the related Jira ticket",
+        "alreadyCommited": "Already committed to Git",
+        "noChangeNotesToCommit": "No change notes selected to commit"
     },
     "prompts": {
         "translationPrompt": "Translation Prompt",
