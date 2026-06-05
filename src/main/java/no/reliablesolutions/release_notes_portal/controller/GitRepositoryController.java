@@ -51,7 +51,7 @@ public class GitRepositoryController {
   })
   @PostMapping("")
   @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<Long> postMethodName(@RequestBody CreateGitRepositoryDTO entity) {
+  public ResponseEntity<Long> createGitRepository(@RequestBody CreateGitRepositoryDTO entity) {
     long id = gitRepositoryService.createGitRepository(entity);
     logger.info("Git repository created with id: {}", id);
     return ResponseEntity.ok(id);

@@ -3,13 +3,11 @@ package no.reliablesolutions.release_notes_portal.util;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
@@ -68,18 +66,22 @@ public class ReleaseNoteSyncHandler {
    *         {@code false} if any step failed
    */
   public boolean syncReleaseNoteToGit(ReleaseNote releaseNote, List<GitRepository> gitRepositories) {
+    List<Pair<GitRepository, File>> preparedRepositoriesDirectories = new ArrayList<>();
     List<File> committedRepositoriesDirectories = new ArrayList<>();
     List<File> pushedRepositoriesDirectories = new ArrayList<>();
-    File repositoryDirectory = null;
+
     boolean isSuccess = true;
 
     try {
       for (GitRepository gitRepository : gitRepositories) {
         syncGitChangeNotes.syncGitRepository(gitRepository); // ensure repository is up to date
-        repositoryDirectory = prepareRepositoryDirectory(gitRepository);
+        File repositoryDirectory = prepareRepositoryDirectory(gitRepository);
         prepareReleaseNoteDirectory(repositoryDirectory);
+        preparedRepositoriesDirectories.add(new Pair<>(gitRepository, repositoryDirectory));
       }
-      for (GitRepository gitRepository : gitRepositories) {
+      for (Pair<GitRepository, File> repoPair : preparedRepositoriesDirectories) {
+        GitRepository gitRepository = repoPair.key();
+        File repositoryDirectory = repoPair.value();
         List<ChangeNote> changeNotes = releaseNote.getChangeNotes();
         List<ChangeNote> changeNotesInThisGitRepo = changeNotes.stream()
           .filter(changeNote -> changeNote.getGitRepository() != null && changeNote.getGitRepository().getId() == gitRepository.getId())
@@ -189,6 +191,7 @@ public class ReleaseNoteSyncHandler {
       yaml.dump(yamlContent, writer);
     } catch (Exception e) {
       logger.error("Failed to write release note to file {}: {}", file.getAbsolutePath(), e.getMessage());
+      throw new FailedSyncReleaseNoteException("Failed to write release note to file " + file.getAbsolutePath(), e);
     }
   }
 
@@ -208,43 +211,14 @@ public class ReleaseNoteSyncHandler {
       throw new FailedSyncReleaseNoteException("Failed to push committed release note to remote Git repository", e);
     }
   }
-
-  private void revert() {
-    //reset locally
-    //delete pushed branches
-  }
   
   private String getBranchNameForReleaseNote(ReleaseNote releaseNote) {
     return "release-note-" + releaseNote.getId();
   }
+
   /**
-   *     boolean success = true;
-    List<ChangeNote> changeNotes = releaseNote.getChangeNotes();
-
-    List<GitRepository> gitRepositories = changeNotes.stream()
-      .filter(changeNote -> changeNote.getGitRepository() != null)
-      .map(ChangeNote::getGitRepository)
-      .distinct()
-      .toList();
-
-    for (GitRepository gitRepository : gitRepositories) {
-      try {
-        syncGitChangeNotes.syncGitRepository(gitRepository);
-      } catch (Exception e) {
-        logger.error("Failed to sync Git repository {} before committing release note: {}", gitRepository.getName(), e.getMessage());
-        success = false;
-      }
-      
-
-      
-      if (success) {
-        
-
-
-      }
-      
-    
-    }
-    return success;
+   * Simple immutable key/value pair used to keep a Git repository associated with its
+   * prepared local directory while syncing.
    */
+  private record Pair<K, V>(K key, V value) {}
 }
