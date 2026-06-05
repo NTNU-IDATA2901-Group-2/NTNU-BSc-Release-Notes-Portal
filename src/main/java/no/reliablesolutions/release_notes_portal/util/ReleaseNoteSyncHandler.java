@@ -55,13 +55,17 @@ public class ReleaseNoteSyncHandler {
   }
 
   /**
-   * Commits and pushes the given release note to the specified Git repository.
+   * Commits and pushes the given release note to each of the specified Git repositories.
    *
-   * <p>Does nothing if no change notes belong to this repository. Failures are logged, not thrown.
+   * <p>For every repository the change notes are split into those originating from that
+   * repository and those from others, written to a YAML file on a dedicated branch, committed,
+   * and finally pushed to the remote. Failures are logged and result in a {@code false} return
+   * value rather than a thrown exception.
    *
-   * @param gitRepository the target repository to commit the release note into
    * @param releaseNote the release note to commit
-   * @param changeNotes all change notes associated with the release note (across all repositories)
+   * @param gitRepositories the target repositories to commit and push the release note into
+   * @return {@code true} if the release note was committed and pushed to all repositories,
+   *         {@code false} if any step failed
    */
   public boolean syncReleaseNoteToGit(ReleaseNote releaseNote, List<GitRepository> gitRepositories) {
     List<File> committedRepositoriesDirectories = new ArrayList<>();
