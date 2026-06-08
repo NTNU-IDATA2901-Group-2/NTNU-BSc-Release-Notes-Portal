@@ -31,9 +31,9 @@ import no.reliablesolutions.release_notes_portal.util.ReleaseNoteSyncHandler;
 public class GitRepositoryService {
     private final GitRepositoryRepository gitRepositoryRepository;
     private final ObjectProvider<ChangeNotesSyncHandler> syncGitChangeNotesProvider;
+    private final ObjectProvider<ReleaseNoteSyncHandler> releaseNoteSyncHandlerProvider;
     private final ChangeNoteRepository changeNoteRepository;
     private final ReleaseNoteRepository releaseNoteRepository;
-    private final ReleaseNoteSyncHandler releaseNoteSyncHandler;
 
     /**
      * Creates a new Git repository based on the provided CreateGitRepositoryDTO.
@@ -149,8 +149,12 @@ public class GitRepositoryService {
    * @throws GitRepositoryNotFoundException if an additional repository id does not exist
    */
   public boolean commitReleaseNoteToGit(long id, List<Long> additionalGitRepositoryIds) {
-    Optional<ReleaseNote> releaseNoteOptional = releaseNoteRepository.findById(id);
+    ReleaseNoteSyncHandler releaseNoteSyncHandler = releaseNoteSyncHandlerProvider.getIfAvailable();
+    if (releaseNoteSyncHandler == null) {
+      throw new IllegalStateException("ReleaseNoteSyncHandler is not available. Cannot sync release note to Git.");
+    }
 
+    Optional<ReleaseNote> releaseNoteOptional = releaseNoteRepository.findById(id);
     if (releaseNoteOptional.isEmpty() || Boolean.TRUE.equals(releaseNoteOptional.get().getArchived())) {
       throw new ReleaseNoteNotFoundException(id);
     }
