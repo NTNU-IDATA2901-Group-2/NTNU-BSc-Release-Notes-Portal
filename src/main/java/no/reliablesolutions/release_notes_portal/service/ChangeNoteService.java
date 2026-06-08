@@ -51,6 +51,7 @@ public class ChangeNoteService {
     ChangeNote changeNote = new ChangeNote();
 
     if (changeNoteDTO != null) {
+      changeNote.setTitle(changeNoteDTO.title());
       changeNote.setReference(changeNoteDTO.reference());
       changeNote.setDescription(changeNoteDTO.description());
       changeNote.setDeveloperNotes(changeNoteDTO.developerNotes());
