@@ -69,7 +69,11 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
         ) AND
         (:#{#filterOptions.filteredIds} IS NULL OR c.id IN :#{#filterOptions.filteredIds}) AND
         (:#{#filterOptions.customerIds} IS NULL OR c.customer.id IN :#{#filterOptions.customerIds}) AND
-        (:#{#filterOptions.featureIds} IS NULL OR c.feature.id IN :#{#filterOptions.featureIds}) AND
+        (
+          (:#{#filterOptions.featureIds} IS NULL AND :#{#filterOptions.includeUnassignedFeature} IS NULL)
+          OR (:#{#filterOptions.featureIds} IS NOT NULL AND c.feature.id IN :#{#filterOptions.featureIds})
+          OR (:#{#filterOptions.includeUnassignedFeature} IS NOT NULL AND c.feature IS NULL)
+        ) AND
         (
           (:#{#filterOptions.scopeIds} IS NULL AND :#{#filterOptions.includeUnassignedScope} IS NULL)
           OR (:#{#filterOptions.scopeIds} IS NOT NULL AND c.scope.id IN :#{#filterOptions.scopeIds})
@@ -120,7 +124,11 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
           )
       AND (:#{#filterOptions.filteredIds} IS NULL OR c.id IN :#{#filterOptions.filteredIds})
       AND (:#{#filterOptions.customerIds} IS NULL OR c.customer.id IN :#{#filterOptions.customerIds})
-      AND (:#{#filterOptions.featureIds} IS NULL OR c.feature.id IN :#{#filterOptions.featureIds})
+      AND (
+        (:#{#filterOptions.featureIds} IS NULL AND :#{#filterOptions.includeUnassignedFeature} IS NULL)
+        OR (:#{#filterOptions.featureIds} IS NOT NULL AND c.feature.id IN :#{#filterOptions.featureIds})
+        OR (:#{#filterOptions.includeUnassignedFeature} IS NOT NULL AND c.feature IS NULL)
+      )
       AND (
         (:#{#filterOptions.scopeIds} IS NULL AND :#{#filterOptions.includeUnassignedScope} IS NULL)
         OR (:#{#filterOptions.scopeIds} IS NOT NULL AND c.scope.id IN :#{#filterOptions.scopeIds})

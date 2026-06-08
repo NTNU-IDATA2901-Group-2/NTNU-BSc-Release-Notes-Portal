@@ -11,6 +11,7 @@ public record ChangeNoteFilterOptionsDTO(
     Boolean hasReleaseNote,
     Boolean includeUnassignedProduct,
     Boolean includeUnassignedScope,
+    Boolean includeUnassignedFeature,
     List<Long> gitRepositoryIds,
     List<Long> filteredIds,
     List<Long> customerIds,
