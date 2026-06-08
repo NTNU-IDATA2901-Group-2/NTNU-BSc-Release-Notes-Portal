@@ -26,7 +26,7 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
    * parameters
    */
   @Query("""
-      SELECT r
+      SELECT DISTINCT r
       FROM ReleaseNote r
       LEFT JOIN r.changeNotes c
         ON c.archived = false
@@ -58,7 +58,7 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
    * parameters
    */
   @Query("""
-      SELECT r
+      SELECT DISTINCT r
       FROM ReleaseNote r
       LEFT JOIN r.changeNotes c ON c.archived = false
         AND (c.customer IS NULL OR UPPER( c.customer.name ) IN :customerGroups)

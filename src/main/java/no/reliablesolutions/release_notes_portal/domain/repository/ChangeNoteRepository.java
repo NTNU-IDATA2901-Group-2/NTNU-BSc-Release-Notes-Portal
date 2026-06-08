@@ -60,15 +60,18 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
   @Query("""
       SELECT c
       FROM ChangeNote c
-      LEFT JOIN c.releaseNotes r ON r.archived = false
       WHERE c.archived = false AND
         (:#{#filterOptions.published} IS NULL OR c.published = :#{#filterOptions.published}) AND
         (:#{#filterOptions.hasReleaseNote} IS NULL OR
-          (:#{#filterOptions.hasReleaseNote} = TRUE AND r IS NOT NULL) OR
-          (:#{#filterOptions.hasReleaseNote} = FALSE AND r IS NULL)
+          (:#{#filterOptions.hasReleaseNote} = TRUE AND EXISTS (SELECT 1 FROM c.releaseNotes rn WHERE rn.archived = false)) OR
+          (:#{#filterOptions.hasReleaseNote} = FALSE AND NOT EXISTS (SELECT 1 FROM c.releaseNotes rn WHERE rn.archived = false))
         ) AND
         (:#{#filterOptions.filteredIds} IS NULL OR c.id IN :#{#filterOptions.filteredIds}) AND
-        (:#{#filterOptions.customerIds} IS NULL OR c.customer.id IN :#{#filterOptions.customerIds}) AND
+        (
+          (:#{#filterOptions.customerIds} IS NULL AND :#{#filterOptions.includeUnassignedCustomer} IS NULL)
+          OR (:#{#filterOptions.customerIds} IS NOT NULL AND c.customer.id IN :#{#filterOptions.customerIds})
+          OR (:#{#filterOptions.includeUnassignedCustomer} IS NOT NULL AND c.customer IS NULL)
+        ) AND
         (
           (:#{#filterOptions.featureIds} IS NULL AND :#{#filterOptions.includeUnassignedFeature} IS NULL)
           OR (:#{#filterOptions.featureIds} IS NOT NULL AND c.feature.id IN :#{#filterOptions.featureIds})
@@ -111,7 +114,6 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
       SELECT c
       FROM ChangeNote c
       LEFT JOIN c.customer customer
-      LEFT JOIN c.releaseNotes r ON r.archived = false
       WHERE c.archived = false
       AND (
         c.viewableByEveryone = true
@@ -119,11 +121,15 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
       )
       AND (:#{#filterOptions.published} IS NULL OR c.published = :#{#filterOptions.published})
       AND (:#{#filterOptions.hasReleaseNote} IS NULL OR
-            (:#{#filterOptions.hasReleaseNote} = TRUE AND r IS NOT NULL) OR
-            (:#{#filterOptions.hasReleaseNote} = FALSE AND r IS NULL)
+            (:#{#filterOptions.hasReleaseNote} = TRUE AND EXISTS (SELECT 1 FROM c.releaseNotes rn WHERE rn.archived = false)) OR
+            (:#{#filterOptions.hasReleaseNote} = FALSE AND NOT EXISTS (SELECT 1 FROM c.releaseNotes rn WHERE rn.archived = false))
           )
       AND (:#{#filterOptions.filteredIds} IS NULL OR c.id IN :#{#filterOptions.filteredIds})
-      AND (:#{#filterOptions.customerIds} IS NULL OR c.customer.id IN :#{#filterOptions.customerIds})
+      AND (
+        (:#{#filterOptions.customerIds} IS NULL AND :#{#filterOptions.includeUnassignedCustomer} IS NULL)
+        OR (:#{#filterOptions.customerIds} IS NOT NULL AND c.customer.id IN :#{#filterOptions.customerIds})
+        OR (:#{#filterOptions.includeUnassignedCustomer} IS NOT NULL AND c.customer IS NULL)
+      )
       AND (
         (:#{#filterOptions.featureIds} IS NULL AND :#{#filterOptions.includeUnassignedFeature} IS NULL)
         OR (:#{#filterOptions.featureIds} IS NOT NULL AND c.feature.id IN :#{#filterOptions.featureIds})

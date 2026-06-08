@@ -13,6 +13,9 @@ const { t } = useI18n();
       <h4 class="text-xl">{{ t('title.customer') }}</h4>
       <p v-if="isLoading">{{ t('loading.filter') }}</p>
       <p v-else-if="isError">{{ t('loadingError.customers') }}</p>
-      <FilterListItem v-else v-for="product in products" :key="product.id" :query-key="'customerIds'" :value="product.id.toString()" :label="product.name"/>
+      <div v-else class="flex gap-3 flex-col">
+        <FilterListItem key="includeUnassignedCustomer" value="true" :query-key="'includeUnassignedCustomer'" :label="t('filters.none')" />
+        <FilterListItem v-for="product in products" :key="product.id" :query-key="'customerIds'" :value="product.id.toString()" :label="product.name"/>
+      </div>
     </div>
 </template>
