@@ -1,5 +1,6 @@
 package no.reliablesolutions.release_notes_portal.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -106,10 +107,12 @@ public class ReleaseNoteController {
       @RequestParam(required = false) String query,
       @RequestParam(required = false) Boolean published,
       @RequestParam(required = false) List<Long> productIds,
-      @RequestParam(required = false) Boolean includeUnassignedProduct) {
-    List<ReleaseNoteDTO> releaseNotes = releaseNoteService.getAllReleaseNotes(query, published, productIds, includeUnassignedProduct);
-    logger.info("Retrieved {} release notes with filters - query: {}, published: {}, productIds: {}, includeUnassignedProduct: {}",
-        releaseNotes.size(), query, published, productIds, includeUnassignedProduct);
+      @RequestParam(required = false) Boolean includeUnassignedProduct,
+      @RequestParam(required = false) LocalDate fromDate,
+      @RequestParam(required = false) LocalDate toDate) {
+    List<ReleaseNoteDTO> releaseNotes = releaseNoteService.getAllReleaseNotes(query, published, productIds, includeUnassignedProduct, fromDate, toDate);
+    logger.info("Retrieved {} release notes with filters - query: {}, published: {}, productIds: {}, includeUnassignedProduct: {}, fromDate: {}, toDate: {}",
+        releaseNotes.size(), query, published, productIds, includeUnassignedProduct, fromDate, toDate);
     return ResponseEntity.ok(releaseNotes);
   }
 

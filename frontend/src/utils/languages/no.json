@@ -1,6 +1,9 @@
 {
     "filters": {
-        "none": "Ingen"
+        "none": "Ingen",
+        "dateRange": "Datointervall",
+        "startRange": "Fra dato",
+        "endRange": "Til dato"
     },
     "pdf": {
         "generated": "Generert",

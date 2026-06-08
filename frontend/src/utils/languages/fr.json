@@ -1,6 +1,9 @@
 {
     "filters": {
-        "none": "Aucun"
+        "none": "Aucun",
+        "dateRange": "Plage de dates",
+        "startRange": "Date de début",
+        "endRange": "Date de fin"
     },
     "pdf": {
         "generated": "Généré",

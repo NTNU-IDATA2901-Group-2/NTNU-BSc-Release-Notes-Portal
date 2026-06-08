@@ -15,6 +15,7 @@ import { useRouter } from 'vue-router';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 import { isAdmin } from '@/utils/keycloak';
 import { toast } from 'vue-sonner';
+import DateRangeFilter from '@/components/filters/DateRangeFilter.vue';
 
 const { t } = useI18n();
 
@@ -28,6 +29,7 @@ const urlSearchParams = computed(() => new URLSearchParams(searchParams.value));
 const { data, isLoading, isFetching, isError } = useGetReleaseNotes(searchParams)
 const search = ref(urlSearchParams.value.get('query') || '');
 watch(searchParams, () => {
+  console.log('Search params changed:', searchParams.value);
   const url = new URL(globalThis.location.href);
   url.search = urlSearchParams.value.toString();
   router.replace({ query: searchParams.value });
@@ -64,6 +66,7 @@ const createReleaseNoteMutation = useCreateReleaseNote({
         }}</Button>
         <ProductFilter />
         <PublicPrivateFilter />
+        <DateRangeFilter />
       </div>
     </DrawerContent>
     <div class="min-h-screen flex justify-center align-bottom mt-6 w-full">
@@ -72,6 +75,7 @@ const createReleaseNoteMutation = useCreateReleaseNote({
           <h1 class="text-3xl text-nowrap">{{ t('title.releaseNotes') }}</h1>
           <ProductFilter />
           <PublicPrivateFilter v-if="isAdmin"/>
+          <DateRangeFilter />
           <Button class="mt-4" variant="outline" @click="clearFilters">{{ t('button.clearFilters')
           }}</Button>
         </div>

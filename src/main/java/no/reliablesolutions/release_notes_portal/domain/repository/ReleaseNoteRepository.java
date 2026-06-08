@@ -1,5 +1,6 @@
 package no.reliablesolutions.release_notes_portal.domain.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -37,11 +38,13 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
           OR (:includeUnassignedProduct IS NOT NULL AND c.product IS NULL)) AND
         ((:query IS NULL OR :query = '') OR
         LOWER(r.tag) LIKE LOWER('%' || :query || '%') OR
-        LOWER(r.summary) LIKE LOWER('%' || :query || '%'))
+        LOWER(r.summary) LIKE LOWER('%' || :query || '%')) AND
+        (:fromDate IS NULL OR r.createdAt >= :fromDate) AND
+        (:toDate IS NULL OR r.createdAt <= :toDate)
       ORDER BY r.createdAt DESC
       """)
   public List<ReleaseNote> findByArchivedFalseAndMatchingFilterParameters(String query, Boolean published,
-      List<Long> productIds, Boolean includeUnassignedProduct);
+      List<Long> productIds, Boolean includeUnassignedProduct, Long fromDate, Long toDate);
 
   /**
    * Finds all non-archived release notes that match the optional provided filter
@@ -69,9 +72,11 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
           OR (:includeUnassignedProduct IS NOT NULL AND c.product IS NULL)) AND
         ((:query IS NULL OR :query = '') OR
         LOWER(r.tag) LIKE LOWER('%' || :query || '%') OR
-        LOWER(r.summary) LIKE LOWER('%' || :query || '%'))
+        LOWER(r.summary) LIKE LOWER('%' || :query || '%')) AND
+        (:fromDate IS NULL OR r.createdAt >= :fromDate) AND
+        (:toDate IS NULL OR r.createdAt <= :toDate)
       ORDER BY r.createdAt DESC
       """)
   public List<ReleaseNote> findByArchivedFalseAndMatchingFilterParametersForCustomers(String query, Boolean published,
-      List<Long> productIds, Boolean includeUnassignedProduct, List<String> customerGroups);
+      List<Long> productIds, Boolean includeUnassignedProduct, Long fromDate, Long toDate, List<String> customerGroups);
 }

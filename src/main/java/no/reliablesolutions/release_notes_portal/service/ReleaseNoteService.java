@@ -1,5 +1,7 @@
 package no.reliablesolutions.release_notes_portal.service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -89,16 +91,24 @@ public class ReleaseNoteService {
    * @return a list of ReleaseNoteDTOs representing all non-archived release notes
    *         that match the provided filters
    */
-  public List<ReleaseNoteDTO> getAllReleaseNotes(String query, Boolean published, List<Long> productIds, Boolean includeUnassignedProduct) {
+  public List<ReleaseNoteDTO> getAllReleaseNotes(String query, Boolean published, List<Long> productIds, Boolean includeUnassignedProduct, LocalDate fromDate, LocalDate toDate) {
+    Long fromDateMillis = fromDate == null ? null : fromDate
+        .atStartOfDay(ZoneId.systemDefault())
+        .toInstant()
+        .toEpochMilli();
+    Long toDateMillis = toDate == null ? null : toDate
+        .atStartOfDay(ZoneId.systemDefault())
+        .toInstant()
+        .toEpochMilli();
     AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
     if (accessScope.isAdmin()) {
-      return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParameters(query, published, productIds, includeUnassignedProduct).stream()
+      return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParameters(query, published, productIds, includeUnassignedProduct, fromDateMillis, toDateMillis).stream()
           .map(rn -> ReleaseNoteMapper.toDTO(rn, accessScope)).toList();
 
     } else {
       List<String> customerGroups = AuthenticationUtil.getCustomerGroups();
       return releaseNoteRepository
-          .findByArchivedFalseAndMatchingFilterParametersForCustomers(query, true, productIds, includeUnassignedProduct, customerGroups).stream()
+          .findByArchivedFalseAndMatchingFilterParametersForCustomers(query, true, productIds, includeUnassignedProduct, fromDateMillis, toDateMillis, customerGroups).stream()
           .map(releaseNote -> ReleaseNoteMapper.toDTO(releaseNote, accessScope)).toList();
     }
   }
