@@ -104,8 +104,9 @@ public class ReleaseNoteSyncHandler {
       }
     } catch (Exception e) {
       logger.error("Failed to sync release note with id {} to Git: {}. Reverting changes", releaseNote.getId(), e.getMessage());
-      deleteLocalBranches(committedRepositoriesDirectories, branchName);
-      deletePushedBranches(pushedRepositoriesDirectories, branchName);
+      String completeBranchName = String.format("refs/heads/%s", branchName);
+      deleteLocalBranches(committedRepositoriesDirectories, completeBranchName);
+      deletePushedBranches(pushedRepositoriesDirectories, completeBranchName);
       isSuccess = false;
     }
     return isSuccess;
@@ -215,9 +216,7 @@ public class ReleaseNoteSyncHandler {
     }
   }
 
-  private void deleteLocalBranches(List<File> committedRepositoriesDirectories, String branchName) {
-    String completeBranchName = String.format("refs/heads/%s", branchName);
-
+  private void deleteLocalBranches(List<File> committedRepositoriesDirectories, String completeBranchName) {
     for (File repositoryDirectory : committedRepositoriesDirectories) {
       try (Git git = Git.open(repositoryDirectory)) {
         String mainBranchName;
@@ -248,10 +247,7 @@ public class ReleaseNoteSyncHandler {
     }
   }
 
-  private void deletePushedBranches(List<File> pushedRepositoriesDirectories, String branchName) {
-
-    String completeBranchName = String.format("refs/heads/%s", branchName);
-
+  private void deletePushedBranches(List<File> pushedRepositoriesDirectories, String completeBranchName) {
     for (File repositoryDirectory : pushedRepositoriesDirectories) {
       try (Git git = Git.open(repositoryDirectory)) {
 
