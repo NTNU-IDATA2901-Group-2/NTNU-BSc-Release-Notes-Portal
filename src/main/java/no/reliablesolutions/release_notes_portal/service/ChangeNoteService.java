@@ -120,7 +120,7 @@ public class ChangeNoteService {
   public List<ChangeNoteDTO> getAllChangeNotes(ChangeNoteFilterOptionsDTO filterOptions) {
 
     if (filterOptions == null) {
-      filterOptions = new ChangeNoteFilterOptionsDTO(null, null, null, null, null, null, null, null, null);
+      filterOptions = new ChangeNoteFilterOptionsDTO(null, null, null, null, null, null, null, null, null, null);
     }
 
     AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
@@ -135,6 +135,7 @@ public class ChangeNoteService {
           filterOptions.query(),
           true,
           filterOptions.hasReleaseNote(),
+          filterOptions.includeUnassignedProduct(),
           filterOptions.gitRepositoryIds(),
           filterOptions.filteredIds(),
           filterOptions.customerIds(),

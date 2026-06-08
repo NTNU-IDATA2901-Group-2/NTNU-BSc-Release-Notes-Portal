@@ -1,4 +1,7 @@
 {
+    "filters": {
+        "none": "None"
+    },
     "pdf": {
         "generated": "Generated",
         "noTitle": "No title",

@@ -7,7 +7,7 @@ const data = {
         { val: 'true', name: 'Published' },
     ],
     private: [
-        { val: 'false', name: 'Unpublished' },
+        { val: 'false', name: 'Private' },
     ]
 }
 const { t } = useI18n();

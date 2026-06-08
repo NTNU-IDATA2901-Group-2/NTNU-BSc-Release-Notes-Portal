@@ -9,6 +9,7 @@ public record ChangeNoteFilterOptionsDTO(
     String query,
     Boolean published,
     Boolean hasReleaseNote,
+    Boolean includeUnassignedProduct,
     List<Long> gitRepositoryIds,
     List<Long> filteredIds,
     List<Long> customerIds,

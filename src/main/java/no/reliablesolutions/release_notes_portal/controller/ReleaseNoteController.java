@@ -105,10 +105,11 @@ public class ReleaseNoteController {
   public ResponseEntity<List<ReleaseNoteDTO>> getAllReleaseNotes(
       @RequestParam(required = false) String query,
       @RequestParam(required = false) Boolean published,
-      @RequestParam(required = false) List<Long> productIds) {
-    List<ReleaseNoteDTO> releaseNotes = releaseNoteService.getAllReleaseNotes(query, published, productIds);
-    logger.info("Retrieved {} release notes with filters - query: {}, published: {}, productIds: {}",
-        releaseNotes.size(), query, published, productIds);
+      @RequestParam(required = false) List<Long> productIds,
+      @RequestParam(required = false) Boolean includeUnassignedProduct) {
+    List<ReleaseNoteDTO> releaseNotes = releaseNoteService.getAllReleaseNotes(query, published, productIds, includeUnassignedProduct);
+    logger.info("Retrieved {} release notes with filters - query: {}, published: {}, productIds: {}, includeUnassignedProduct: {}",
+        releaseNotes.size(), query, published, productIds, includeUnassignedProduct);
     return ResponseEntity.ok(releaseNotes);
   }
 

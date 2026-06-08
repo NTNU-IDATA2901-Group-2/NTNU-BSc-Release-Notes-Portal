@@ -89,16 +89,16 @@ public class ReleaseNoteService {
    * @return a list of ReleaseNoteDTOs representing all non-archived release notes
    *         that match the provided filters
    */
-  public List<ReleaseNoteDTO> getAllReleaseNotes(String query, Boolean published, List<Long> productIds) {
+  public List<ReleaseNoteDTO> getAllReleaseNotes(String query, Boolean published, List<Long> productIds, Boolean includeUnassignedProduct) {
     AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
     if (accessScope.isAdmin()) {
-      return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParameters(query, published, productIds).stream()
+      return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParameters(query, published, productIds, includeUnassignedProduct).stream()
           .map(rn -> ReleaseNoteMapper.toDTO(rn, accessScope)).toList();
 
     } else {
       List<String> customerGroups = AuthenticationUtil.getCustomerGroups();
       return releaseNoteRepository
-          .findByArchivedFalseAndMatchingFilterParametersForCustomers(query, true, productIds, customerGroups).stream()
+          .findByArchivedFalseAndMatchingFilterParametersForCustomers(query, true, productIds, includeUnassignedProduct, customerGroups).stream()
           .map(releaseNote -> ReleaseNoteMapper.toDTO(releaseNote, accessScope)).toList();
     }
   }
