@@ -70,7 +70,11 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
         (:#{#filterOptions.filteredIds} IS NULL OR c.id IN :#{#filterOptions.filteredIds}) AND
         (:#{#filterOptions.customerIds} IS NULL OR c.customer.id IN :#{#filterOptions.customerIds}) AND
         (:#{#filterOptions.featureIds} IS NULL OR c.feature.id IN :#{#filterOptions.featureIds}) AND
-        (:#{#filterOptions.scopeIds} IS NULL OR c.scope.id IN :#{#filterOptions.scopeIds}) AND
+        (
+          (:#{#filterOptions.scopeIds} IS NULL AND :#{#filterOptions.includeUnassignedScope} IS NULL)
+          OR (:#{#filterOptions.scopeIds} IS NOT NULL AND c.scope.id IN :#{#filterOptions.scopeIds})
+          OR (:#{#filterOptions.includeUnassignedScope} IS NOT NULL AND c.scope IS NULL)
+        ) AND
         (
           (:#{#filterOptions.productIds} IS NULL AND :#{#filterOptions.includeUnassignedProduct} IS NULL)
           OR (:#{#filterOptions.productIds} IS NOT NULL AND c.product.id IN :#{#filterOptions.productIds})
@@ -117,7 +121,11 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
       AND (:#{#filterOptions.filteredIds} IS NULL OR c.id IN :#{#filterOptions.filteredIds})
       AND (:#{#filterOptions.customerIds} IS NULL OR c.customer.id IN :#{#filterOptions.customerIds})
       AND (:#{#filterOptions.featureIds} IS NULL OR c.feature.id IN :#{#filterOptions.featureIds})
-      AND (:#{#filterOptions.scopeIds} IS NULL OR c.scope.id IN :#{#filterOptions.scopeIds})
+      AND (
+        (:#{#filterOptions.scopeIds} IS NULL AND :#{#filterOptions.includeUnassignedScope} IS NULL)
+        OR (:#{#filterOptions.scopeIds} IS NOT NULL AND c.scope.id IN :#{#filterOptions.scopeIds})
+        OR (:#{#filterOptions.includeUnassignedScope} IS NOT NULL AND c.scope IS NULL)
+      )
       AND (
         (:#{#filterOptions.productIds} IS NULL AND :#{#filterOptions.includeUnassignedProduct} IS NULL)
         OR (:#{#filterOptions.productIds} IS NOT NULL AND c.product.id IN :#{#filterOptions.productIds})
