@@ -1,5 +1,6 @@
 package no.reliablesolutions.release_notes_portal.dto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -18,5 +19,7 @@ public record ChangeNoteFilterOptionsDTO(
     List<Long> customerIds,
     List<Long> featureIds,
     List<Long> scopeIds,
-    List<Long> productIds) {
+    List<Long> productIds,
+    LocalDate fromDate,
+    LocalDate toDate) {
 }

@@ -22,6 +22,7 @@ import { useRouter } from 'vue-router';
 import { toast } from 'vue-sonner';
 import { isAdmin } from '@/utils/keycloak';
 import AllocatedFilter from '@/components/filters/AllocatedFilter.vue';
+import DateRangeFilter from '@/components/filters/DateRangeFilter.vue';
 
 const router = useRouter();
 const { t } = useI18n();
@@ -127,6 +128,7 @@ const onSearch = () => {
         <ScopeFilter />
         <FeatureFilter />
         <CustomerFilter v-if="isAdmin" />
+        <DateRangeFilter />
       </ScrollArea>
     </DrawerContent>
     <div class="min-h-screen w-full flex justify-center align-bottom mt-6">
@@ -139,6 +141,7 @@ const onSearch = () => {
           <ScopeFilter />
           <FeatureFilter />
           <CustomerFilter v-if="isAdmin" />
+          <DateRangeFilter />
           <Button class="mt-4" variant="outline" @click="clearFilters">{{ t('button.clearFilters') }}</Button>
         </div>
 

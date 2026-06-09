@@ -1,5 +1,6 @@
 package no.reliablesolutions.release_notes_portal.service;
 
+import java.time.ZoneId;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -121,13 +122,22 @@ public class ChangeNoteService {
   public List<ChangeNoteDTO> getAllChangeNotes(ChangeNoteFilterOptionsDTO filterOptions) {
 
     if (filterOptions == null) {
-      filterOptions = new ChangeNoteFilterOptionsDTO(null, null, null, null, null, null, null, null, null, null, null, null, null);
+      filterOptions = new ChangeNoteFilterOptionsDTO(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 
+    Long fromDateMillis = filterOptions.fromDate() == null ? null : filterOptions.fromDate()
+        .atStartOfDay(ZoneId.systemDefault())
+        .toInstant()
+        .toEpochMilli();
+    Long toDateMillis = filterOptions.toDate() == null ? null : filterOptions.toDate()
+        .atStartOfDay(ZoneId.systemDefault())
+        .toInstant()
+        .toEpochMilli();
+
     AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
-    
+
     if (accessScope.isAdmin()) {
-      return changeNoteRepository.findByArchivedFalseAndMatchingFilterParameters(filterOptions).stream()
+      return changeNoteRepository.findByArchivedFalseAndMatchingFilterParameters(filterOptions, fromDateMillis, toDateMillis).stream()
           .map(changeNote -> ChangeNoteMapper.toDTO(changeNote, accessScope))
           .toList();
 
@@ -145,10 +155,12 @@ public class ChangeNoteService {
           filterOptions.customerIds(),
           filterOptions.featureIds(),
           filterOptions.scopeIds(),
-          filterOptions.productIds()
+          filterOptions.productIds(),
+          filterOptions.fromDate(),
+          filterOptions.toDate()
       );
-      
-      return changeNoteRepository.findForCustomerNamesMatchingFilterParameters(accessScope.getCustomerGroups(), filterOptions).stream()
+
+      return changeNoteRepository.findForCustomerNamesMatchingFilterParameters(accessScope.getCustomerGroups(), filterOptions, fromDateMillis, toDateMillis).stream()
           .map(note -> {
             note.setDeveloperNotes(null);
             note.setUpgradeNotes(null);
