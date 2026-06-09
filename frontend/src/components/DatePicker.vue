@@ -11,7 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-import { inject, onMounted, ref, watch, type Ref } from 'vue'
+import { computed, inject, onMounted, ref, watch, type Ref } from 'vue'
 
 const defaultPlaceholder = today(getLocalTimeZone())
 const date = ref() as Ref<DateValue | undefined>
@@ -23,16 +23,23 @@ const df = new DateFormatter('en-US', {
 const props = defineProps<{
   placeholder: string
   queryKey: string
+  minQueryKey?: string
+  maxQueryKey?: string
 }>()
 
 const searchParams = inject('searchParams') as Ref<{ [key: string]: string }>;
 
+function parseParamDate(value?: string): CalendarDate | undefined {
+  if (!value) return undefined;
+  const jsDate = new Date(value);
+  return new CalendarDate(jsDate.getFullYear(), jsDate.getMonth() + 1, jsDate.getDate());
+}
+
+const minValue = computed(() => props.minQueryKey ? parseParamDate(searchParams.value[props.minQueryKey]) : undefined);
+const maxValue = computed(() => props.maxQueryKey ? parseParamDate(searchParams.value[props.maxQueryKey]) : undefined);
+
 onMounted(() => {
-  const paramDate = searchParams.value[props.queryKey];
-  if (paramDate) {
-    const jsDate = new Date(paramDate);
-    date.value = new CalendarDate(jsDate.getFullYear(), jsDate.getMonth() + 1, jsDate.getDate());
-  }
+  date.value = parseParamDate(searchParams.value[props.queryKey]);
 })
 
 watch(date, (newDate) => {
@@ -44,13 +51,7 @@ watch(date, (newDate) => {
 })
 
 watch(searchParams, () => {
-  const paramDate = searchParams.value[props.queryKey];
-  if (paramDate) {
-    const jsDate = new Date(paramDate);
-    date.value = new CalendarDate(jsDate.getFullYear(), jsDate.getMonth() + 1, jsDate.getDate());
-  } else {
-    date.value = undefined;
-  }
+  date.value = parseParamDate(searchParams.value[props.queryKey]);
 }, { deep: true });
 
 </script>
@@ -70,6 +71,8 @@ watch(searchParams, () => {
       <Calendar
         v-model="date"
         :default-placeholder="defaultPlaceholder"
+        :min-value="minValue"
+        :max-value="maxValue"
         layout="month-and-year"
         initial-focus
         @update:model-value="close"
