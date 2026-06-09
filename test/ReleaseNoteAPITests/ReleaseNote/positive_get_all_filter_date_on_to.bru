@@ -1,0 +1,39 @@
+meta {
+  name: positive_get_all_filter_date_on_to
+  type: http
+  seq: 21
+}
+
+get {
+  url: {{baseurl}}/releasenotes?toDate={{date_filter_to}}
+  body: none
+  auth: inherit
+}
+
+params:query {
+  toDate: {{date_filter_to}}
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:pre-request {
+  // toDate exactly on the note's creation day. The upper bound is inclusive of the
+  // whole day (createdAt < startOfDay(toDate + 1)), so the note must be returned.
+  bru.setEnvVar("date_filter_to", bru.getEnvVar("release_note_1_created_date"))
+}
+
+tests {
+  const ids = res.body.map(rn => String(rn.id))
+  expect(ids).to.include(String(bru.getEnvVar("release_id_1")))
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
