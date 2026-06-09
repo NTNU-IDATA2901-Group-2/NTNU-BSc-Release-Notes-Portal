@@ -5,8 +5,10 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import no.reliablesolutions.release_notes_portal.domain.entity.ReleaseNote;
+import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteFilterOptionsDTO;
 
 /**
  * Repository for managing ReleaseNote entities.
@@ -16,13 +18,13 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
   /**
    * Finds all non-archived release notes that match the optional provided filter
    * parameters.
-   * 
-   * @param query      The search query to match against the tag and summary
-   *                   fields (case-insensitive).
-   * @param published  The filter for published status
-   * @param productIds The list of product IDs to filter by.
-   * @param includeUnassignedProduct Whether to include release notes that are not associated with any product
-   * 
+   *
+   * @param filterOptions the filter options to apply to the search
+   * @param fromDate      the lower bound (inclusive) for the release note creation
+   *                      timestamp, or {@code null} for no lower bound
+   * @param toDate        the upper bound (exclusive) for the release note creation
+   *                      timestamp, or {@code null} for no upper bound
+   *
    * @return all non-archived release notes that match the optional provided filter
    * parameters
    */
@@ -32,31 +34,33 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
       LEFT JOIN r.changeNotes c
         ON c.archived = false
       WHERE r.archived = false AND
-        (:published IS NULL OR r.published = :published) AND
-        ((:productIds IS NULL AND :includeUnassignedProduct IS NULL)
-          OR (:productIds IS NOT NULL AND c.product.id IN :productIds)
-          OR (:includeUnassignedProduct IS NOT NULL AND c.product IS NULL)) AND
-        ((:query IS NULL OR :query = '') OR
-        LOWER(r.tag) LIKE LOWER('%' || :query || '%') OR
-        LOWER(r.summary) LIKE LOWER('%' || :query || '%')) AND
+        (:#{#filterOptions.published} IS NULL OR r.published = :#{#filterOptions.published}) AND
+        ((:#{#filterOptions.productIds} IS NULL AND :#{#filterOptions.includeUnassignedProduct} IS NULL)
+          OR (:#{#filterOptions.productIds} IS NOT NULL AND c.product.id IN :#{#filterOptions.productIds})
+          OR (:#{#filterOptions.includeUnassignedProduct} IS NOT NULL AND c.product IS NULL)) AND
+        ((:#{#filterOptions.query} IS NULL OR :#{#filterOptions.query} = '') OR
+        LOWER(r.tag) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
+        LOWER(r.summary) LIKE LOWER('%' || :#{#filterOptions.query} || '%')) AND
         (CAST(:fromDate AS Instant) IS NULL OR r.createdAt >= :fromDate) AND
         (CAST(:toDate AS Instant) IS NULL OR r.createdAt < :toDate)
       ORDER BY r.createdAt DESC
       """)
-  public List<ReleaseNote> findByArchivedFalseAndMatchingFilterParameters(String query, Boolean published,
-      List<Long> productIds, Boolean includeUnassignedProduct, Instant fromDate, Instant toDate);
+  public List<ReleaseNote> findByArchivedFalseAndMatchingFilterParameters(
+      @Param("filterOptions") ReleaseNoteFilterOptionsDTO filterOptions,
+      @Param("fromDate") Instant fromDate,
+      @Param("toDate") Instant toDate);
 
   /**
    * Finds all non-archived release notes that match the optional provided filter
    * parameters.
-   * 
-   * @param query      The search query to match against the tag and summary
-   *                   fields (case-insensitive).
-   * @param published  The filter for published status
-   * @param productIds The list of product IDs to filter by.
-   * @param includeUnassignedProduct Whether to include release notes that are not associated with any product
+   *
+   * @param filterOptions  the filter options to apply to the search
+   * @param fromDate       the lower bound (inclusive) for the release note creation
+   *                       timestamp, or {@code null} for no lower bound
+   * @param toDate         the upper bound (exclusive) for the release note creation
+   *                       timestamp, or {@code null} for no upper bound
    * @param customerGroups The list of customer groups to filter by (case-insensitive).
-   * 
+   *
    * @return all non-archived release notes that match the optional provided filter
    * parameters
    */
@@ -66,17 +70,20 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
       LEFT JOIN r.changeNotes c ON c.archived = false
         AND (c.customer IS NULL OR UPPER( c.customer.name ) IN :customerGroups)
       WHERE r.archived = false AND
-        (:published IS NULL OR r.published = :published) AND
-        ((:productIds IS NULL AND :includeUnassignedProduct IS NULL)
-          OR (:productIds IS NOT NULL AND c.product.id IN :productIds)
-          OR (:includeUnassignedProduct IS NOT NULL AND c.product IS NULL)) AND
-        ((:query IS NULL OR :query = '') OR
-        LOWER(r.tag) LIKE LOWER('%' || :query || '%') OR
-        LOWER(r.summary) LIKE LOWER('%' || :query || '%')) AND
+        (:#{#filterOptions.published} IS NULL OR r.published = :#{#filterOptions.published}) AND
+        ((:#{#filterOptions.productIds} IS NULL AND :#{#filterOptions.includeUnassignedProduct} IS NULL)
+          OR (:#{#filterOptions.productIds} IS NOT NULL AND c.product.id IN :#{#filterOptions.productIds})
+          OR (:#{#filterOptions.includeUnassignedProduct} IS NOT NULL AND c.product IS NULL)) AND
+        ((:#{#filterOptions.query} IS NULL OR :#{#filterOptions.query} = '') OR
+        LOWER(r.tag) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
+        LOWER(r.summary) LIKE LOWER('%' || :#{#filterOptions.query} || '%')) AND
         (CAST(:fromDate AS Instant) IS NULL OR r.createdAt >= :fromDate) AND
         (CAST(:toDate AS Instant) IS NULL OR r.createdAt < :toDate)
       ORDER BY r.createdAt DESC
       """)
-  public List<ReleaseNote> findByArchivedFalseAndMatchingFilterParametersForCustomers(String query, Boolean published,
-      List<Long> productIds, Boolean includeUnassignedProduct, Instant fromDate, Instant toDate, List<String> customerGroups);
+  public List<ReleaseNote> findByArchivedFalseAndMatchingFilterParametersForCustomers(
+      @Param("filterOptions") ReleaseNoteFilterOptionsDTO filterOptions,
+      @Param("fromDate") Instant fromDate,
+      @Param("toDate") Instant toDate,
+      @Param("customerGroups") List<String> customerGroups);
 }

@@ -16,6 +16,7 @@ import no.reliablesolutions.release_notes_portal.domain.repository.ChangeNoteRep
 import no.reliablesolutions.release_notes_portal.domain.repository.ReleaseNoteRepository;
 import no.reliablesolutions.release_notes_portal.dto.CreateReleaseNoteDTO;
 import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteDTO;
+import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteFilterOptionsDTO;
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.InvalidDateRangeException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
@@ -88,18 +89,26 @@ public class ReleaseNoteService {
    * Retrieves a list of all non-archived release notes with optional filters for
    * query, published status, and product.
    *
-   * @param query      optional filter for release note tag or summary containing
-   *                   the query string (case-insensitive)
-   * @param published  optional filter for release note published status
-   * @param productIds optional filter for release note associated product IDs
+   * @param filterOptions optional filterOptions dto containing filter parameters
+   *                      such as query, published status, product IDs, and date
+   *                      range
    *
    * @return a list of ReleaseNoteDTOs representing all non-archived release notes
    *         that match the provided filters
    */
-  public List<ReleaseNoteDTO> getAllReleaseNotes(String query, Boolean published, List<Long> productIds, Boolean includeUnassignedProduct, LocalDate fromDate, LocalDate toDate) {
+  public List<ReleaseNoteDTO> getAllReleaseNotes(ReleaseNoteFilterOptionsDTO filterOptions) {
+
+    if (filterOptions == null) {
+      filterOptions = new ReleaseNoteFilterOptionsDTO(null, null, null, null, null, null);
+    }
+
+    LocalDate fromDate = filterOptions.fromDate();
+    LocalDate toDate = filterOptions.toDate();
+
     if (fromDate != null && toDate != null && fromDate.isAfter(toDate)) {
       throw new InvalidDateRangeException(fromDate, toDate);
     }
+
     Instant fromDateInstant = fromDate == null ? null : fromDate
         .atStartOfDay(BUSINESS_ZONE)
         .toInstant();
@@ -107,15 +116,26 @@ public class ReleaseNoteService {
         .plusDays(1)
         .atStartOfDay(BUSINESS_ZONE)
         .toInstant();
+
     AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
+
     if (accessScope.isAdmin()) {
-      return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParameters(query, published, productIds, includeUnassignedProduct, fromDateInstant, toDateInstant).stream()
+      return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParameters(filterOptions, fromDateInstant, toDateInstant).stream()
           .map(rn -> ReleaseNoteMapper.toDTO(rn, accessScope)).toList();
 
     } else {
+      filterOptions = new ReleaseNoteFilterOptionsDTO(
+          filterOptions.query(),
+          true,
+          filterOptions.includeUnassignedProduct(),
+          filterOptions.productIds(),
+          fromDate,
+          toDate
+      );
+
       List<String> customerGroups = AuthenticationUtil.getCustomerGroups();
       return releaseNoteRepository
-          .findByArchivedFalseAndMatchingFilterParametersForCustomers(query, true, productIds, includeUnassignedProduct, fromDateInstant, toDateInstant, customerGroups).stream()
+          .findByArchivedFalseAndMatchingFilterParametersForCustomers(filterOptions, fromDateInstant, toDateInstant, customerGroups).stream()
           .map(releaseNote -> ReleaseNoteMapper.toDTO(releaseNote, accessScope)).toList();
     }
   }

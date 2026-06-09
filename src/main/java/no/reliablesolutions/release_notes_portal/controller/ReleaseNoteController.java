@@ -1,6 +1,5 @@
 package no.reliablesolutions.release_notes_portal.controller;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -9,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +27,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import no.reliablesolutions.release_notes_portal.dto.CreateReleaseNoteDTO;
 import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteDTO;
+import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteFilterOptionsDTO;
 import no.reliablesolutions.release_notes_portal.service.ReleaseNoteService;
 
 /**
@@ -93,6 +94,7 @@ public class ReleaseNoteController {
    * Retrieves a list of all non-archived release notes, with optional filters for
    * query, published status, and product.
    *
+   * @param filterOptions the filter options for querying release notes
    * @return a ResponseEntity with a 200 status and a list of ReleaseNoteDTOs in
    *         the body
    */
@@ -104,15 +106,9 @@ public class ReleaseNoteController {
   })
   @GetMapping("")
   public ResponseEntity<List<ReleaseNoteDTO>> getAllReleaseNotes(
-      @RequestParam(required = false) String query,
-      @RequestParam(required = false) Boolean published,
-      @RequestParam(required = false) List<Long> productIds,
-      @RequestParam(required = false) Boolean includeUnassignedProduct,
-      @RequestParam(required = false) LocalDate fromDate,
-      @RequestParam(required = false) LocalDate toDate) {
-    List<ReleaseNoteDTO> releaseNotes = releaseNoteService.getAllReleaseNotes(query, published, productIds, includeUnassignedProduct, fromDate, toDate);
-    logger.info("Retrieved {} release notes with filters - query: {}, published: {}, productIds: {}, includeUnassignedProduct: {}, fromDate: {}, toDate: {}",
-        releaseNotes.size(), query, published, productIds, includeUnassignedProduct, fromDate, toDate);
+      @ModelAttribute ReleaseNoteFilterOptionsDTO filterOptions) {
+    List<ReleaseNoteDTO> releaseNotes = releaseNoteService.getAllReleaseNotes(filterOptions);
+    logger.info("Retrieved {} release notes with filters: {}", releaseNotes.size(), filterOptions);
     return ResponseEntity.ok(releaseNotes);
   }
 
