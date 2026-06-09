@@ -34,6 +34,9 @@ assert {
 
 script:post-response {
   bru.setEnvVar("change_id_1", res.body)
+  // Capture the calendar date (Europe/Oslo, the server's business zone) the note was
+  // created on, so the date-filter tests can build fromDate/toDate around it.
+  bru.setEnvVar("change_note_1_created_date", new Date().toLocaleDateString("en-CA", { timeZone: "Europe/Oslo" }))
 }
 
 settings {

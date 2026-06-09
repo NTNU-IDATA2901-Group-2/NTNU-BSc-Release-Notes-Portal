@@ -1,0 +1,41 @@
+meta {
+  name: positive_get_all_filter_date_excluding_from
+  type: http
+  seq: 37
+}
+
+get {
+  url: {{baseurl}}/changenotes?fromDate={{date_filter_from}}
+  body: none
+  auth: inherit
+}
+
+params:query {
+  fromDate: {{date_filter_from}}
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:pre-request {
+  // fromDate set to the day AFTER the note was created. The note's createdAt is before
+  // startOfDay(fromDate), so it must be filtered out.
+  const base = new Date(bru.getEnvVar("change_note_1_created_date") + "T12:00:00Z")
+  base.setUTCDate(base.getUTCDate() + 1)
+  bru.setEnvVar("date_filter_from", base.toISOString().slice(0, 10))
+}
+
+tests {
+  const ids = res.body.map(cn => String(cn.id))
+  expect(ids).to.not.include(String(bru.getEnvVar("change_id_1")))
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -81,7 +81,7 @@ jobs:
           done
 
       - name: Run Bruno API Tests
-        run: bru run --env Local
+        run: bru run --env Local --sandbox=developer
         working-directory: test/ReleaseNoteAPITests
 
       - name: Upload spring-boot artifact
