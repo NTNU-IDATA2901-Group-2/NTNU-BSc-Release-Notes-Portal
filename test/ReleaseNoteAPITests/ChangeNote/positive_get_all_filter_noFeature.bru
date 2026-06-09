@@ -1,17 +1,17 @@
 meta {
-  name: positive_get_all_filter_productId
+  name: positive_get_all_filter_noFeature
   type: http
-  seq: 19
+  seq: 27
 }
 
 get {
-  url: {{baseurl}}/changenotes?productIds=1
+  url: {{baseurl}}/changenotes?includeUnassignedFeature=true
   body: none
   auth: inherit
 }
 
 params:query {
-  productIds: 1
+  includeUnassignedFeature: true
 }
 
 headers {
@@ -19,9 +19,9 @@ headers {
 }
 
 assert {
-  res.body[0].id: eq {{change_id_1}}
   res.body: length 1
   res.status: eq 200
+  res.body[0].id: eq {{change_id_3}}
 }
 
 settings {

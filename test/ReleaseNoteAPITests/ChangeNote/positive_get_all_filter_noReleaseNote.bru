@@ -1,7 +1,7 @@
 meta {
   name: positive_get_all_filter_noReleaseNote
   type: http
-  seq: 33
+  seq: 38
 }
 
 get {
@@ -19,9 +19,10 @@ headers {
 }
 
 assert {
-  res.body: length 1
+  res.body: length 2
   res.status: eq 200
-  res.body[0].id: eq {{change_id_2}}
+  res.body[0].id: eq {{change_id_3}}
+  res.body[1].id: eq {{change_id_2}}
 }
 
 settings {
