@@ -1,6 +1,7 @@
 package no.reliablesolutions.release_notes_portal.service;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import no.reliablesolutions.release_notes_portal.dto.CreateChangeNoteDTO;
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.CustomerNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.FeatureNotFoundException;
+import no.reliablesolutions.release_notes_portal.exception.InvalidDateRangeException;
 import no.reliablesolutions.release_notes_portal.exception.ProductNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ScopeNotFoundException;
 import no.reliablesolutions.release_notes_portal.util.AccessScope;
@@ -129,10 +131,17 @@ public class ChangeNoteService {
       filterOptions = new ChangeNoteFilterOptionsDTO(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 
-    Instant fromDateInstant = filterOptions.fromDate() == null ? null : filterOptions.fromDate()
+    LocalDate fromDate = filterOptions.fromDate();
+    LocalDate toDate = filterOptions.toDate();
+
+    if (fromDate != null && toDate != null && fromDate.isAfter(toDate)) {
+      throw new InvalidDateRangeException(fromDate, toDate);
+    }
+
+    Instant fromDateInstant = fromDate == null ? null : fromDate
         .atStartOfDay(BUSINESS_ZONE)
         .toInstant();
-    Instant toDateInstant = filterOptions.toDate() == null ? null : filterOptions.toDate()
+    Instant toDateInstant = toDate == null ? null : toDate
         .plusDays(1)
         .atStartOfDay(BUSINESS_ZONE)
         .toInstant();
@@ -150,7 +159,7 @@ public class ChangeNoteService {
           true,
           filterOptions.hasReleaseNote(),
           filterOptions.includeUnassignedProduct(),
-          filterOptions.includeUnassignedScope(),S
+          filterOptions.includeUnassignedScope(),
           filterOptions.includeUnassignedFeature(),
           filterOptions.includeUnassignedCustomer(),
           filterOptions.gitRepositoryIds(),
@@ -159,8 +168,8 @@ public class ChangeNoteService {
           filterOptions.featureIds(),
           filterOptions.scopeIds(),
           filterOptions.productIds(),
-          filterOptions.fromDate(),
-          filterOptions.toDate()
+          fromDate,
+          toDate
       );
 
       return changeNoteRepository.findForCustomerNamesMatchingFilterParameters(accessScope.getCustomerGroups(), filterOptions, fromDateInstant, toDateInstant).stream()

@@ -17,6 +17,7 @@ import no.reliablesolutions.release_notes_portal.domain.repository.ReleaseNoteRe
 import no.reliablesolutions.release_notes_portal.dto.CreateReleaseNoteDTO;
 import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteDTO;
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
+import no.reliablesolutions.release_notes_portal.exception.InvalidDateRangeException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.util.AccessScope;
 import no.reliablesolutions.release_notes_portal.util.AccessScopeFactory;
@@ -96,6 +97,9 @@ public class ReleaseNoteService {
    *         that match the provided filters
    */
   public List<ReleaseNoteDTO> getAllReleaseNotes(String query, Boolean published, List<Long> productIds, Boolean includeUnassignedProduct, LocalDate fromDate, LocalDate toDate) {
+    if (fromDate != null && toDate != null && fromDate.isAfter(toDate)) {
+      throw new InvalidDateRangeException(fromDate, toDate);
+    }
     Instant fromDateInstant = fromDate == null ? null : fromDate
         .atStartOfDay(BUSINESS_ZONE)
         .toInstant();

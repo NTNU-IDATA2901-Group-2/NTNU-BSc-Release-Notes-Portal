@@ -23,6 +23,7 @@ import no.reliablesolutions.release_notes_portal.exception.DiffStringGenerationE
 import no.reliablesolutions.release_notes_portal.exception.FailedSyncGitChangeNotesException;
 import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityException;
 import no.reliablesolutions.release_notes_portal.exception.FeatureNotFoundException;
+import no.reliablesolutions.release_notes_portal.exception.InvalidDateRangeException;
 import no.reliablesolutions.release_notes_portal.exception.ProductNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteAlreadySyncedException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
@@ -189,6 +190,17 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleChangeNoteNotFoundException(ChangeNoteNotFoundException e) {
     logger.warn("Change note not found: {}", e.getChangeNoteId());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Change note with ID %d not found", e.getChangeNoteId()));
+  }
+
+  /**
+   * Handles the case where a date range is invalid (start date after end date). Logs the event and returns a 400 response with a message.
+   * @param e the exception containing details about the invalid date range
+   * @return a ResponseEntity with a 400 status and a message indicating the invalid date range
+   */
+  @ExceptionHandler(value = {InvalidDateRangeException.class})
+  public ResponseEntity<String> handleInvalidDateRangeException(InvalidDateRangeException e) {
+    logger.warn("Invalid date range: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
   }
 
   /**
