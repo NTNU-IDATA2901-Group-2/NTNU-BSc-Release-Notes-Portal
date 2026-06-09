@@ -1,5 +1,6 @@
 package no.reliablesolutions.release_notes_portal.service;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -32,6 +33,9 @@ public class ReleaseNoteService {
 
   private final ReleaseNoteRepository releaseNoteRepository;
   private final ChangeNoteRepository changeNoteRepository;
+
+  /** Zone used to resolve a calendar date filter into an absolute instant range. */
+  private static final ZoneId BUSINESS_ZONE = ZoneId.of("Europe/Oslo");
 
   /**
    * Creates a new release note based on the provided DTO.
@@ -92,23 +96,22 @@ public class ReleaseNoteService {
    *         that match the provided filters
    */
   public List<ReleaseNoteDTO> getAllReleaseNotes(String query, Boolean published, List<Long> productIds, Boolean includeUnassignedProduct, LocalDate fromDate, LocalDate toDate) {
-    Long fromDateMillis = fromDate == null ? null : fromDate
-        .atStartOfDay(ZoneId.systemDefault())
-        .toInstant()
-        .toEpochMilli();
-    Long toDateMillis = toDate == null ? null : toDate
-        .atStartOfDay(ZoneId.systemDefault())
-        .toInstant()
-        .toEpochMilli();
+    Instant fromDateInstant = fromDate == null ? null : fromDate
+        .atStartOfDay(BUSINESS_ZONE)
+        .toInstant();
+    Instant toDateInstant = toDate == null ? null : toDate
+        .plusDays(1)
+        .atStartOfDay(BUSINESS_ZONE)
+        .toInstant();
     AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
     if (accessScope.isAdmin()) {
-      return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParameters(query, published, productIds, includeUnassignedProduct, fromDateMillis, toDateMillis).stream()
+      return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParameters(query, published, productIds, includeUnassignedProduct, fromDateInstant, toDateInstant).stream()
           .map(rn -> ReleaseNoteMapper.toDTO(rn, accessScope)).toList();
 
     } else {
       List<String> customerGroups = AuthenticationUtil.getCustomerGroups();
       return releaseNoteRepository
-          .findByArchivedFalseAndMatchingFilterParametersForCustomers(query, true, productIds, includeUnassignedProduct, fromDateMillis, toDateMillis, customerGroups).stream()
+          .findByArchivedFalseAndMatchingFilterParametersForCustomers(query, true, productIds, includeUnassignedProduct, fromDateInstant, toDateInstant, customerGroups).stream()
           .map(releaseNote -> ReleaseNoteMapper.toDTO(releaseNote, accessScope)).toList();
     }
   }

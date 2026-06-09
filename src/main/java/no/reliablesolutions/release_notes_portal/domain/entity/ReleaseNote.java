@@ -1,6 +1,6 @@
 package no.reliablesolutions.release_notes_portal.domain.entity;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -40,6 +40,6 @@ public class ReleaseNote {
   private String summary = "";
   private Boolean published = false;
   private Boolean archived = false;
-  private final Long createdAt = new Date().getTime();
+  private final Instant createdAt = Instant.now();
   private Boolean syncedToGit = false;
 }

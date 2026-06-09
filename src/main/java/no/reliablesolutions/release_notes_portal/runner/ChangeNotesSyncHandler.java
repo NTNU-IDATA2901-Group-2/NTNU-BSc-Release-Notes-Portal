@@ -2,6 +2,7 @@ package no.reliablesolutions.release_notes_portal.runner;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 
 import org.eclipse.jgit.api.Git;
@@ -284,7 +285,7 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
           if (changeNote != null) {
             changeNote.setGitRepository(gitRepository);
             changeNote.setGitCommitHash(commit.getName());
-            changeNote.setGitCommitTimestamp(commit.getCommitTime() * 1000L); // convert seconds to milliseconds
+            changeNote.setGitCommitTimestamp(Instant.ofEpochSecond(commit.getCommitTime())); // git commit time is epoch seconds
             try {
               changeNoteService.updateChangeNote(changeNote);
               logger.info("Created change note from file {} for commit {} in repository with id {}", changeNoteFile.getPath(), commit.getName(), gitRepository.getId());

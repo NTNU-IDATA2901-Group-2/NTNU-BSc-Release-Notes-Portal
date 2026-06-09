@@ -1,5 +1,6 @@
 package no.reliablesolutions.release_notes_portal.service;
 
+import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
 
@@ -37,6 +38,9 @@ public class ChangeNoteService {
   private final ScopeRepository scopeRepository;
   private final FeatureRepository featureRepository;
   private final CustomerRepository customerRepository;
+
+  /** Zone used to resolve a calendar date filter into an absolute instant range. */
+  private static final ZoneId BUSINESS_ZONE = ZoneId.of("Europe/Oslo");
 
   /**
    * Creates a new change note based on the provided DTO. Empty fields in the provided DTO remains as default.
@@ -125,19 +129,18 @@ public class ChangeNoteService {
       filterOptions = new ChangeNoteFilterOptionsDTO(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 
-    Long fromDateMillis = filterOptions.fromDate() == null ? null : filterOptions.fromDate()
-        .atStartOfDay(ZoneId.systemDefault())
-        .toInstant()
-        .toEpochMilli();
-    Long toDateMillis = filterOptions.toDate() == null ? null : filterOptions.toDate()
-        .atStartOfDay(ZoneId.systemDefault())
-        .toInstant()
-        .toEpochMilli();
+    Instant fromDateInstant = filterOptions.fromDate() == null ? null : filterOptions.fromDate()
+        .atStartOfDay(BUSINESS_ZONE)
+        .toInstant();
+    Instant toDateInstant = filterOptions.toDate() == null ? null : filterOptions.toDate()
+        .plusDays(1)
+        .atStartOfDay(BUSINESS_ZONE)
+        .toInstant();
 
     AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
 
     if (accessScope.isAdmin()) {
-      return changeNoteRepository.findByArchivedFalseAndMatchingFilterParameters(filterOptions, fromDateMillis, toDateMillis).stream()
+      return changeNoteRepository.findByArchivedFalseAndMatchingFilterParameters(filterOptions, fromDateInstant, toDateInstant).stream()
           .map(changeNote -> ChangeNoteMapper.toDTO(changeNote, accessScope))
           .toList();
 
@@ -147,7 +150,7 @@ public class ChangeNoteService {
           true,
           filterOptions.hasReleaseNote(),
           filterOptions.includeUnassignedProduct(),
-          filterOptions.includeUnassignedScope(),
+          filterOptions.includeUnassignedScope(),S
           filterOptions.includeUnassignedFeature(),
           filterOptions.includeUnassignedCustomer(),
           filterOptions.gitRepositoryIds(),
@@ -160,7 +163,7 @@ public class ChangeNoteService {
           filterOptions.toDate()
       );
 
-      return changeNoteRepository.findForCustomerNamesMatchingFilterParameters(accessScope.getCustomerGroups(), filterOptions, fromDateMillis, toDateMillis).stream()
+      return changeNoteRepository.findForCustomerNamesMatchingFilterParameters(accessScope.getCustomerGroups(), filterOptions, fromDateInstant, toDateInstant).stream()
           .map(note -> {
             note.setDeveloperNotes(null);
             note.setUpgradeNotes(null);

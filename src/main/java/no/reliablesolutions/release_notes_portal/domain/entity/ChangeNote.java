@@ -1,6 +1,6 @@
 package no.reliablesolutions.release_notes_portal.domain.entity;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -37,7 +37,7 @@ public class ChangeNote {
   private String developerNotes = "";
   @Column(columnDefinition = "TEXT")
   private String upgradeNotes = "";
-  private final long creationTimestamp = new Date().getTime();
+  private final Instant creationTimestamp = Instant.now();
   private boolean published = false;
   private boolean archived = false;
   private boolean viewableByEveryone = false;
@@ -59,7 +59,7 @@ public class ChangeNote {
 
   private String gitCommitHash;
 
-  private Long gitCommitTimestamp;
+  private Instant gitCommitTimestamp;
 
   @ManyToOne(optional = true)
   private GitRepository gitRepository;

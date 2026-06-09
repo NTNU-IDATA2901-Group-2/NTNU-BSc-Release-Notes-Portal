@@ -1,6 +1,6 @@
 package no.reliablesolutions.release_notes_portal.domain.repository;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -39,12 +39,12 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
         ((:query IS NULL OR :query = '') OR
         LOWER(r.tag) LIKE LOWER('%' || :query || '%') OR
         LOWER(r.summary) LIKE LOWER('%' || :query || '%')) AND
-        (:fromDate IS NULL OR r.createdAt >= :fromDate) AND
-        (:toDate IS NULL OR r.createdAt <= :toDate)
+        (CAST(:fromDate AS Instant) IS NULL OR r.createdAt >= :fromDate) AND
+        (CAST(:toDate AS Instant) IS NULL OR r.createdAt < :toDate)
       ORDER BY r.createdAt DESC
       """)
   public List<ReleaseNote> findByArchivedFalseAndMatchingFilterParameters(String query, Boolean published,
-      List<Long> productIds, Boolean includeUnassignedProduct, Long fromDate, Long toDate);
+      List<Long> productIds, Boolean includeUnassignedProduct, Instant fromDate, Instant toDate);
 
   /**
    * Finds all non-archived release notes that match the optional provided filter
@@ -73,10 +73,10 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
         ((:query IS NULL OR :query = '') OR
         LOWER(r.tag) LIKE LOWER('%' || :query || '%') OR
         LOWER(r.summary) LIKE LOWER('%' || :query || '%')) AND
-        (:fromDate IS NULL OR r.createdAt >= :fromDate) AND
-        (:toDate IS NULL OR r.createdAt <= :toDate)
+        (CAST(:fromDate AS Instant) IS NULL OR r.createdAt >= :fromDate) AND
+        (CAST(:toDate AS Instant) IS NULL OR r.createdAt < :toDate)
       ORDER BY r.createdAt DESC
       """)
   public List<ReleaseNote> findByArchivedFalseAndMatchingFilterParametersForCustomers(String query, Boolean published,
-      List<Long> productIds, Boolean includeUnassignedProduct, Long fromDate, Long toDate, List<String> customerGroups);
+      List<Long> productIds, Boolean includeUnassignedProduct, Instant fromDate, Instant toDate, List<String> customerGroups);
 }

@@ -1,5 +1,6 @@
 package no.reliablesolutions.release_notes_portal.domain.repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -94,14 +95,14 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
         LOWER(c.description) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
         LOWER(c.developerNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
         LOWER(c.upgradeNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%')) AND
-        (:fromDate IS NULL OR COALESCE(c.gitCommitTimestamp, c.creationTimestamp) >= :fromDate) AND
-        (:toDate IS NULL OR COALESCE(c.gitCommitTimestamp, c.creationTimestamp) <= :toDate)
+        (CAST(:fromDate AS Instant) IS NULL OR COALESCE(c.gitCommitTimestamp, c.creationTimestamp) >= :fromDate) AND
+        (CAST(:toDate AS Instant) IS NULL OR COALESCE(c.gitCommitTimestamp, c.creationTimestamp) < :toDate)
       ORDER BY CASE WHEN c.gitCommitTimestamp IS NULL THEN c.creationTimestamp ELSE c.gitCommitTimestamp END DESC
       """)
   public List<ChangeNote> findByArchivedFalseAndMatchingFilterParameters(
       @Param("filterOptions") ChangeNoteFilterOptionsDTO filterOptions,
-      @Param("fromDate") Long fromDate,
-      @Param("toDate") Long toDate);
+      @Param("fromDate") Instant fromDate,
+      @Param("toDate") Instant toDate);
 
   /**
    * Finds all non-archived change notes that are viewable by everyone or
@@ -156,15 +157,15 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
       OR LOWER(c.description) LIKE LOWER('%' || :#{#filterOptions.query} || '%')
       OR LOWER(c.developerNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%')
       OR LOWER(c.upgradeNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%'))
-      AND (:fromDate IS NULL OR COALESCE(c.gitCommitTimestamp, c.creationTimestamp) >= :fromDate)
-      AND (:toDate IS NULL OR COALESCE(c.gitCommitTimestamp, c.creationTimestamp) <= :toDate)
+      AND (CAST(:fromDate AS Instant) IS NULL OR COALESCE(c.gitCommitTimestamp, c.creationTimestamp) >= :fromDate)
+      AND (CAST(:toDate AS Instant) IS NULL OR COALESCE(c.gitCommitTimestamp, c.creationTimestamp) < :toDate)
       ORDER BY CASE WHEN c.gitCommitTimestamp IS NULL THEN c.creationTimestamp ELSE c.gitCommitTimestamp END DESC
       """)
   public List<ChangeNote> findForCustomerNamesMatchingFilterParameters(
       @Param("customerNames") List<String> customerNames,
       @Param("filterOptions") ChangeNoteFilterOptionsDTO filterOptions,
-      @Param("fromDate") Long fromDate,
-      @Param("toDate") Long toDate);
+      @Param("fromDate") Instant fromDate,
+      @Param("toDate") Instant toDate);
 
   /**
    * Finds the Git commit hash and the previous Git commit hash for a change note
