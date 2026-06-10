@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -93,6 +92,28 @@ public class ReleaseNoteService {
     releaseNoteRepository.save(releaseNote);
   }
 
+  /**
+   * Retrieves non-archived release notes matching the provided filter options,
+   * optionally paginated.
+   *
+   * <p>Admins see notes regardless of published status; non-admins are restricted
+   * to published notes and to the customer groups resolved from the current
+   * authentication. When {@code page} or {@code size} is {@code null} the result
+   * is returned unpaged (all matches in a single page).
+   *
+   * @param filterOptions optional filter parameters such as query, published
+   *                      status, product IDs, and date range; {@code null} is
+   *                      treated as no filters
+   * @param page          the zero-based page index, or {@code null} to return all
+   *                      matches unpaged
+   * @param size          the page size, or {@code null} to return all matches
+   *                      unpaged
+   * @return a {@link PaginatedResponseDTO} wrapping the page of ReleaseNoteDTOs and
+   *         the total page count
+   * @throws InvalidDateRangeException if {@code fromDate} is after {@code toDate}
+   * @throws IllegalArgumentException  if {@code page} is negative or {@code size}
+   *                                   is not positive
+   */
   public PaginatedResponseDTO<List<ReleaseNoteDTO>> getAllReleaseNotes(ReleaseNoteFilterOptionsDTO filterOptions, Integer page, Integer size) {
 
     if (filterOptions == null) {
@@ -118,8 +139,8 @@ public class ReleaseNoteService {
       pageable = PageRequest.of(page, size);
     }
 
-    Instant fromDateInstant = getInstantFromLocalDate(fromDate, false);
-    Instant toDateInstant = getInstantFromLocalDate(toDate, true);
+    Instant fromDateInstant = startOfDayInstant(fromDate, 0);
+    Instant toDateInstant = startOfDayInstant(toDate, 1);
 
     AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
 
@@ -239,14 +260,19 @@ public class ReleaseNoteService {
     releaseNoteRepository.save(releaseNote);
   }
 
-  private Instant getInstantFromLocalDate(LocalDate localDate, boolean inclusive) {
+  /**
+   * Returns the start-of-day instant for {@code localDate} (in the business zone),
+   * after adding {@code plusDays}.
+   *
+   * @param localDate the calendar date to convert, or {@code null}
+   * @param plusDays  the number of days to add before taking the start of day
+   * @return the corresponding {@link Instant}, or {@code null} if {@code localDate}
+   *         is {@code null}
+   */
+  private Instant startOfDayInstant(LocalDate localDate, int plusDays) {
     if (localDate == null) {
       return null;
     }
-    if (inclusive) {
-      return localDate.plusDays(1).atStartOfDay(BUSINESS_ZONE).toInstant();
-    } else {
-      return localDate.atStartOfDay(BUSINESS_ZONE).toInstant();
-    }
+    return localDate.plusDays(plusDays).atStartOfDay(BUSINESS_ZONE).toInstant();
   }
 }
