@@ -26,6 +26,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import no.reliablesolutions.release_notes_portal.dto.CreateReleaseNoteDTO;
+import no.reliablesolutions.release_notes_portal.dto.PaginatedResponseDTO;
 import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteDTO;
 import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteFilterOptionsDTO;
 import no.reliablesolutions.release_notes_portal.service.ReleaseNoteService;
@@ -105,10 +106,12 @@ public class ReleaseNoteController {
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @GetMapping("")
-  public ResponseEntity<List<ReleaseNoteDTO>> getAllReleaseNotes(
-      @ModelAttribute ReleaseNoteFilterOptionsDTO filterOptions) {
-    List<ReleaseNoteDTO> releaseNotes = releaseNoteService.getAllReleaseNotes(filterOptions);
-    logger.info("Retrieved {} release notes with filters: {}", releaseNotes.size(), filterOptions);
+  public ResponseEntity<PaginatedResponseDTO<List<ReleaseNoteDTO>>> getAllReleaseNotes(
+      @ModelAttribute ReleaseNoteFilterOptionsDTO filterOptions,
+      @RequestParam (required = false) Integer page,
+      @RequestParam (required = false) Integer size) {
+    PaginatedResponseDTO<List<ReleaseNoteDTO>> releaseNotes = releaseNoteService.getAllReleaseNotes(filterOptions, page, size);
+    logger.info("Retrieved {} release notes with filters: {}", releaseNotes.content().size(), filterOptions);
     return ResponseEntity.ok(releaseNotes);
   }
 

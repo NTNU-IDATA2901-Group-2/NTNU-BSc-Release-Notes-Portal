@@ -7,6 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
@@ -15,6 +21,7 @@ import no.reliablesolutions.release_notes_portal.domain.entity.ReleaseNote;
 import no.reliablesolutions.release_notes_portal.domain.repository.ChangeNoteRepository;
 import no.reliablesolutions.release_notes_portal.domain.repository.ReleaseNoteRepository;
 import no.reliablesolutions.release_notes_portal.dto.CreateReleaseNoteDTO;
+import no.reliablesolutions.release_notes_portal.dto.PaginatedResponseDTO;
 import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteDTO;
 import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteFilterOptionsDTO;
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
@@ -33,6 +40,7 @@ import no.reliablesolutions.release_notes_portal.util.ReleaseNoteMapper;
 @AllArgsConstructor
 public class ReleaseNoteService {
 
+  private final Logger logger = LoggerFactory.getLogger(ReleaseNoteService.class);
   private final ReleaseNoteRepository releaseNoteRepository;
   private final ChangeNoteRepository changeNoteRepository;
 
@@ -85,18 +93,7 @@ public class ReleaseNoteService {
     releaseNoteRepository.save(releaseNote);
   }
 
-  /**
-   * Retrieves a list of all non-archived release notes with optional filters for
-   * query, published status, and product.
-   *
-   * @param filterOptions optional filterOptions dto containing filter parameters
-   *                      such as query, published status, product IDs, and date
-   *                      range
-   *
-   * @return a list of ReleaseNoteDTOs representing all non-archived release notes
-   *         that match the provided filters
-   */
-  public List<ReleaseNoteDTO> getAllReleaseNotes(ReleaseNoteFilterOptionsDTO filterOptions) {
+  public PaginatedResponseDTO<List<ReleaseNoteDTO>> getAllReleaseNotes(ReleaseNoteFilterOptionsDTO filterOptions, Integer page, Integer size) {
 
     if (filterOptions == null) {
       filterOptions = new ReleaseNoteFilterOptionsDTO(null, null, null, null, null, null);
@@ -109,20 +106,26 @@ public class ReleaseNoteService {
       throw new InvalidDateRangeException(fromDate, toDate);
     }
 
-    Instant fromDateInstant = fromDate == null ? null : fromDate
-        .atStartOfDay(BUSINESS_ZONE)
-        .toInstant();
-    Instant toDateInstant = toDate == null ? null : toDate
-        .plusDays(1)
-        .atStartOfDay(BUSINESS_ZONE)
-        .toInstant();
+    Pageable pageable;
+    if (page == null || size == null) {
+      logger.warn("Page number or page size is null. Returning all release notes without pagination.");
+      pageable = Pageable.unpaged();
+    } else if (page < 0) {
+      throw new IllegalArgumentException("Page number cannot be negative");
+    } else if (size <= 0) {
+      throw new IllegalArgumentException("Page size must be greater than zero");
+    } else {
+      pageable = PageRequest.of(page, size);
+    }
+
+    Instant fromDateInstant = getInstantFromLocalDate(fromDate, false);
+    Instant toDateInstant = getInstantFromLocalDate(toDate, true);
 
     AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
 
+    Page<ReleaseNote> releaseNotesPage;
     if (accessScope.isAdmin()) {
-      return releaseNoteRepository.findByArchivedFalseAndMatchingFilterParameters(filterOptions, fromDateInstant, toDateInstant).stream()
-          .map(rn -> ReleaseNoteMapper.toDTO(rn, accessScope)).toList();
-
+      releaseNotesPage = releaseNoteRepository.findByArchivedFalseAndMatchingFilterParameters(filterOptions, fromDateInstant, toDateInstant, pageable);
     } else {
       filterOptions = new ReleaseNoteFilterOptionsDTO(
           filterOptions.query(),
@@ -132,12 +135,16 @@ public class ReleaseNoteService {
           fromDate,
           toDate
       );
-
       List<String> customerGroups = AuthenticationUtil.getCustomerGroups();
-      return releaseNoteRepository
-          .findByArchivedFalseAndMatchingFilterParametersForCustomers(filterOptions, fromDateInstant, toDateInstant, customerGroups).stream()
-          .map(releaseNote -> ReleaseNoteMapper.toDTO(releaseNote, accessScope)).toList();
+      
+      releaseNotesPage = releaseNoteRepository
+          .findByArchivedFalseAndMatchingFilterParametersForCustomers(filterOptions, fromDateInstant, toDateInstant, customerGroups, pageable);
     }
+    List<ReleaseNoteDTO> dtos = releaseNotesPage.getContent()
+      .stream()
+      .map(rn -> ReleaseNoteMapper.toDTO(rn, accessScope)).toList();
+    
+    return new PaginatedResponseDTO<>(dtos, releaseNotesPage.getTotalPages());
   }
 
   /**
@@ -230,5 +237,16 @@ public class ReleaseNoteService {
     ReleaseNote releaseNote = releaseNoteOptional.get();
     releaseNote.setPublished(publish);
     releaseNoteRepository.save(releaseNote);
+  }
+
+  private Instant getInstantFromLocalDate(LocalDate localDate, boolean inclusive) {
+    if (localDate == null) {
+      return null;
+    }
+    if (inclusive) {
+      return localDate.plusDays(1).atStartOfDay(BUSINESS_ZONE).toInstant();
+    } else {
+      return localDate.atStartOfDay(BUSINESS_ZONE).toInstant();
+    }
   }
 }

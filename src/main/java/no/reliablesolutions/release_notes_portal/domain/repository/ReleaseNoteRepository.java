@@ -3,6 +3,8 @@ package no.reliablesolutions.release_notes_portal.domain.repository;
 import java.time.Instant;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,6 +26,7 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
    *                      timestamp, or {@code null} for no lower bound
    * @param toDate        the upper bound (exclusive) for the release note creation
    *                      timestamp, or {@code null} for no upper bound
+   * @param pageable      the pagination information for the query
    *
    * @return all non-archived release notes that match the optional provided filter
    * parameters
@@ -45,10 +48,11 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
         (CAST(:toDate AS Instant) IS NULL OR r.createdAt < :toDate)
       ORDER BY r.createdAt DESC
       """)
-  public List<ReleaseNote> findByArchivedFalseAndMatchingFilterParameters(
+  public Page<ReleaseNote> findByArchivedFalseAndMatchingFilterParameters(
       @Param("filterOptions") ReleaseNoteFilterOptionsDTO filterOptions,
       @Param("fromDate") Instant fromDate,
-      @Param("toDate") Instant toDate);
+      @Param("toDate") Instant toDate,
+      Pageable pageable);
 
   /**
    * Finds all non-archived release notes that match the optional provided filter
@@ -81,9 +85,10 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
         (CAST(:toDate AS Instant) IS NULL OR r.createdAt < :toDate)
       ORDER BY r.createdAt DESC
       """)
-  public List<ReleaseNote> findByArchivedFalseAndMatchingFilterParametersForCustomers(
+  public Page<ReleaseNote> findByArchivedFalseAndMatchingFilterParametersForCustomers(
       @Param("filterOptions") ReleaseNoteFilterOptionsDTO filterOptions,
       @Param("fromDate") Instant fromDate,
       @Param("toDate") Instant toDate,
-      @Param("customerGroups") List<String> customerGroups);
+      @Param("customerGroups") List<String> customerGroups,
+      Pageable pageable);
 }
