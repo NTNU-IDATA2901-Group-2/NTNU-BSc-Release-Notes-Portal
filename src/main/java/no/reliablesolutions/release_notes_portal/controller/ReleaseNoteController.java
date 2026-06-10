@@ -96,8 +96,12 @@ public class ReleaseNoteController {
    * query, published status, and product.
    *
    * @param filterOptions the filter options for querying release notes
-   * @return a ResponseEntity with a 200 status and a list of ReleaseNoteDTOs in
-   *         the body
+   * @param page          the zero-based page index to retrieve, or {@code null}
+   *                      to return all matching release notes unpaged
+   * @param size          the page size, or {@code null} to return all matching
+   *                      release notes unpaged
+   * @return a ResponseEntity with a 200 status and a {@link PaginatedResponseDTO}
+   *         wrapping the page of ReleaseNoteDTOs and the total page count
    */
   @Operation(summary = "Get all release notes, with optional filters", description = "Retrieves a list of all release notes with optional filters")
   @ApiResponses(value = {

@@ -28,8 +28,8 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
    *                      timestamp, or {@code null} for no upper bound
    * @param pageable      the pagination information for the query
    *
-   * @return all non-archived release notes that match the optional provided filter
-   * parameters
+   * @return a page of non-archived release notes matching the provided filter
+   * parameters, ordered by creation time descending
    */
   @Query("""
       SELECT DISTINCT r
@@ -64,9 +64,10 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
    * @param toDate         the upper bound (exclusive) for the release note creation
    *                       timestamp, or {@code null} for no upper bound
    * @param customerGroups The list of customer groups to filter by (case-insensitive).
+   * @param pageable       the pagination information for the query
    *
-   * @return all non-archived release notes that match the optional provided filter
-   * parameters
+   * @return a page of non-archived release notes matching the provided filter
+   * parameters, ordered by creation time descending
    */
   @Query("""
       SELECT DISTINCT r
