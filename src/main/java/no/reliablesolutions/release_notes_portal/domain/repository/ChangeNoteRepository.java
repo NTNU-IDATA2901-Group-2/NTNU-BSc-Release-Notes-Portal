@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -53,10 +55,15 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
   /**
    * Finds all non-archived change notes that match the provided filter
    * parameters.
-   * 
+   *
    * @param filterOptions the filter options to apply to the search
-   * @return a list of all non-archived change notes that match the provided
-   *         filters
+   * @param fromDate      the lower bound (inclusive) for the change note
+   *                      timestamp, or {@code null} for no lower bound
+   * @param toDate        the upper bound (exclusive) for the change note
+   *                      timestamp, or {@code null} for no upper bound
+   * @param pageable      the pagination information for the query
+   * @return a page of non-archived change notes matching the provided filter
+   *         parameters, ordered by timestamp descending
    */
   @Query("""
       SELECT c
@@ -99,10 +106,11 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
         (CAST(:toDate AS Instant) IS NULL OR COALESCE(c.gitCommitTimestamp, c.creationTimestamp) < :toDate)
       ORDER BY CASE WHEN c.gitCommitTimestamp IS NULL THEN c.creationTimestamp ELSE c.gitCommitTimestamp END DESC
       """)
-  public List<ChangeNote> findByArchivedFalseAndMatchingFilterParameters(
+  public Page<ChangeNote> findByArchivedFalseAndMatchingFilterParameters(
       @Param("filterOptions") ChangeNoteFilterOptionsDTO filterOptions,
       @Param("fromDate") Instant fromDate,
-      @Param("toDate") Instant toDate);
+      @Param("toDate") Instant toDate,
+      Pageable pageable);
 
   /**
    * Finds all non-archived change notes that are viewable by everyone or
@@ -111,9 +119,14 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
    * 
    * @param customerNames a list of customer names to filter by (case-insensitive)
    * @param filterOptions the filter options to apply to the search
-   * @return a list of all non-archived change notes that are viewable by everyone
+   * @param fromDate      the lower bound (inclusive) for the change note
+   *                      timestamp, or {@code null} for no lower bound
+   * @param toDate        the upper bound (exclusive) for the change note
+   *                      timestamp, or {@code null} for no upper bound
+   * @param pageable      the pagination information for the query
+   * @return a page of non-archived change notes that are viewable by everyone
    *         or associated with a customer whose name is in the provided list, and
-   *         that match the provided filter parameters
+   *         that match the provided filter parameters, ordered by timestamp descending
    */
   @Query("""
       SELECT c
@@ -161,11 +174,12 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
       AND (CAST(:toDate AS Instant) IS NULL OR COALESCE(c.gitCommitTimestamp, c.creationTimestamp) < :toDate)
       ORDER BY CASE WHEN c.gitCommitTimestamp IS NULL THEN c.creationTimestamp ELSE c.gitCommitTimestamp END DESC
       """)
-  public List<ChangeNote> findForCustomerNamesMatchingFilterParameters(
+  public Page<ChangeNote> findForCustomerNamesMatchingFilterParameters(
       @Param("customerNames") List<String> customerNames,
       @Param("filterOptions") ChangeNoteFilterOptionsDTO filterOptions,
       @Param("fromDate") Instant fromDate,
-      @Param("toDate") Instant toDate);
+      @Param("toDate") Instant toDate,
+      Pageable pageable);
 
   /**
    * Finds the Git commit hash and the previous Git commit hash for a change note

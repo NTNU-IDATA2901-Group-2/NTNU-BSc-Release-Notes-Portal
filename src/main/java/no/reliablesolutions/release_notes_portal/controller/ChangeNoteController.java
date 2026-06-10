@@ -27,6 +27,7 @@ import lombok.AllArgsConstructor;
 import no.reliablesolutions.release_notes_portal.dto.ChangeNoteDTO;
 import no.reliablesolutions.release_notes_portal.dto.ChangeNoteFilterOptionsDTO;
 import no.reliablesolutions.release_notes_portal.dto.CreateChangeNoteDTO;
+import no.reliablesolutions.release_notes_portal.dto.PaginatedResponseDTO;
 import no.reliablesolutions.release_notes_portal.service.ChangeNoteService;
 
 /**
@@ -84,10 +85,14 @@ public class ChangeNoteController {
 
   /**
    * Endpoint for retrieving a list of all change notes with optional filters.
-   * 
+   *
    * @param filterOptions the filter options for querying change notes
-   * @return a ResponseEntity containing a list of ChangeNoteDTOs representing the
-   *         filtered change notes
+   * @param page          the zero-based page index to retrieve, or {@code null}
+   *                      to return all matching change notes unpaged
+   * @param size          the page size, or {@code null} to return all matching
+   *                      change notes unpaged
+   * @return a ResponseEntity with a 200 status and a {@link PaginatedResponseDTO}
+   *         wrapping the page of ChangeNoteDTOs and the total item count
    */
   @Operation(summary = "Get all change notes, with optional filters", description = "Retrieves a list of all change notes with optional filters")
   @ApiResponses(value = {
@@ -95,10 +100,12 @@ public class ChangeNoteController {
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @GetMapping("")
-  public ResponseEntity<List<ChangeNoteDTO>> getAllChangeNotes(
-      @ModelAttribute ChangeNoteFilterOptionsDTO filterOptions) {
-    List<ChangeNoteDTO> changeNotes = changeNoteService.getAllChangeNotes(filterOptions);
-    logger.info("Retrieved {} change notes with filters: {}", changeNotes.size(), filterOptions);
+  public ResponseEntity<PaginatedResponseDTO<List<ChangeNoteDTO>>> getAllChangeNotes(
+      @ModelAttribute ChangeNoteFilterOptionsDTO filterOptions,
+      @RequestParam (required = false) Integer page,
+      @RequestParam (required = false) Integer size) {
+    PaginatedResponseDTO<List<ChangeNoteDTO>> changeNotes = changeNoteService.getAllChangeNotes(filterOptions, page, size);
+    logger.info("Retrieved {} change notes with filters: {} and pagination parameters: Page {}, Size {}", changeNotes.content().size(), filterOptions, page, size);
     return ResponseEntity.ok(changeNotes);
   }
 

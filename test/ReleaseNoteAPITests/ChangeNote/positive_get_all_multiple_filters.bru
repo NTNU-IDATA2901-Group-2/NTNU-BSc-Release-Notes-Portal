@@ -20,7 +20,7 @@ headers {
 }
 
 assert {
-  res.body: length 0
+  res.body.content: length 0
   res.status: eq 200
 }
 

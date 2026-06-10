@@ -16,7 +16,7 @@ headers {
 
 assert {
   res.status: eq 200
-  res.body: length 1
+  res.body.content: length 1
 }
 
 settings {

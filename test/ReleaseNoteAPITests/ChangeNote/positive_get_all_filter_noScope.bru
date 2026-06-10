@@ -19,9 +19,9 @@ headers {
 }
 
 assert {
-  res.body: length 1
+  res.body.content: length 1
   res.status: eq 200
-  res.body[0].id: eq {{change_id_3}}
+  res.body.content[0].id: eq {{change_id_3}}
 }
 
 settings {

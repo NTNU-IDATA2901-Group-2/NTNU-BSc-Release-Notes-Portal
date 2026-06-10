@@ -26,7 +26,7 @@ const { data: selectedChangeNotes } = useGetChangeNotes(params)
 const { data: availableChangeNotes } = useGetChangeNotes()
 
 const changeNoteOptions = computed(() =>
-  (availableChangeNotes.value ?? []).map((cn) => ({ value: cn.id, label: getLabelFromChangeNote(cn) }))
+  (availableChangeNotes.value?.content ?? []).map((cn) => ({ value: cn.id, label: getLabelFromChangeNote(cn) }))
 )
 
 
@@ -73,7 +73,7 @@ onUnmounted(() => {
       <PopoverAnchor ref="anchorRef" class="inline-flex w-full">
         <TagsInput v-model="model" class="w-full" @click="open = true">
           <TagsInputItem
-            v-for="changeNote in selectedChangeNotes"
+            v-for="changeNote in selectedChangeNotes?.content"
             :key="changeNote.id"
             :value="changeNote.id"
             class="bg-border/20 dark:bg-border p-2"

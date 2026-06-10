@@ -1,4 +1,4 @@
-import type { ChangeNote, OnMutationApiCallFinished, PersistChangeNoteDTO } from "@/utils/types";
+import type { ChangeNote, OnMutationApiCallFinished, PaginatedResponse, PersistChangeNoteDTO } from "@/utils/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import api from "./api";
 import { unref, type MaybeRef, type Ref } from "vue";
@@ -237,7 +237,7 @@ const getChangeNote = async (id: string): Promise<ChangeNote> => {
  * @param params Optional URL search parameters to filter the change notes.
  * @returns An array of change note data that matches the provided search parameters.
  */
-export const useGetChangeNotes = (searchParams?: Ref<Record<string, string>> | URLSearchParams) => useQuery<ChangeNote[]>({  
+export const useGetChangeNotes = (searchParams?: Ref<Record<string, string>> | URLSearchParams) => useQuery<PaginatedResponse<ChangeNote[]>>({
   queryKey: ['changeNotes', searchParams],
   queryFn: () => getChangeNotes(new URLSearchParams(searchParams instanceof URLSearchParams ? searchParams : searchParams?.value)),
 });
@@ -250,9 +250,9 @@ export const useGetChangeNotes = (searchParams?: Ref<Record<string, string>> | U
  * @returns An array of change note data that matches the provided search parameters.
  * @throws An error if the API request to retrieve the change notes fails.
  */
-const getChangeNotes = async (params?: URLSearchParams) => {
+const getChangeNotes = async (params?: URLSearchParams): Promise<PaginatedResponse<ChangeNote[]>> => {
   const response = await api.get(`changenotes`, { params });
-  return response.data as ChangeNote[];
+  return response.data as PaginatedResponse<ChangeNote[]>;
 }
 
 /**

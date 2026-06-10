@@ -39,13 +39,15 @@ const releaseNote = props.releaseNote;
 const changeNoteIdsWithinReleaseNote = ref<number[]>(releaseNote.changeNotes?.map(cn => cn.id) || [])
 
 const { data: availableGitRepositories } = useGetGitRepositories()
-const { data: availableChangeNotes } = useGetChangeNotes()
+const { data: availableChangeNotesPage } = useGetChangeNotes()
+const availableChangeNotes = computed(() => availableChangeNotesPage.value?.content ?? [])
 
 const gitRepository = ref<GitRepository | null>(null)
 const params = computed(() => {
   return { gitRepositoryIds: gitRepository.value?.id ? gitRepository.value?.id.toString() : '' }
 });
-const { data: currentGitRepositoryChangeNotes, isFetched: isCurrentGitRepositoryChangeNotesFetched } = useGetChangeNotes(params)
+const { data: currentGitRepositoryChangeNotesPage, isFetched: isCurrentGitRepositoryChangeNotesFetched } = useGetChangeNotes(params)
+const currentGitRepositoryChangeNotes = computed(() => currentGitRepositoryChangeNotesPage.value?.content ?? [])
 
 const fromChangeNote = ref<ChangeNote | null>(null);
 const toChangeNote = ref<ChangeNote | null>(null);

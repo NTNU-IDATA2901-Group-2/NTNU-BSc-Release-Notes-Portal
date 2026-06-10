@@ -23,6 +23,13 @@ import { toast } from 'vue-sonner';
 import { isAdmin } from '@/utils/keycloak';
 import AllocatedFilter from '@/components/filters/AllocatedFilter.vue';
 import DateRangeFilter from '@/components/filters/DateRangeFilter.vue';
+import Pagination from '@/components/ui/pagination/Pagination.vue';
+import PaginationContent from '@/components/ui/pagination/PaginationContent.vue';
+import PaginationPrevious from '@/components/ui/pagination/PaginationPrevious.vue';
+import PaginationItem from '@/components/ui/pagination/PaginationItem.vue';
+import PaginationNext from '@/components/ui/pagination/PaginationNext.vue';
+import NativeSelectOption from '@/components/ui/native-select/NativeSelectOption.vue';
+import NativeSelect from '@/components/ui/native-select/NativeSelect.vue';
 
 const router = useRouter();
 const { t } = useI18n();
@@ -35,6 +42,13 @@ const getInitialSelections = () => {
 const initialSelections = getInitialSelections();
 const { selection, ...initialSearchParams } = initialSelections;
 const searchParams = ref(initialSearchParams);
+
+const pageIndex = ref(initialSearchParams.page ? parseInt(initialSearchParams.page) : 0);
+const pageSize = ref(initialSearchParams.size ? parseInt(initialSearchParams.size) : 10);
+const pageSizeOptions = [10, 20, 50, 100];
+watch([pageIndex, pageSize], () => {
+  searchParams.value = { ...searchParams.value, page: (pageIndex.value - 1).toString(), size: pageSize.value.toString() };
+}, { deep: true });
 
 const { isLoading, isFetching, isError, data } = useGetChangeNotes(searchParams);
 
@@ -131,9 +145,9 @@ const onSearch = () => {
         <DateRangeFilter />
       </ScrollArea>
     </DrawerContent>
-    <div class="min-h-screen w-full flex justify-center align-bottom mt-6">
-      <div class="flex gap-8 flex-col h-min w-full md:flex-row justify-center p-4">
-        <div class="h-min hidden md:block">
+    <div class="max-h-screen w-full flex justify-center align-bottom mt-6">
+      <div class="flex gap-8 flex-col min-h-full w-full md:flex-row justify-center p-4">
+        <ScrollArea class="h-[80vh] hidden md:block">
           <h1 class="text-3xl text-nowrap">{{ t('title.changeNotes') }}</h1>
           <AllocatedFilter v-if="isAdmin" />
           <PublicPrivateFilter v-if="isAdmin"/>
@@ -143,7 +157,7 @@ const onSearch = () => {
           <CustomerFilter v-if="isAdmin" />
           <DateRangeFilter />
           <Button class="mt-4" variant="outline" @click="clearFilters">{{ t('button.clearFilters') }}</Button>
-        </div>
+        </ScrollArea>
 
         <div class="flex flex-col w-full gap-4 max-w-4xl">
           <div class="w-full flex flex-col md:flex-row-reverse justify-center md:justify-end gap-2">
@@ -189,16 +203,44 @@ const onSearch = () => {
           <Spinner v-if="isLoading || isFetching" />
           <p v-else-if="isError">{{ t('loadingError.releaseNotes') }}</p>
 
-          <ScrollArea class="h-[75vh] w-full" v-else>
-            <p v-if="data?.length === 0" class="text-center">{{ t('placeholder.noChangeNotesFound') }}</p>
-            <div v-for="changeNote in data" :key="changeNote.id" class="flex flex-col">
-              <ChangeNoteCard 
-                class="my-4" :key="changeNote.id"
-                :model-value="isChangeNoteSelected(changeNote.id)" :change-note="changeNote"
-                @update:model-value="toggleSelection(changeNote)" />
-              <Separator />
-            </div>
-          </ScrollArea>
+          <div v-else>
+            <ScrollArea class="h-[60vh] w-full">
+              <p v-if="data?.content.length === 0" class="text-center">{{ t('placeholder.noChangeNotesFound') }}</p>
+              <div v-for="changeNote in data?.content" :key="changeNote.id" class="flex flex-col">
+                <ChangeNoteCard
+                  class="my-4" :key="changeNote.id"
+                  :model-value="isChangeNoteSelected(changeNote.id)" :change-note="changeNote"
+                  @update:model-value="toggleSelection(changeNote)" />
+                <Separator />
+              </div>
+            </ScrollArea>
+            <Pagination class="text-text-primary h-[10vh]" v-slot="{ page }" :items-per-page="pageSize" :total="data?.totalItems" :default-page="1">
+              <PaginationContent v-slot="{ items }">
+                <PaginationPrevious />
+                <template v-for="(item, index) in items" :key="index">
+                  <PaginationItem
+                    v-if="item.type === 'page'"
+                    :value="item.value"
+                    :is-active="item.value === page"
+                    @click="pageIndex = item.value"
+                  >
+                    {{ item.value }}
+                  </PaginationItem>
+                </template>
+                <PaginationNext />
+                <NativeSelect v-model="pageSize">
+                  <NativeSelectOption
+                    v-for="option in pageSizeOptions"
+                    :value="option"
+                    :key="option"
+                    @click="pageIndex = 1"
+                  >
+                    {{ t('pagination.itemsPerPage', { count: option }) }}
+                  </NativeSelectOption>
+                </NativeSelect>
+              </PaginationContent>
+            </Pagination>
+          </div>
         </div>
       </div>
     </div>
