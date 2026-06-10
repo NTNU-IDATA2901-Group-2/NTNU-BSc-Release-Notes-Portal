@@ -20,8 +20,8 @@ headers {
 
 assert {
   res.status: eq 200
-  res.body.length: eq 1
-  res.body[0].id: eq {{release_id_2}}
+  res.body.content.length: eq 1
+  res.body.content[0].id: eq {{release_id_2}}
 }
 
 settings {

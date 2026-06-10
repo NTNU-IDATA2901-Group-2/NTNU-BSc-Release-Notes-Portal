@@ -34,7 +34,7 @@ script:pre-request {
 
 tests {
   // The note created in positive_post_valid_1 falls inside the [from, to] range.
-  const ids = res.body.map(rn => String(rn.id))
+  const ids = res.body.content.map(rn => String(rn.id))
   expect(ids).to.include(String(bru.getEnvVar("release_id_1")))
 }
 
