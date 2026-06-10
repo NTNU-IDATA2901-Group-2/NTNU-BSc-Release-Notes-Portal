@@ -70,6 +70,11 @@ export interface ReleaseNote {
     syncedToGit: boolean
 }
 
+export interface PaginatedResponse<T> {
+    content: T,
+    totalItems: number
+}
+
 export interface PersistReleaseNoteDTO {
     version?: string,
     description?: string,

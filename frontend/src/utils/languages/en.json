@@ -5,6 +5,9 @@
         "startRange": "Start date",
         "endRange": "End date"
     },
+    "pagination": {
+        "itemsPerPage": "{count} per page"
+    },
     "pdf": {
         "generated": "Generated",
         "noTitle": "No title",

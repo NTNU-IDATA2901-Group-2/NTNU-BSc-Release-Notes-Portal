@@ -16,6 +16,14 @@ import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 import { isAdmin } from '@/utils/keycloak';
 import { toast } from 'vue-sonner';
 import DateRangeFilter from '@/components/filters/DateRangeFilter.vue';
+import Pagination from '@/components/ui/pagination/Pagination.vue';
+import PaginationContent from '@/components/ui/pagination/PaginationContent.vue';
+import PaginationPrevious from '@/components/ui/pagination/PaginationPrevious.vue';
+import PaginationItem from '@/components/ui/pagination/PaginationItem.vue';
+import PaginationEllipsis from '@/components/ui/pagination/PaginationEllipsis.vue';
+import PaginationNext from '@/components/ui/pagination/PaginationNext.vue';
+import NativeSelectOption from '@/components/ui/native-select/NativeSelectOption.vue';
+import NativeSelect from '@/components/ui/native-select/NativeSelect.vue';
 
 const { t } = useI18n();
 
@@ -26,10 +34,16 @@ const url = new URL(globalThis.location.href);
 const searchParams = ref({ ...Object.fromEntries(url.searchParams.entries()) });
 const urlSearchParams = computed(() => new URLSearchParams(searchParams.value));
 
-const { data, isLoading, isFetching, isError } = useGetReleaseNotes(searchParams)
+const pageIndex = ref(urlSearchParams.value.get('page') ? parseInt(urlSearchParams.value.get('page') as string) : 0);
+const pageSize = ref(urlSearchParams.value.get('size') ? parseInt(urlSearchParams.value.get('size') as string) : 10);
+const pageSizeOptions = [10, 20, 50, 100];
+watch([pageIndex, pageSize], () => {
+  searchParams.value = { ...searchParams.value, page: (pageIndex.value - 1).toString(), size: pageSize.value.toString() };
+}, { deep: true });
+
+const { data, isLoading, isFetching, isError } = useGetReleaseNotes(searchParams);
 const search = ref(urlSearchParams.value.get('query') || '');
 watch(searchParams, () => {
-  console.log('Search params changed:', searchParams.value);
   const url = new URL(globalThis.location.href);
   url.search = urlSearchParams.value.toString();
   router.replace({ query: searchParams.value });
@@ -69,8 +83,8 @@ const createReleaseNoteMutation = useCreateReleaseNote({
         <DateRangeFilter />
       </div>
     </DrawerContent>
-    <div class="min-h-screen flex justify-center align-bottom mt-6 w-full">
-      <div class="flex gap-8 flex-col h-min w-full md:flex-row justify-center p-4">
+    <div class="max-h-screen flex justify-center align-bottom mt-6 w-full">
+      <div class="flex gap-8 flex-col min-h-full w-full md:flex-row justify-center p-4">
         <div class="h-min hidden md:block">
           <h1 class="text-3xl text-nowrap">{{ t('title.releaseNotes') }}</h1>
           <ProductFilter />
@@ -109,15 +123,43 @@ const createReleaseNoteMutation = useCreateReleaseNote({
           </div>
           <Spinner v-if="isLoading || isFetching" />
           <p v-else-if="isError">{{ t('loadingError.releaseNotes') }}</p>
-          <ScrollArea class="h-[80vh] w-full" v-else>
-            <p v-if="data?.length === 0" class="text-center">{{ t('placeholder.noReleaseNotesFound') }}</p>
-            <div v-for="releaseNote in data" :key="releaseNote.id" class="flex flex-col">
+          <div v-else>
+            <ScrollArea class="h-[70vh] w-full">
+            <p v-if="data?.content.length === 0" class="text-center">{{ t('placeholder.noReleaseNotesFound') }}</p>
+            <div v-for="releaseNote in data?.content" :key="releaseNote.id" class="flex flex-col">
               <ReleaseNoteCard 
                 class="my-4" :key="releaseNote.id"
                 :selected="selectedItems.includes(releaseNote.id)" :release-note="releaseNote" />
               <Separator />
             </div>
           </ScrollArea>
+          <Pagination class="text-text-primary h-[10vh]" v-slot="{ page }" :items-per-page="pageSize" :total="data?.totalItems" :default-page="1">
+            <PaginationContent v-slot="{ items }">
+              <PaginationPrevious />
+              <template v-for="(item, index) in items" :key="index">
+                <PaginationItem
+                  v-if="item.type === 'page'"
+                  :value="item.value"
+                  :is-active="item.value === page"
+                  @click="pageIndex = item.value"
+                >
+                  {{ item.value }}
+                </PaginationItem>
+              </template>
+              <PaginationNext />
+              <NativeSelect v-model="pageSize">
+                <NativeSelectOption
+                  v-for="option in pageSizeOptions"
+                  :value="option"
+                  :key="option"
+                  @click="pageIndex = 1"
+                >
+                  {{ t('pagination.itemsPerPage', { count: option }) }}
+                </NativeSelectOption>
+              </NativeSelect>
+            </PaginationContent>
+          </Pagination>
+          </div>
         </div>
       </div>
     </div>

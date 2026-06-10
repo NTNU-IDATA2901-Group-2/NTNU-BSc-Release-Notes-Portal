@@ -5,6 +5,9 @@
         "startRange": "Fra dato",
         "endRange": "Til dato"
     },
+    "pagination": {
+        "itemsPerPage": "{count} per side"
+    },
     "pdf": {
         "generated": "Generert",
         "noTitle": "Ingen tittel",

@@ -101,7 +101,7 @@ public class ReleaseNoteController {
    * @param size          the page size, or {@code null} to return all matching
    *                      release notes unpaged
    * @return a ResponseEntity with a 200 status and a {@link PaginatedResponseDTO}
-   *         wrapping the page of ReleaseNoteDTOs and the total page count
+   *         wrapping the page of ReleaseNoteDTOs and the total item count
    */
   @Operation(summary = "Get all release notes, with optional filters", description = "Retrieves a list of all release notes with optional filters")
   @ApiResponses(value = {
@@ -115,7 +115,7 @@ public class ReleaseNoteController {
       @RequestParam (required = false) Integer page,
       @RequestParam (required = false) Integer size) {
     PaginatedResponseDTO<List<ReleaseNoteDTO>> releaseNotes = releaseNoteService.getAllReleaseNotes(filterOptions, page, size);
-    logger.info("Retrieved {} release notes with filters: {}", releaseNotes.content().size(), filterOptions);
+    logger.info("Retrieved {} release notes with filters: {} and pagination parameters: Page {}, Size {}", releaseNotes.content().size(), filterOptions, page, size);
     return ResponseEntity.ok(releaseNotes);
   }
 

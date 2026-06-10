@@ -109,7 +109,7 @@ public class ReleaseNoteService {
    * @param size          the page size, or {@code null} to return all matches
    *                      unpaged
    * @return a {@link PaginatedResponseDTO} wrapping the page of ReleaseNoteDTOs and
-   *         the total page count
+   *         the total item count
    * @throws InvalidDateRangeException if {@code fromDate} is after {@code toDate}
    * @throws IllegalArgumentException  if {@code page} is negative or {@code size}
    *                                   is not positive
@@ -165,7 +165,7 @@ public class ReleaseNoteService {
       .stream()
       .map(rn -> ReleaseNoteMapper.toDTO(rn, accessScope)).toList();
     
-    return new PaginatedResponseDTO<>(dtos, releaseNotesPage.getTotalPages());
+    return new PaginatedResponseDTO<>(dtos, releaseNotesPage.getTotalElements());
   }
 
   /**
