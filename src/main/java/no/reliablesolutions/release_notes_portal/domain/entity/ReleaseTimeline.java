@@ -1,6 +1,6 @@
 package no.reliablesolutions.release_notes_portal.domain.entity;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class ReleaseTimeline {
-    private Instant previewAvailableFrom;
-    private Instant recommendedTestPhaseFrom;
-    private Instant recommendedTestPhaseTo;
-    private Instant plannedProductionDeployment;
+    private LocalDate previewAvailableFrom;
+    private LocalDate recommendedTestPhaseFrom;
+    private LocalDate recommendedTestPhaseTo;
+    private LocalDate plannedProductionDeployment;
 }

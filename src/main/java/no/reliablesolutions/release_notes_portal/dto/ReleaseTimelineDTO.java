@@ -1,6 +1,6 @@
 package no.reliablesolutions.release_notes_portal.dto;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,10 +12,10 @@ import no.reliablesolutions.release_notes_portal.domain.entity.ReleaseTimeline;
 @AllArgsConstructor
 @Getter
 public class ReleaseTimelineDTO {
-    private Instant previewAvailableFrom;
-    private Instant recommendedTestPhaseFrom;
-    private Instant recommendedTestPhaseTo;
-    private Instant plannedProductionDeployment;
+    private LocalDate previewAvailableFrom;
+    private LocalDate recommendedTestPhaseFrom;
+    private LocalDate recommendedTestPhaseTo;
+    private LocalDate plannedProductionDeployment;
     
     public static ReleaseTimelineDTO fromEntity(ReleaseTimeline timeline) {
       if (timeline == null) {

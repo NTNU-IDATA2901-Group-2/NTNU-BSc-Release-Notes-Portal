@@ -17,12 +17,14 @@ import org.springframework.stereotype.Service;
 import lombok.AllArgsConstructor;
 import no.reliablesolutions.release_notes_portal.domain.entity.ChangeNote;
 import no.reliablesolutions.release_notes_portal.domain.entity.ReleaseNote;
+import no.reliablesolutions.release_notes_portal.domain.entity.ReleaseTimeline;
 import no.reliablesolutions.release_notes_portal.domain.repository.ChangeNoteRepository;
 import no.reliablesolutions.release_notes_portal.domain.repository.ReleaseNoteRepository;
 import no.reliablesolutions.release_notes_portal.dto.CreateReleaseNoteDTO;
 import no.reliablesolutions.release_notes_portal.dto.PaginatedResponseDTO;
 import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteDTO;
 import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteFilterOptionsDTO;
+import no.reliablesolutions.release_notes_portal.dto.ReleaseTimelineDTO;
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.InvalidDateRangeException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
@@ -208,6 +210,15 @@ public class ReleaseNoteService {
     }
 
     ReleaseNote releaseNote = releaseNoteOptional.get();
+
+    ReleaseTimelineDTO releaseTimeline = createReleaseNoteDTO.releaseTimeline();
+    if (releaseTimeline != null) {
+      LocalDate from = releaseTimeline.getRecommendedTestPhaseFrom();
+      LocalDate to = releaseTimeline.getRecommendedTestPhaseTo();
+    if (from != null && to != null && from.isAfter(to)) {
+      throw new InvalidDateRangeException(from, to);
+    }
+}
 
     List<ChangeNote> changeNotesInReleaseNote = new ArrayList<>();
     if (createReleaseNoteDTO.changeNoteIds() != null) {
