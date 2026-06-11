@@ -6,7 +6,8 @@ import { InputGroup, InputGroupInput } from '@/components/ui/input-group';
 import Separator from '@/components/ui/separator/Separator.vue';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 import { FilePlus, ListFilterPlus, Search } from 'lucide-vue-next';
-import { computed, provide, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
+import { useSearchParams } from '@/composables/useSearchParams';
 import { useI18n } from 'vue-i18n';
 import ScrollArea from '@/components/ui/scroll-area/ScrollArea.vue';
 import ProductFilter from '@/components/filters/ProductFilter.vue';
@@ -20,7 +21,6 @@ import Pagination from '@/components/ui/pagination/Pagination.vue';
 import PaginationContent from '@/components/ui/pagination/PaginationContent.vue';
 import PaginationPrevious from '@/components/ui/pagination/PaginationPrevious.vue';
 import PaginationItem from '@/components/ui/pagination/PaginationItem.vue';
-import PaginationEllipsis from '@/components/ui/pagination/PaginationEllipsis.vue';
 import PaginationNext from '@/components/ui/pagination/PaginationNext.vue';
 import NativeSelectOption from '@/components/ui/native-select/NativeSelectOption.vue';
 import NativeSelect from '@/components/ui/native-select/NativeSelect.vue';
@@ -30,33 +30,30 @@ const { t } = useI18n();
 const selectedItems = ref<number[]>([]);
 
 const router = useRouter();
-const url = new URL(globalThis.location.href);
-const searchParams = ref({ ...Object.fromEntries(url.searchParams.entries()) });
-const urlSearchParams = computed(() => new URLSearchParams(searchParams.value));
+const { params, single, csv, date, match, clear } = useSearchParams(router);
 
-const pageIndex = ref(urlSearchParams.value.get('page') ? parseInt(urlSearchParams.value.get('page') as string) : 0);
-const pageSize = ref(urlSearchParams.value.get('size') ? parseInt(urlSearchParams.value.get('size') as string) : 10);
+const productIds = csv('productIds');
+const includeUnassignedProduct = match('includeUnassignedProduct', 'true');
+const published = single('published');
+const fromDate = date('fromDate');
+const toDate = date('toDate');
+
+const pageIndex = ref(params.value.page ? parseInt(params.value.page) : 0);
+const pageSize = ref(params.value.size ? parseInt(params.value.size) : 10);
 const pageSizeOptions = [10, 20, 50, 100];
 watch([pageIndex, pageSize], () => {
-  searchParams.value = { ...searchParams.value, page: (pageIndex.value - 1).toString(), size: pageSize.value.toString() };
-}, { deep: true });
+  params.value = { ...params.value, page: (pageIndex.value - 1).toString(), size: pageSize.value.toString() };
+});
 
-const { data, isLoading, isFetching, isError } = useGetReleaseNotes(searchParams);
-const search = ref(urlSearchParams.value.get('query') || '');
-watch(searchParams, () => {
-  const url = new URL(globalThis.location.href);
-  url.search = urlSearchParams.value.toString();
-  router.replace({ query: searchParams.value });
-}, { deep: true });
-
-provide('searchParams', searchParams);
+const { data, isLoading, isFetching, isError } = useGetReleaseNotes(params);
+const search = ref(params.value.query || '');
 
 const clearFilters = () => {
-  searchParams.value = {};
+  clear();
 }
 
 const onSearch = () => {
-  searchParams.value = { ...searchParams.value, query: search.value };
+  params.value = { ...params.value, query: search.value };
 }
 
 // Creation of release note
@@ -78,18 +75,18 @@ const createReleaseNoteMutation = useCreateReleaseNote({
       <div class="h-min md:block p-4">
         <Button class="mt-4" variant="outline" @click="clearFilters">{{ t('button.clearFilters')
         }}</Button>
-        <ProductFilter />
-        <PublishedDraftFilter />
-        <DateRangeFilter />
+        <ProductFilter v-model:selected="productIds" v-model:include-unassigned="includeUnassignedProduct" />
+        <PublishedDraftFilter v-model="published" />
+        <DateRangeFilter v-model:from="fromDate" v-model:to="toDate" />
       </div>
     </DrawerContent>
     <div class="max-h-screen flex justify-center align-bottom mt-6 w-full">
       <div class="flex gap-8 flex-col min-h-full w-full md:flex-row justify-center p-4">
         <div class="h-min hidden md:block">
           <h1 class="text-3xl text-nowrap">{{ t('title.releaseNotes') }}</h1>
-          <ProductFilter />
-          <PublishedDraftFilter v-if="isAdmin"/>
-          <DateRangeFilter />
+          <ProductFilter v-model:selected="productIds" v-model:include-unassigned="includeUnassignedProduct" />
+          <PublishedDraftFilter v-if="isAdmin" v-model="published" />
+          <DateRangeFilter v-model:from="fromDate" v-model:to="toDate" />
           <Button class="mt-4" variant="outline" @click="clearFilters">{{ t('button.clearFilters')
           }}</Button>
         </div>

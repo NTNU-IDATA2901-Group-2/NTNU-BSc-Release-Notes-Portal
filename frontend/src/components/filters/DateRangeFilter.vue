@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
+import type { DateValue } from '@internationalized/date';
 import DatePicker from '../DatePicker.vue';
+
+const from = defineModel<DateValue | undefined>('from');
+const to = defineModel<DateValue | undefined>('to');
 
 const { t } = useI18n();
 </script>
@@ -9,8 +13,8 @@ const { t } = useI18n();
   <div class="flex gap-3 flex-col mt-4">
     <h4 class="text-xl">{{ t('filters.dateRange') }}</h4>
     <div class="flex flex-col gap-3">
-      <DatePicker :placeholder="t('filters.startRange')" :query-key="'fromDate'" :max-query-key="'toDate'" />
-      <DatePicker :placeholder="t('filters.endRange')" :query-key="'toDate'" :min-query-key="'fromDate'" />
+      <DatePicker v-model="from" :placeholder="t('filters.startRange')" :max="to" />
+      <DatePicker v-model="to" :placeholder="t('filters.endRange')" :min="from" />
     </div>
   </div>
 </template>

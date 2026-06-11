@@ -16,7 +16,8 @@ import Separator from '@/components/ui/separator/Separator.vue';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 import type { ChangeNote } from '@/utils/types';
 import { Eye, FilePlus, LayersPlus, ListFilterPlus, Search } from 'lucide-vue-next';
-import { computed, provide, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { useSearchParams } from '@/composables/useSearchParams';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue-sonner';
@@ -34,44 +35,53 @@ import NativeSelect from '@/components/ui/native-select/NativeSelect.vue';
 const router = useRouter();
 const { t } = useI18n();
 
-const getInitialSelections = () => {
-  const url = new URL(globalThis.location.href);
-  return Object.fromEntries(url.searchParams.entries());
-}
 
-const initialSelections = getInitialSelections();
-const { selection, ...initialSearchParams } = initialSelections;
-const searchParams = ref(initialSearchParams);
-
-const pageIndex = ref(initialSearchParams.page ? parseInt(initialSearchParams.page) : 0);
-const pageSize = ref(initialSearchParams.size ? parseInt(initialSearchParams.size) : 10);
-const pageSizeOptions = [10, 20, 50, 100];
-watch([pageIndex, pageSize], () => {
-  searchParams.value = { ...searchParams.value, page: (pageIndex.value - 1).toString(), size: pageSize.value.toString() };
-}, { deep: true });
-
-const { isLoading, isFetching, isError, data } = useGetChangeNotes(searchParams);
-
-const initialSelection = selection ?? '';
+const initialSelection = new URL(globalThis.location.href).searchParams.get('selection') ?? '';
 const selectedChangeNotes = ref<number[]>(initialSelection.split(',').map(id => Number.parseInt(id)).filter(id => !Number.isNaN(id)));
 const selectionString = computed(() => selectedChangeNotes.value.join(','));
 
-watch([searchParams, selectionString], () => {
-  let queryParams = { ...searchParams.value };
+const { params, single, csv, date, match, clear } = useSearchParams(router, {
+  exclude: ['selection'],
+  extraQuery: () => {
+    const extra: Record<string, string> = {};
+    if (selectedChangeNotes.value.length > 0) {
+      extra.selection = selectionString.value;
+    }
+    return extra;
+  },
+});
 
-  if (selectedChangeNotes.value.length > 0) {
-    queryParams.selection = selectionString.value;
-  }
+const productIds = csv('productIds');
+const includeUnassignedProduct = match('includeUnassignedProduct', 'true');
+const scopeIds = csv('scopeIds');
+const includeUnassignedScope = match('includeUnassignedScope', 'true');
+const featureIds = csv('featureIds');
+const includeUnassignedFeature = match('includeUnassignedFeature', 'true');
+const customerIds = csv('customerIds');
+const includeUnassignedCustomer = match('includeUnassignedCustomer', 'true');
+const published = single('published');
+const hasReleaseNote = match('hasReleaseNote', 'false');
+const fromDate = date('fromDate');
+const toDate = date('toDate');
 
-  router.replace({ query: queryParams });
-}, { deep: true });
+// Preserve the AllocatedFilter default: "unallocated" is pre-selected for admins.
+if (isAdmin.value && params.value.hasReleaseNote === undefined) {
+  hasReleaseNote.value = true;
+}
 
-provide('searchParams', searchParams);
+const pageIndex = ref(params.value.page ? parseInt(params.value.page) : 0);
+const pageSize = ref(params.value.size ? parseInt(params.value.size) : 10);
+const pageSizeOptions = [10, 20, 50, 100];
+watch([pageIndex, pageSize], () => {
+  params.value = { ...params.value, page: (pageIndex.value - 1).toString(), size: pageSize.value.toString() };
+});
 
-const search = ref<string>(searchParams.value.query || '');
+const { isLoading, isFetching, isError, data } = useGetChangeNotes(params);
+
+const search = ref<string>(params.value.query || '');
 
 const clearFilters = () => {
-  searchParams.value = {};
+  clear();
 }
 
 const isChangeNoteSelected = (changeNoteId: number) => {
@@ -125,7 +135,7 @@ const createReleaseNoteMutation = useCreateReleaseNote({
 })
 
 const onSearch = () => {
-  searchParams.value = { ...searchParams.value, query: search.value };
+  params.value = { ...params.value, query: search.value };
 }
 
 </script>
@@ -136,26 +146,26 @@ const onSearch = () => {
       <ScrollArea class="h-100 p-5">
         <Button class="mt-4" variant="outline" @click="clearFilters">{{ t('button.clearFilters')
         }}</Button>
-        <AllocatedFilter v-if="isAdmin" />
-        <PublishedDraftFilter v-if="isAdmin"/>
-        <ProductFilter />
-        <ScopeFilter />
-        <FeatureFilter />
-        <CustomerFilter v-if="isAdmin" />
-        <DateRangeFilter />
+        <AllocatedFilter v-if="isAdmin" v-model="hasReleaseNote" />
+        <PublishedDraftFilter v-if="isAdmin" v-model="published" />
+        <ProductFilter v-model:selected="productIds" v-model:include-unassigned="includeUnassignedProduct" />
+        <ScopeFilter v-model:selected="scopeIds" v-model:include-unassigned="includeUnassignedScope" />
+        <FeatureFilter v-model:selected="featureIds" v-model:include-unassigned="includeUnassignedFeature" />
+        <CustomerFilter v-if="isAdmin" v-model:selected="customerIds" v-model:include-unassigned="includeUnassignedCustomer" />
+        <DateRangeFilter v-model:from="fromDate" v-model:to="toDate" />
       </ScrollArea>
     </DrawerContent>
     <div class="max-h-screen w-full flex justify-center align-bottom mt-6">
       <div class="flex gap-8 flex-col min-h-full w-full md:flex-row justify-center p-4">
         <ScrollArea class="h-[80vh] hidden md:block">
           <h1 class="text-3xl text-nowrap">{{ t('title.changeNotes') }}</h1>
-          <AllocatedFilter v-if="isAdmin" />
-          <PublishedDraftFilter v-if="isAdmin"/>
-          <ProductFilter />
-          <ScopeFilter />
-          <FeatureFilter />
-          <CustomerFilter v-if="isAdmin" />
-          <DateRangeFilter />
+          <AllocatedFilter v-if="isAdmin" v-model="hasReleaseNote" />
+          <PublishedDraftFilter v-if="isAdmin" v-model="published" />
+          <ProductFilter v-model:selected="productIds" v-model:include-unassigned="includeUnassignedProduct" />
+          <ScopeFilter v-model:selected="scopeIds" v-model:include-unassigned="includeUnassignedScope" />
+          <FeatureFilter v-model:selected="featureIds" v-model:include-unassigned="includeUnassignedFeature" />
+          <CustomerFilter v-if="isAdmin" v-model:selected="customerIds" v-model:include-unassigned="includeUnassignedCustomer" />
+          <DateRangeFilter v-model:from="fromDate" v-model:to="toDate" />
           <Button class="mt-4" variant="outline" @click="clearFilters">{{ t('button.clearFilters') }}</Button>
         </ScrollArea>
 
