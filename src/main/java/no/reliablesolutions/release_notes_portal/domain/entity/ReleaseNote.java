@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.List;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -42,4 +43,7 @@ public class ReleaseNote {
   private Boolean archived = false;
   private final Instant createdAt = Instant.now();
   private Boolean syncedToGit = false;
+
+  @Embedded
+  private ReleaseTimeline releaseTimeline;
 }

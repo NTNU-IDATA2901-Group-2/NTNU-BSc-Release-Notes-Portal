@@ -13,5 +13,6 @@ public record ReleaseNoteDTO(
     String summary,
     boolean published,
     Instant createdAt,
-    boolean syncedToGit) {
+    boolean syncedToGit,
+    ReleaseTimelineDTO releaseTimeline) {
 }

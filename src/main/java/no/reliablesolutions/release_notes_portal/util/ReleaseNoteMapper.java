@@ -5,6 +5,7 @@ import java.util.List;
 import no.reliablesolutions.release_notes_portal.domain.entity.ReleaseNote;
 import no.reliablesolutions.release_notes_portal.dto.ChangeNoteDTO;
 import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteDTO;
+import no.reliablesolutions.release_notes_portal.dto.ReleaseTimelineDTO;
 
 /**
  * A utility class for mapping ReleaseNote entities to ReleaseNoteDTOs.
@@ -54,7 +55,8 @@ public class ReleaseNoteMapper {
         releaseNote.getSummary(),
         releaseNote.getPublished(),
         releaseNote.getCreatedAt(),
-        releaseNote.getSyncedToGit());
+        releaseNote.getSyncedToGit(),
+        ReleaseTimelineDTO.fromEntity(releaseNote.getReleaseTimeline()));
   }
 
 }

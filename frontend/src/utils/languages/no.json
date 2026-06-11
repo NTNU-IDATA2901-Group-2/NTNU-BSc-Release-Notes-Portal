@@ -70,7 +70,11 @@
         "to": "Til",
         "addFromRepository": "Legg til fra repository",
         "fromRepository": "Fra repository",
-        "reference": "Referanse"
+        "reference": "Referanse",
+        "releaseTimeline": "Utgivelsestidslinje",
+        "previewAvailableFrom": "Forhåndsvisning tilgjengelig fra",
+        "recommendedTestPhase": "Anbefalt testperiode",
+        "plannedProductionDeployment": "Planlagt produksjonssetting"
     },
     "toast": {
         "changeNoteDeleted": "Endringsnotat slettet",
@@ -152,7 +156,8 @@
         "noChangeNotesAdded": "Ingen endringsnotater lagt til",
         "noTitle": "Ingen tittel",
         "noDescription": "Ingen beskrivelse",
-        "reference": "Referanse"
+        "reference": "Referanse",
+        "toBeDetermined": "Ikke fastsatt"
     },
     "repositories": {
         "title": "Git Repositorier",

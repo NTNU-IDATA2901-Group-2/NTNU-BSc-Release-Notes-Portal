@@ -61,25 +61,31 @@ export interface Scope {
     name: string
 }
 
+export interface ReleaseTimeline {
+    previewAvailableFrom?: string,
+    recommendedTestPhaseFrom?: string,
+    recommendedTestPhaseTo?: string,
+    plannedProductionDeployment?: string
+}
+
 export interface ReleaseNote {
     id: number,
     tag: string,
     summary: string,
     published: boolean,
     changeNotes: ChangeNote[],
-    syncedToGit: boolean
+    syncedToGit: boolean,
+    releaseTimeline: ReleaseTimeline
 }
 
-export interface PaginatedResponse<T> {
-    content: T,
-    totalItems: number
-}
+
 
 export interface PersistReleaseNoteDTO {
     version?: string,
     description?: string,
     published?: boolean,
-    changeNoteIds?: number[]
+    changeNoteIds?: number[],
+    releaseTimeline?: ReleaseTimeline
 }
 
 export interface PersistChangeNoteDTO {
@@ -93,6 +99,11 @@ export interface PersistChangeNoteDTO {
     featureId?: number,
     customerId?: number,
     viewableByEveryone?: boolean,
+}
+
+export interface PaginatedResponse<T> {
+    content: T,
+    totalItems: number
 }
 
 export interface Tag {

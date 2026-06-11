@@ -30,6 +30,7 @@ import { openJiraTicket } from '@/utils/jira.ts';
 import ScrollArea from '../ui/scroll-area/ScrollArea.vue';
 import { getLabelFromChangeNote } from '@/utils/change-note.ts';
 import { useSyncReleaseNoteToGit } from '@/api/git-repository-api.ts';
+import { getLocaleDateString } from '@/utils/format-date.ts';
 
 const props = defineProps<{
   releaseNote: ReleaseNote;
@@ -366,6 +367,38 @@ const customerFilter = ref<number>(-1);
         <p v-if="hasTranslation" class="text-text-primary/50 text-right">{{
           t('ai.translationDisclaimer') }}
         </p>
+      </div>
+      <div class="flex flex-col gap-16 w-full">
+        <Separator class="w-full h-2" />
+        <div class="flex flex-col gap-4 w-full">
+          <h2 class="text-3xl truncate max-w-full leading-normal">{{ t('title.releaseTimeline') }}</h2>
+          <div class="flex flex-col gap-4">
+            <span class="flex flex-row gap-2">
+              <p class="text-md">{{ `${t('title.previewAvailableFrom')}: ` }}</p>
+              <p>
+                {{ releaseNote.releaseTimeline?.previewAvailableFrom ?
+                getLocaleDateString(releaseNote.releaseTimeline.previewAvailableFrom) :
+                t('placeholder.toBeDetermined') }}
+              </p>
+            </span>
+            <span class="flex flex-row gap-2">
+              <p class="text-md">{{ `${t('title.recommendedTestPhase')}: ` }}</p>
+              <p>
+                {{ releaseNote.releaseTimeline ? 
+                `${releaseNote.releaseTimeline.recommendedTestPhaseFrom ? getLocaleDateString(releaseNote.releaseTimeline.recommendedTestPhaseFrom) : t('placeholder.toBeDetermined')} -
+                 ${releaseNote.releaseTimeline.recommendedTestPhaseTo ? getLocaleDateString(releaseNote.releaseTimeline.recommendedTestPhaseTo) : t('placeholder.toBeDetermined')}` : t('placeholder.toBeDetermined') }}
+              </p>
+            </span>
+            <span class="flex flex-row gap-2">
+              <p class="text-md">{{ `${t('title.plannedProductionDeployment')}: ` }}</p>
+              <p>
+                {{ releaseNote.releaseTimeline?.plannedProductionDeployment ?
+                getLocaleDateString(releaseNote.releaseTimeline.plannedProductionDeployment) :
+                t('placeholder.toBeDetermined') }}
+              </p>
+            </span>
+          </div>
+        </div>
       </div>
       <Separator class="w-full h-2" />
       <div class="flex flex-col w-full gap-10">

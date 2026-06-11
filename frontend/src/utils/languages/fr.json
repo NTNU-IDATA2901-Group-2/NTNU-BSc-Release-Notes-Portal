@@ -69,7 +69,11 @@
         "to": "À",
         "addFromRepository": "Ajouter depuis le dépôt",
         "fromRepository": "Depuis le dépôt",
-        "reference": "Référence"
+        "reference": "Référence",
+        "releaseTimeline": "Calendrier de version",
+        "previewAvailableFrom": "Aperçu disponible à partir du",
+        "recommendedTestPhase": "Phase de test recommandée",
+        "plannedProductionDeployment": "Mise en production prévue"
     },
     "toast": {
         "changeNoteDeleted": "Note de changement supprimée avec succès",
@@ -151,7 +155,8 @@
         "noChangeNotesAdded": "Aucune note de changement ajoutée",
         "noTitle": "Sans titre",
         "noDescription": "Aucune description",
-        "reference": "Référence"
+        "reference": "Référence",
+        "toBeDetermined": "À déterminer"
     },
     "repositories": {
         "title": "Dépôts Git",

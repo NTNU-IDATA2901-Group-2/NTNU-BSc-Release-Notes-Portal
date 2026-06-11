@@ -69,7 +69,11 @@
         "to": "To",
         "addFromRepository": "Add from repository",
         "fromRepository": "From repository",
-        "reference": "Reference"
+        "reference": "Reference",
+        "releaseTimeline": "Release Timeline",
+        "previewAvailableFrom": "Preview available from",
+        "recommendedTestPhase": "Recommended test phase",
+        "plannedProductionDeployment": "Planned production deployment"
     },
     "toast": {
         "changeNoteDeleted": "Change note deleted successfully",
@@ -151,7 +155,8 @@
         "noChangeNotesAdded": "No change notes added",
         "noTitle": "No title",
         "noDescription": "No description",
-        "reference": "Reference"
+        "reference": "Reference",
+        "toBeDetermined": "To be determined"
     },
     "repositories": {
         "title": "Git Repositories",

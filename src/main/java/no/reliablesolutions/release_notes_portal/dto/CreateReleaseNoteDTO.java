@@ -9,6 +9,7 @@ public record CreateReleaseNoteDTO(
     List<Long> changeNoteIds,
     String tag,
     String summary,
-    Boolean published) {
+    Boolean published,
+    ReleaseTimelineDTO releaseTimeline) {
 
 }
