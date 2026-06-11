@@ -43,6 +43,7 @@
         "translate": "Translate",
         "undo": "Undo",
         "showGeneralChanges": "Show General Changes",
+        "showPrivateChanges": "Show Private Changes",
         "confirm": "Confirm",
         "summarize": "Summarize",
         "allCustomers": "All customers",

@@ -27,7 +27,6 @@ import SelectGroup from '../ui/select/SelectGroup.vue';
 import SelectItem from '../ui/select/SelectItem.vue';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { openJiraTicket } from '@/utils/jira.ts';
-import Textarea from '../ui/textarea/Textarea.vue';
 import ScrollArea from '../ui/scroll-area/ScrollArea.vue';
 import { getLabelFromChangeNote } from '@/utils/change-note.ts';
 import { useSyncReleaseNoteToGit } from '@/api/git-repository-api.ts';
@@ -160,7 +159,8 @@ const onTranslate = async () => {
   hasToastedSuccess = false;
 }
 
-const generalReleasesChecked = ref(true);
+const generalChangesChecked = ref(true);
+const privateChangesChecked = ref(true);
 
 const copiedKey = ref<string | null>(null);
 let copyResetTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -211,8 +211,12 @@ const uniqueCustomers = computed(() => {
 })
 
 const shouldShowChangeNote = (change: ChangeNote) => {
+  if (!change.published && !privateChangesChecked.value) {
+    return false;
+  }
+
   if (change.customer === null) {
-    return generalReleasesChecked.value;
+    return generalChangesChecked.value;
   }
 
   if (customerFilter.value === -1) {
@@ -367,10 +371,14 @@ const customerFilter = ref<number>(-1);
       <div class="flex flex-col w-full gap-10">
         <div class="flex gap-4 flex-col md:flex-row justify-between items-start">
           <h2 class="text-3xl">{{ t('title.changeNotes') }}</h2>
-          <div class="flex flex-row items-center gap-4">
+          <div class="flex flex-col sm:flex-row items-center gap-4">
             <div class="flex gap-2">
               <p>{{ t('button.showGeneralChanges') }}</p>
-              <Checkbox v-model="generalReleasesChecked" class="cursor-pointer"/>
+              <Checkbox v-model="generalChangesChecked" class="cursor-pointer"/>
+            </div>
+            <div class="flex gap-2">
+              <p>{{ t('button.showPrivateChanges') }}</p>
+              <Checkbox v-model="privateChangesChecked" class="cursor-pointer"/>
             </div>
             <div>
               <Select v-model="customerFilter">
