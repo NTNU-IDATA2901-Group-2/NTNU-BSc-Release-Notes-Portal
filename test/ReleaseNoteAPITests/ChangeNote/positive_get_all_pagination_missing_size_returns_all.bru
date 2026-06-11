@@ -1,17 +1,17 @@
 meta {
-  name: positive_patch_publish
+  name: positive_get_all_pagination_missing_size_returns_all
   type: http
-  seq: 59
+  seq: 52
 }
 
-patch {
-  url: {{baseurl}}/changenotes/{{change_id_1}}/publish?publish=true
+get {
+  url: {{baseurl}}/changenotes?page=0
   body: none
   auth: inherit
 }
 
 params:query {
-  publish: true
+  page: 0
 }
 
 headers {
@@ -20,6 +20,8 @@ headers {
 
 assert {
   res.status: eq 200
+  res.body.content: length 3
+  res.body.totalItems: eq 3
 }
 
 settings {

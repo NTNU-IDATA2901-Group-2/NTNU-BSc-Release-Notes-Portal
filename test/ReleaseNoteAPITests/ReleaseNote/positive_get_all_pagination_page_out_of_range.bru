@@ -1,13 +1,18 @@
 meta {
-  name: get_all_should_exclude_patched
+  name: positive_get_all_pagination_page_out_of_range
   type: http
-  seq: 48
+  seq: 30
 }
 
 get {
-  url: {{baseurl}}/releasenotes
+  url: {{baseurl}}/releasenotes?page=10&size=1
   body: none
   auth: inherit
+}
+
+params:query {
+  page: 10
+  size: 1
 }
 
 headers {
@@ -17,6 +22,7 @@ headers {
 assert {
   res.status: eq 200
   res.body.content.length: eq 0
+  res.body.totalItems: eq 2
 }
 
 settings {

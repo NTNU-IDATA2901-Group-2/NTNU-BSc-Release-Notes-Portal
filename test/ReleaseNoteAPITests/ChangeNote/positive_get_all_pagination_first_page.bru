@@ -1,0 +1,31 @@
+meta {
+  name: positive_get_all_pagination_first_page
+  type: http
+  seq: 48
+}
+
+get {
+  url: {{baseurl}}/changenotes?page=0&size=2
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: 0
+  size: 2
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 200
+  res.body.content: length 2
+  res.body.totalItems: eq 3
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

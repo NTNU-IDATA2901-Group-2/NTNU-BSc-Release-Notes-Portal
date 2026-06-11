@@ -1,17 +1,18 @@
 meta {
-  name: positive_patch_publish
+  name: negative_get_all_pagination_negative_page
   type: http
-  seq: 59
+  seq: 53
 }
 
-patch {
-  url: {{baseurl}}/changenotes/{{change_id_1}}/publish?publish=true
+get {
+  url: {{baseurl}}/changenotes?page=-1&size=2
   body: none
   auth: inherit
 }
 
 params:query {
-  publish: true
+  page: -1
+  size: 2
 }
 
 headers {
@@ -19,7 +20,7 @@ headers {
 }
 
 assert {
-  res.status: eq 200
+  res.status: eq 400
 }
 
 settings {
