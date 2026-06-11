@@ -160,7 +160,7 @@ const onTranslate = async () => {
 }
 
 const generalChangesChecked = ref(true);
-const privateChangesChecked = ref(true);
+const draftChangesChecked = ref(true);
 
 const copiedKey = ref<string | null>(null);
 let copyResetTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -211,7 +211,7 @@ const uniqueCustomers = computed(() => {
 })
 
 const shouldShowChangeNote = (change: ChangeNote) => {
-  if (!change.published && !privateChangesChecked.value) {
+  if (!change.published && !draftChangesChecked.value) {
     return false;
   }
 
@@ -286,11 +286,11 @@ const customerFilter = ref<number>(-1);
                   class="h-6 w-fit mr-auto"
                   :variant="releaseNote.published ? 'success' : 'destructive'"
                 >
-                  {{ releaseNote.published ? t('card.published') : t('card.private') }}
+                  {{ releaseNote.published ? t('card.published') : t('card.draft') }}
                 </Badge>
               </TooltipTrigger>
               <TooltipContent>
-                  {{ releaseNote.published ? t('tooltip.publishedNote') : t('tooltip.privateNote') }}
+                  {{ releaseNote.published ? t('tooltip.publishedNote') : t('tooltip.draftNote') }}
               </TooltipContent>
             </Tooltip>
             <Button 
@@ -377,8 +377,8 @@ const customerFilter = ref<number>(-1);
               <Checkbox v-model="generalChangesChecked" class="cursor-pointer"/>
             </div>
             <div class="flex gap-2">
-              <p>{{ t('button.showPrivateChanges') }}</p>
-              <Checkbox v-model="privateChangesChecked" class="cursor-pointer"/>
+              <p>{{ t('button.showDraftChanges') }}</p>
+              <Checkbox v-model="draftChangesChecked" class="cursor-pointer"/>
             </div>
             <div>
               <Select v-model="customerFilter">

@@ -43,7 +43,7 @@
         "translate": "Translate",
         "undo": "Undo",
         "showGeneralChanges": "Show General Changes",
-        "showPrivateChanges": "Show Private Changes",
+        "showDraftChanges": "Show Draft Changes",
         "confirm": "Confirm",
         "summarize": "Summarize",
         "allCustomers": "All customers",
@@ -116,7 +116,7 @@
     },
     "card": {
         "published": "Published",
-        "private": "Private",
+        "draft": "Draft",
         "containsChangeNotes": "no change notes | 1 change note | {count} change notes"
     },
     "input": {
@@ -198,7 +198,7 @@
     "tooltip": {
         "noCommits": "No associated git commits",
         "publishedNote": "Non-administrators can view this note",
-        "privateNote": "Only administrators can view this note",
+        "draftNote": "Only administrators can view this draft",
         "explainSummarize": "Use associated git diffs to summarize",
         "reference": "Open the related Jira ticket",
         "alreadyCommited": "Already committed to Git",

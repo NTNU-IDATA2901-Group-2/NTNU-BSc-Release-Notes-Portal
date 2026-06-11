@@ -43,7 +43,7 @@
         "translate": "Traduire",
         "undo": "Annuler",
         "showGeneralChanges": "Afficher les changements généraux",
-        "showPrivateChanges": "Afficher les changements privés",
+        "showDraftChanges": "Afficher les brouillons",
         "confirm": "Confirmer",
         "summarize": "Résumer",
         "allCustomers": "Tous les clients",
@@ -116,7 +116,7 @@
     },
     "card": {
         "published": "Publié",
-        "private": "Privé",
+        "draft": "Brouillon",
         "containsChangeNotes": "aucune note de changement | 1 note de changement | {count} notes de changement"
     },
     "input": {
@@ -198,7 +198,7 @@
     "tooltip": {
         "noCommits": "Aucun commit git associé",
         "publishedNote": "Les non-administrateurs peuvent voir cette note",
-        "privateNote": "Seuls les administrateurs peuvent voir cette note",
+        "draftNote": "Seuls les administrateurs peuvent voir ce brouillon",
         "explainSummarize": "Utilisez les diffs git associés pour résumer",
         "reference": "Ouvrir le ticket Jira associé",
         "alreadyCommited": "Déjà validé sur Git",

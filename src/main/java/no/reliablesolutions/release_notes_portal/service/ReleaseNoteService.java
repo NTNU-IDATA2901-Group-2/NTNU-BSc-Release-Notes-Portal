@@ -238,11 +238,11 @@ public class ReleaseNoteService {
   }
 
   /**
-   * Publishes an existing release note by its ID. Privates release note if
-   * publish is false.
+   * Publishes an existing release note by its ID. Reverts release note to draft
+   * if publish is false.
    *
    * @param id      the ID of the release note to be published
-   * @param publish a boolean indicating whether to publish (true) or private
+   * @param publish a boolean indicating whether to publish (true) or set as draft
    *                (false) the release note
    * @throws ReleaseNoteNotFoundException if the specified ID does not correspond
    *                                      to an existing

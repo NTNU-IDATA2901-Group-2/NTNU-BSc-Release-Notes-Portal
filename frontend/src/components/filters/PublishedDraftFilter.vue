@@ -6,8 +6,8 @@ const data = {
     published: [
         { val: 'true', name: 'Published' },
     ],
-    private: [
-        { val: 'false', name: 'Private' },
+    draft: [
+        { val: 'false', name: 'Draft' },
     ]
 }
 const { t } = useI18n();
@@ -18,6 +18,6 @@ const { t } = useI18n();
     <div class="flex gap-3 flex-col mt-4">
       <h4 class="text-xl">{{ t('title.status') }}</h4>
         <SingleFilterListItem v-for="option in data.published" :key="option.val" :query-key="'published'" :value="option.val" :label="option.name"/>
-        <SingleFilterListItem v-for="option in data.private" :key="option.val" :query-key="'published'" :value="option.val" :label="option.name"/>
+        <SingleFilterListItem v-for="option in data.draft" :key="option.val" :query-key="'published'" :value="option.val" :label="option.name"/>
     </div>
 </template>

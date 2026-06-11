@@ -298,7 +298,7 @@ public class ChangeNoteService {
    * Alters the published status of a change note by ID to the provided state.
    * 
    * @param id the ID of the change note to change the published status of
-   * @param publish a boolean indicating whether to publish (true) or private (false)
+   * @param publish a boolean indicating whether to publish (true) or set as draft (false)
    * @throws ChangeNoteNotFoundException if no change note with the given ID
    *                                     exists
    */

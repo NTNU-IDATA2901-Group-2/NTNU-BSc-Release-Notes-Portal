@@ -31,11 +31,11 @@ const { t } = useI18n();
               data-pdf-exclude  class="h-6"
               :variant="releaseNote.published ? 'success' : 'destructive'"
             >
-              {{ releaseNote.published ? t('card.published') : t('card.private') }}
+              {{ releaseNote.published ? t('card.published') : t('card.draft') }}
             </Badge>
           </TooltipTrigger>
           <TooltipContent>
-              {{ releaseNote.published ? t('tooltip.publishedNote') : t('tooltip.privateNote') }}
+              {{ releaseNote.published ? t('tooltip.publishedNote') : t('tooltip.draftNote') }}
           </TooltipContent>
         </Tooltip>
       </div>

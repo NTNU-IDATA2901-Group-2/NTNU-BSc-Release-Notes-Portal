@@ -5,7 +5,7 @@ import ChangeNoteCard from '@/components/ChangeNoteCard.vue';
 import CustomerFilter from '@/components/filters/CustomerFilter.vue';
 import FeatureFilter from '@/components/filters/FeatureFilter.vue';
 import ProductFilter from '@/components/filters/ProductFilter.vue';
-import PublicPrivateFilter from '@/components/filters/PublicPrivateFilter..vue';
+import PublishedDraftFilter from '@/components/filters/PublishedDraftFilter.vue';
 import ScopeFilter from '@/components/filters/ScopeFilter.vue';
 import MultiselectChangeNotes from '@/components/MultiselectChangeNotes.vue';
 import Button from '@/components/ui/button/Button.vue';
@@ -137,7 +137,7 @@ const onSearch = () => {
         <Button class="mt-4" variant="outline" @click="clearFilters">{{ t('button.clearFilters')
         }}</Button>
         <AllocatedFilter v-if="isAdmin" />
-        <PublicPrivateFilter v-if="isAdmin"/>
+        <PublishedDraftFilter v-if="isAdmin"/>
         <ProductFilter />
         <ScopeFilter />
         <FeatureFilter />
@@ -150,7 +150,7 @@ const onSearch = () => {
         <ScrollArea class="h-[80vh] hidden md:block">
           <h1 class="text-3xl text-nowrap">{{ t('title.changeNotes') }}</h1>
           <AllocatedFilter v-if="isAdmin" />
-          <PublicPrivateFilter v-if="isAdmin"/>
+          <PublishedDraftFilter v-if="isAdmin"/>
           <ProductFilter />
           <ScopeFilter />
           <FeatureFilter />

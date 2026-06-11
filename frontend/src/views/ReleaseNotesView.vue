@@ -10,7 +10,7 @@ import { computed, provide, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ScrollArea from '@/components/ui/scroll-area/ScrollArea.vue';
 import ProductFilter from '@/components/filters/ProductFilter.vue';
-import PublicPrivateFilter from '@/components/filters/PublicPrivateFilter..vue';
+import PublishedDraftFilter from '@/components/filters/PublishedDraftFilter.vue';
 import { useRouter } from 'vue-router';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 import { isAdmin } from '@/utils/keycloak';
@@ -79,7 +79,7 @@ const createReleaseNoteMutation = useCreateReleaseNote({
         <Button class="mt-4" variant="outline" @click="clearFilters">{{ t('button.clearFilters')
         }}</Button>
         <ProductFilter />
-        <PublicPrivateFilter />
+        <PublishedDraftFilter />
         <DateRangeFilter />
       </div>
     </DrawerContent>
@@ -88,7 +88,7 @@ const createReleaseNoteMutation = useCreateReleaseNote({
         <div class="h-min hidden md:block">
           <h1 class="text-3xl text-nowrap">{{ t('title.releaseNotes') }}</h1>
           <ProductFilter />
-          <PublicPrivateFilter v-if="isAdmin"/>
+          <PublishedDraftFilter v-if="isAdmin"/>
           <DateRangeFilter />
           <Button class="mt-4" variant="outline" @click="clearFilters">{{ t('button.clearFilters')
           }}</Button>
