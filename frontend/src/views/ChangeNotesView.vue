@@ -40,7 +40,7 @@ const initialSelection = new URL(globalThis.location.href).searchParams.get('sel
 const selectedChangeNotes = ref<number[]>(initialSelection.split(',').map(id => Number.parseInt(id)).filter(id => !Number.isNaN(id)));
 const selectionString = computed(() => selectedChangeNotes.value.join(','));
 
-const { params, single, csv, date, match, clear } = useSearchParams(router, {
+const { params, single, csv, match, clear } = useSearchParams(router, {
   exclude: ['selection'],
   extraQuery: () => {
     const extra: Record<string, string> = {};
@@ -61,8 +61,8 @@ const customerIds = csv('customerIds');
 const includeUnassignedCustomer = match('includeUnassignedCustomer', 'true');
 const published = single('published');
 const hasReleaseNote = match('hasReleaseNote', 'false');
-const fromDate = date('fromDate');
-const toDate = date('toDate');
+const fromDate = single('fromDate');
+const toDate = single('toDate');
 
 // Preserve the AllocatedFilter default: "unallocated" is pre-selected for admins.
 if (isAdmin.value && params.value.hasReleaseNote === undefined) {

@@ -73,6 +73,8 @@
         "releaseTimeline": "Release Timeline",
         "previewAvailableFrom": "Preview available from",
         "recommendedTestPhase": "Recommended test phase",
+        "recommendedTestPhaseFrom": "Recommended test phase from",
+        "recommendedTestPhaseTo": "Recommended test phase to",
         "plannedProductionDeployment": "Planned production deployment"
     },
     "toast": {

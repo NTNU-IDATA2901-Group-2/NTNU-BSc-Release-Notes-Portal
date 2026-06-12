@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { DateValue } from '@internationalized/date'
-import { DateFormatter, getLocalTimeZone, today } from '@internationalized/date'
+import { CalendarDate, getLocalTimeZone, today } from '@internationalized/date'
 
 import { CalendarIcon } from '@lucide/vue'
 import { cn } from '@/utils/utils'
@@ -14,13 +14,24 @@ import {
 import { getLocaleDateString } from '@/utils/format-date'
 
 const defaultPlaceholder = today(getLocalTimeZone())
-const date = defineModel<DateValue | undefined>()
+
+const model = defineModel<string | undefined>()
 
 defineProps<{
   placeholder: string
-  min?: DateValue
-  max?: DateValue
+  min?: string
+  max?: string
 }>()
+
+const toCalendarDate = (value: string | undefined): CalendarDate | undefined => {
+  if (!value) return undefined
+  const date = new Date(value)
+  return new CalendarDate(date.getFullYear(), date.getMonth() + 1, date.getDate())
+}
+
+const onUpdate = (value: DateValue | undefined) => {
+  model.value = value?.toString()
+}
 </script>
 
 <template>
@@ -31,18 +42,18 @@ defineProps<{
         :class="cn('w-50 justify-start text-left font-normal')"
       >
         <CalendarIcon />
-        {{ date ? getLocaleDateString(date.toString()) : placeholder }}
+        {{ model ? getLocaleDateString(model) : placeholder }}
       </Button>
     </PopoverTrigger>
     <PopoverContent class="w-auto p-0" align="start">
       <Calendar
-        v-model="date"
+        :model-value="toCalendarDate(model)"
         :default-placeholder="defaultPlaceholder"
-        :min-value="min"
-        :max-value="max"
+        :min-value="toCalendarDate(min)"
+        :max-value="toCalendarDate(max)"
         layout="month-and-year"
         initial-focus
-        @update:model-value="close"
+        @update:model-value="(value) => { onUpdate(value); close() }"
       />
     </PopoverContent>
   </Popover>

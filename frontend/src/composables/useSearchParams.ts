@@ -1,6 +1,5 @@
 import { computed, ref, watch, type Ref, type WritableComputedRef } from 'vue'
 import type { Router } from 'vue-router'
-import { CalendarDate, type DateValue } from '@internationalized/date'
 
 export type SearchParams = Record<string, string>
 
@@ -9,13 +8,6 @@ interface UseSearchParamsOptions {
   exclude?: string[]
   /** Extra entries merged into the URL only (never into params). Re-evaluated reactively. */
   extraQuery?: () => SearchParams
-}
-
-/** Parses a `yyyy-MM-dd` (or any Date-parseable) query value into a CalendarDate. */
-export function parseParamDate(value?: string): CalendarDate | undefined {
-  if (!value) return undefined
-  const jsDate = new Date(value)
-  return new CalendarDate(jsDate.getFullYear(), jsDate.getMonth() + 1, jsDate.getDate())
 }
 
 /**
@@ -67,14 +59,6 @@ export function useSearchParams(router: Router, options: UseSearchParamsOptions 
     })
   }
 
-  /** A `yyyy-MM-dd` date, e.g. `fromDate`. */
-  function date(key: string): WritableComputedRef<DateValue | undefined> {
-    return computed({
-      get: () => parseParamDate(params.value[key]),
-      set: (value) => setKey(key, value ? value.toString() : undefined),
-    })
-  }
-
   /** A boolean expressed as the presence of a specific value, e.g. `hasReleaseNote=false`. */
   function match(key: string, value: string): WritableComputedRef<boolean> {
     return computed({
@@ -87,5 +71,5 @@ export function useSearchParams(router: Router, options: UseSearchParamsOptions 
     params.value = {}
   }
 
-  return { params, single, csv, date, match, setKey, clear }
+  return { params, single, csv, match, setKey, clear }
 }

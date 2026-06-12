@@ -74,6 +74,8 @@
         "releaseTimeline": "Utgivelsestidslinje",
         "previewAvailableFrom": "Forhåndsvisning tilgjengelig fra",
         "recommendedTestPhase": "Anbefalt testperiode",
+        "recommendedTestPhaseFrom": "Anbefalt testperiode fra",
+        "recommendedTestPhaseTo": "Anbefalt testperiode til",
         "plannedProductionDeployment": "Planlagt produksjonssetting"
     },
     "toast": {

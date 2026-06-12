@@ -5,6 +5,12 @@ export const EditReleaseNoteSchema = z.object({
   summary: z.string().optional(),
   changeNoteIds: z.array(z.number()).optional(),
   published: z.boolean(),
+  releaseTimeline: z.object({
+    previewAvailableFrom: z.string().optional(),
+    recommendedTestPhaseFrom: z.string().optional(),
+    recommendedTestPhaseTo: z.string().optional(),
+    plannedProductionDeployment: z.string().optional(),
+  }).optional()
 })
 
 export const EditChangeNoteSchema = z.object({

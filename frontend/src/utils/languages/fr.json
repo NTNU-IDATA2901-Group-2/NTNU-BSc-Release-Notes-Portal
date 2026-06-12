@@ -73,6 +73,8 @@
         "releaseTimeline": "Calendrier de version",
         "previewAvailableFrom": "Aperçu disponible à partir du",
         "recommendedTestPhase": "Phase de test recommandée",
+        "recommendedTestPhaseFrom": "Phase de test recommandée à partir du",
+        "recommendedTestPhaseTo": "Phase de test recommandée jusqu'au",
         "plannedProductionDeployment": "Mise en production prévue"
     },
     "toast": {

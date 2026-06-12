@@ -30,13 +30,13 @@ const { t } = useI18n();
 const selectedItems = ref<number[]>([]);
 
 const router = useRouter();
-const { params, single, csv, date, match, clear } = useSearchParams(router);
+const { params, single, csv, match, clear } = useSearchParams(router);
 
 const productIds = csv('productIds');
 const includeUnassignedProduct = match('includeUnassignedProduct', 'true');
 const published = single('published');
-const fromDate = date('fromDate');
-const toDate = date('toDate');
+const fromDate = single('fromDate');
+const toDate = single('toDate');
 
 const pageIndex = ref(params.value.page ? parseInt(params.value.page) : 0);
 const pageSize = ref(params.value.size ? parseInt(params.value.size) : 10);

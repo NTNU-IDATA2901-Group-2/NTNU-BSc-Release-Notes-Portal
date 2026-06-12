@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import type { DateValue } from '@internationalized/date';
 import DatePicker from '../DatePicker.vue';
 
-const from = defineModel<DateValue | undefined>('from');
-const to = defineModel<DateValue | undefined>('to');
+const from = defineModel<string | undefined>('from');
+const to = defineModel<string | undefined>('to');
 
 const { t } = useI18n();
 </script>

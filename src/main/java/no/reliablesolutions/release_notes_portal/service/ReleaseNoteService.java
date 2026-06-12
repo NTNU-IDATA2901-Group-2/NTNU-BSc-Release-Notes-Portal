@@ -243,6 +243,14 @@ public class ReleaseNoteService {
     releaseNote.setTag(createReleaseNoteDTO.tag());
     releaseNote.setSummary(createReleaseNoteDTO.summary());
     releaseNote.setPublished(createReleaseNoteDTO.published());
+    releaseNote.setReleaseTimeline(createReleaseNoteDTO.releaseTimeline() != null
+        ? new ReleaseTimeline(
+            createReleaseNoteDTO.releaseTimeline().getPreviewAvailableFrom(),
+            createReleaseNoteDTO.releaseTimeline().getRecommendedTestPhaseFrom(),
+            createReleaseNoteDTO.releaseTimeline().getRecommendedTestPhaseTo(),
+            createReleaseNoteDTO.releaseTimeline().getPlannedProductionDeployment()
+        )
+        : null);
 
     releaseNoteRepository.save(releaseNote);
     return ReleaseNoteMapper.toDTO(releaseNote, AccessScopeFactory.fromCurrentUser());

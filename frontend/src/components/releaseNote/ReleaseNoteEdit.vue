@@ -25,7 +25,6 @@ import DialogPrompt from '../DialogPrompt.vue';
 import { useGetGitRepositories } from '@/api/git-repository-api';
 import Spinner from '../ui/spinner/Spinner.vue';
 import DatePicker from '../DatePicker.vue';
-import type { DateValue } from 'reka-ui';
 
 const { t } = useI18n();
 
@@ -138,6 +137,12 @@ const onSubmit = form.handleSubmit((values) => {
     const payload = {
       ...values,
       changeNoteIds: changeNoteIdsWithinReleaseNote.value,
+      releaseTimeline: {
+        previewAvailableFrom: previewAvailableFrom.value,
+        recommendedTestPhaseFrom: recommendedTestPhaseFrom.value,
+        recommendedTestPhaseTo: recommendedTestPhaseTo.value,
+        plannedProductionDeployment: plannedProductionDeployment.value,
+      },
     }
     updateReleaseNoteMutation.mutate({ id: releaseNote.id, dto: payload });
   }
@@ -174,10 +179,11 @@ onBeforeUnmount(() => {
   globalThis.removeEventListener('beforeunload', beforeUnloadListener);
 })
 
-const previewAvailableFrom = defineModel<DateValue | undefined>('previewAvailableFrom');
-const recommendedTestPhaseFrom = defineModel<DateValue | undefined>('recommendedTestPhaseFrom');
-const recommendedTestPhaseTo = defineModel<DateValue | undefined>('recommendedTestPhaseTo');
-const plannedProductionDeployment = defineModel<DateValue | undefined>('plannedProductionDeployment');
+const releaseTimeline = releaseNote.releaseTimeline
+const previewAvailableFrom = ref<string | undefined>(releaseTimeline?.previewAvailableFrom);
+const recommendedTestPhaseFrom = ref<string | undefined>(releaseTimeline?.recommendedTestPhaseFrom);
+const recommendedTestPhaseTo = ref<string | undefined>(releaseTimeline?.recommendedTestPhaseTo);
+const plannedProductionDeployment = ref<string | undefined>(releaseTimeline?.plannedProductionDeployment);
 
 </script>
 
@@ -272,26 +278,17 @@ const plannedProductionDeployment = defineModel<DateValue | undefined>('plannedP
             class="w-full" v-model="summary"
               :placeholder="t('placeholder.description')" />
           </div>
-          <div class="flex flex-col gap-1 w-[60%]">
+          <div class="flex flex-col gap-1">
             <h1 class="text-lg">{{ t('title.releaseTimeline') }}</h1>
-            <div class="flex flex-col gap-4">
-              <div class="flex flex-row gap-2 justify-between items-center">
-                <p>{{ `${t('title.previewAvailableFrom')}:` }}</p>
-                <DatePicker v-model="previewAvailableFrom" :placeholder="t('placeholder.toBeDetermined')"/>
-              </div>
-              <div class="flex flex-row gap-2 justify-between items-center">
-                <p>{{ `${t('title.plannedProductionDeployment')}:` }}</p>
-                <DatePicker v-model="plannedProductionDeployment" :placeholder="t('placeholder.toBeDetermined')"/>
-              </div>
-              <div class="flex flex-col gap-2 justify-between items-start">
-                <div class="flex flex-row gap-2 justify-between w-full items-center ">
-                  <p class="flex-1">{{ `${t('title.recommendedTestPhase')}:` }}</p>
-                  <DatePicker v-model="recommendedTestPhaseFrom" :placeholder="t('placeholder.toBeDetermined')"/>
-                </div>
-                <div class="ml-auto" >
-                  <DatePicker v-model="recommendedTestPhaseTo" :placeholder="t('placeholder.toBeDetermined')"/>
-                </div>
-              </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 w-fit">
+              <p class="self-center">{{ `${t('title.previewAvailableFrom')}:` }}</p>
+              <DatePicker v-model="previewAvailableFrom" :placeholder="t('placeholder.toBeDetermined')"/>
+              <p class="self-center">{{ `${t('title.recommendedTestPhaseFrom')}:` }}</p>
+              <DatePicker v-model="recommendedTestPhaseFrom" :max="recommendedTestPhaseTo" :placeholder="t('placeholder.toBeDetermined')"/>
+              <p class="self-center">{{ `${t('title.recommendedTestPhaseTo')}:` }}</p>
+              <DatePicker v-model="recommendedTestPhaseTo" :min="recommendedTestPhaseFrom" :placeholder="t('placeholder.toBeDetermined')"/>
+              <p class="self-center">{{ `${t('title.plannedProductionDeployment')}:` }}</p>
+              <DatePicker v-model="plannedProductionDeployment" :placeholder="t('placeholder.toBeDetermined')"/>
             </div>
           </div>
         </div>
