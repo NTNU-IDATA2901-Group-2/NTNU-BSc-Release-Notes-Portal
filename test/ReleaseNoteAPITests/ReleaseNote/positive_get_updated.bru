@@ -1,7 +1,7 @@
 meta {
   name: positive_get_updated
   type: http
-  seq: 38
+  seq: 39
 }
 
 get {
@@ -20,6 +20,10 @@ assert {
   res.body.tag: eq updated
   res.body.summary: eq updated
   res.body.published: eq true
+  res.body.releaseTimeline.previewAvailableFrom: eq 2026-07-01
+  res.body.releaseTimeline.recommendedTestPhaseFrom: eq 2026-07-08
+  res.body.releaseTimeline.recommendedTestPhaseTo: eq 2026-07-15
+  res.body.releaseTimeline.plannedProductionDeployment: eq 2026-08-01
 }
 
 settings {
