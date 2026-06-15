@@ -77,7 +77,18 @@
         "recommendedTestPhaseFrom": "Recommended test phase from",
         "recommendedTestPhaseTo": "Recommended test phase to",
         "plannedProductionDeployment": "Planned production deployment",
-        "knownLimitations": "Known Limitations"
+        "knownLimitations": "Known Limitations",
+        "changeImpacts": "Overview of changes and expected impact",
+        "whatIsChanged": "What is changed",
+        "whatShouldBeTested": "What should be tested",
+        "testingNeed": "Testing need"
+    },
+    "testingNeeds": {
+        "low": "Low",
+        "low_medium": "Low-medium",
+        "medium": "Medium",
+        "medium_high": "Medium-high",
+        "high": "High"
     },
     "toast": {
         "changeNoteDeleted": "Change note deleted successfully",
@@ -162,7 +173,9 @@
         "reference": "Reference",
         "toBeDetermined": "To be determined",
         "knownLimitation": "Limitation",
-        "noKnownLimitations": "No known limitations"
+        "noKnownLimitations": "No known limitations",
+        "filterByCustomer": "Filter by customer",
+        "noResults": "No results"
     },
     "repositories": {
         "title": "Git Repositories",

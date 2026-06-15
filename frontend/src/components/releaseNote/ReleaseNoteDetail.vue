@@ -31,6 +31,7 @@ import ScrollArea from '../ui/scroll-area/ScrollArea.vue';
 import { getLabelFromChangeNote } from '@/utils/change-note.ts';
 import { useSyncReleaseNoteToGit } from '@/api/git-repository-api.ts';
 import { getLocaleDateString } from '@/utils/format-date.ts';
+import ChangeImpactTable from '../ChangeImpactTable.vue';
 
 const props = defineProps<{
   releaseNote: ReleaseNote;
@@ -407,6 +408,13 @@ const customerFilter = ref<number>(-1);
         <template v-if="isAdmin">
           <Separator class="w-full h-2" />
           <div class="flex flex-col gap-4 w-full">
+            <h2 class="text-3xl truncate max-w-full leading-normal">{{ t('title.changeImpacts') }}</h2>
+            <ChangeImpactTable :data="releaseNote.changeImpacts"/>
+          </div>
+        </template>
+        <template v-if="isAdmin">
+          <Separator class="w-full h-2" />
+          <div class="flex flex-col gap-4 w-full">
             <h2 class="text-3xl truncate max-w-full leading-normal">{{ t('title.knownLimitations') }}</h2>
             <ul v-if="releaseNote.knownLimitations?.length" class="list-disc pl-6 flex flex-col gap-2">
               <li v-for="(limitation, index) in releaseNote.knownLimitations" :key="index">
@@ -433,7 +441,7 @@ const customerFilter = ref<number>(-1);
             <div>
               <Select v-model="customerFilter">
                 <SelectTrigger class="w-42">
-                  <SelectValue placeholder="Filter by customer"/>
+                  <SelectValue :placeholder="t('placeholder.filterByCustomer')"/>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>

@@ -61,7 +61,7 @@ INSERT INTO release_note (id, archived, published, synced_to_git, created_at, su
 (40, false, false, false, to_timestamp(1771654100), 'Optimized cache invalidation behavior to reduce stale data windows and improve consistency after edits.', 'v2.4.2', NULL, NULL, NULL, NULL)
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO change_impact (id, release_note_id, position, scope_id, what_is_changed, what_should_be_tested, testing_need) VALUES
+INSERT INTO change_impact (id, release_note_id, position, feature_id, what_is_changed, what_should_be_tested, testing_need) VALUES
 (1, 1, 0, 3, 'Introduced the core release note management module, including creating, editing, and publishing release notes.', 'Verify full create/edit/publish lifecycle and that published notes are visible to end users.', 'HIGH'),
 (2, 1, 1, 2, 'Added the ability to link change notes to a release note.', 'Confirm change notes can be attached and detached, and that links survive an edit.', 'MEDIUM'),
 (3, 5, 0, 1, 'Reduced API latency through query tuning on the release note list endpoints.', 'Load test the list endpoints with large datasets and compare response times against the previous version.', 'MEDIUM_HIGH'),

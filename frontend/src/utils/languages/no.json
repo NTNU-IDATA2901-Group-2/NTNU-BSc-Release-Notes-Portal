@@ -78,7 +78,18 @@
         "recommendedTestPhaseFrom": "Anbefalt testperiode fra",
         "recommendedTestPhaseTo": "Anbefalt testperiode til",
         "plannedProductionDeployment": "Planlagt produksjonssetting",
-        "knownLimitations": "Kjente begrensninger"
+        "knownLimitations": "Kjente begrensninger",
+        "changeImpacts": "Oversikt over endringer og forventet påvirkning",
+        "whatIsChanged": "Hva er endret",
+        "whatShouldBeTested": "Hva bør testes",
+        "testingNeed": "Testbehov"
+    },
+    "testingNeeds": {
+        "low": "Lav",
+        "low_medium": "Lav-middels",
+        "medium": "Middels",
+        "medium_high": "Middels-høy",
+        "high": "Høy"
     },
     "toast": {
         "changeNoteDeleted": "Endringsnotat slettet",
@@ -163,7 +174,9 @@
         "reference": "Referanse",
         "toBeDetermined": "Ikke fastsatt",
         "knownLimitation": "Begrensning",
-        "noKnownLimitations": "Ingen kjente begrensninger"
+        "noKnownLimitations": "Ingen kjente begrensninger",
+        "filterByCustomer": "Filtrer etter kunde",
+        "noResults": "Ingen resultater"
     },
     "repositories": {
         "title": "Git Repositorier",

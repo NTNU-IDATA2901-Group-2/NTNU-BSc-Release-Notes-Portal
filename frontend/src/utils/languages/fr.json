@@ -77,7 +77,18 @@
         "recommendedTestPhaseFrom": "Phase de test recommandée à partir du",
         "recommendedTestPhaseTo": "Phase de test recommandée jusqu'au",
         "plannedProductionDeployment": "Mise en production prévue",
-        "knownLimitations": "Limitations connues"
+        "knownLimitations": "Limitations connues",
+        "changeImpacts": "Aperçu des changements et de l'impact attendu",
+        "whatIsChanged": "Ce qui a changé",
+        "whatShouldBeTested": "Ce qui doit être testé",
+        "testingNeed": "Besoin de test"
+    },
+    "testingNeeds": {
+        "low": "Faible",
+        "low_medium": "Faible-moyen",
+        "medium": "Moyen",
+        "medium_high": "Moyen-élevé",
+        "high": "Élevé"
     },
     "toast": {
         "changeNoteDeleted": "Note de changement supprimée avec succès",
@@ -162,7 +173,9 @@
         "reference": "Référence",
         "toBeDetermined": "À déterminer",
         "knownLimitation": "Limitation",
-        "noKnownLimitations": "Aucune limitation connue"
+        "noKnownLimitations": "Aucune limitation connue",
+        "filterByCustomer": "Filtrer par client",
+        "noResults": "Aucun résultat"
     },
     "repositories": {
         "title": "Dépôts Git",

@@ -4,11 +4,11 @@ import no.reliablesolutions.release_notes_portal.domain.entity.ChangeImpact;
 import no.reliablesolutions.release_notes_portal.domain.entity.ChangeImpact.TestingNeed;
 
 /**
- * A data transfer object for representing the impact a change has on a scope.
+ * A data transfer object for representing the impact a change has on a feature.
  */
 public record ChangeImpactDTO(
     long id,
-    ScopeDTO scope,
+    FeatureDTO feature,
     String whatIsChanged,
     String whatShouldBeTested,
     TestingNeed testingNeed) {
@@ -22,7 +22,7 @@ public record ChangeImpactDTO(
   public static ChangeImpactDTO fromEntity(ChangeImpact changeImpact) {
     return new ChangeImpactDTO(
         changeImpact.getId(),
-        changeImpact.getScope() != null ? ScopeDTO.fromScope(changeImpact.getScope()) : null,
+        changeImpact.getFeature() != null ? FeatureDTO.fromFeature(changeImpact.getFeature()) : null,
         changeImpact.getWhatIsChanged(),
         changeImpact.getWhatShouldBeTested(),
         changeImpact.getTestingNeed());
