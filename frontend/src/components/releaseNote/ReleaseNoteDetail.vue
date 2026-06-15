@@ -375,29 +375,44 @@ const customerFilter = ref<number>(-1);
           <div class="flex flex-col gap-4">
             <span class="flex flex-row gap-2">
               <p class="text-md">{{ `${t('title.previewAvailableFrom')}: ` }}</p>
-              <p>
-                {{ releaseNote.releaseTimeline?.previewAvailableFrom ?
-                getLocaleDateString(releaseNote.releaseTimeline.previewAvailableFrom) :
-                t('placeholder.toBeDetermined') }}
+              <p v-if="releaseNote.releaseTimeline?.previewAvailableFrom">
+                {{ getLocaleDateString(releaseNote.releaseTimeline.previewAvailableFrom) }}
               </p>
+              <p v-else class="text-text-primary/50">{{ t('placeholder.toBeDetermined') }}</p>
             </span>
             <span class="flex flex-row gap-2">
               <p class="text-md">{{ `${t('title.recommendedTestPhase')}: ` }}</p>
-              <p>
-                {{ releaseNote.releaseTimeline ? 
-                `${releaseNote.releaseTimeline.recommendedTestPhaseFrom ? getLocaleDateString(releaseNote.releaseTimeline.recommendedTestPhaseFrom) : t('placeholder.toBeDetermined')} -
-                 ${releaseNote.releaseTimeline.recommendedTestPhaseTo ? getLocaleDateString(releaseNote.releaseTimeline.recommendedTestPhaseTo) : t('placeholder.toBeDetermined')}` : t('placeholder.toBeDetermined') }}
-              </p>
+              <p v-if="!releaseNote.releaseTimeline" class="text-text-primary/50">{{ t('placeholder.toBeDetermined') }}</p>
+              <template v-else>
+                <p v-if="releaseNote.releaseTimeline.recommendedTestPhaseFrom">
+                  {{ getLocaleDateString(releaseNote.releaseTimeline.recommendedTestPhaseFrom) }}
+                </p>
+                <p v-else class="text-text-primary/50">{{ t('placeholder.toBeDetermined') }}</p>
+                <p>-</p>
+                <p v-if="releaseNote.releaseTimeline.recommendedTestPhaseTo">
+                  {{ getLocaleDateString(releaseNote.releaseTimeline.recommendedTestPhaseTo) }}
+                </p>
+                <p v-else class="text-text-primary/50">{{ t('placeholder.toBeDetermined') }}</p>
+              </template>
             </span>
             <span class="flex flex-row gap-2">
               <p class="text-md">{{ `${t('title.plannedProductionDeployment')}: ` }}</p>
-              <p>
-                {{ releaseNote.releaseTimeline?.plannedProductionDeployment ?
-                getLocaleDateString(releaseNote.releaseTimeline.plannedProductionDeployment) :
-                t('placeholder.toBeDetermined') }}
+              <p v-if="releaseNote.releaseTimeline?.plannedProductionDeployment">
+                {{ getLocaleDateString(releaseNote.releaseTimeline.plannedProductionDeployment) }}
               </p>
+              <p v-else class="text-text-primary/50">{{ t('placeholder.toBeDetermined') }}</p>
             </span>
           </div>
+        </div>
+        <Separator class="w-full h-2" />
+        <div class="flex flex-col gap-4 w-full">
+          <h2 class="text-3xl truncate max-w-full leading-normal">{{ t('title.knownLimitations') }}</h2>
+          <ul v-if="releaseNote.knownLimitations?.length" class="list-disc pl-6 flex flex-col gap-2">
+            <li v-for="(limitation, index) in releaseNote.knownLimitations" :key="index">
+              {{ limitation }}
+            </li>
+          </ul>
+          <p v-else class="text-text-primary/50">{{ t('placeholder.noKnownLimitations') }}</p>
         </div>
       </div>
       <Separator class="w-full h-2" />

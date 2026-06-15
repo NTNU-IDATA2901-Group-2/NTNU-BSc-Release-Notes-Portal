@@ -14,5 +14,6 @@ public record ReleaseNoteDTO(
     boolean published,
     Instant createdAt,
     boolean syncedToGit,
-    ReleaseTimelineDTO releaseTimeline) {
+    ReleaseTimelineDTO releaseTimeline,
+    List<String> knownLimitations) {
 }

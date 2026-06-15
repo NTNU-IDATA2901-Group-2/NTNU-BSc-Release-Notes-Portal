@@ -49,7 +49,8 @@
         "allCustomers": "All customers",
         "updateRange": "Update Range",
         "clearChangeNotes": "Clear change notes",
-        "commitToGit": "Commit to Git"
+        "commitToGit": "Commit to Git",
+        "addKnownLimitation": "Add limitation"
     },
     "title": {
         "title": "Title",
@@ -75,7 +76,8 @@
         "recommendedTestPhase": "Recommended test phase",
         "recommendedTestPhaseFrom": "Recommended test phase from",
         "recommendedTestPhaseTo": "Recommended test phase to",
-        "plannedProductionDeployment": "Planned production deployment"
+        "plannedProductionDeployment": "Planned production deployment",
+        "knownLimitations": "Known Limitations"
     },
     "toast": {
         "changeNoteDeleted": "Change note deleted successfully",
@@ -158,7 +160,9 @@
         "noTitle": "No title",
         "noDescription": "No description",
         "reference": "Reference",
-        "toBeDetermined": "To be determined"
+        "toBeDetermined": "To be determined",
+        "knownLimitation": "Limitation",
+        "noKnownLimitations": "No known limitations"
     },
     "repositories": {
         "title": "Git Repositories",

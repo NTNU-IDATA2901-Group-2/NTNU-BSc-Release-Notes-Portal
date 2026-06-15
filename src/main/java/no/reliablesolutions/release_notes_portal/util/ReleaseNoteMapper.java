@@ -56,7 +56,8 @@ public class ReleaseNoteMapper {
         releaseNote.getPublished(),
         releaseNote.getCreatedAt(),
         releaseNote.getSyncedToGit(),
-        ReleaseTimelineDTO.fromEntity(releaseNote.getReleaseTimeline()));
+        ReleaseTimelineDTO.fromEntity(releaseNote.getReleaseTimeline()),
+        releaseNote.getKnownLimitations());
   }
 
 }

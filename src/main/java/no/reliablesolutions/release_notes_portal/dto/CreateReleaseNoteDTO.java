@@ -10,6 +10,7 @@ public record CreateReleaseNoteDTO(
     String tag,
     String summary,
     Boolean published,
-    ReleaseTimelineDTO releaseTimeline) {
+    ReleaseTimelineDTO releaseTimeline,
+    List<String> knownLimitations) {
 
 }

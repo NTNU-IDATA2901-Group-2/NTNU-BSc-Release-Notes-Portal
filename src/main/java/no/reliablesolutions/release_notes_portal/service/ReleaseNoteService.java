@@ -64,6 +64,10 @@ public class ReleaseNoteService {
     releaseNote.setSummary(createReleaseNoteDTO.summary());
     releaseNote.setPublished(createReleaseNoteDTO.published() != null && createReleaseNoteDTO.published());
 
+    if (createReleaseNoteDTO.knownLimitations() != null) {
+      releaseNote.setKnownLimitations(new ArrayList<>(createReleaseNoteDTO.knownLimitations()));
+    }
+
     List<ChangeNote> changeNotesInReleaseNote = new ArrayList<>();
     if (createReleaseNoteDTO.changeNoteIds() != null) {
       for (Long changeNoteId : createReleaseNoteDTO.changeNoteIds()) {
@@ -251,6 +255,11 @@ public class ReleaseNoteService {
             createReleaseNoteDTO.releaseTimeline().getPlannedProductionDeployment()
         )
         : null);
+
+    releaseNote.getKnownLimitations().clear();
+    if (createReleaseNoteDTO.knownLimitations() != null) {
+      releaseNote.getKnownLimitations().addAll(createReleaseNoteDTO.knownLimitations());
+    }
 
     releaseNoteRepository.save(releaseNote);
     return ReleaseNoteMapper.toDTO(releaseNote, AccessScopeFactory.fromCurrentUser());

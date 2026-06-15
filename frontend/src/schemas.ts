@@ -10,7 +10,8 @@ export const EditReleaseNoteSchema = z.object({
     recommendedTestPhaseFrom: z.string().optional(),
     recommendedTestPhaseTo: z.string().optional(),
     plannedProductionDeployment: z.string().optional(),
-  }).optional()
+  }).optional(),
+  knownLimitations: z.array(z.string()).optional()
 })
 
 export const EditChangeNoteSchema = z.object({

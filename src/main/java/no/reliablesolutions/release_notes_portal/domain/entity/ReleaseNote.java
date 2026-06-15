@@ -1,9 +1,11 @@
 package no.reliablesolutions.release_notes_portal.domain.entity;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OrderColumn;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -46,4 +49,9 @@ public class ReleaseNote {
 
   @Embedded
   private ReleaseTimeline releaseTimeline;
+
+  @ElementCollection
+  @OrderColumn(name = "position")
+  @Column(name = "limitation", columnDefinition = "TEXT")
+  private List<String> knownLimitations = new ArrayList<>();
 }

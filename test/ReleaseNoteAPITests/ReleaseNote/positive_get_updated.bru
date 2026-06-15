@@ -24,6 +24,9 @@ assert {
   res.body.releaseTimeline.recommendedTestPhaseFrom: eq 2026-07-08
   res.body.releaseTimeline.recommendedTestPhaseTo: eq 2026-07-15
   res.body.releaseTimeline.plannedProductionDeployment: eq 2026-08-01
+  res.body.knownLimitations: length 2
+  res.body.knownLimitations[0]: eq limitation-one
+  res.body.knownLimitations[1]: eq limitation-two
 }
 
 settings {

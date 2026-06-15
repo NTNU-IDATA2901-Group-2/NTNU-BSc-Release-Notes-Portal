@@ -49,7 +49,8 @@
         "allCustomers": "Tous les clients",
         "updateRange": "Mettre à jour la plage",
         "clearChangeNotes": "Effacer les notes de changement",
-        "commitToGit": "Valider sur Git"
+        "commitToGit": "Valider sur Git",
+        "addKnownLimitation": "Ajouter une limitation"
     },
     "title": {
         "title": "Titre",
@@ -75,7 +76,8 @@
         "recommendedTestPhase": "Phase de test recommandée",
         "recommendedTestPhaseFrom": "Phase de test recommandée à partir du",
         "recommendedTestPhaseTo": "Phase de test recommandée jusqu'au",
-        "plannedProductionDeployment": "Mise en production prévue"
+        "plannedProductionDeployment": "Mise en production prévue",
+        "knownLimitations": "Limitations connues"
     },
     "toast": {
         "changeNoteDeleted": "Note de changement supprimée avec succès",
@@ -158,7 +160,9 @@
         "noTitle": "Sans titre",
         "noDescription": "Aucune description",
         "reference": "Référence",
-        "toBeDetermined": "À déterminer"
+        "toBeDetermined": "À déterminer",
+        "knownLimitation": "Limitation",
+        "noKnownLimitations": "Aucune limitation connue"
     },
     "repositories": {
         "title": "Dépôts Git",

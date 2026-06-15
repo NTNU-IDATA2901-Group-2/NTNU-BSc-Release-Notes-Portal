@@ -8,7 +8,7 @@ import { onBeforeUnmount, onMounted, computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { toast } from 'vue-sonner';
 import { Button } from '../ui/button';
-import { ArrowLeft, Ban, Save, Sparkles } from 'lucide-vue-next';
+import { ArrowLeft, Ban, Plus, Save, Sparkles, Trash2 } from 'lucide-vue-next';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../ui/breadcrumb';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
@@ -143,6 +143,7 @@ const onSubmit = form.handleSubmit((values) => {
         recommendedTestPhaseTo: recommendedTestPhaseTo.value,
         plannedProductionDeployment: plannedProductionDeployment.value,
       },
+      knownLimitations: knownLimitations.value.map(limitation => limitation.trim()).filter(limitation => limitation !== ''),
     }
     updateReleaseNoteMutation.mutate({ id: releaseNote.id, dto: payload });
   }
@@ -184,6 +185,16 @@ const previewAvailableFrom = ref<string | undefined>(releaseTimeline?.previewAva
 const recommendedTestPhaseFrom = ref<string | undefined>(releaseTimeline?.recommendedTestPhaseFrom);
 const recommendedTestPhaseTo = ref<string | undefined>(releaseTimeline?.recommendedTestPhaseTo);
 const plannedProductionDeployment = ref<string | undefined>(releaseTimeline?.plannedProductionDeployment);
+
+const knownLimitations = ref<string[]>([...(releaseNote.knownLimitations ?? [])]);
+
+const addKnownLimitation = () => {
+  knownLimitations.value.push('');
+}
+
+const removeKnownLimitation = (index: number) => {
+  knownLimitations.value.splice(index, 1);
+}
 
 </script>
 
@@ -289,6 +300,21 @@ const plannedProductionDeployment = ref<string | undefined>(releaseTimeline?.pla
               <DatePicker v-model="recommendedTestPhaseTo" :min="recommendedTestPhaseFrom" :placeholder="t('placeholder.toBeDetermined')"/>
               <p class="self-center">{{ `${t('title.plannedProductionDeployment')}:` }}</p>
               <DatePicker v-model="plannedProductionDeployment" :placeholder="t('placeholder.toBeDetermined')"/>
+            </div>
+          </div>
+          <div class="flex flex-col gap-1">
+            <h1 class="text-lg">{{ t('title.knownLimitations') }}</h1>
+            <div class="flex flex-col gap-2">
+              <div v-for="(_, index) in knownLimitations" :key="index" class="flex flex-row gap-2">
+                <Input class="w-full" v-model="knownLimitations[index]" :placeholder="t('placeholder.knownLimitation')" />
+                <Button type="button" variant="outline" size="icon" @click="removeKnownLimitation(index)">
+                  <Trash2 />
+                </Button>
+              </div>
+              <Button type="button" variant="outline" class="w-fit" @click="addKnownLimitation">
+                {{ t('button.addKnownLimitation') }}
+                <Plus />
+              </Button>
             </div>
           </div>
         </div>

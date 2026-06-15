@@ -49,7 +49,8 @@
         "allCustomers": "Alle kunder",
         "updateRange": "Oppdater fra/til",
         "clearChangeNotes": "Fjern endringsnotater",
-        "commitToGit": "Commit til Git"
+        "commitToGit": "Commit til Git",
+        "addKnownLimitation": "Legg til begrensning"
     },
     "title": {
         "title": "Tittel",
@@ -76,7 +77,8 @@
         "recommendedTestPhase": "Anbefalt testperiode",
         "recommendedTestPhaseFrom": "Anbefalt testperiode fra",
         "recommendedTestPhaseTo": "Anbefalt testperiode til",
-        "plannedProductionDeployment": "Planlagt produksjonssetting"
+        "plannedProductionDeployment": "Planlagt produksjonssetting",
+        "knownLimitations": "Kjente begrensninger"
     },
     "toast": {
         "changeNoteDeleted": "Endringsnotat slettet",
@@ -159,7 +161,9 @@
         "noTitle": "Ingen tittel",
         "noDescription": "Ingen beskrivelse",
         "reference": "Referanse",
-        "toBeDetermined": "Ikke fastsatt"
+        "toBeDetermined": "Ikke fastsatt",
+        "knownLimitation": "Begrensning",
+        "noKnownLimitations": "Ingen kjente begrensninger"
     },
     "repositories": {
         "title": "Git Repositorier",

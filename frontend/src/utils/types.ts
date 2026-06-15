@@ -75,7 +75,8 @@ export interface ReleaseNote {
     published: boolean,
     changeNotes: ChangeNote[],
     syncedToGit: boolean,
-    releaseTimeline: ReleaseTimeline
+    releaseTimeline: ReleaseTimeline,
+    knownLimitations: string[]
 }
 
 
@@ -85,7 +86,8 @@ export interface PersistReleaseNoteDTO {
     description?: string,
     published?: boolean,
     changeNoteIds?: number[],
-    releaseTimeline?: ReleaseTimeline
+    releaseTimeline?: ReleaseTimeline,
+    knownLimitations?: string[]
 }
 
 export interface PersistChangeNoteDTO {
