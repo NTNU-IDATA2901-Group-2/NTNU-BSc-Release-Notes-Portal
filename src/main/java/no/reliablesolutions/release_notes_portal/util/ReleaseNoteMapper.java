@@ -3,6 +3,7 @@ package no.reliablesolutions.release_notes_portal.util;
 import java.util.List;
 
 import no.reliablesolutions.release_notes_portal.domain.entity.ReleaseNote;
+import no.reliablesolutions.release_notes_portal.dto.ChangeImpactDTO;
 import no.reliablesolutions.release_notes_portal.dto.ChangeNoteDTO;
 import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteDTO;
 import no.reliablesolutions.release_notes_portal.dto.ReleaseTimelineDTO;
@@ -48,6 +49,11 @@ public class ReleaseNoteMapper {
         .map(changeNote -> ChangeNoteMapper.toDTO(changeNote, accessScope))
         .toList();
 
+    List<String> knownLimitations = accessScope.isAdmin() ? releaseNote.getKnownLimitations() : List.of();
+    List<ChangeImpactDTO> changeImpactDTOs = accessScope.isAdmin()
+        ? releaseNote.getChangeImpacts().stream().map(ChangeImpactDTO::fromEntity).toList()
+        : List.of();
+
     return new ReleaseNoteDTO(
         releaseNote.getId(),
         changeNoteDTOs,
@@ -57,7 +63,8 @@ public class ReleaseNoteMapper {
         releaseNote.getCreatedAt(),
         releaseNote.getSyncedToGit(),
         ReleaseTimelineDTO.fromEntity(releaseNote.getReleaseTimeline()),
-        releaseNote.getKnownLimitations());
+        knownLimitations,
+        changeImpactDTOs);
   }
 
 }

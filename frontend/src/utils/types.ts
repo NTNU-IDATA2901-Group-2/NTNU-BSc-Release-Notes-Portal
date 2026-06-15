@@ -68,6 +68,16 @@ export interface ReleaseTimeline {
     plannedProductionDeployment?: string
 }
 
+export type TestingNeed = 'LOW' | 'LOW_MEDIUM' | 'MEDIUM' | 'MEDIUM_HIGH' | 'HIGH'
+
+export interface ChangeImpact {
+    id: number,
+    product?: Product,
+    whatIsChanged: string,
+    whatShouldBeTested: string,
+    testingNeed?: TestingNeed
+}
+
 export interface ReleaseNote {
     id: number,
     tag: string,
@@ -76,7 +86,8 @@ export interface ReleaseNote {
     changeNotes: ChangeNote[],
     syncedToGit: boolean,
     releaseTimeline: ReleaseTimeline,
-    knownLimitations: string[]
+    knownLimitations: string[],
+    changeImpacts: ChangeImpact[]
 }
 
 
