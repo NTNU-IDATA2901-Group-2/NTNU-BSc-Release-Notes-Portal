@@ -404,16 +404,18 @@ const customerFilter = ref<number>(-1);
             </span>
           </div>
         </div>
-        <Separator class="w-full h-2" />
-        <div class="flex flex-col gap-4 w-full">
-          <h2 class="text-3xl truncate max-w-full leading-normal">{{ t('title.knownLimitations') }}</h2>
-          <ul v-if="releaseNote.knownLimitations?.length" class="list-disc pl-6 flex flex-col gap-2">
-            <li v-for="(limitation, index) in releaseNote.knownLimitations" :key="index">
-              {{ limitation }}
-            </li>
-          </ul>
-          <p v-else class="text-text-primary/50">{{ t('placeholder.noKnownLimitations') }}</p>
-        </div>
+        <template v-if="isAdmin">
+          <Separator class="w-full h-2" />
+          <div class="flex flex-col gap-4 w-full">
+            <h2 class="text-3xl truncate max-w-full leading-normal">{{ t('title.knownLimitations') }}</h2>
+            <ul v-if="releaseNote.knownLimitations?.length" class="list-disc pl-6 flex flex-col gap-2">
+              <li v-for="(limitation, index) in releaseNote.knownLimitations" :key="index">
+                {{ limitation }}
+              </li>
+            </ul>
+            <p v-else class="text-text-primary/50">{{ t('placeholder.noKnownLimitations') }}</p>
+          </div>
+        </template>
       </div>
       <Separator class="w-full h-2" />
       <div class="flex flex-col w-full gap-10">

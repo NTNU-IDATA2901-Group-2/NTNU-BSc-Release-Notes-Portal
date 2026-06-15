@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Entity representing the impact a change has on a product, describing what changed,
+ * Entity representing the impact a change has on a scope, describing what changed,
  * what should be tested and how urgently it should be tested.
  */
 @Entity
@@ -26,7 +26,7 @@ public class ChangeImpact {
   private Long id;
 
   @ManyToOne(optional = true)
-  private Product product;
+  private Scope scope;
 
   @Column(columnDefinition = "TEXT")
   private String whatIsChanged = "";

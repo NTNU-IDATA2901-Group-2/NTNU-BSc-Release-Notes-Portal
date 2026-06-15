@@ -72,7 +72,7 @@ export type TestingNeed = 'LOW' | 'LOW_MEDIUM' | 'MEDIUM' | 'MEDIUM_HIGH' | 'HIG
 
 export interface ChangeImpact {
     id: number,
-    product?: Product,
+    scope?: Scope,
     whatIsChanged: string,
     whatShouldBeTested: string,
     testingNeed?: TestingNeed
