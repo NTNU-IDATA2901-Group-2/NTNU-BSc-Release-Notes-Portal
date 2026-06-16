@@ -25,7 +25,7 @@ public class ChangeImpact {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @ManyToOne(optional = true)
+  @ManyToOne(optional = false)
   private Feature feature;
 
   @Column(columnDefinition = "TEXT")
@@ -36,6 +36,17 @@ public class ChangeImpact {
 
   @Enumerated(EnumType.STRING)
   private TestingNeed testingNeed;
+
+  /**
+   * Creates a change impact for a feature. The {@code id} is assigned by the
+   * persistence provider on save.
+   */
+  public ChangeImpact(Feature feature, String whatIsChanged, String whatShouldBeTested, TestingNeed testingNeed) {
+    this.feature = feature;
+    this.whatIsChanged = whatIsChanged;
+    this.whatShouldBeTested = whatShouldBeTested;
+    this.testingNeed = testingNeed;
+  }
 
   /**
    * Degree to which a change impact needs to be tested.

@@ -409,7 +409,7 @@ const customerFilter = ref<number>(-1);
           <Separator class="w-full h-2" />
           <div class="flex flex-col gap-4 w-full">
             <h2 class="text-3xl truncate max-w-full leading-normal">{{ t('title.changeImpacts') }}</h2>
-            <ChangeImpactTable :data="releaseNote.changeImpacts"/>
+            <ChangeImpactTable :model-value="releaseNote.changeImpacts"/>
           </div>
         </template>
         <template v-if="isAdmin">

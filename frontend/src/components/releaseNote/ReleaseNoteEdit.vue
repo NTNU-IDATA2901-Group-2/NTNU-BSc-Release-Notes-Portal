@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useUpdateReleaseNote } from '@/api/release-note-api';
 import { EditReleaseNoteSchema } from '@/schemas';
-import type { GitRepository, ChangeNote, ReleaseNote } from '@/utils/types';
+import { type GitRepository, type ChangeNote, type ReleaseNote, type ChangeImpact, type PersistChangeImpactDTO } from '@/utils/types';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
 import { onBeforeUnmount, onMounted, computed, ref } from 'vue';
@@ -25,6 +25,7 @@ import DialogPrompt from '../DialogPrompt.vue';
 import { useGetGitRepositories } from '@/api/git-repository-api';
 import Spinner from '../ui/spinner/Spinner.vue';
 import DatePicker from '../DatePicker.vue';
+import ChangeImpactTable from '../ChangeImpactTable.vue';
 
 const { t } = useI18n();
 
@@ -144,9 +145,18 @@ const onSubmit = form.handleSubmit((values) => {
         plannedProductionDeployment: plannedProductionDeployment.value,
       },
       knownLimitations: knownLimitations.value.map(limitation => limitation.trim()).filter(limitation => limitation !== ''),
+      changeImpacts: changeImpacts.value.map(ci => ({
+        featureId: ci.feature.id,
+        whatIsChanged: ci.whatIsChanged,
+        whatShouldBeTested: ci.whatShouldBeTested,
+        testingNeed: ci.testingNeed
+      } as PersistChangeImpactDTO))
     }
     updateReleaseNoteMutation.mutate({ id: releaseNote.id, dto: payload });
   }
+}, ({ errors }) => {
+    console.error('Change note edit validation failed', errors);
+    toast.error(t('toast.releaseNoteUpdateError'));
 })
 
 const updateReleaseNoteMutation = useUpdateReleaseNote({
@@ -196,6 +206,8 @@ const removeKnownLimitation = (index: number) => {
   knownLimitations.value.splice(index, 1);
 }
 
+const changeImpacts = ref<ChangeImpact[]>([...(releaseNote.changeImpacts ?? [])]);
+
 </script>
 
 
@@ -227,7 +239,7 @@ const removeKnownLimitation = (index: number) => {
       <div 
       ref="releaseNoteRef"
         class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
-        <div class="flex flex-col gap-4 w-full">
+        <div class="flex flex-col gap-8 w-full">
           <div data-pdf-exclude class="flex sm:hidden gap-4 ml-auto">
             <Button 
             :disabled="disableSummarizeButton" type="button"
@@ -303,6 +315,10 @@ const removeKnownLimitation = (index: number) => {
             </div>
           </div>
           <div class="flex flex-col gap-1">
+            <h1 class="text-lg">{{ t('title.changeImpacts') }}</h1>
+            <ChangeImpactTable v-model="changeImpacts" :editable="true"/>
+          </div>
+          <div class="flex flex-col gap-1">
             <h1 class="text-lg">{{ t('title.knownLimitations') }}</h1>
             <div class="flex flex-col gap-2">
               <div v-for="(_, index) in knownLimitations" :key="index" class="flex flex-row gap-2">
@@ -335,7 +351,7 @@ const removeKnownLimitation = (index: number) => {
               </Button>
             </div>
             <div class="flex flex-col gap-1">
-              <h2 class="text-xl">{{ t('title.addFromRepository') }}</h2>
+              <h2 class="text-lg">{{ t('title.addFromRepository') }}</h2>
               <p
                 v-if="availableGitRepositories == undefined || availableGitRepositories.length < 1">
                 {{ t('repositories.noGitRepositories') }}</p>

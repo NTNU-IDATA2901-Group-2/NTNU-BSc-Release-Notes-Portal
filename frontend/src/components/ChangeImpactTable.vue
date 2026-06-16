@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ChangeImpact } from '@/utils/types'
+import type { ChangeImpact, Feature } from '@/utils/types'
 import { FlexRender, getCoreRowModel, useVueTable, type ColumnDef } from '@tanstack/vue-table'
 import { h } from 'vue'
 import Table from './ui/table/Table.vue'
@@ -9,21 +9,72 @@ import TableBody from './ui/table/TableBody.vue'
 import TableCell from './ui/table/TableCell.vue'
 import TableHead from './ui/table/TableHead.vue'
 import { useI18n } from 'vue-i18n'
+import SelectFeatures from './SelectFeatures.vue'
+import Textarea from './ui/textarea/Textarea.vue'
 
 const { t } = useI18n();
+
+const model = defineModel<ChangeImpact[]>({
+  default: () => []
+})
+
+const props = defineProps({
+  editable: {
+    type: Boolean,
+    default: false,
+    required: false
+  }
+})
+
+function updateData<K extends keyof ChangeImpact>(
+  rowIndex: number,
+  key: K,
+  value: ChangeImpact[K]
+) {
+  model.value = model.value.map((row, index) =>
+    index === rowIndex ? { ...row, [key]: value } : row
+  )
+}
 
 const columns: ColumnDef<ChangeImpact>[] = [
   {
     accessorKey: 'feature.name',
     header: () => t('title.feature'),
+    cell: ({ cell, row }) => {
+      return props.editable
+        ? h(SelectFeatures, {
+            class:'w-full',
+            'modelValue': row.original.feature,
+            'onUpdate:modelValue': (value: Feature) => updateData(row.index, 'feature', value)
+          })
+        : cell.getValue() as string;
+    }
   },
   {
     accessorKey: 'whatIsChanged',
     header: () => t('title.whatIsChanged'),
+    cell: ({ cell, row }) => {
+      return props.editable
+        ? h(Textarea, {
+            'modelValue': cell.getValue() as string,
+            'onUpdate:modelValue': (value: string | number) =>
+              updateData(row.index, 'whatIsChanged', String(value))
+          })
+        : cell.getValue() as string;
+    }
   },
   {
     accessorKey: 'whatShouldBeTested',
     header: () => t('title.whatShouldBeTested'),
+    cell: ({ cell, row }) => {
+      return props.editable
+        ? h(Textarea, {
+            'modelValue': cell.getValue() as string,
+            'onUpdate:modelValue': (value: string | number) =>
+              updateData(row.index, 'whatShouldBeTested', String(value))
+          })
+        : cell.getValue() as string;
+    }
   },
   {
     accessorKey: 'testingNeed',
@@ -35,12 +86,8 @@ const columns: ColumnDef<ChangeImpact>[] = [
   },
 ]
 
-const props = defineProps<{
-  data: ChangeImpact[]
-}>()
-
 const table = useVueTable({
-  get data() { return props.data },
+  get data() { return model.value },
   get columns() { return columns },
   getCoreRowModel: getCoreRowModel(),
 })

@@ -90,7 +90,7 @@ public class FeatureController {
 	})
 	@GetMapping("/{id}")
 	public ResponseEntity<FeatureDTO> getFeatureById(@PathVariable long id) {
-		FeatureDTO feature = featureService.getFeatureById(id);
+		FeatureDTO feature = featureService.getFeatureDTOById(id);
 		logger.info("Retrieved feature with id: {}", id);
 		return ResponseEntity.ok(feature);
 	}

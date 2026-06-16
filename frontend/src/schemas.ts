@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { testingNeedValues } from './utils/types'
 
 export const EditReleaseNoteSchema = z.object({
   tag: z.string().optional(),
@@ -11,7 +12,13 @@ export const EditReleaseNoteSchema = z.object({
     recommendedTestPhaseTo: z.string().optional(),
     plannedProductionDeployment: z.string().optional(),
   }).optional(),
-  knownLimitations: z.array(z.string()).optional()
+  knownLimitations: z.array(z.string()).optional(),
+  changeImpacts: z.array(z.object({
+    featureId: z.number(),
+    whatIsChanged: z.string(),
+    whatShouldBeTested: z.string(),
+    testingNeed: z.enum(testingNeedValues),
+  })).optional(),
 })
 
 export const EditChangeNoteSchema = z.object({

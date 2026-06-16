@@ -150,7 +150,8 @@
         "customers": "Une erreur s'est produite lors du chargement des clients"
     },
     "loading": {
-        "filter": "Chargement du filtre..."
+        "filter": "Chargement du filtre...",
+        "features": "Chargement des fonctionnalités..."
     },
     "notFound": {
         "resourceNotFound": "La ressource à laquelle vous essayez d'accéder a été déplacée ou n'existe pas.",

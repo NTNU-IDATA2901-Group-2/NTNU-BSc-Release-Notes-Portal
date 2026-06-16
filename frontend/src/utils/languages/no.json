@@ -151,7 +151,8 @@
         "customers": "Det oppsto en feil under innlastning av kunder"
     },
     "loading": {
-        "filter": "Laster inn filter..."
+        "filter": "Laster inn filter...",
+        "features": "Laster inn funksjoner..."
     },
     "notFound": {
         "resourceNotFound": "Ressursen du prøver å få tilgang til har enten blitt flyttet, eller eksisterer ikke.",

@@ -11,6 +11,7 @@ public record CreateReleaseNoteDTO(
     String summary,
     Boolean published,
     ReleaseTimelineDTO releaseTimeline,
-    List<String> knownLimitations) {
+    List<String> knownLimitations,
+    List<CreateChangeImpactDTO> changeImpacts) {
 
 }

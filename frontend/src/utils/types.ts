@@ -69,13 +69,20 @@ export interface ReleaseTimeline {
 }
 
 export type TestingNeed = 'LOW' | 'LOW_MEDIUM' | 'MEDIUM' | 'MEDIUM_HIGH' | 'HIGH'
-
+export const testingNeedValues = ['LOW', 'LOW_MEDIUM', 'MEDIUM', 'MEDIUM_HIGH', 'HIGH'] as const
 export interface ChangeImpact {
     id: number,
-    feature?: Feature,
+    feature: Feature,
     whatIsChanged: string,
     whatShouldBeTested: string,
     testingNeed?: TestingNeed
+}
+
+export interface PersistChangeImpactDTO {
+    featureId: number,
+    whatIsChanged: string,
+    whatShouldBeTested: string,
+    testingNeed: TestingNeed
 }
 
 export interface ReleaseNote {

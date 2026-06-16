@@ -15,11 +15,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
+import no.reliablesolutions.release_notes_portal.domain.entity.ChangeImpact;
 import no.reliablesolutions.release_notes_portal.domain.entity.ChangeNote;
+import no.reliablesolutions.release_notes_portal.domain.entity.Feature;
 import no.reliablesolutions.release_notes_portal.domain.entity.ReleaseNote;
 import no.reliablesolutions.release_notes_portal.domain.entity.ReleaseTimeline;
+import no.reliablesolutions.release_notes_portal.domain.entity.ChangeImpact.TestingNeed;
 import no.reliablesolutions.release_notes_portal.domain.repository.ChangeNoteRepository;
 import no.reliablesolutions.release_notes_portal.domain.repository.ReleaseNoteRepository;
+import no.reliablesolutions.release_notes_portal.dto.CreateChangeImpactDTO;
 import no.reliablesolutions.release_notes_portal.dto.CreateReleaseNoteDTO;
 import no.reliablesolutions.release_notes_portal.dto.PaginatedResponseDTO;
 import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteDTO;
@@ -44,6 +48,7 @@ public class ReleaseNoteService {
   private final Logger logger = LoggerFactory.getLogger(ReleaseNoteService.class);
   private final ReleaseNoteRepository releaseNoteRepository;
   private final ChangeNoteRepository changeNoteRepository;
+  private final FeatureService featureService;
 
   /** Zone used to resolve a calendar date filter into an absolute instant range. */
   private static final ZoneId BUSINESS_ZONE = ZoneId.of("Europe/Oslo");
@@ -78,6 +83,7 @@ public class ReleaseNoteService {
     }
 
     releaseNote.setChangeNotes(changeNotesInReleaseNote);
+    applyChangeImpacts(releaseNote, createReleaseNoteDTO.changeImpacts());
     releaseNote = releaseNoteRepository.save(releaseNote);
 
     return releaseNote.getId();
@@ -261,8 +267,38 @@ public class ReleaseNoteService {
       releaseNote.getKnownLimitations().addAll(createReleaseNoteDTO.knownLimitations());
     }
 
+    applyChangeImpacts(releaseNote, createReleaseNoteDTO.changeImpacts());
+
     releaseNoteRepository.save(releaseNote);
     return ReleaseNoteMapper.toDTO(releaseNote, AccessScopeFactory.fromCurrentUser());
+  }
+
+  /**
+   * Replaces the change impacts on the given release note with ones built from
+   * the provided DTOs, resolving each feature by its id. Existing change impacts
+   * are orphan-removed before the new ones are added.
+   *
+   * @param releaseNote      the release note whose change impacts to replace
+   * @param changeImpactDTOs the change impacts to apply, or {@code null} to clear
+   *                         all existing change impacts
+   */
+  private void applyChangeImpacts(ReleaseNote releaseNote, List<CreateChangeImpactDTO> changeImpactDTOs) {
+    releaseNote.getChangeImpacts().clear();
+    if (changeImpactDTOs == null) {
+      return;
+    }
+    for (CreateChangeImpactDTO changeImpactDTO : changeImpactDTOs) {
+      logger.info("Applying changes impact for feature ID: {}. What is changed: {}", changeImpactDTO.getFeatureId(), changeImpactDTO.getWhatIsChanged());
+      Feature feature = featureService.getFeatureById(changeImpactDTO.getFeatureId());
+      TestingNeed testingNeed = changeImpactDTO.getTestingNeed() != null
+          ? TestingNeed.valueOf(changeImpactDTO.getTestingNeed())
+          : null;
+      releaseNote.getChangeImpacts().add(new ChangeImpact(
+          feature,
+          changeImpactDTO.getWhatIsChanged(),
+          changeImpactDTO.getWhatShouldBeTested(),
+          testingNeed));
+    }
   }
 
   /**

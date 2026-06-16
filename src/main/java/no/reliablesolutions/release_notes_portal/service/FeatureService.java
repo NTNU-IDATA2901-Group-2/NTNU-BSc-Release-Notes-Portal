@@ -49,16 +49,28 @@ public class FeatureService {
   }
 
   /**
-   * Retrieves a specific feature by its ID.
+   * Retrieves a specific feature DTO by its ID.
    *
    * @param id the ID of the feature to retrieve
    * @return a DTO representing the feature
    * @throws FeatureNotFoundException if no feature with the given ID exists
    */
-  public FeatureDTO getFeatureById(long id) {
+  public FeatureDTO getFeatureDTOById(long id) {
     Feature feature = featureRepository.findById(id)
         .orElseThrow(() -> new FeatureNotFoundException(id));
     return FeatureDTO.fromFeature(feature);
+  }
+
+  /**
+   * Retrieves a specific feature entity by its ID.
+   * 
+   * @param id the ID of the feature to retrieve
+   * @return the feature entity with the given ID
+   * @throws FeatureNotFoundException if no feature with the given ID exists
+   */
+  public Feature getFeatureById(long id) {
+    return featureRepository.findById(id)
+        .orElseThrow(() -> new FeatureNotFoundException(id));
   }
 
   /**
