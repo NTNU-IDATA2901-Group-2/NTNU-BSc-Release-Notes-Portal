@@ -98,7 +98,7 @@ const handleExport = () => {
   if (!releaseNote) return;
   try {
     const filteredChangeNotes = (translatedChangeNotes.value ?? releaseNote.changeNotes).filter(shouldShowChangeNote);
-    exportToPdf(releaseNote.tag, releaseNote.summary, filteredChangeNotes);
+    exportToPdf(releaseNote, filteredChangeNotes);
   } catch (error) {
     console.error('Error exporting to PDF:', error);
     toast.error(t('toast.exportPdfError'));
@@ -348,7 +348,7 @@ const customerFilter = ref<number>(-1);
                 </Tooltip>
                 <DropdownMenuItem @click="handleExport">
                   <div class="w-full flex gap-2">
-                    <p class="ml-auto text-text-primary">{{ t('button.export') }}</p>
+                    <p class="ml-auto text-text-primary">{{ releaseNote.published ? t('button.exportRelease') : t('button.exportPreview') }}</p>
                     <FileDown class="text-text-primary" />
                   </div>
                 </DropdownMenuItem>

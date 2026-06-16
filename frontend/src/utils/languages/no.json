@@ -11,7 +11,15 @@
     "pdf": {
         "generated": "Generert",
         "noTitle": "Ingen tittel",
-        "noReference": "Ingen referanse"
+        "noReference": "Ingen referanse",
+        "ticketId": "Saks-ID",
+        "previewIntro": "Dette er en forhåndsversjon av kommende release. Formålet er å planlegge for testing og verifisere at løsningen fungerer som forventet i deres oppsett før produksjonssetting.",
+        "timeline": "Tidslinje",
+        "previewTestingNotice": "Flere av endringene kan påvirke eksisterende arbeidsprosesser, og det vil derfor være behov for målrettet testing.",
+        "featureDetails": "Funksjoner",
+        "otherFeature": "Annet",
+        "testingResponsibility": "Ansvar for testing og oppfølging",
+        "testingResponsibilityBody": "For å sikre en god overgang til ny versjon, ber vi dere gjennomføre testing av deres oppsett basert på denne Release Previewen.\n\nDette innebærer at dere som kunde har ansvar for å teste:\n\n- egne integrasjoner (andre tredjepartssystemer)\n- funksjonalitet og oppsett som benyttes i deres daglige bruk\n- kritiske forretningsprosesser og ende-til-ende flyt\n\nVi tester standardløsningen i kontrollerte miljøer.\n\nVi anbefaler at dere spesielt verifiserer funksjonalitet som er sentral for deres faktiske bruk av løsningen, inkludert konfigurasjon, tilpasninger og rapportering som benyttes i deres organisasjon.\n\nEn nærmere oversikt over relevante områder for deres oppsett kan deles og gjennomgås separat.\n\nProduksjonssetting forutsetter at relevant testing er gjennomført på deres side."
     },
     "header": {
         "releaseNotesLink": "Utgivelsesnotater",
@@ -31,6 +39,8 @@
         "cancel": "Avbryt",
         "delete": "Slett",
         "export": "Eksporter PDF",
+        "exportRelease": "Eksporter utgivelse til PDF",
+        "exportPreview": "Eksporter forhåndsvisning til PDF",
         "publish": "Publiser",
         "unpublish": "Avpubliser",
         "none": "Ingen",
@@ -81,6 +91,7 @@
         "plannedProductionDeployment": "Planlagt produksjonssetting",
         "knownLimitations": "Kjente begrensninger",
         "changeImpacts": "Oversikt over endringer og forventet påvirkning",
+        "summary": "Sammendrag",
         "whatIsChanged": "Hva er endret",
         "whatShouldBeTested": "Hva bør testes",
         "testingNeed": "Testbehov"

@@ -1,10 +1,13 @@
 import solwrLogo from '@/assets/solwr_logo.svg?raw';
 import md from './markdown-it';
 import { i18n } from './i18n';
-import type { ChangeNote } from './types';
+import { getLocaleDateString } from './format-date';
+import type { ChangeImpact, ChangeNote, ReleaseNote, ReleaseTimeline } from './types';
 import pdfMake from "pdfmake/build/pdfmake";
 import vfs from "pdfmake/build/vfs_fonts";
-import type { Content, ContentText, TDocumentDefinitions } from "pdfmake/interfaces";
+import type { Content, ContentText, TableCell, TDocumentDefinitions } from "pdfmake/interfaces";
+
+const t = (key: string) => i18n.global.t(key);
 
 pdfMake.addVirtualFileSystem(vfs);
 
@@ -16,11 +19,17 @@ type Token = ReturnType<typeof md.parse>[number];
 
 // Font sizes for headings authored inside markdown content. `#` (h1) renders
 // larger than `##`, and every level below `##` collapses to the `##` size.
-// Both stay below the change note title (16) so a `#` in the markdown can
-// never outrank the structure around it.
-const MARKDOWN_H1_SIZE = 13;
+// Both stay below the change note heading (NOTE_HEADING_SIZE / the release
+// title style) so a `#` in the markdown can never outrank the structure around
+// it.
+const MARKDOWN_H1_SIZE = 12;
 const MARKDOWN_H2_SIZE = 11;
 const MARKDOWN_BODY_SIZE = 11;
+
+// The change note label line ("Ticket ID: … Title") in the preview layout.
+// Kept above MARKDOWN_H1_SIZE so a markdown heading in the description can't
+// render larger than the note's own heading.
+const NOTE_HEADING_SIZE = 13;
 
 /**
  * Flattens an `inline` token's children into a pdfmake text run, carrying bold,
@@ -150,40 +159,174 @@ function markdownToContent(text: string): Content[] {
   return tokensToContent(md.parse(text, {}));
 }
 
-/**
- * Exports a release note to a downloaded PDF file.
- *
- * The document leads with the release note's tag and summary, followed by the
- * change notes grouped together by feature. Groups appear in the order their
- * feature is first encountered, and change notes without a feature are listed
- * last. Within each feature the notes are further grouped by customer, with
- * customerless notes at the bottom. Each change note leads with a heading
- * line — "Title (reference)"
- * followed by the feature name when present — then the customer on its own line
- * and the description beneath. Change notes without a title or reference fall
- * back to localized placeholders. The summary and description are authored in
- * markdown and rendered with matching headings, lists and emphasis.
- *
- * This PDF is customer-facing, so it deliberately omits the change notes'
- * developer notes and upgrade requirements, which are internal-only.
- */
-export async function exportToPdf(releaseNoteTag: string, releaseNoteSummary: string, changeNotes: ChangeNote[]) {
-  const now = new Date();
-  const generatedDate = [
-    String(now.getDate()).padStart(2, '0'),
-    String(now.getMonth() + 1).padStart(2, '0'),
-    now.getFullYear(),
-  ].join('.');
+/** A section heading on the level of "Timeline" or "Known limitations". */
+function sectionHeading(text: string): Content {
+  return { text, style: 'sectionHeading' };
+}
 
-  const content: Content[] = [
-    { svg: blackLogo, width: 160, margin: [0, 0, 0, 24], alignment: 'right' },
-    {
-      columns: [
-        { text: releaseNoteTag, style: 'tag' },
-        { text: `${i18n.global.t('pdf.generated')}: ${generatedDate}`, style: 'generated' },
-      ],
-    },
+/** Formats a timeline date, falling back to the "to be determined" placeholder. */
+function timelineDate(date?: string): string {
+  return date ? getLocaleDateString(date) : t('placeholder.toBeDetermined');
+}
+
+/**
+ * Renders the release timeline as a bulleted list: preview availability, the
+ * recommended test phase as a date range, and the planned production date.
+ * Missing dates fall back to a placeholder so every line is always present.
+ */
+function renderTimeline(timeline?: ReleaseTimeline): Content {
+  const line = (label: string, value: string): ContentText => ({
+    text: [{ text: `${label}: `, bold: true }, value],
+  });
+  return {
+    ul: [
+      line(t('title.previewAvailableFrom'), timelineDate(timeline?.previewAvailableFrom)),
+      line(
+        t('title.recommendedTestPhase'),
+        `${timelineDate(timeline?.recommendedTestPhaseFrom)} – ${timelineDate(timeline?.recommendedTestPhaseTo)}`,
+      ),
+      line(t('title.plannedProductionDeployment'), timelineDate(timeline?.plannedProductionDeployment)),
+    ],
+    margin: [0, 0, 0, 16],
+  };
+}
+
+/**
+ * Renders the change impacts as a table mirroring the in-app ChangeImpactTable:
+ * feature, what changed, what to test and the testing need. Falls back to a
+ * placeholder row when there are no impacts.
+ */
+function renderChangeImpactTable(changeImpacts: ChangeImpact[]): Content {
+  const header: TableCell[] = [
+    { text: t('title.feature'), style: 'tableHeader' },
+    { text: t('title.whatIsChanged'), style: 'tableHeader' },
+    { text: t('title.whatShouldBeTested'), style: 'tableHeader' },
+    { text: t('title.testingNeed'), style: 'tableHeader' },
   ];
+
+  const rows: TableCell[][] = (changeImpacts ?? []).map((impact) => [
+    { text: impact.feature?.name ?? '' },
+    { text: impact.whatIsChanged ?? '' },
+    { text: impact.whatShouldBeTested ?? '' },
+    { text: impact.testingNeed ? t(`testingNeeds.${impact.testingNeed.toLowerCase()}`) : '' },
+  ]);
+
+  if (rows.length === 0) {
+    rows.push([{ text: t('placeholder.noChangeImpacts'), colSpan: 4, italics: true, color: '#666666' }, {}, {}, {}]);
+  }
+
+  return {
+    table: { headerRows: 1, widths: ['auto', '*', '*', 'auto'], body: [header, ...rows] },
+    layout: 'lightHorizontalLines',
+    fontSize: 10,
+    margin: [0, 0, 0, 16],
+  };
+}
+
+/**
+ * Renders change notes grouped by feature, one sub-heading per feature in
+ * first-seen order, with featureless notes collected under "Other" at the end.
+ * Each note leads with its reference and title, then the markdown description.
+ */
+function renderFeatureDetails(changeNotes: ChangeNote[]): Content[] {
+  const groups: { name: string; notes: ChangeNote[] }[] = [];
+  const groupsByFeatureId = new Map<number, { name: string; notes: ChangeNote[] }>();
+  const featurelessNotes: ChangeNote[] = [];
+
+  for (const changeNote of changeNotes ?? []) {
+    if (changeNote.feature) {
+      let group = groupsByFeatureId.get(changeNote.feature.id);
+      if (!group) {
+        group = { name: changeNote.feature.name, notes: [] };
+        groupsByFeatureId.set(changeNote.feature.id, group);
+        groups.push(group);
+      }
+      group.notes.push(changeNote);
+    } else {
+      featurelessNotes.push(changeNote);
+    }
+  }
+  if (featurelessNotes.length > 0) {
+    groups.push({ name: t('pdf.otherFeature'), notes: featurelessNotes });
+  }
+
+  if (groups.length === 0) {
+    return [{ text: t('placeholder.noChangeNotesAdded'), italics: true, color: '#666666', margin: [0, 0, 0, 16] }];
+  }
+
+  // Each note leads with its reference — shown as a bold "Ticket ID:" label
+  // followed by the value — and its title; if both are missing it falls back to
+  // a placeholder so the note still has a visible label.
+  const renderNote = (changeNote: ChangeNote): Content => {
+    const label: ContentText[] = [];
+    if (changeNote.reference) {
+      label.push({ text: `${t('pdf.ticketId')}: `, bold: true }, { text: changeNote.reference });
+    }
+    if (changeNote.title) label.push({ text: label.length ? ` ${changeNote.title}` : changeNote.title });
+    if (label.length === 0) label.push({ text: t('pdf.noTitle'), italics: true });
+
+    const note: Content[] = [{ text: label, fontSize: NOTE_HEADING_SIZE, margin: [0, 0, 0, 2] }];
+    if (changeNote.description) {
+      note.push({ stack: markdownToContent(changeNote.description), margin: [12, 0, 0, 8] });
+    }
+    return { stack: note, unbreakable: true, margin: [0, 6, 0, 0] };
+  };
+
+  return groups.map((group) => ({
+    stack: [{ text: group.name, style: 'featureHeading' }, ...group.notes.map(renderNote)],
+  }));
+}
+
+/**
+ * Builds the body of a release preview PDF. A preview is meant to help
+ * customers plan testing ahead of a production deployment, so it leads with an
+ * explanatory intro and the release timeline, followed by the release note
+ * summary, then summarizes the expected impact of the changes, the per-feature
+ * change details and the known limitations. The generated date sits directly
+ * below the intro paragraph rather than next to the title.
+ */
+function buildPreviewBody(releaseNote: ReleaseNote, changeNotes: ChangeNote[], generated: Content): Content[] {
+  return [
+    generated,
+    { text: t('pdf.previewIntro'), style: 'intro' },
+    sectionHeading(t('pdf.timeline')),
+    renderTimeline(releaseNote.releaseTimeline),
+    ...(releaseNote.summary
+      ? [sectionHeading(t('title.summary')), { stack: markdownToContent(releaseNote.summary), margin: [0, 0, 0, 16] } as Content]
+      : []),
+    sectionHeading(t('title.changeImpacts')),
+    { text: t('pdf.previewTestingNotice'), margin: [0, 0, 0, 8] },
+    renderChangeImpactTable(releaseNote.changeImpacts),
+    sectionHeading(t('pdf.featureDetails')),
+    ...renderFeatureDetails(changeNotes),
+    sectionHeading(t('pdf.testingResponsibility')),
+    ...markdownToContent(t('pdf.testingResponsibilityBody')),
+    sectionHeading(t('title.knownLimitations')),
+    renderKnownLimitations(releaseNote.knownLimitations),
+  ];
+}
+
+/** Renders the release note's known limitations as a bulleted list. */
+function renderKnownLimitations(knownLimitations: string[]): Content {
+  if (!knownLimitations?.length) {
+    return { text: t('placeholder.noKnownLimitations'), italics: true, color: '#666666', fontSize: MARKDOWN_BODY_SIZE };
+  }
+  return { ul: knownLimitations.map((limitation) => ({ text: limitation })), fontSize: MARKDOWN_BODY_SIZE };
+}
+
+/**
+ * Builds the body of a published release PDF. The document leads with the
+ * release note's summary, followed by the change notes grouped together by
+ * feature. Groups appear in the order their feature is first encountered, and
+ * change notes without a feature are listed last. Within each feature the notes
+ * are further grouped by customer, with customerless notes at the bottom. Each
+ * change note leads with a heading line — "Title (reference)" followed by the
+ * feature name when present — then the customer on its own line and the
+ * description beneath. Change notes without a title or reference fall back to
+ * localized placeholders.
+ */
+function buildReleaseBody(releaseNoteSummary: string, changeNotes: ChangeNote[]): Content[] {
+  const content: Content[] = [];
 
   if (releaseNoteSummary) {
     content.push({ stack: markdownToContent(releaseNoteSummary), margin: [0, 0, 0, 24] });
@@ -229,8 +372,8 @@ export async function exportToPdf(releaseNoteTag: string, releaseNoteSummary: st
   };
 
   const renderChangeNote = (changeNote: ChangeNote): Content => {
-    const titleText = changeNote.title || i18n.global.t('pdf.noTitle');
-    const referenceText = changeNote.reference || i18n.global.t('pdf.noReference');
+    const titleText = changeNote.title || t('pdf.noTitle');
+    const referenceText = changeNote.reference || t('pdf.noReference');
 
     // The heading line reads "Title (reference)", with the feature name
     // appended when the note has one.
@@ -264,19 +407,70 @@ export async function exportToPdf(releaseNoteTag: string, releaseNoteSummary: st
     content.push(renderChangeNote(changeNote));
   }
 
+  return content;
+}
+
+/**
+ * Exports a release note to a downloaded PDF file.
+ *
+ * The layout depends on the release note's publication state: a published note
+ * produces the full customer-facing release document, while a draft produces a
+ * preview aimed at planning testing before deployment. Both share the same
+ * header (logo, tag, generated date) and are authored from the supplied change
+ * notes, which the caller has already filtered and optionally translated.
+ *
+ * This PDF is customer-facing, so it deliberately omits the change notes'
+ * developer notes and upgrade requirements, which are internal-only.
+ */
+export async function exportToPdf(releaseNote: ReleaseNote, changeNotes: ChangeNote[]) {
+  const now = new Date();
+  const generatedDate = [
+    String(now.getDate()).padStart(2, '0'),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    now.getFullYear(),
+  ].join('.');
+
+  // A preview is labelled as such in the title. The label is intentionally not
+  // translated so the document reads the same across locales.
+  const title = releaseNote.published ? releaseNote.tag : `Release preview: ${releaseNote.tag}`;
+  const generated = { text: `${t('pdf.generated')}: ${generatedDate}`, style: 'generated', width: 'auto', noWrap: true };
+
+  const content: Content[] = [
+    { svg: blackLogo, width: 160, margin: [0, 0, 0, 24], alignment: 'right' },
+  ];
+
+  if (releaseNote.published) {
+    // The release title and the generated date share the top row.
+    content.push(
+      { columns: [{ text: title, style: 'tag' }, generated] },
+      ...buildReleaseBody(releaseNote.summary, changeNotes),
+    );
+  } else {
+    // The preview title spans the row on its own; the generated date moves down
+    // to sit alongside the intro paragraph instead.
+    content.push(
+      { text: title, style: 'tag' },
+      ...buildPreviewBody(releaseNote, changeNotes, generated),
+    );
+  }
+
   const documentDefinition: TDocumentDefinitions = {
-    info: { title: releaseNoteTag },
+    info: { title: releaseNote.tag },
     content,
     styles: {
       tag: { fontSize: 24, bold: true, margin: [0, 0, 0, 8] },
-      generated: { fontSize: 10, color: '#666666', alignment: 'right', margin: [0, 8, 0, 0] },
+      generated: { fontSize: 10, color: '#666666', alignment: 'left', margin: [0, 0, 0, 8] },
+      intro: { fontSize: 11, italics: true, color: '#666666', margin: [0, 0, 0, 16] },
+      sectionHeading: { fontSize: 16, bold: true, margin: [0, 16, 0, 8] },
+      featureHeading: { fontSize: 14, bold: true, margin: [0, 10, 0, 4] },
+      tableHeader: { fontSize: 10, bold: true, fillColor: '#f0f0f0' },
       title: { fontSize: 16, bold: true },
       reference: { fontSize: 12, bold: true },
       customer: { fontSize: 12, italics: true, color: '#666666' },
       feature: { fontSize: 12, bold: true, color: '#666666' },
     },
-    defaultStyle: { font: 'Roboto' },
+    defaultStyle: { font: 'Roboto', lineHeight: 1.3 },
   };
 
-  pdfMake.createPdf(documentDefinition).download(`${releaseNoteTag}.pdf`);
+  pdfMake.createPdf(documentDefinition).download(`${releaseNote.tag}.pdf`);
 }

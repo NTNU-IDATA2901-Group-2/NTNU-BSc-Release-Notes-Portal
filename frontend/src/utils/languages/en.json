@@ -11,7 +11,15 @@
     "pdf": {
         "generated": "Generated",
         "noTitle": "No title",
-        "noReference": "No reference"
+        "noReference": "No reference",
+        "ticketId": "Ticket ID",
+        "previewIntro": "This is a preview version of the upcoming release. Its purpose is to plan for testing and verify that the solution works as expected in your setup before production deployment.",
+        "timeline": "Timeline",
+        "previewTestingNotice": "Several of the changes may affect existing work processes, and there will therefore be a need for targeted testing.",
+        "featureDetails": "Features",
+        "otherFeature": "Other",
+        "testingResponsibility": "Responsibility for testing and follow-up",
+        "testingResponsibilityBody": "To ensure a smooth transition to the new version, we ask you to test your setup based on this Release Preview.\n\nThis means that you, as a customer, are responsible for testing:\n\n- your own integrations (other third-party systems)\n- functionality and configuration used in your daily operations\n- critical business processes and end-to-end flows\n\nWe test the standard solution in controlled environments.\n\nWe recommend that you pay particular attention to verifying functionality that is central to your actual use of the solution, including configuration, customizations and reporting used in your organization.\n\nA more detailed overview of the relevant areas for your setup can be shared and reviewed separately.\n\nProduction deployment requires that the relevant testing has been completed on your side."
     },
     "header": {
         "releaseNotesLink": "Release Notes",
@@ -31,6 +39,8 @@
         "cancel": "Cancel",
         "delete": "Delete",
         "export": "Export PDF",
+        "exportRelease": "Export release to PDF",
+        "exportPreview": "Export preview to PDF",
         "publish": "Publish",
         "unpublish": "Unpublish",
         "none": "None",
@@ -80,6 +90,7 @@
         "plannedProductionDeployment": "Planned production deployment",
         "knownLimitations": "Known Limitations",
         "changeImpacts": "Overview of changes and expected impact",
+        "summary": "Summary",
         "whatIsChanged": "What is changed",
         "whatShouldBeTested": "What should be tested",
         "testingNeed": "Testing need"
