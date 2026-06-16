@@ -50,7 +50,8 @@
         "updateRange": "Update Range",
         "clearChangeNotes": "Clear change notes",
         "commitToGit": "Commit to Git",
-        "addKnownLimitation": "Add limitation"
+        "addKnownLimitation": "Add limitation",
+        "addChangeImpact": "Add change"
     },
     "title": {
         "title": "Title",
@@ -184,7 +185,8 @@
         "knownLimitation": "Limitation",
         "noKnownLimitations": "No known limitations",
         "filterByCustomer": "Filter by customer",
-        "noResults": "No results"
+        "noResults": "No results",
+        "noChangeImpacts": "No change impacts"
     },
     "repositories": {
         "title": "Git Repositories",

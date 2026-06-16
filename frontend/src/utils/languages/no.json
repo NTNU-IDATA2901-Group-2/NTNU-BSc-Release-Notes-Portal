@@ -50,7 +50,8 @@
         "updateRange": "Oppdater fra/til",
         "clearChangeNotes": "Fjern endringsnotater",
         "commitToGit": "Commit til Git",
-        "addKnownLimitation": "Legg til begrensning"
+        "addKnownLimitation": "Legg til begrensning",
+        "addChangeImpact": "Legg til endring"
     },
     "title": {
         "title": "Tittel",
@@ -185,7 +186,8 @@
         "knownLimitation": "Begrensning",
         "noKnownLimitations": "Ingen kjente begrensninger",
         "filterByCustomer": "Filtrer etter kunde",
-        "noResults": "Ingen resultater"
+        "noResults": "Ingen resultater",
+        "noChangeImpacts": "Ingen endringer"
     },
     "repositories": {
         "title": "Git Repositorier",

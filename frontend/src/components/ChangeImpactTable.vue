@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ChangeImpact, Feature, TestingNeed } from '@/utils/types'
 import { FlexRender, getCoreRowModel, useVueTable, type ColumnDef } from '@tanstack/vue-table'
-import { h } from 'vue'
+import { computed, h } from 'vue'
 import Table from './ui/table/Table.vue'
 import TableHeader from './ui/table/TableHeader.vue'
 import TableRow from './ui/table/TableRow.vue'
@@ -12,6 +12,8 @@ import { useI18n } from 'vue-i18n'
 import SelectFeatures from './SelectFeatures.vue'
 import SelectTestingNeed from './SelectTestingNeed.vue'
 import Textarea from './ui/textarea/Textarea.vue'
+import { Button } from './ui/button'
+import { Plus, Trash2 } from 'lucide-vue-next'
 
 const { t } = useI18n();
 
@@ -37,7 +39,22 @@ function updateData<K extends keyof ChangeImpact>(
   )
 }
 
-const columns: ColumnDef<ChangeImpact>[] = [
+// Temporary ids for rows added in the UI; never sent to the backend (stripped on submit).
+let nextTempId = -1;
+
+function addChangeImpact() {
+  model.value = [
+    ...model.value,
+    { id: nextTempId--, feature: undefined, whatIsChanged: '', whatShouldBeTested: '', testingNeed: undefined },
+  ]
+}
+
+function removeChangeImpact(rowIndex: number) {
+  model.value = model.value.filter((_, index) => index !== rowIndex)
+}
+
+const columns = computed<ColumnDef<ChangeImpact>[]>(() => {
+  const baseColumns: ColumnDef<ChangeImpact>[] = [
   {
     accessorKey: 'feature.name',
     header: () => t('title.feature'),
@@ -93,18 +110,37 @@ const columns: ColumnDef<ChangeImpact>[] = [
         : h('span', { class: 'capitalize' }, testingNeed ? t(`testingNeeds.${testingNeed.toLowerCase()}`) : '');
     }
   },
-]
+  ]
+
+  if (props.editable) {
+    baseColumns.push({
+      id: 'actions',
+      header: () => '',
+      cell: ({ row }) =>
+        h(Button, {
+          type: 'button',
+          variant: 'outline',
+          size: 'icon',
+          'aria-label': t('button.delete'),
+          onClick: () => removeChangeImpact(row.index),
+        }, () => h(Trash2)),
+    })
+  }
+
+  return baseColumns
+})
 
 const table = useVueTable({
   get data() { return model.value },
-  get columns() { return columns },
+  get columns() { return columns.value },
   getCoreRowModel: getCoreRowModel(),
 })
 </script>
 
 
 <template>
-  <div class="border rounded-md overflow-hidden">
+  <div class="flex flex-col gap-2">
+    <div class="border rounded-md overflow-hidden">
     <Table class="overflow-hidden">
       <TableHeader>
         <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
@@ -122,7 +158,7 @@ const table = useVueTable({
             v-for="row in table.getRowModel().rows" :key="row.id"
             :data-state="row.getIsSelected() ? 'selected' : undefined"
           >
-            <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id" class="whitespace-normal align-top wrap-break-word">
+            <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id" class="whitespace-normal wrap-break-word">
               <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
             </TableCell>
           </TableRow>
@@ -130,11 +166,19 @@ const table = useVueTable({
         <template v-else>
           <TableRow>
             <TableCell :colspan="columns.length" class="h-24 text-center">
-              {{ t('placeholder.noResults') }}
+              {{ t('placeholder.noChangeImpacts') }}
             </TableCell>
           </TableRow>
         </template>
       </TableBody>
     </Table>
+    </div>
+    <Button
+      v-if="editable" type="button" variant="outline" class="w-fit"
+      @click="addChangeImpact"
+    >
+      {{ t('button.addChangeImpact') }}
+      <Plus />
+    </Button>
   </div>
 </template>

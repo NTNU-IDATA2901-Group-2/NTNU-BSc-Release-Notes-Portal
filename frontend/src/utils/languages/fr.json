@@ -50,7 +50,8 @@
         "updateRange": "Mettre à jour la plage",
         "clearChangeNotes": "Effacer les notes de changement",
         "commitToGit": "Valider sur Git",
-        "addKnownLimitation": "Ajouter une limitation"
+        "addKnownLimitation": "Ajouter une limitation",
+        "addChangeImpact": "Ajouter un changement"
     },
     "title": {
         "title": "Titre",
@@ -184,7 +185,8 @@
         "knownLimitation": "Limitation",
         "noKnownLimitations": "Aucune limitation connue",
         "filterByCustomer": "Filtrer par client",
-        "noResults": "Aucun résultat"
+        "noResults": "Aucun résultat",
+        "noChangeImpacts": "Aucun changement"
     },
     "repositories": {
         "title": "Dépôts Git",
