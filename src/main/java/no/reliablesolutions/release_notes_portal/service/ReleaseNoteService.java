@@ -20,7 +20,6 @@ import no.reliablesolutions.release_notes_portal.domain.entity.ChangeNote;
 import no.reliablesolutions.release_notes_portal.domain.entity.Feature;
 import no.reliablesolutions.release_notes_portal.domain.entity.ReleaseNote;
 import no.reliablesolutions.release_notes_portal.domain.entity.ReleaseTimeline;
-import no.reliablesolutions.release_notes_portal.domain.entity.ChangeImpact.TestingNeed;
 import no.reliablesolutions.release_notes_portal.domain.repository.ChangeNoteRepository;
 import no.reliablesolutions.release_notes_portal.domain.repository.ReleaseNoteRepository;
 import no.reliablesolutions.release_notes_portal.dto.CreateChangeImpactDTO;
@@ -288,16 +287,13 @@ public class ReleaseNoteService {
       return;
     }
     for (CreateChangeImpactDTO changeImpactDTO : changeImpactDTOs) {
-      logger.info("Applying changes impact for feature ID: {}. What is changed: {}", changeImpactDTO.getFeatureId(), changeImpactDTO.getWhatIsChanged());
-      Feature feature = featureService.getFeatureById(changeImpactDTO.getFeatureId());
-      TestingNeed testingNeed = changeImpactDTO.getTestingNeed() != null
-          ? TestingNeed.valueOf(changeImpactDTO.getTestingNeed())
-          : null;
+      logger.info("Applying change impact for feature ID: {}. What is changed: {}", changeImpactDTO.featureId(), changeImpactDTO.whatIsChanged());
+      Feature feature = featureService.getFeatureById(changeImpactDTO.featureId());
       releaseNote.getChangeImpacts().add(new ChangeImpact(
           feature,
-          changeImpactDTO.getWhatIsChanged(),
-          changeImpactDTO.getWhatShouldBeTested(),
-          testingNeed));
+          changeImpactDTO.whatIsChanged(),
+          changeImpactDTO.whatShouldBeTested(),
+          changeImpactDTO.testingNeed()));
     }
   }
 

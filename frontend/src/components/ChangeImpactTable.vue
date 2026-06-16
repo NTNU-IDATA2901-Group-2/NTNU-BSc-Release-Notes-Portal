@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ChangeImpact, Feature } from '@/utils/types'
+import type { ChangeImpact, Feature, TestingNeed } from '@/utils/types'
 import { FlexRender, getCoreRowModel, useVueTable, type ColumnDef } from '@tanstack/vue-table'
 import { h } from 'vue'
 import Table from './ui/table/Table.vue'
@@ -10,6 +10,7 @@ import TableCell from './ui/table/TableCell.vue'
 import TableHead from './ui/table/TableHead.vue'
 import { useI18n } from 'vue-i18n'
 import SelectFeatures from './SelectFeatures.vue'
+import SelectTestingNeed from './SelectTestingNeed.vue'
 import Textarea from './ui/textarea/Textarea.vue'
 
 const { t } = useI18n();
@@ -45,7 +46,7 @@ const columns: ColumnDef<ChangeImpact>[] = [
         ? h(SelectFeatures, {
             class:'w-full',
             'modelValue': row.original.feature,
-            'onUpdate:modelValue': (value: Feature) => updateData(row.index, 'feature', value)
+            'onUpdate:modelValue': (value?: Feature) => value && updateData(row.index, 'feature', value)
           })
         : cell.getValue() as string;
     }
@@ -79,9 +80,15 @@ const columns: ColumnDef<ChangeImpact>[] = [
   {
     accessorKey: 'testingNeed',
     header: () => t('title.testingNeed'),
-    cell: ({ getValue }) => {
-      const testingNeed = getValue() as string;
-      return h('span', { class: 'capitalize' }, t(`testingNeeds.${testingNeed.toLowerCase()}`));
+    cell: ({ row }) => {
+      const testingNeed = row.original.testingNeed;
+      return props.editable
+        ? h(SelectTestingNeed, {
+            class: 'w-full',
+            'modelValue': testingNeed,
+            'onUpdate:modelValue': (value?: TestingNeed) => updateData(row.index, 'testingNeed', value)
+          })
+        : h('span', { class: 'capitalize' }, testingNeed ? t(`testingNeeds.${testingNeed.toLowerCase()}`) : '');
     }
   },
 ]

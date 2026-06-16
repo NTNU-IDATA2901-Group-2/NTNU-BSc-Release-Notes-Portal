@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useGetFeatures } from '@/api/features-api';
 import Select from './ui/select/Select.vue';
 import SelectTrigger from './ui/select/SelectTrigger.vue';
 import SelectValue from './ui/select/SelectValue.vue';
@@ -7,32 +6,26 @@ import SelectItem from './ui/select/SelectItem.vue';
 import SelectContent from './ui/select/SelectContent.vue';
 import { useI18n } from 'vue-i18n';
 import type { HTMLAttributes } from 'vue';
-import type { Feature } from '@/utils/types.ts';
+import { testingNeedValues, type TestingNeed } from '@/utils/types.ts';
 
 const { t } = useI18n();
 
 const props = defineProps<{ class?: HTMLAttributes['class'] }>();
 
-const selected = defineModel<Feature>();
-
-const { data: features, isLoading, isError } = useGetFeatures();
+const selected = defineModel<TestingNeed>();
 </script>
 
 <template>
   <Select v-model="selected">
     <SelectTrigger :class="props.class">
-      <SelectValue :placeholder="t('title.feature')">
-        {{ selected?.name ?? t('title.feature') }}
+      <SelectValue :placeholder="t('title.testingNeed')">
+        {{ selected ? t(`testingNeeds.${selected.toLowerCase()}`) : t('title.testingNeed') }}
       </SelectValue>
     </SelectTrigger>
     <SelectContent>
-      <template v-if="!isLoading && !isError">
-        <SelectItem v-for="feature in features" :key="feature.id" :value="feature">
-          {{ feature.name }}
-        </SelectItem>
-      </template>
-      <p v-else-if="isError">{{ t('loadingError.features') }}</p>
-      <p v-else-if="isLoading">{{ t('loading.features') }}</p>
+      <SelectItem v-for="need in testingNeedValues" :key="need" :value="need">
+        {{ t(`testingNeeds.${need.toLowerCase()}`) }}
+      </SelectItem>
     </SelectContent>
   </Select>
 </template>
