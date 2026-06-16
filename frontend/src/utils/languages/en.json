@@ -125,6 +125,14 @@
         "commitToGitSuccess": "Release note committed to Git successfully",
         "commitToGitError": "An error occurred while committing the release note to Git"
     },
+    "validation": {
+        "changeImpact": {
+            "feature": "Please select a feature for every change impact",
+            "whatIsChanged": "Please describe what is changed for every change impact",
+            "whatShouldBeTested": "Please describe what should be tested for every change impact",
+            "testingNeed": "Please select a testing need for every change impact"
+        }
+    },
     "deletePrompt": {
         "title": "Are you sure you want to delete?",
         "description": "This action cannot be undone."

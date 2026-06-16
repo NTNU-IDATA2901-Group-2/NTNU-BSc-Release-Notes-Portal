@@ -125,6 +125,14 @@
         "commitToGitSuccess": "Note de version validée sur Git avec succès",
         "commitToGitError": "Une erreur s'est produite lors de la validation de la note de version sur Git"
     },
+    "validation": {
+        "changeImpact": {
+            "feature": "Veuillez sélectionner une fonctionnalité pour chaque changement",
+            "whatIsChanged": "Veuillez décrire ce qui a changé pour chaque changement",
+            "whatShouldBeTested": "Veuillez décrire ce qui doit être testé pour chaque changement",
+            "testingNeed": "Veuillez sélectionner un besoin de test pour chaque changement"
+        }
+    },
     "deletePrompt": {
         "title": "Êtes-vous sûr de vouloir supprimer ?",
         "description": "Cette action ne peut pas être annulée."

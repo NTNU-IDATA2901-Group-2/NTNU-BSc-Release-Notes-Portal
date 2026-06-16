@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { useUpdateReleaseNote } from '@/api/release-note-api';
-import { EditReleaseNoteSchema } from '@/schemas';
-import { type GitRepository, type ChangeNote, type ReleaseNote, type ChangeImpact, type PersistChangeImpactDTO } from '@/utils/types';
+import { ChangeImpactSchema, EditReleaseNoteSchema } from '@/schemas';
+import { type GitRepository, type ChangeNote, type ReleaseNote, type ChangeImpact } from '@/utils/types';
+import { z } from 'zod';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
 import { onBeforeUnmount, onMounted, computed, ref } from 'vue';
@@ -134,26 +135,35 @@ const cancelEdit = () => {
 }
 
 const onSubmit = form.handleSubmit((values) => {
-  if (releaseNote !== undefined) {
-    const payload = {
-      ...values,
-      changeNoteIds: changeNoteIdsWithinReleaseNote.value,
-      releaseTimeline: {
-        previewAvailableFrom: previewAvailableFrom.value,
-        recommendedTestPhaseFrom: recommendedTestPhaseFrom.value,
-        recommendedTestPhaseTo: recommendedTestPhaseTo.value,
-        plannedProductionDeployment: plannedProductionDeployment.value,
-      },
-      knownLimitations: knownLimitations.value.map(limitation => limitation.trim()).filter(limitation => limitation !== ''),
-      changeImpacts: changeImpacts.value.map(ci => ({
-        featureId: ci.feature.id,
-        whatIsChanged: ci.whatIsChanged,
-        whatShouldBeTested: ci.whatShouldBeTested,
-        testingNeed: ci.testingNeed
-      } as PersistChangeImpactDTO))
-    }
-    updateReleaseNoteMutation.mutate({ id: releaseNote.id, dto: payload });
+  if (releaseNote === undefined) return;
+
+  const mappedChangeImpacts = changeImpacts.value.map(ci => ({
+    featureId: ci.feature?.id,
+    whatIsChanged: ci.whatIsChanged,
+    whatShouldBeTested: ci.whatShouldBeTested,
+    testingNeed: ci.testingNeed
+  }));
+
+  const changeImpactsResult = z.array(ChangeImpactSchema).safeParse(mappedChangeImpacts);
+  if (!changeImpactsResult.success) {
+    const messages = [...new Set(changeImpactsResult.error.issues.map(issue => issue.message))];
+    messages.forEach(message => toast.error(t(message)));
+    return;
   }
+
+  const payload = {
+    ...values,
+    changeNoteIds: changeNoteIdsWithinReleaseNote.value,
+    releaseTimeline: {
+      previewAvailableFrom: previewAvailableFrom.value,
+      recommendedTestPhaseFrom: recommendedTestPhaseFrom.value,
+      recommendedTestPhaseTo: recommendedTestPhaseTo.value,
+      plannedProductionDeployment: plannedProductionDeployment.value,
+    },
+    knownLimitations: knownLimitations.value.map(limitation => limitation.trim()).filter(limitation => limitation !== ''),
+    changeImpacts: changeImpactsResult.data
+  }
+  updateReleaseNoteMutation.mutate({ id: releaseNote.id, dto: payload });
 }, ({ errors }) => {
     console.error('Change note edit validation failed', errors);
     toast.error(t('toast.releaseNoteUpdateError'));

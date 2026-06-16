@@ -126,6 +126,14 @@
         "commitToGitSuccess": "Utgivelsesnotat committet til Git",
         "commitToGitError": "Det oppsto en feil under committing av utgivelsesnotat til Git"
     },
+    "validation": {
+        "changeImpact": {
+            "feature": "Velg en funksjon for hver endring",
+            "whatIsChanged": "Beskriv hva som er endret for hver endring",
+            "whatShouldBeTested": "Beskriv hva som bør testes for hver endring",
+            "testingNeed": "Velg et testbehov for hver endring"
+        }
+    },
     "deletePrompt": {
         "title": "Er du sikker på at du vil slette?",
         "description": "Denne handlingen kan ikke angres."

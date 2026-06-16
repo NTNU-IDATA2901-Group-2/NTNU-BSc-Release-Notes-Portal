@@ -72,7 +72,7 @@ export type TestingNeed = 'LOW' | 'LOW_MEDIUM' | 'MEDIUM' | 'MEDIUM_HIGH' | 'HIG
 export const testingNeedValues = ['LOW', 'LOW_MEDIUM', 'MEDIUM', 'MEDIUM_HIGH', 'HIGH'] as const
 export interface ChangeImpact {
     id: number,
-    feature: Feature,
+    feature?: Feature,
     whatIsChanged: string,
     whatShouldBeTested: string,
     testingNeed?: TestingNeed

@@ -46,7 +46,7 @@ const columns: ColumnDef<ChangeImpact>[] = [
         ? h(SelectFeatures, {
             class:'w-full',
             'modelValue': row.original.feature,
-            'onUpdate:modelValue': (value?: Feature) => value && updateData(row.index, 'feature', value)
+            'onUpdate:modelValue': (value?: Feature) => updateData(row.index, 'feature', value)
           })
         : cell.getValue() as string;
     }
@@ -57,6 +57,7 @@ const columns: ColumnDef<ChangeImpact>[] = [
     cell: ({ cell, row }) => {
       return props.editable
         ? h(Textarea, {
+            class: 'resize-none',
             'modelValue': cell.getValue() as string,
             'onUpdate:modelValue': (value: string | number) =>
               updateData(row.index, 'whatIsChanged', String(value))
@@ -70,6 +71,7 @@ const columns: ColumnDef<ChangeImpact>[] = [
     cell: ({ cell, row }) => {
       return props.editable
         ? h(Textarea, {
+            class: 'resize-none',
             'modelValue': cell.getValue() as string,
             'onUpdate:modelValue': (value: string | number) =>
               updateData(row.index, 'whatShouldBeTested', String(value))

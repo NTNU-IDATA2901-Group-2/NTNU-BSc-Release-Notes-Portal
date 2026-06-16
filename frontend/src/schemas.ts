@@ -1,6 +1,20 @@
 import { z } from 'zod'
 import { testingNeedValues } from './utils/types'
 
+// Error messages are i18n keys, translated where they are surfaced (e.g. toasted in ReleaseNoteEdit).
+export const ChangeImpactSchema = z.object({
+  featureId: z.number({
+    required_error: 'validation.changeImpact.feature',
+    invalid_type_error: 'validation.changeImpact.feature',
+  }),
+  whatIsChanged: z.string().min(1, { message: 'validation.changeImpact.whatIsChanged' }),
+  whatShouldBeTested: z.string().min(1, { message: 'validation.changeImpact.whatShouldBeTested' }),
+  testingNeed: z.enum(testingNeedValues, {
+    required_error: 'validation.changeImpact.testingNeed',
+    invalid_type_error: 'validation.changeImpact.testingNeed',
+  }),
+})
+
 export const EditReleaseNoteSchema = z.object({
   tag: z.string().optional(),
   summary: z.string().optional(),
@@ -13,12 +27,7 @@ export const EditReleaseNoteSchema = z.object({
     plannedProductionDeployment: z.string().optional(),
   }).optional(),
   knownLimitations: z.array(z.string()).optional(),
-  changeImpacts: z.array(z.object({
-    featureId: z.number(),
-    whatIsChanged: z.string(),
-    whatShouldBeTested: z.string(),
-    testingNeed: z.enum(testingNeedValues),
-  })).optional(),
+  changeImpacts: z.array(ChangeImpactSchema).optional(),
 })
 
 export const EditChangeNoteSchema = z.object({

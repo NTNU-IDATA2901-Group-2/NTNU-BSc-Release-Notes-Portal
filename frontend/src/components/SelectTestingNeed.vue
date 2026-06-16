@@ -12,7 +12,7 @@ const { t } = useI18n();
 
 const props = defineProps<{ class?: HTMLAttributes['class'] }>();
 
-const selected = defineModel<TestingNeed>();
+const selected = defineModel<TestingNeed | undefined>();
 </script>
 
 <template>
@@ -23,6 +23,9 @@ const selected = defineModel<TestingNeed>();
       </SelectValue>
     </SelectTrigger>
     <SelectContent>
+      <SelectItem :key="undefined" :value="null">
+        {{ t('filters.none') }}
+      </SelectItem>
       <SelectItem v-for="need in testingNeedValues" :key="need" :value="need">
         {{ t(`testingNeeds.${need.toLowerCase()}`) }}
       </SelectItem>

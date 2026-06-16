@@ -13,7 +13,7 @@ const { t } = useI18n();
 
 const props = defineProps<{ class?: HTMLAttributes['class'] }>();
 
-const selected = defineModel<Feature>();
+const selected = defineModel<Feature | undefined>();
 
 const { data: features, isLoading, isError } = useGetFeatures();
 </script>
@@ -27,6 +27,9 @@ const { data: features, isLoading, isError } = useGetFeatures();
     </SelectTrigger>
     <SelectContent>
       <template v-if="!isLoading && !isError">
+        <SelectItem :key="undefined" :value="null">
+          {{ t('filters.none') }}
+        </SelectItem>
         <SelectItem v-for="feature in features" :key="feature.id" :value="feature">
           {{ feature.name }}
         </SelectItem>
