@@ -1,7 +1,7 @@
 meta {
   name: positive_put_update
   type: http
-  seq: 38
+  seq: 52
 }
 
 put {
@@ -26,7 +26,15 @@ body:json {
       "recommendedTestPhaseTo": "2026-07-15",
       "plannedProductionDeployment": "2026-08-01"
     },
-    "knownLimitations": ["limitation-one", "limitation-two"]
+    "knownLimitations": ["limitation-one", "limitation-two"],
+    "changeImpacts": [
+      {
+        "featureId": 1,
+        "whatIsChanged": "updated change",
+        "whatShouldBeTested": "updated test",
+        "testingNeed": "MEDIUM"
+      }
+    ]
   }
 }
 

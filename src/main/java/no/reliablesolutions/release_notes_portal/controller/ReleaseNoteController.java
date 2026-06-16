@@ -63,7 +63,7 @@ public class ReleaseNoteController {
   @PostMapping("")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<String> createReleaseNote(
-      @Parameter(name = "createReleaseNoteDTO", description = "Details of the release note to be created", required = true) @RequestBody CreateReleaseNoteDTO createReleaseNoteDTO) {
+      @Parameter(name = "createReleaseNoteDTO", description = "Details of the release note to be created", required = true) @Valid @RequestBody CreateReleaseNoteDTO createReleaseNoteDTO) {
     long id = releaseNoteService.createReleaseNote(createReleaseNoteDTO);
     logger.info("Release note created with id: {}", id);
     return ResponseEntity.status(HttpStatus.CREATED).body(String.valueOf(id));
@@ -158,7 +158,7 @@ public class ReleaseNoteController {
   @PutMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<ReleaseNoteDTO> updateReleaseNote(@PathVariable long id,
-      @RequestBody CreateReleaseNoteDTO createReleaseNoteDTO) {
+      @Valid @RequestBody CreateReleaseNoteDTO createReleaseNoteDTO) {
     ReleaseNoteDTO releaseNote = releaseNoteService.updateReleaseNote(id, createReleaseNoteDTO);
     logger.info("Updated release note with id: {}", id);
     return ResponseEntity.ok(releaseNote);

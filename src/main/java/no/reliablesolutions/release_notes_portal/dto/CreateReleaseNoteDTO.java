@@ -2,6 +2,8 @@ package no.reliablesolutions.release_notes_portal.dto;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 /**
  * DTO class for creating/updating a release note.
  */
@@ -12,6 +14,6 @@ public record CreateReleaseNoteDTO(
     Boolean published,
     ReleaseTimelineDTO releaseTimeline,
     List<String> knownLimitations,
-    List<CreateChangeImpactDTO> changeImpacts) {
+    @Valid List<CreateChangeImpactDTO> changeImpacts) {
 
 }

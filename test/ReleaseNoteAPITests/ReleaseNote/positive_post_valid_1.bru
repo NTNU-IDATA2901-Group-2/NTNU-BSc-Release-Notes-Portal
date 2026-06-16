@@ -19,7 +19,21 @@ body:json {
     "changeNoteIds": [{{change_id_1}}, {{change_id_2}}],
     "tag": "v1.0.0",
     "summary": "Initial release with core features",
-    "published": true
+    "published": true,
+    "changeImpacts": [
+      {
+        "featureId": 1,
+        "whatIsChanged": "Invoicing totals recalculated",
+        "whatShouldBeTested": "Verify invoice totals match line items",
+        "testingNeed": "HIGH"
+      },
+      {
+        "featureId": 2,
+        "whatIsChanged": "Picking flow reordered",
+        "whatShouldBeTested": "Verify pick sequence is correct",
+        "testingNeed": "LOW"
+      }
+    ]
   }
 }
 

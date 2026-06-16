@@ -1,7 +1,7 @@
 meta {
   name: positive_get_updated
   type: http
-  seq: 39
+  seq: 53
 }
 
 get {
@@ -27,6 +27,11 @@ assert {
   res.body.knownLimitations: length 2
   res.body.knownLimitations[0]: eq limitation-one
   res.body.knownLimitations[1]: eq limitation-two
+  res.body.changeImpacts: length 1
+  res.body.changeImpacts[0].feature.id: eq 1
+  res.body.changeImpacts[0].whatIsChanged: eq "updated change"
+  res.body.changeImpacts[0].whatShouldBeTested: eq "updated test"
+  res.body.changeImpacts[0].testingNeed: eq MEDIUM
 }
 
 settings {

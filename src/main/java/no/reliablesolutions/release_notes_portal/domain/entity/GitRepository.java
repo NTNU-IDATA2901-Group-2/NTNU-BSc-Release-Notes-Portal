@@ -33,7 +33,6 @@ public class GitRepository {
     private String url;
 
     @Setter
-    @NotBlank
     private String lastCheckedCommitHash;
 
     /**

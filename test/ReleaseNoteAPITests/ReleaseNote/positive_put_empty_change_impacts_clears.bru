@@ -1,0 +1,35 @@
+meta {
+  name: positive_put_empty_change_impacts_clears
+  type: http
+  seq: 43
+}
+
+put {
+  url: {{baseurl}}/releasenotes/{{release_id_1}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "changeNoteIds": [{{change_id_1}}, {{change_id_2}}],
+    "tag": "v1.0.0",
+    "summary": "Empty change impacts list clears them",
+    "published": true,
+    "changeImpacts": []
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.changeImpacts: length 0
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

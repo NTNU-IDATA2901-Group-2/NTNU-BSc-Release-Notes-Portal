@@ -1,0 +1,48 @@
+meta {
+  name: negative_put_change_impact_null_feature
+  type: http
+  seq: 46
+}
+
+put {
+  url: {{baseurl}}/releasenotes/{{release_id_1}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "changeNoteIds": [{{change_id_1}}, {{change_id_2}}],
+    "tag": "v1.0.0",
+    "summary": "Null feature id",
+    "published": true,
+    "changeImpacts": [
+      {
+        "featureId": null,
+        "whatIsChanged": "x",
+        "whatShouldBeTested": "y",
+        "testingNeed": "HIGH"
+      }
+    ]
+  }
+}
+
+assert {
+  res.status: eq 400
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  A null featureId is rejected with 400. CreateChangeImpactDTO.featureId is
+  annotated @NotNull, so the @Valid request body fails validation at the boundary
+  (MethodArgumentNotValidException -> 400). FeatureService.getFeatureById also
+  guards against null (IllegalArgumentException -> 400) as a backstop.
+}

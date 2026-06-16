@@ -1,10 +1,11 @@
 package no.reliablesolutions.release_notes_portal.dto;
 
+import jakarta.validation.constraints.NotNull;
 import no.reliablesolutions.release_notes_portal.domain.entity.ChangeImpact.TestingNeed;
 
 public record CreateChangeImpactDTO(
-    Long featureId,
-    String whatIsChanged,
-    String whatShouldBeTested,
-    TestingNeed testingNeed) {
+    @NotNull Long featureId,
+    @NotNull String whatIsChanged,
+    @NotNull String whatShouldBeTested,
+    @NotNull TestingNeed testingNeed) {
 }

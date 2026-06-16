@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,12 +30,15 @@ public class ChangeImpact {
   private Feature feature;
 
   @Column(columnDefinition = "TEXT")
-  private String whatIsChanged = "";
+  @NotNull
+  private String whatIsChanged;
 
   @Column(columnDefinition = "TEXT")
-  private String whatShouldBeTested = "";
+  @NotNull
+  private String whatShouldBeTested;
 
   @Enumerated(EnumType.STRING)
+  @NotNull
   private TestingNeed testingNeed;
 
   /**

@@ -1,0 +1,28 @@
+meta {
+  name: positive_get_replaced_change_impacts
+  type: http
+  seq: 37
+}
+
+get {
+  url: {{baseurl}}/releasenotes/{{release_id_1}}
+  body: none
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 200
+  res.body.changeImpacts: length 1
+  res.body.changeImpacts[0].feature.id: eq 2
+  res.body.changeImpacts[0].whatIsChanged: eq "Only impact after replace"
+  res.body.changeImpacts[0].testingNeed: eq MEDIUM
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

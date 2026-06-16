@@ -1,0 +1,50 @@
+meta {
+  name: positive_put_readd_change_impacts
+  type: http
+  seq: 42
+}
+
+put {
+  url: {{baseurl}}/releasenotes/{{release_id_1}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "changeNoteIds": [{{change_id_1}}, {{change_id_2}}],
+    "tag": "v1.0.0",
+    "summary": "Re-added change impacts",
+    "published": true,
+    "changeImpacts": [
+      {
+        "featureId": 1,
+        "whatIsChanged": "Re-added first",
+        "whatShouldBeTested": "Test re-added first",
+        "testingNeed": "MEDIUM_HIGH"
+      },
+      {
+        "featureId": 2,
+        "whatIsChanged": "Re-added second",
+        "whatShouldBeTested": "Test re-added second",
+        "testingNeed": "LOW_MEDIUM"
+      }
+    ]
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.changeImpacts: length 2
+  res.body.changeImpacts[0].testingNeed: eq MEDIUM_HIGH
+  res.body.changeImpacts[1].testingNeed: eq LOW_MEDIUM
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

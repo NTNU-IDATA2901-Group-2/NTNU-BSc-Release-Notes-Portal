@@ -1,0 +1,41 @@
+meta {
+  name: negative_post_change_impact_invalid_feature
+  type: http
+  seq: 45
+}
+
+post {
+  url: {{baseurl}}/releasenotes
+  body: json
+  auth: none
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "changeNoteIds": [],
+    "tag": "invalid-feature",
+    "summary": "Invalid feature id on create",
+    "published": false,
+    "changeImpacts": [
+      {
+        "featureId": 999999,
+        "whatIsChanged": "x",
+        "whatShouldBeTested": "y",
+        "testingNeed": "HIGH"
+      }
+    ]
+  }
+}
+
+assert {
+  res.status: eq 404
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

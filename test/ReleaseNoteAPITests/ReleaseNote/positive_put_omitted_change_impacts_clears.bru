@@ -1,0 +1,42 @@
+meta {
+  name: positive_put_omitted_change_impacts_clears
+  type: http
+  seq: 41
+}
+
+put {
+  url: {{baseurl}}/releasenotes/{{release_id_1}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "changeNoteIds": [{{change_id_1}}, {{change_id_2}}],
+    "tag": "v1.0.0",
+    "summary": "Omitting changeImpacts clears them",
+    "published": true
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.changeImpacts: length 0
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  Documents current behaviour: omitting `changeImpacts` from an update payload
+  (so it deserializes to null) clears all existing change impacts, because
+  ReleaseNoteService.applyChangeImpacts treats a null list the same as an empty
+  list. A client that wants to leave change impacts untouched cannot do so via
+  this endpoint. Flagged for review - see the summary that accompanied these tests.
+}
