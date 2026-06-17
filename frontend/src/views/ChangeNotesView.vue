@@ -69,15 +69,19 @@ if (isAdmin.value && params.value.hasReleaseNote === undefined) {
   hasReleaseNote.value = true;
 }
 
+const defaultPage = 1;
+const defaultPageSize = 10;
 const pageSizeOptions = [10, 20, 50, 100];
 // <Pagination> is 1-based; the backend `page` query param is 0-based.
-const page = ref(params.value.page ? parseInt(params.value.page) + 1 : 1);
-const pageSize = ref(params.value.size ? parseInt(params.value.size) : 10);
-const updatePaginationParams = () => {
+const page = ref(params.value.page ? parseInt(params.value.page) + 1 : defaultPage);
+const pageSize = ref(params.value.size ? parseInt(params.value.size) : defaultPageSize);
+const updatePaginationParams = (newPage: number, newPageSize: number) => {
+  page.value = newPage;
+  pageSize.value = newPageSize;
   params.value = { ...params.value, page: (page.value - 1).toString(), size: pageSize.value.toString() };
 };
-updatePaginationParams();
-watch([page, pageSize], updatePaginationParams);
+updatePaginationParams(page.value, pageSize.value);
+watch([page, pageSize], ([newPage, newSize]) => updatePaginationParams(newPage, newSize));
 
 const { isLoading, isFetching, isError, data } = useGetChangeNotes(params);
 
@@ -85,6 +89,10 @@ const search = ref<string>(params.value.query || '');
 
 const clearFilters = () => {
   clear();
+  updatePaginationParams(defaultPage, defaultPageSize);
+  search.value = '';
+  // Preserve the AllocatedFilter default: "unallocated" is pre-selected for admins.
+  if (isAdmin.value) hasReleaseNote.value = true;
 }
 
 const isChangeNoteSelected = (changeNoteId: number) => {
