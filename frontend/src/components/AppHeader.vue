@@ -94,18 +94,18 @@ const handleLogoClick = () => {
 					</MenubarSub>
 					<template v-if="isAdmin">
 						<MenubarSeparator/>
-						<MenubarItem>
-						<div class="w-full flex justify-end gap-2">
-							<RouterLink class="text-md" :to="routeNames.gitRepositories">{{ t('header.repositories') }}</RouterLink>
-							<GitBranch class="text-text-primary"/>
-						</div>
+						<MenubarItem @click="router.push(routeNames.gitRepositories)">
+							<div class="w-full flex justify-end gap-2">
+								<p class="text-md">{{ t('header.repositories') }}</p>
+								<GitBranch class="text-text-primary"/>
+							</div>
 						</MenubarItem>
 						<MenubarSeparator />
-						<MenubarItem>
-						<div class="w-full flex justify-end gap-2">
-							<RouterLink class="text-md" :to="routeNames.editPrompts">{{ t('header.editPrompts') }}</RouterLink>
-							<Sparkles class="text-text-primary"/>
-						</div>
+						<MenubarItem @click="router.push(routeNames.editPrompts)">
+							<div class="w-full flex justify-end gap-2">
+								<p class="text-md">{{ t('header.editPrompts') }}</p>
+								<Sparkles class="text-text-primary"/>
+							</div>
 						</MenubarItem>
 					</template>
 					<MenubarSeparator />
@@ -121,9 +121,9 @@ const handleLogoClick = () => {
 	</div>
 	<Separator/>
 	<div class="md:hidden">
-	    <nav class="flex items-center justify-between px-12 h-12">
-		<RouterLink class="text-lg text-text-dark-static" :to="routeNames.releaseNotes">{{ t('header.releaseNotesLink') }}</RouterLink>
-		<RouterLink class="text-lg text-text-dark-static" :to="routeNames.changeNotes">{{ t('header.changeNotesLink') }}</RouterLink>
+	    <nav class="flex items-center justify-between px-6 h-12">
+		<RouterLink class="text-md text-text-dark-static" :to="routeNames.releaseNotes">{{ t('header.releaseNotesLink') }}</RouterLink>
+		<RouterLink class="text-md text-text-dark-static" :to="routeNames.changeNotes">{{ t('header.changeNotesLink') }}</RouterLink>
 	    </nav>
 	    <Separator/>
 	</div>

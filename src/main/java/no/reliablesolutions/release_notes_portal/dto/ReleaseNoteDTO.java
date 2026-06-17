@@ -1,5 +1,6 @@
 package no.reliablesolutions.release_notes_portal.dto;
 
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -11,5 +12,9 @@ public record ReleaseNoteDTO(
     String tag,
     String summary,
     boolean published,
-    long createdAt) {
+    Instant createdAt,
+    boolean syncedToGit,
+    ReleaseTimelineDTO releaseTimeline,
+    List<String> knownLimitations,
+    List<ChangeImpactDTO> changeImpacts) {
 }

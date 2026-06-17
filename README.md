@@ -160,7 +160,7 @@ Run API tests with Bruno:
 ```bash
 npm install -g @usebruno/cli
 cd test/ReleaseNoteAPITests
-bru run --env Local
+bru run --env Local --sandbox=developer
 ```
 
 ## Useful Endpoints

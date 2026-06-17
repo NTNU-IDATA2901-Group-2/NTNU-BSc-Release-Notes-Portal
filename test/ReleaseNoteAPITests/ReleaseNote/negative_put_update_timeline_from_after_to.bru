@@ -1,0 +1,37 @@
+meta {
+  name: negative_put_update_timeline_from_after_to
+  type: http
+  seq: 51
+}
+
+put {
+  url: {{baseurl}}/releasenotes/{{release_id_2}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "changeNoteIds": [{{change_id_2}}],
+    "tag": "updated",
+    "summary": "updated",
+    "published": true,
+    "releaseTimeline": {
+      "recommendedTestPhaseFrom": "2026-07-15",
+      "recommendedTestPhaseTo": "2026-07-08"
+    }
+  }
+}
+
+assert {
+  res.status: eq 400
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

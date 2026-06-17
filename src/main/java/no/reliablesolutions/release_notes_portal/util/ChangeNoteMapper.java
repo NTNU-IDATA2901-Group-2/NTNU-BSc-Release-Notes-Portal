@@ -31,6 +31,7 @@ public class ChangeNoteMapper {
     if (!accessScope.isAdmin()) {
       return new ChangeNoteDTO(
           changeNote.getId(),
+          changeNote.getTitle(),
           changeNote.getReference(),
           changeNote.getDescription(),
           null,
@@ -42,10 +43,12 @@ public class ChangeNoteMapper {
           changeNote.isPublished(),
           null,
           changeNote.getGitRepository() != null ? changeNote.getGitRepository().getId() : null,
-          changeNote.getGitCommitHash());
+          changeNote.getGitCommitHash(),
+          changeNote.getReleaseNotes().stream().map(rn -> rn.getId()).toList());
     } else {
       return new ChangeNoteDTO(
           changeNote.getId(),
+          changeNote.getTitle(),
           changeNote.getReference(),
           changeNote.getDescription(),
           changeNote.getDeveloperNotes(),
@@ -57,7 +60,8 @@ public class ChangeNoteMapper {
           changeNote.isPublished(),
           changeNote.isViewableByEveryone(),
           changeNote.getGitRepository() != null ? changeNote.getGitRepository().getId() : null,
-          changeNote.getGitCommitHash());
+          changeNote.getGitCommitHash(),
+          changeNote.getReleaseNotes().stream().map(rn -> rn.getId()).toList());
     }
   }
 }

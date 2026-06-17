@@ -1,4 +1,4 @@
-import type { OnMutationApiCallFinished, PersistReleaseNoteDTO, ReleaseNote } from "@/utils/types"
+import type { OnMutationApiCallFinished, PaginatedResponse, PersistReleaseNoteDTO, ReleaseNote } from "@/utils/types"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import api from "./api";
 import type { Ref } from "vue";
@@ -72,9 +72,9 @@ const getReleaseNote = async (id: string): Promise<ReleaseNote> => {
  * @throws An error if the API request to retrieve the release notes fails.
  * @returns A promise that resolves to an array of release note data retrieved from the API.
  */
-const getReleaseNotes = async (params?: URLSearchParams): Promise<ReleaseNote[]> => {
+const getReleaseNotes = async (params?: URLSearchParams): Promise<PaginatedResponse<ReleaseNote[]>> => {
   const response = await api.get(`releasenotes`, { params });
-  return response.data as ReleaseNote[];
+  return response.data as PaginatedResponse<ReleaseNote[]>;
 }
 
 /**
@@ -83,9 +83,9 @@ const getReleaseNotes = async (params?: URLSearchParams): Promise<ReleaseNote[]>
  * @param searchParams A reactive reference to an object containing search parameters to filter the release notes.
  * @returns A promise that resolves to an array of release note data retrieved from the API.
  */
-export const useGetReleaseNotes = (searchParams: Ref<Record<string, string>>) => useQuery<ReleaseNote[]>({
+export const useGetReleaseNotes = (searchParams: Ref<Record<string, string>>) => useQuery<PaginatedResponse<ReleaseNote[]>>({
   queryKey: ['releaseNotes', searchParams],
-  queryFn: () => getReleaseNotes(new URLSearchParams(searchParams.value)),
+  queryFn: () => getReleaseNotes(new URLSearchParams(searchParams.value))
 });
 
 

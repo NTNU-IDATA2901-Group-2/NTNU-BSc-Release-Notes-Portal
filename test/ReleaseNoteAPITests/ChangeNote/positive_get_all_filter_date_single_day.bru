@@ -1,0 +1,41 @@
+meta {
+  name: positive_get_all_filter_date_single_day
+  type: http
+  seq: 39
+}
+
+get {
+  url: {{baseurl}}/changenotes?fromDate={{date_filter_day}}&toDate={{date_filter_day}}
+  body: none
+  auth: inherit
+}
+
+params:query {
+  fromDate: {{date_filter_day}}
+  toDate: {{date_filter_day}}
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:pre-request {
+  // fromDate == toDate == the note's creation day. A single-day range must still include
+  // the note (covers the inclusive lower bound and the toDate + 1 inclusive upper bound
+  // collapsing onto one day).
+  bru.setEnvVar("date_filter_day", bru.getEnvVar("change_note_1_created_date"))
+}
+
+tests {
+  const ids = res.body.content.map(cn => String(cn.id))
+  expect(ids).to.include(String(bru.getEnvVar("change_id_1")))
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

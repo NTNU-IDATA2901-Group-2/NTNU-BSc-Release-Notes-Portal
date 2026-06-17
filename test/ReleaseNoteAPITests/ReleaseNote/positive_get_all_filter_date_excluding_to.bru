@@ -1,0 +1,41 @@
+meta {
+  name: positive_get_all_filter_date_excluding_to
+  type: http
+  seq: 23
+}
+
+get {
+  url: {{baseurl}}/releasenotes?toDate={{date_filter_to}}
+  body: none
+  auth: inherit
+}
+
+params:query {
+  toDate: {{date_filter_to}}
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:pre-request {
+  // toDate set to the day BEFORE the note was created. The note's createdAt is not before
+  // startOfDay(toDate + 1), so it must be filtered out.
+  const base = new Date(bru.getEnvVar("release_note_1_created_date") + "T12:00:00Z")
+  base.setUTCDate(base.getUTCDate() - 1)
+  bru.setEnvVar("date_filter_to", base.toISOString().slice(0, 10))
+}
+
+tests {
+  const ids = res.body.content.map(rn => String(rn.id))
+  expect(ids).to.not.include(String(bru.getEnvVar("release_id_1")))
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

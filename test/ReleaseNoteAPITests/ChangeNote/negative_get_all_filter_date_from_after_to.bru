@@ -1,0 +1,37 @@
+meta {
+  name: negative_get_all_filter_date_from_after_to
+  type: http
+  seq: 40
+}
+
+get {
+  url: {{baseurl}}/changenotes?fromDate={{date_filter_from}}&toDate={{date_filter_to}}
+  body: none
+  auth: inherit
+}
+
+params:query {
+  fromDate: {{date_filter_from}}
+  toDate: {{date_filter_to}}
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 400
+}
+
+script:pre-request {
+  // fromDate after toDate is an invalid range and must be rejected with 400.
+  const base = new Date(bru.getEnvVar("change_note_1_created_date") + "T12:00:00Z")
+  const shift = (n) => { const d = new Date(base); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10) }
+  bru.setEnvVar("date_filter_from", shift(1))
+  bru.setEnvVar("date_filter_to", shift(-1))
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,5 +1,6 @@
 export interface ChangeNote {
     id: number,
+    title: string,
     reference: string,
     description: string,
     developerNotes: string,
@@ -13,9 +14,11 @@ export interface ChangeNote {
     viewableByEveryone: boolean,
     gitRepositoryId?: number,
     gitCommitHash?: string,
+    relatedReleaseNoteIds?: number[]
 }
 
 export interface PersistChangeNoteDTO {
+    title?: string,
     reference?: string,
     description?: string,
     developerNotes?: string,
@@ -58,22 +61,55 @@ export interface Scope {
     name: string
 }
 
+export interface ReleaseTimeline {
+    previewAvailableFrom?: string,
+    recommendedTestPhaseFrom?: string,
+    recommendedTestPhaseTo?: string,
+    plannedProductionDeployment?: string
+}
+
+export type TestingNeed = 'LOW' | 'LOW_MEDIUM' | 'MEDIUM' | 'MEDIUM_HIGH' | 'HIGH'
+export const testingNeedValues = ['LOW', 'LOW_MEDIUM', 'MEDIUM', 'MEDIUM_HIGH', 'HIGH'] as const
+export interface ChangeImpact {
+    id: number,
+    feature?: Feature,
+    whatIsChanged: string,
+    whatShouldBeTested: string,
+    testingNeed?: TestingNeed
+}
+
+export interface PersistChangeImpactDTO {
+    featureId: number,
+    whatIsChanged: string,
+    whatShouldBeTested: string,
+    testingNeed: TestingNeed
+}
+
 export interface ReleaseNote {
     id: number,
     tag: string,
     summary: string,
     published: boolean,
-    changeNotes: ChangeNote[]
+    changeNotes: ChangeNote[],
+    syncedToGit: boolean,
+    releaseTimeline: ReleaseTimeline,
+    knownLimitations: string[],
+    changeImpacts: ChangeImpact[]
 }
+
+
 
 export interface PersistReleaseNoteDTO {
     version?: string,
     description?: string,
     published?: boolean,
-    changeNoteIds?: number[]
+    changeNoteIds?: number[],
+    releaseTimeline?: ReleaseTimeline,
+    knownLimitations?: string[]
 }
 
 export interface PersistChangeNoteDTO {
+    title?: string,
     reference?: string,
     description?: string,
     developerNotes?: string,
@@ -83,6 +119,11 @@ export interface PersistChangeNoteDTO {
     featureId?: number,
     customerId?: number,
     viewableByEveryone?: boolean,
+}
+
+export interface PaginatedResponse<T> {
+    content: T,
+    totalItems: number
 }
 
 export interface Tag {

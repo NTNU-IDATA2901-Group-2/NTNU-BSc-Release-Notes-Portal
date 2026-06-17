@@ -1,8 +1,11 @@
 package no.reliablesolutions.release_notes_portal.domain.repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -52,47 +55,62 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
   /**
    * Finds all non-archived change notes that match the provided filter
    * parameters.
-   * 
-   * @param query          optional filter for searching change notes by
-   *                       reference, description, developer notes or upgrade
-   *                       notes
-   * @param published      optional filter for published status
-   * @param hasReleaseNote optional filter for change notes that have an
-   *                       associated release note
-   * @param filteredIds    optional filter for specific change note IDs
-   * @param customerIds    optional filter for customer ID
-   * @param featureIds     optional filter for feature ID
-   * @param scopeIds       optional filter for scope ID
-   * @param productIds     optional filter for product ID
-   * 
-   * @return a list of all non-archived change notes that match the provided
-   *         filters
+   *
+   * @param filterOptions the filter options to apply to the search
+   * @param fromDate      the lower bound (inclusive) for the change note
+   *                      timestamp, or {@code null} for no lower bound
+   * @param toDate        the upper bound (exclusive) for the change note
+   *                      timestamp, or {@code null} for no upper bound
+   * @param pageable      the pagination information for the query
+   * @return a page of non-archived change notes matching the provided filter
+   *         parameters, ordered by timestamp descending
    */
   @Query("""
       SELECT c
       FROM ChangeNote c
-      LEFT JOIN c.releaseNotes r ON r.archived = false
       WHERE c.archived = false AND
         (:#{#filterOptions.published} IS NULL OR c.published = :#{#filterOptions.published}) AND
         (:#{#filterOptions.hasReleaseNote} IS NULL OR
-          (:#{#filterOptions.hasReleaseNote} = TRUE AND r IS NOT NULL) OR
-          (:#{#filterOptions.hasReleaseNote} = FALSE AND r IS NULL)
+          (:#{#filterOptions.hasReleaseNote} = TRUE AND EXISTS (SELECT 1 FROM c.releaseNotes rn WHERE rn.archived = false)) OR
+          (:#{#filterOptions.hasReleaseNote} = FALSE AND NOT EXISTS (SELECT 1 FROM c.releaseNotes rn WHERE rn.archived = false))
         ) AND
         (:#{#filterOptions.filteredIds} IS NULL OR c.id IN :#{#filterOptions.filteredIds}) AND
-        (:#{#filterOptions.customerIds} IS NULL OR c.customer.id IN :#{#filterOptions.customerIds}) AND
-        (:#{#filterOptions.featureIds} IS NULL OR c.feature.id IN :#{#filterOptions.featureIds}) AND
-        (:#{#filterOptions.scopeIds} IS NULL OR c.scope.id IN :#{#filterOptions.scopeIds}) AND
-        (:#{#filterOptions.productIds} IS NULL OR c.product.id IN :#{#filterOptions.productIds}) AND
+        (
+          (:#{#filterOptions.customerIds} IS NULL AND :#{#filterOptions.includeUnassignedCustomer} IS NULL)
+          OR (:#{#filterOptions.customerIds} IS NOT NULL AND c.customer.id IN :#{#filterOptions.customerIds})
+          OR (:#{#filterOptions.includeUnassignedCustomer} IS NOT NULL AND c.customer IS NULL)
+        ) AND
+        (
+          (:#{#filterOptions.featureIds} IS NULL AND :#{#filterOptions.includeUnassignedFeature} IS NULL)
+          OR (:#{#filterOptions.featureIds} IS NOT NULL AND c.feature.id IN :#{#filterOptions.featureIds})
+          OR (:#{#filterOptions.includeUnassignedFeature} IS NOT NULL AND c.feature IS NULL)
+        ) AND
+        (
+          (:#{#filterOptions.scopeIds} IS NULL AND :#{#filterOptions.includeUnassignedScope} IS NULL)
+          OR (:#{#filterOptions.scopeIds} IS NOT NULL AND c.scope.id IN :#{#filterOptions.scopeIds})
+          OR (:#{#filterOptions.includeUnassignedScope} IS NOT NULL AND c.scope IS NULL)
+        ) AND
+        (
+          (:#{#filterOptions.productIds} IS NULL AND :#{#filterOptions.includeUnassignedProduct} IS NULL)
+          OR (:#{#filterOptions.productIds} IS NOT NULL AND c.product.id IN :#{#filterOptions.productIds})
+          OR (:#{#filterOptions.includeUnassignedProduct} IS NOT NULL AND c.product IS NULL)
+        ) AND
         (:#{#filterOptions.gitRepositoryIds} IS NULL OR c.gitRepository.id IN :#{#filterOptions.gitRepositoryIds}) AND
         ((:#{#filterOptions.query} IS NULL OR :#{#filterOptions.query} = '') OR
+        LOWER(c.title) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
         LOWER(c.reference) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
         LOWER(c.description) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
         LOWER(c.developerNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%') OR
-        LOWER(c.upgradeNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%'))
+        LOWER(c.upgradeNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%')) AND
+        (CAST(:fromDate AS Instant) IS NULL OR COALESCE(c.gitCommitTimestamp, c.creationTimestamp) >= :fromDate) AND
+        (CAST(:toDate AS Instant) IS NULL OR COALESCE(c.gitCommitTimestamp, c.creationTimestamp) < :toDate)
       ORDER BY CASE WHEN c.gitCommitTimestamp IS NULL THEN c.creationTimestamp ELSE c.gitCommitTimestamp END DESC
       """)
-  public List<ChangeNote> findByArchivedFalseAndMatchingFilterParameters(
-      @Param("filterOptions") ChangeNoteFilterOptionsDTO filterOptions);
+  public Page<ChangeNote> findByArchivedFalseAndMatchingFilterParameters(
+      @Param("filterOptions") ChangeNoteFilterOptionsDTO filterOptions,
+      @Param("fromDate") Instant fromDate,
+      @Param("toDate") Instant toDate,
+      Pageable pageable);
 
   /**
    * Finds all non-archived change notes that are viewable by everyone or
@@ -101,15 +119,19 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
    * 
    * @param customerNames a list of customer names to filter by (case-insensitive)
    * @param filterOptions the filter options to apply to the search
-   * @return a list of all non-archived change notes that are viewable by everyone
+   * @param fromDate      the lower bound (inclusive) for the change note
+   *                      timestamp, or {@code null} for no lower bound
+   * @param toDate        the upper bound (exclusive) for the change note
+   *                      timestamp, or {@code null} for no upper bound
+   * @param pageable      the pagination information for the query
+   * @return a page of non-archived change notes that are viewable by everyone
    *         or associated with a customer whose name is in the provided list, and
-   *         that match the provided filter parameters
+   *         that match the provided filter parameters, ordered by timestamp descending
    */
   @Query("""
       SELECT c
       FROM ChangeNote c
       LEFT JOIN c.customer customer
-      LEFT JOIN c.releaseNotes r ON r.archived = false
       WHERE c.archived = false
       AND (
         c.viewableByEveryone = true
@@ -117,25 +139,47 @@ public interface ChangeNoteRepository extends JpaRepository<ChangeNote, Long> {
       )
       AND (:#{#filterOptions.published} IS NULL OR c.published = :#{#filterOptions.published})
       AND (:#{#filterOptions.hasReleaseNote} IS NULL OR
-            (:#{#filterOptions.hasReleaseNote} = TRUE AND r IS NOT NULL) OR
-            (:#{#filterOptions.hasReleaseNote} = FALSE AND r IS NULL)
+            (:#{#filterOptions.hasReleaseNote} = TRUE AND EXISTS (SELECT 1 FROM c.releaseNotes rn WHERE rn.archived = false)) OR
+            (:#{#filterOptions.hasReleaseNote} = FALSE AND NOT EXISTS (SELECT 1 FROM c.releaseNotes rn WHERE rn.archived = false))
           )
       AND (:#{#filterOptions.filteredIds} IS NULL OR c.id IN :#{#filterOptions.filteredIds})
-      AND (:#{#filterOptions.customerIds} IS NULL OR c.customer.id IN :#{#filterOptions.customerIds})
-      AND (:#{#filterOptions.featureIds} IS NULL OR c.feature.id IN :#{#filterOptions.featureIds})
-      AND (:#{#filterOptions.scopeIds} IS NULL OR c.scope.id IN :#{#filterOptions.scopeIds})
-      AND (:#{#filterOptions.productIds} IS NULL OR c.product.id IN :#{#filterOptions.productIds})
-      AND (:#{#filterOptions.gitRepositoryIds} IS NULL OR c.gitRepository.id IN :#{#filterOptions.gitRepositoryIds}) 
+      AND (
+        (:#{#filterOptions.customerIds} IS NULL AND :#{#filterOptions.includeUnassignedCustomer} IS NULL)
+        OR (:#{#filterOptions.customerIds} IS NOT NULL AND c.customer.id IN :#{#filterOptions.customerIds})
+        OR (:#{#filterOptions.includeUnassignedCustomer} IS NOT NULL AND c.customer IS NULL)
+      )
+      AND (
+        (:#{#filterOptions.featureIds} IS NULL AND :#{#filterOptions.includeUnassignedFeature} IS NULL)
+        OR (:#{#filterOptions.featureIds} IS NOT NULL AND c.feature.id IN :#{#filterOptions.featureIds})
+        OR (:#{#filterOptions.includeUnassignedFeature} IS NOT NULL AND c.feature IS NULL)
+      )
+      AND (
+        (:#{#filterOptions.scopeIds} IS NULL AND :#{#filterOptions.includeUnassignedScope} IS NULL)
+        OR (:#{#filterOptions.scopeIds} IS NOT NULL AND c.scope.id IN :#{#filterOptions.scopeIds})
+        OR (:#{#filterOptions.includeUnassignedScope} IS NOT NULL AND c.scope IS NULL)
+      )
+      AND (
+        (:#{#filterOptions.productIds} IS NULL AND :#{#filterOptions.includeUnassignedProduct} IS NULL)
+        OR (:#{#filterOptions.productIds} IS NOT NULL AND c.product.id IN :#{#filterOptions.productIds})
+        OR (:#{#filterOptions.includeUnassignedProduct} IS NOT NULL AND c.product IS NULL)
+      )
+      AND (:#{#filterOptions.gitRepositoryIds} IS NULL OR c.gitRepository.id IN :#{#filterOptions.gitRepositoryIds})
       AND ((:#{#filterOptions.query} IS NULL OR :#{#filterOptions.query} = '')
+      OR LOWER(c.title) LIKE LOWER('%' || :#{#filterOptions.query} || '%')
       OR LOWER(c.reference) LIKE LOWER('%' || :#{#filterOptions.query} || '%')
       OR LOWER(c.description) LIKE LOWER('%' || :#{#filterOptions.query} || '%')
       OR LOWER(c.developerNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%')
       OR LOWER(c.upgradeNotes) LIKE LOWER('%' || :#{#filterOptions.query} || '%'))
+      AND (CAST(:fromDate AS Instant) IS NULL OR COALESCE(c.gitCommitTimestamp, c.creationTimestamp) >= :fromDate)
+      AND (CAST(:toDate AS Instant) IS NULL OR COALESCE(c.gitCommitTimestamp, c.creationTimestamp) < :toDate)
       ORDER BY CASE WHEN c.gitCommitTimestamp IS NULL THEN c.creationTimestamp ELSE c.gitCommitTimestamp END DESC
       """)
-  public List<ChangeNote> findForCustomerNamesMatchingFilterParameters(
+  public Page<ChangeNote> findForCustomerNamesMatchingFilterParameters(
       @Param("customerNames") List<String> customerNames,
-      @Param("filterOptions") ChangeNoteFilterOptionsDTO filterOptions);
+      @Param("filterOptions") ChangeNoteFilterOptionsDTO filterOptions,
+      @Param("fromDate") Instant fromDate,
+      @Param("toDate") Instant toDate,
+      Pageable pageable);
 
   /**
    * Finds the Git commit hash and the previous Git commit hash for a change note

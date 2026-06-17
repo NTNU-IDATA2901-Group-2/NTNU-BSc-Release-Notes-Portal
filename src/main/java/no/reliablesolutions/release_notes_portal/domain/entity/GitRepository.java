@@ -10,7 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import no.reliablesolutions.release_notes_portal.runner.SyncGitChangeNotes;
+import no.reliablesolutions.release_notes_portal.runner.ChangeNotesSyncHandler;
 
 /**
  * Entity representing a Git repository.
@@ -33,7 +33,6 @@ public class GitRepository {
     private String url;
 
     @Setter
-    @NotBlank
     private String lastCheckedCommitHash;
 
     /**
@@ -42,7 +41,7 @@ public class GitRepository {
      * @return the local path for this Git repository
      */
     public String getLocalPath() {
-        return SyncGitChangeNotes.REPOSITORY_DIRECTORIES_PATH + File.separator + this.getName();
+        return ChangeNotesSyncHandler.REPOSITORY_DIRECTORIES_PATH + File.separator + this.getName();
     }
 }
 

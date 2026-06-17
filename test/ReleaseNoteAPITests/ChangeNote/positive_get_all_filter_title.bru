@@ -1,0 +1,30 @@
+meta {
+  name: positive_get_all_filter_title
+  type: http
+  seq: 14
+}
+
+get {
+  url: {{baseurl}}/changenotes?query=itle
+  body: none
+  auth: inherit
+}
+
+params:query {
+  query: itle
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.body.content[0].id: eq {{change_id_1}}
+  res.body.content: length 1
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

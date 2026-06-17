@@ -1,0 +1,41 @@
+meta {
+  name: negative_put_change_impact_null_whatShouldBeTested
+  type: http
+  seq: 39
+}
+
+put {
+  url: {{baseurl}}/releasenotes/{{release_id_1}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "changeNoteIds": [{{change_id_1}}, {{change_id_2}}],
+    "tag": "v1.0.0",
+    "summary": "Null required change impact fields",
+    "published": true,
+    "changeImpacts": [
+      {
+        "featureId": 1,
+        "whatIsChanged": "something",
+        "whatShouldBeTested": null,
+        "testingNeed": "HIGH"
+      }
+    ]
+  }
+}
+
+assert {
+  res.status: eq 400
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,4 +1,4 @@
-import type { ChangeNote, OnMutationApiCallFinished, PersistChangeNoteDTO } from "@/utils/types";
+import type { ChangeNote, OnMutationApiCallFinished, PaginatedResponse, PersistChangeNoteDTO } from "@/utils/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import api from "./api";
 import { unref, type MaybeRef, type Ref } from "vue";
@@ -158,7 +158,7 @@ export const useArchiveChangeNote = (id: number, onFinished: OnMutationApiCallFi
  * @return A promise that resolves when the change note is successfully updated.
  * @throws An error if the API request to update the change note fails.
  */
-const updateChangeNote = async (changeNoteId: number | undefined, changeNoteData: PersistChangeNoteDTO | undefined): Promise<void> => {
+const updateChangeNote = async (changeNoteId: string | undefined, changeNoteData: PersistChangeNoteDTO | undefined): Promise<void> => {
   if (changeNoteId === undefined) {
     console.error("Change note ID is undefined. Cannot update change note.");
   } else if (changeNoteData === undefined) {
@@ -178,20 +178,28 @@ const updateChangeNote = async (changeNoteId: number | undefined, changeNoteData
 export const useUpdateChangeNote = (onFinished: OnMutationApiCallFinished) => {
   const queryClient = useQueryClient();
   interface MutationVariables {
-    id: number;
+    id: string;
+    relatedReleaseNoteIds?: string[];
     dto: PersistChangeNoteDTO;
   }
 
-  let updateId: number | undefined;
-
+  let updateId: string | undefined;
+  let releaseNoteIds: string[] | undefined;
   return useMutation<void, unknown, MutationVariables>({
-    mutationFn: ({ id, dto }: MutationVariables) => {
+    mutationFn: ({ id, relatedReleaseNoteIds, dto }: MutationVariables) => {
       updateId = id;
+      releaseNoteIds = relatedReleaseNoteIds;
       return updateChangeNote(id, dto)
     },
     onSettled: () => onFinished.onSettled?.(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['changeNote', `${updateId}`] });
+      queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
+      if (releaseNoteIds !== undefined) {
+        releaseNoteIds.forEach((id) => {
+          queryClient.invalidateQueries({ queryKey: ['releaseNote', id] });
+        });
+      }
       onFinished.onSuccess();
     },
     onError: () => {
@@ -229,7 +237,7 @@ const getChangeNote = async (id: string): Promise<ChangeNote> => {
  * @param params Optional URL search parameters to filter the change notes.
  * @returns An array of change note data that matches the provided search parameters.
  */
-export const useGetChangeNotes = (searchParams?: Ref<Record<string, string>> | URLSearchParams) => useQuery<ChangeNote[]>({  
+export const useGetChangeNotes = (searchParams?: Ref<Record<string, string>> | URLSearchParams) => useQuery<PaginatedResponse<ChangeNote[]>>({
   queryKey: ['changeNotes', searchParams],
   queryFn: () => getChangeNotes(new URLSearchParams(searchParams instanceof URLSearchParams ? searchParams : searchParams?.value)),
 });
@@ -242,9 +250,9 @@ export const useGetChangeNotes = (searchParams?: Ref<Record<string, string>> | U
  * @returns An array of change note data that matches the provided search parameters.
  * @throws An error if the API request to retrieve the change notes fails.
  */
-const getChangeNotes = async (params?: URLSearchParams) => {
+const getChangeNotes = async (params?: URLSearchParams): Promise<PaginatedResponse<ChangeNote[]>> => {
   const response = await api.get(`changenotes`, { params });
-  return response.data as ChangeNote[];
+  return response.data as PaginatedResponse<ChangeNote[]>;
 }
 
 /**

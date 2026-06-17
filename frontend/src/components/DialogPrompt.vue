@@ -45,6 +45,7 @@ const { t } = useI18n();
           {{ t(props.descriptionKey) }}
         </DialogDescription>
       </DialogHeader>
+      <slot/>
       <DialogFooter>
         <Button variant="outline" @click="handleClose">{{ t('button.cancel') }}</Button>
         <Button variant="destructive" @click="handleConfirm">{{ t(`button.${props.mode}`) }}</Button>

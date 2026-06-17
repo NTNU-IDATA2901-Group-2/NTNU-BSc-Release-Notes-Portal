@@ -1,0 +1,44 @@
+meta {
+  name: positive_put_replace_change_impacts
+  type: http
+  seq: 36
+}
+
+put {
+  url: {{baseurl}}/releasenotes/{{release_id_1}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "changeNoteIds": [{{change_id_1}}, {{change_id_2}}],
+    "tag": "v1.0.0",
+    "summary": "Replaced change impacts",
+    "published": true,
+    "changeImpacts": [
+      {
+        "featureId": 2,
+        "whatIsChanged": "Only impact after replace",
+        "whatShouldBeTested": "Test the replacement",
+        "testingNeed": "MEDIUM"
+      }
+    ]
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.changeImpacts: length 1
+  res.body.changeImpacts[0].feature.id: eq 2
+  res.body.changeImpacts[0].testingNeed: eq MEDIUM
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

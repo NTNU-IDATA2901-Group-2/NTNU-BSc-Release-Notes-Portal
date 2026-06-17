@@ -1,0 +1,44 @@
+meta {
+  name: positive_get_all_filter_date_between
+  type: http
+  seq: 34
+}
+
+get {
+  url: {{baseurl}}/changenotes?fromDate={{date_filter_from}}&toDate={{date_filter_to}}
+  body: none
+  auth: inherit
+}
+
+params:query {
+  fromDate: {{date_filter_from}}
+  toDate: {{date_filter_to}}
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:pre-request {
+  // change_note_1_created_date is "YYYY-MM-DD" in Europe/Oslo, set by positive_post_1_admin.
+  // Build a [from, to] range that brackets that day: from = day-1, to = day+1.
+  const base = new Date(bru.getEnvVar("change_note_1_created_date") + "T12:00:00Z")
+  const shift = (n) => { const d = new Date(base); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10) }
+  bru.setEnvVar("date_filter_from", shift(-1))
+  bru.setEnvVar("date_filter_to", shift(1))
+}
+
+tests {
+  // The note created in positive_post_1_admin falls inside the [from, to] range.
+  const ids = res.body.content.map(cn => String(cn.id))
+  expect(ids).to.include(String(bru.getEnvVar("change_id_1")))
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

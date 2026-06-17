@@ -1,0 +1,32 @@
+meta {
+  name: positive_post_3_admin_no_allocation
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseurl}}/changenotes
+  body: json
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {}
+}
+
+assert {
+  res.status: eq 201
+}
+
+script:post-response {
+  bru.setEnvVar("change_id_3", res.body)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

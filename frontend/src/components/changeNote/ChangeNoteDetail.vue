@@ -22,6 +22,7 @@ import { useTranslate } from '@/api/ai-api';
 import Button from '../ui/button/Button.vue';
 import Spinner from '../ui/spinner/Spinner.vue';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
+import { openJiraTicket } from '@/utils/jira.ts';
 
 const { t, locale } = useI18n();
 
@@ -71,7 +72,7 @@ const hasTranslation = computed(() => translatedDescription.value !== null);
 
 const translateMutation = useTranslate({
   onSuccess: () => {
-    toast.success(t('toast.translationSuccess'));
+    toast.success(t('toast.changeNoteTranslationSuccess'));
   },
   onError: () => {
     toast.error(t('toast.translationError'));
@@ -136,26 +137,38 @@ onBeforeUnmount(() => {
   <DialogPrompt :open="showDeletePrompt" :mode="'delete'" :title-key="'deletePrompt.title'" :description-key="'deletePrompt.description'" @update:open="showDeletePrompt = false" @confirm="onDelete" />
     <div class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
       <div class="flex flex-col gap-4 w-full">
-        <div class="flex flex-row items-center justify-between w-full gap-4">
-          <div class="flex items-center gap-4 min-w-0">
-            <h1 v-if="changeNote.reference" class="text-3xl md:text-4xl whitespace-nowrap text-ellipsis overflow-hidden">{{
-              changeNote.reference }}</h1>
-            <h1 v-else class="text-3xl text-text-primary/50">{{ t('placeholder.noTitle') }}</h1>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-4">
+          <h1 v-if="changeNote.title" class="text-3xl md:text-4xl whitespace-nowrap text-ellipsis overflow-hidden leading-normal">{{
+            changeNote.title }}</h1>
+          <h1 v-else class="text-3xl text-text-primary/50 leading-normal">{{ t('placeholder.noTitle') }}</h1>
+          <div class="flex gap-4 justify-center items-center grow">
             <Tooltip v-if="isAdmin">
               <TooltipTrigger as-child>
                 <Badge 
-                  v-if="isAdmin" class="h-6"
+                  v-if="isAdmin" class="h-6 mr-auto"
                   :variant="changeNote.published ? 'success' : 'destructive'"
                 >
-                  {{ changeNote.published ? t('card.published') : t('card.private') }}
+                  {{ changeNote.published ? t('card.published') : t('card.draft') }}
                 </Badge>
               </TooltipTrigger>
               <TooltipContent>
-                  {{ changeNote.published ? t('tooltip.publishedNote') : t('tooltip.privateNote') }}
+                  {{ changeNote.published ? t('tooltip.publishedNote') : t('tooltip.draftNote') }}
               </TooltipContent>
             </Tooltip>
-          </div>
-          <div class="flex gap-4 justify-center items-center">
+            <Tooltip v-if="isAdmin && changeNote.reference">
+              <TooltipTrigger as-child>
+                <Badge 
+                  class="h-6 hover:cursor-pointer hover:underline"
+                  variant="outline"
+                  @click="() => openJiraTicket(changeNote.reference)"
+                >
+                  {{ changeNote.reference }}
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                  {{ t('tooltip.reference') }}
+              </TooltipContent>
+            </Tooltip>
             <Button :disabled="isTranslating" v-if="!(locale === 'en')" variant="glow" @click="onTranslate">{{hasTranslation ? t('button.undo') : t('button.translate') }}
               <Spinner v-if="isTranslating" class="h-4 dark:text-text-primary"/>
               <Sparkles v-else/> 

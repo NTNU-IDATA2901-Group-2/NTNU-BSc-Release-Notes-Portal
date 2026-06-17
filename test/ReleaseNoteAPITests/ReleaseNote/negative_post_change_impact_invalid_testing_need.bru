@@ -1,0 +1,41 @@
+meta {
+  name: negative_post_change_impact_invalid_testing_need
+  type: http
+  seq: 48
+}
+
+post {
+  url: {{baseurl}}/releasenotes
+  body: json
+  auth: none
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "changeNoteIds": [],
+    "tag": "invalid-testing-need",
+    "summary": "Invalid testing need on create",
+    "published": false,
+    "changeImpacts": [
+      {
+        "featureId": 1,
+        "whatIsChanged": "x",
+        "whatShouldBeTested": "y",
+        "testingNeed": "EXTREME"
+      }
+    ]
+  }
+}
+
+assert {
+  res.status: eq 400
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

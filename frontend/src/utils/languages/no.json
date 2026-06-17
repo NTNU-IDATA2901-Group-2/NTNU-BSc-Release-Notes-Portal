@@ -1,4 +1,26 @@
 {
+    "filters": {
+        "none": "Ingen",
+        "dateRange": "Datointervall",
+        "startRange": "Fra dato",
+        "endRange": "Til dato"
+    },
+    "pagination": {
+        "itemsPerPage": "{count} per side"
+    },
+    "pdf": {
+        "generated": "Generert",
+        "noTitle": "Ingen tittel",
+        "noReference": "Ingen referanse",
+        "ticketId": "Saks-ID",
+        "previewIntro": "Dette er en forhåndsversjon av kommende release. Formålet er å planlegge for testing og verifisere at løsningen fungerer som forventet i deres oppsett før produksjonssetting.",
+        "timeline": "Tidslinje",
+        "previewTestingNotice": "Flere av endringene kan påvirke eksisterende arbeidsprosesser, og det vil derfor være behov for målrettet testing.",
+        "featureDetails": "Funksjoner",
+        "otherFeature": "Annet",
+        "testingResponsibility": "Ansvar for testing og oppfølging",
+        "testingResponsibilityBody": "For å sikre en god overgang til ny versjon, ber vi dere gjennomføre testing av deres oppsett basert på denne Release Previewen.\n\nDette innebærer at dere som kunde har ansvar for å teste:\n\n- egne integrasjoner (andre tredjepartssystemer)\n- funksjonalitet og oppsett som benyttes i deres daglige bruk\n- kritiske forretningsprosesser og ende-til-ende flyt\n\nVi tester standardløsningen i kontrollerte miljøer.\n\nVi anbefaler at dere spesielt verifiserer funksjonalitet som er sentral for deres faktiske bruk av løsningen, inkludert konfigurasjon, tilpasninger og rapportering som benyttes i deres organisasjon.\n\nEn nærmere oversikt over relevante områder for deres oppsett kan deles og gjennomgås separat.\n\nProduksjonssetting forutsetter at relevant testing er gjennomført på deres side."
+    },
     "header": {
         "releaseNotesLink": "Utgivelsesnotater",
         "changeNotesLink": "Endringsnotater",
@@ -17,6 +39,8 @@
         "cancel": "Avbryt",
         "delete": "Slett",
         "export": "Eksporter PDF",
+        "exportRelease": "Eksporter utgivelse til PDF",
+        "exportPreview": "Eksporter forhåndsvisning til PDF",
         "publish": "Publiser",
         "unpublish": "Avpubliser",
         "none": "Ingen",
@@ -29,11 +53,15 @@
         "translate": "Oversett",
         "undo": "Angre",
         "showGeneralChanges": "Vis generelle endringer",
+        "showDraftChanges": "Vis utkast",
         "confirm": "Bekreft",
         "summarize": "Oppsummer",
         "allCustomers": "Alle kunder",
         "updateRange": "Oppdater fra/til",
-        "clearChangeNotes": "Fjern endringsnotater"
+        "clearChangeNotes": "Fjern endringsnotater",
+        "commitToGit": "Commit til Git",
+        "addKnownLimitation": "Legg til begrensning",
+        "addChangeImpact": "Legg til endring"
     },
     "title": {
         "title": "Tittel",
@@ -53,7 +81,27 @@
         "from": "Fra",
         "to": "Til",
         "addFromRepository": "Legg til fra repository",
-        "fromRepository": "Fra repository"
+        "fromRepository": "Fra repository",
+        "reference": "Referanse",
+        "releaseTimeline": "Utgivelsestidslinje",
+        "previewAvailableFrom": "Forhåndsvisning tilgjengelig fra",
+        "recommendedTestPhase": "Anbefalt testperiode",
+        "recommendedTestPhaseFrom": "Anbefalt testperiode fra",
+        "recommendedTestPhaseTo": "Anbefalt testperiode til",
+        "plannedProductionDeployment": "Planlagt produksjonssetting",
+        "knownLimitations": "Kjente begrensninger",
+        "changeImpacts": "Oversikt over endringer og forventet påvirkning",
+        "summary": "Sammendrag",
+        "whatIsChanged": "Hva er endret",
+        "whatShouldBeTested": "Hva bør testes",
+        "testingNeed": "Testbehov"
+    },
+    "testingNeeds": {
+        "low": "Lav",
+        "low_medium": "Lav-middels",
+        "medium": "Middels",
+        "medium_high": "Middels-høy",
+        "high": "Høy"
     },
     "toast": {
         "changeNoteDeleted": "Endringsnotat slettet",
@@ -81,19 +129,34 @@
         "releaseNoteUpdateError": "Det oppsto en feil under oppdatering av utgivelsesnotat",
         "exportPdfError": "Det oppsto en feil under eksportering til PDF",
         "translationError": "Det oppsto en feil under oversettelse av endringsnotat",
-        "translationSuccess": "Endringsnotat oversatt",
+        "changeNoteTranslationSuccess": "Endringsnotat oversatt",
+        "releaseNoteTranslationSuccess": "Utgivelsesnotat oversatt",
         "copySuccess": "Innhold kopiert til utklippstavle",
         "copyError": "Det oppsto en feil under kopiering til utklippstavle",
         "summarizeSuccess": "Oppsummert",
-        "summarizeError": "Det oppsto en feil under oppsummering"
+        "summarizeError": "Det oppsto en feil under oppsummering",
+        "commitToGitSuccess": "Utgivelsesnotat committet til Git",
+        "commitToGitError": "Det oppsto en feil under committing av utgivelsesnotat til Git"
+    },
+    "validation": {
+        "changeImpact": {
+            "feature": "Velg en funksjon for hver endring",
+            "whatIsChanged": "Beskriv hva som er endret for hver endring",
+            "whatShouldBeTested": "Beskriv hva som bør testes for hver endring",
+            "testingNeed": "Velg et testbehov for hver endring"
+        }
     },
     "deletePrompt": {
         "title": "Er du sikker på at du vil slette?",
         "description": "Denne handlingen kan ikke angres."
     },
+    "commitPrompt": {
+        "title": "Er du sikker på at du vil committe til Git?",
+        "description": "Denne handlingen kan ikke angres. Dette utgivelsesnotatet vil bli knyttet til følgende endringsnotater i Git:"
+    },
     "card": {
         "published": "Publisert",
-        "private": "Privat",
+        "draft": "Utkast",
         "containsChangeNotes": "ingen endringsnotater | 1 endringsnotat | {count} endringsnotater"
     },
       "input": {
@@ -108,7 +171,8 @@
         "customers": "Det oppsto en feil under innlastning av kunder"
     },
     "loading": {
-        "filter": "Laster inn filter..."
+        "filter": "Laster inn filter...",
+        "features": "Laster inn funksjoner..."
     },
     "notFound": {
         "resourceNotFound": "Ressursen du prøver å få tilgang til har enten blitt flyttet, eller eksisterer ikke.",
@@ -127,7 +191,14 @@
         "noSummary": "Ingen oppsummering",
         "noChangeNotesAdded": "Ingen endringsnotater lagt til",
         "noTitle": "Ingen tittel",
-        "noDescription": "Ingen beskrivelse"
+        "noDescription": "Ingen beskrivelse",
+        "reference": "Referanse",
+        "toBeDetermined": "Ikke fastsatt",
+        "knownLimitation": "Begrensning",
+        "noKnownLimitations": "Ingen kjente begrensninger",
+        "filterByCustomer": "Filtrer etter kunde",
+        "noResults": "Ingen resultater",
+        "noChangeImpacts": "Ingen endringer"
     },
     "repositories": {
         "title": "Git Repositorier",
@@ -137,7 +208,7 @@
         "remove": "Fjern",
         "id": "Id",
         "namePlaceholder": "Repository navn",
-        "urlPlaceholder": "Git klone url",
+        "urlPlaceholder": "Git klone url (HTTP)",
         "deleteSuccess": "Repository fjernet",
         "deleteError": "Det oppsto en feil under fjerning av repository",
         "createSuccess": "Repository lagt til",
@@ -174,8 +245,11 @@
     "tooltip": {
         "noCommits": "Ingen tilknyttede git commits",
         "publishedNote": "Ikke-administratorer kan se dette notatet",
-        "privateNote": "Bare administratorer kan se dette notatet",
-        "explainSummarize": "Bruk tilknyttede git diffs for å oppsummere"
+        "draftNote": "Bare administratorer kan se dette utkastet",
+        "explainSummarize": "Bruk tilknyttede git diffs for å oppsummere",
+        "reference": "Åpne den tilknyttede Jira-saken",
+        "alreadyCommited": "Allerede committet til Git",
+        "noChangeNotesToCommit": "Ingen endringsnotater valgt for commit"
     },
     "prompts": {
         "translationPrompt": "Oversettelsesprompt",

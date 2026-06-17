@@ -1,5 +1,6 @@
 package no.reliablesolutions.release_notes_portal.dto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -9,10 +10,16 @@ public record ChangeNoteFilterOptionsDTO(
     String query,
     Boolean published,
     Boolean hasReleaseNote,
+    Boolean includeUnassignedProduct,
+    Boolean includeUnassignedScope,
+    Boolean includeUnassignedFeature,
+    Boolean includeUnassignedCustomer,
     List<Long> gitRepositoryIds,
     List<Long> filteredIds,
     List<Long> customerIds,
     List<Long> featureIds,
     List<Long> scopeIds,
-    List<Long> productIds) {
+    List<Long> productIds,
+    LocalDate fromDate,
+    LocalDate toDate) {
 }
