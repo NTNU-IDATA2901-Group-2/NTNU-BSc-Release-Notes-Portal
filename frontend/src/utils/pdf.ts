@@ -159,9 +159,13 @@ function markdownToContent(text: string): Content[] {
   return tokensToContent(md.parse(text, {}));
 }
 
-/** A section heading on the level of "Timeline" or "Known limitations". */
+/**
+ * A section heading on the level of "Timeline" or "Known limitations".
+ * `headlineLevel` marks it for the document's `pageBreakBefore` rule so it is
+ * never stranded at the bottom of a page without its content.
+ */
 function sectionHeading(text: string): Content {
-  return { text, style: 'sectionHeading' };
+  return { text, style: 'sectionHeading', headlineLevel: 1 };
 }
 
 /** Formats a timeline date, falling back to the "to be determined" placeholder. */
@@ -224,11 +228,14 @@ function renderChangeImpactTable(changeImpacts: ChangeImpact[]): Content {
 }
 
 /**
- * Renders change notes grouped by feature, one sub-heading per feature in
+ * Renders the change-details section: its `sectionTitle` heading followed by
+ * the change notes grouped by feature, one sub-heading per feature in
  * first-seen order, with featureless notes collected under "Other" at the end.
  * Each note leads with its reference and title, then the markdown description.
+ * The section heading is owned here (rather than emitted by the caller) so it
+ * can be glued to the first feature group and never stranded above a page break.
  */
-function renderFeatureDetails(changeNotes: ChangeNote[]): Content[] {
+function renderFeatureDetails(changeNotes: ChangeNote[], sectionTitle: string): Content[] {
   const groups: { name: string; notes: ChangeNote[] }[] = [];
   const groupsByFeatureId = new Map<number, { name: string; notes: ChangeNote[] }>();
   const featurelessNotes: ChangeNote[] = [];
@@ -251,7 +258,10 @@ function renderFeatureDetails(changeNotes: ChangeNote[]): Content[] {
   }
 
   if (groups.length === 0) {
-    return [{ text: t('placeholder.noChangeNotesAdded'), italics: true, color: '#666666', margin: [0, 0, 0, 16] }];
+    return [
+      sectionHeading(sectionTitle),
+      { text: t('placeholder.noChangeNotesAdded'), italics: true, color: '#666666', margin: [0, 0, 0, 16] },
+    ];
   }
 
   // Each note leads with its reference — shown as a bold "Ticket ID:" label
@@ -272,35 +282,51 @@ function renderFeatureDetails(changeNotes: ChangeNote[]): Content[] {
     return { stack: note, unbreakable: true, margin: [0, 6, 0, 0] };
   };
 
-  return groups.map((group) => ({
-    stack: [{ text: group.name, style: 'featureHeading' }, ...group.notes.map(renderNote)],
-  }));
+  // Glue each feature heading to its first change note in one unbreakable block
+  // so the heading is never stranded at the foot of a page; the remaining notes
+  // flow after it, each unbreakable on its own. The section heading joins the
+  // first group's block for the same reason.
+  return groups.flatMap((group, index) => {
+    const notes = group.notes.map(renderNote);
+    const block: Content[] = [{ text: group.name, style: 'featureHeading' }, notes[0]!];
+    if (index === 0) block.unshift(sectionHeading(sectionTitle));
+    return [
+      { stack: block, unbreakable: true },
+      ...notes.slice(1),
+    ];
+  });
 }
 
 /**
- * Builds the body of a release preview PDF. A preview is meant to help
- * customers plan testing ahead of a production deployment, so it leads with an
- * explanatory intro and the release timeline, followed by the release note
- * summary, then summarizes the expected impact of the changes, the per-feature
- * change details and the known limitations. The generated date sits directly
- * below the intro paragraph rather than next to the title.
+ * Builds the body shared by both PDF layouts. A draft renders the full preview
+ * aimed at planning testing before deployment: an explanatory intro, the
+ * release timeline, the summary, the expected-impact overview, the per-feature
+ * change details, the testing responsibilities and the known limitations.
+ *
+ * A published release reuses the same builder but drops the preview-only
+ * sections — the intro, the timeline, the expected-impact overview and the
+ * testing responsibilities — leaving the summary, the change details and the
+ * known limitations.
  */
-function buildPreviewBody(releaseNote: ReleaseNote, changeNotes: ChangeNote[], generated: Content): Content[] {
+function buildBody(releaseNote: ReleaseNote, changeNotes: ChangeNote[]): Content[] {
+  const isPreview = !releaseNote.published;
   return [
-    generated,
-    { text: t('pdf.previewIntro'), style: 'intro' },
-    sectionHeading(t('pdf.timeline')),
-    renderTimeline(releaseNote.releaseTimeline),
+    ...(isPreview ? [{ text: t('pdf.previewIntro'), style: 'intro' } as Content] : []),
+    ...(isPreview ? [sectionHeading(t('pdf.timeline')), renderTimeline(releaseNote.releaseTimeline)] : []),
     ...(releaseNote.summary
       ? [sectionHeading(t('title.summary')), { stack: markdownToContent(releaseNote.summary), margin: [0, 0, 0, 16] } as Content]
       : []),
-    sectionHeading(t('title.changeImpacts')),
-    { text: t('pdf.previewTestingNotice'), margin: [0, 0, 0, 8] },
-    renderChangeImpactTable(releaseNote.changeImpacts),
-    sectionHeading(t('pdf.featureDetails')),
-    ...renderFeatureDetails(changeNotes),
-    sectionHeading(t('pdf.testingResponsibility')),
-    ...markdownToContent(t('pdf.testingResponsibilityBody')),
+    ...(isPreview
+      ? [
+          sectionHeading(t('title.changeImpacts')),
+          { text: t('pdf.previewTestingNotice'), margin: [0, 0, 0, 8] } as Content,
+          renderChangeImpactTable(releaseNote.changeImpacts),
+        ]
+      : []),
+    ...renderFeatureDetails(changeNotes, t('pdf.featureDetails')),
+    ...(isPreview
+      ? [sectionHeading(t('pdf.testingResponsibility')), ...markdownToContent(t('pdf.testingResponsibilityBody'))]
+      : []),
     sectionHeading(t('title.knownLimitations')),
     renderKnownLimitations(releaseNote.knownLimitations),
   ];
@@ -315,109 +341,15 @@ function renderKnownLimitations(knownLimitations: string[]): Content {
 }
 
 /**
- * Builds the body of a published release PDF. The document leads with the
- * release note's summary, followed by the change notes grouped together by
- * feature. Groups appear in the order their feature is first encountered, and
- * change notes without a feature are listed last. Within each feature the notes
- * are further grouped by customer, with customerless notes at the bottom. Each
- * change note leads with a heading line — "Title (reference)" followed by the
- * feature name when present — then the customer on its own line and the
- * description beneath. Change notes without a title or reference fall back to
- * localized placeholders.
- */
-function buildReleaseBody(releaseNoteSummary: string, changeNotes: ChangeNote[]): Content[] {
-  const content: Content[] = [];
-
-  if (releaseNoteSummary) {
-    content.push({ stack: markdownToContent(releaseNoteSummary), margin: [0, 0, 0, 24] });
-  }
-
-  // Group change notes by feature, preserving the order in which features are
-  // first seen. Notes without a feature are collected separately and rendered
-  // last, after all feature groups. The feature is shown on each note rather
-  // than as a separate group heading.
-  const featureGroups = new Map<number, ChangeNote[]>();
-  const featurelessNotes: ChangeNote[] = [];
-  for (const changeNote of changeNotes ?? []) {
-    if (changeNote.feature) {
-      const group = featureGroups.get(changeNote.feature.id);
-      if (group) {
-        group.push(changeNote);
-      } else {
-        featureGroups.set(changeNote.feature.id, [changeNote]);
-      }
-    } else {
-      featurelessNotes.push(changeNote);
-    }
-  }
-
-  // Within a feature, order notes so those sharing a customer are contiguous
-  // (in first-seen order), with customerless notes placed at the bottom.
-  const orderByCustomer = (notes: ChangeNote[]): ChangeNote[] => {
-    const customerGroups = new Map<number, ChangeNote[]>();
-    const customerlessNotes: ChangeNote[] = [];
-    for (const note of notes) {
-      if (note.customer) {
-        const group = customerGroups.get(note.customer.id);
-        if (group) {
-          group.push(note);
-        } else {
-          customerGroups.set(note.customer.id, [note]);
-        }
-      } else {
-        customerlessNotes.push(note);
-      }
-    }
-    return [...[...customerGroups.values()].flat(), ...customerlessNotes];
-  };
-
-  const renderChangeNote = (changeNote: ChangeNote): Content => {
-    const titleText = changeNote.title || t('pdf.noTitle');
-    const referenceText = changeNote.reference || t('pdf.noReference');
-
-    // The heading line reads "Title (reference)", with the feature name
-    // appended when the note has one.
-    const heading: ContentText[] = [
-      { text: titleText, style: 'title' },
-      { text: ` (${referenceText})`, style: 'reference' },
-    ];
-    if (changeNote.feature) {
-      heading.push({ text: ` ${changeNote.feature.name}`, style: 'feature' });
-    }
-
-    // Group each change note into one unbreakable block so a note is never
-    // split across a page boundary: the heading line, an optional customer line
-    // and the markdown description beneath.
-    const note: Content[] = [{ text: heading, margin: [0, 0, 0, 4] }];
-    if (changeNote.customer) {
-      note.push({ text: changeNote.customer.name, style: 'customer' });
-    }
-    if (changeNote.description) {
-      note.push({ stack: markdownToContent(changeNote.description), margin: [12, 4, 0, 8] });
-    }
-    return { stack: note, unbreakable: true, margin: [0, 16, 0, 0] };
-  };
-
-  for (const group of featureGroups.values()) {
-    for (const changeNote of orderByCustomer(group)) {
-      content.push(renderChangeNote(changeNote));
-    }
-  }
-  for (const changeNote of orderByCustomer(featurelessNotes)) {
-    content.push(renderChangeNote(changeNote));
-  }
-
-  return content;
-}
-
-/**
  * Exports a release note to a downloaded PDF file.
  *
  * The layout depends on the release note's publication state: a published note
- * produces the full customer-facing release document, while a draft produces a
- * preview aimed at planning testing before deployment. Both share the same
- * header (logo, tag, generated date) and are authored from the supplied change
- * notes, which the caller has already filtered and optionally translated.
+ * produces the customer-facing release document, while a draft produces a
+ * preview aimed at planning testing before deployment. The preview carries
+ * extra sections (intro, timeline, expected-impact overview and testing
+ * responsibilities) and labels its title accordingly; both are authored from
+ * the supplied change notes, which the caller has already filtered and
+ * optionally translated.
  *
  * This PDF is customer-facing, so it deliberately omits the change notes'
  * developer notes and upgrade requirements, which are internal-only.
@@ -441,22 +373,22 @@ export async function exportToPdf(releaseNote: ReleaseNote, changeNotes: ChangeN
 
   if (releaseNote.published) {
     // The release title and the generated date share the top row.
-    content.push(
-      { columns: [{ text: title, style: 'tag' }, generated] },
-      ...buildReleaseBody(releaseNote.summary, changeNotes),
-    );
+    content.push({ columns: [{ text: title, style: 'tag' }, generated] });
   } else {
-    // The preview title spans the row on its own; the generated date moves down
-    // to sit alongside the intro paragraph instead.
-    content.push(
-      { text: title, style: 'tag' },
-      ...buildPreviewBody(releaseNote, changeNotes, generated),
-    );
+    // The preview title spans the row on its own; the generated date sits below.
+    content.push({ text: title, style: 'tag' }, generated);
   }
+  content.push(...buildBody(releaseNote, changeNotes));
 
   const documentDefinition: TDocumentDefinitions = {
     info: { title: releaseNote.tag },
     content,
+    // Keep every heading with its content: a heading marked with headlineLevel
+    // moves to the next page when nothing — or only further headings — would
+    // follow it on the current page.
+    pageBreakBefore: (currentNode, nodeQueries) =>
+      currentNode.headlineLevel === 1 &&
+      nodeQueries.getFollowingNodesOnPage().every((node) => node.headlineLevel === 1),
     styles: {
       tag: { fontSize: 24, bold: true, margin: [0, 0, 0, 8] },
       generated: { fontSize: 10, color: '#666666', alignment: 'left', margin: [0, 0, 0, 8] },
@@ -464,10 +396,6 @@ export async function exportToPdf(releaseNote: ReleaseNote, changeNotes: ChangeN
       sectionHeading: { fontSize: 16, bold: true, margin: [0, 16, 0, 8] },
       featureHeading: { fontSize: 14, bold: true, margin: [0, 10, 0, 4] },
       tableHeader: { fontSize: 10, bold: true, fillColor: '#f0f0f0' },
-      title: { fontSize: 16, bold: true },
-      reference: { fontSize: 12, bold: true },
-      customer: { fontSize: 12, italics: true, color: '#666666' },
-      feature: { fontSize: 12, bold: true, color: '#666666' },
     },
     defaultStyle: { font: 'Roboto', lineHeight: 1.3 },
   };
