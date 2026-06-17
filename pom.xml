@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>reliablesolutions</groupId>
 	<artifactId>release-notes-portal</artifactId>
-	<version>1.4.2</version>
+	<version>1.5.0</version>
 	<name>Release Notes Portal</name>
 	<description>Portal for viewing, creating, edting and publishing release notes</description>
 	<url/>
