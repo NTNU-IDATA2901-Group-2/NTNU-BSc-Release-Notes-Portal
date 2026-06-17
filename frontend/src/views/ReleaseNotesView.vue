@@ -121,7 +121,7 @@ const createReleaseNoteMutation = useCreateReleaseNote({
               </DrawerTrigger>
             </div>
           </div>
-          <Spinner v-if="isLoading || isFetching" />
+          <Spinner v-if="isLoading || isFetching" class="w-full"/>
           <p v-else-if="isError">{{ t('loadingError.releaseNotes') }}</p>
           <div v-else>
             <ScrollArea class="h-[70vh] w-full">
