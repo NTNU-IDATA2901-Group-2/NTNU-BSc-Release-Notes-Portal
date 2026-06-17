@@ -20,6 +20,16 @@ assert {
   res.body.tag: eq "v1.0.0"
   res.body.summary: eq "Initial release with core features"
   res.body.published: eq true
+  res.body.knownLimitations: length 0
+  res.body.changeImpacts: length 2
+  res.body.changeImpacts[0].feature.id: eq 1
+  res.body.changeImpacts[0].feature.name: eq Invoicing
+  res.body.changeImpacts[0].whatIsChanged: eq "Invoicing totals recalculated"
+  res.body.changeImpacts[0].whatShouldBeTested: eq "Verify invoice totals match line items"
+  res.body.changeImpacts[0].testingNeed: eq HIGH
+  res.body.changeImpacts[1].feature.id: eq 2
+  res.body.changeImpacts[1].feature.name: eq Picking
+  res.body.changeImpacts[1].testingNeed: eq LOW
 }
 
 settings {

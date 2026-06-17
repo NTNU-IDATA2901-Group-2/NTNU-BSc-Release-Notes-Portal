@@ -1,0 +1,41 @@
+meta {
+  name: negative_put_change_impact_invalid_feature
+  type: http
+  seq: 44
+}
+
+put {
+  url: {{baseurl}}/releasenotes/{{release_id_1}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "changeNoteIds": [{{change_id_1}}, {{change_id_2}}],
+    "tag": "v1.0.0",
+    "summary": "Invalid feature id",
+    "published": true,
+    "changeImpacts": [
+      {
+        "featureId": 999999,
+        "whatIsChanged": "x",
+        "whatShouldBeTested": "y",
+        "testingNeed": "HIGH"
+      }
+    ]
+  }
+}
+
+assert {
+  res.status: eq 404
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

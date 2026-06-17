@@ -1,4 +1,26 @@
 {
+    "filters": {
+        "none": "None",
+        "dateRange": "Date range",
+        "startRange": "Start date",
+        "endRange": "End date"
+    },
+    "pagination": {
+        "itemsPerPage": "{count} per page"
+    },
+    "pdf": {
+        "generated": "Generated",
+        "noTitle": "No title",
+        "noReference": "No reference",
+        "ticketId": "Ticket ID",
+        "previewIntro": "This is a preview version of the upcoming release. Its purpose is to plan for testing and verify that the solution works as expected in your setup before production deployment.",
+        "timeline": "Timeline",
+        "previewTestingNotice": "Several of the changes may affect existing work processes, and there will therefore be a need for targeted testing.",
+        "featureDetails": "Features",
+        "otherFeature": "Other",
+        "testingResponsibility": "Responsibility for testing and follow-up",
+        "testingResponsibilityBody": "To ensure a smooth transition to the new version, we ask you to test your setup based on this Release Preview.\n\nThis means that you, as a customer, are responsible for testing:\n\n- your own integrations (other third-party systems)\n- functionality and configuration used in your daily operations\n- critical business processes and end-to-end flows\n\nWe test the standard solution in controlled environments.\n\nWe recommend that you pay particular attention to verifying functionality that is central to your actual use of the solution, including configuration, customizations and reporting used in your organization.\n\nA more detailed overview of the relevant areas for your setup can be shared and reviewed separately.\n\nProduction deployment requires that the relevant testing has been completed on your side."
+    },
     "header": {
         "releaseNotesLink": "Release Notes",
         "changeNotesLink": "Change Notes",
@@ -17,6 +39,8 @@
         "cancel": "Cancel",
         "delete": "Delete",
         "export": "Export PDF",
+        "exportRelease": "Export release to PDF",
+        "exportPreview": "Export preview to PDF",
         "publish": "Publish",
         "unpublish": "Unpublish",
         "none": "None",
@@ -29,11 +53,15 @@
         "translate": "Translate",
         "undo": "Undo",
         "showGeneralChanges": "Show General Changes",
+        "showDraftChanges": "Show Draft Changes",
         "confirm": "Confirm",
         "summarize": "Summarize",
         "allCustomers": "All customers",
         "updateRange": "Update Range",
-        "clearChangeNotes": "Clear change notes"
+        "clearChangeNotes": "Clear change notes",
+        "commitToGit": "Commit to Git",
+        "addKnownLimitation": "Add limitation",
+        "addChangeImpact": "Add change"
     },
     "title": {
         "title": "Title",
@@ -52,7 +80,27 @@
         "from": "From",
         "to": "To",
         "addFromRepository": "Add from repository",
-        "fromRepository": "From repository"
+        "fromRepository": "From repository",
+        "reference": "Reference",
+        "releaseTimeline": "Release Timeline",
+        "previewAvailableFrom": "Preview available from",
+        "recommendedTestPhase": "Recommended test phase",
+        "recommendedTestPhaseFrom": "Recommended test phase from",
+        "recommendedTestPhaseTo": "Recommended test phase to",
+        "plannedProductionDeployment": "Planned production deployment",
+        "knownLimitations": "Known Limitations",
+        "changeImpacts": "Overview of changes and expected impact",
+        "summary": "Summary",
+        "whatIsChanged": "What is changed",
+        "whatShouldBeTested": "What should be tested",
+        "testingNeed": "Testing need"
+    },
+    "testingNeeds": {
+        "low": "Low",
+        "low_medium": "Low-medium",
+        "medium": "Medium",
+        "medium_high": "Medium-high",
+        "high": "High"
     },
     "toast": {
         "changeNoteDeleted": "Change note deleted successfully",
@@ -80,19 +128,34 @@
         "releaseNoteUpdateError": "An error occurred while updating the release note",
         "exportPdfError": "An error occurred while exporting to PDF",
         "translationError": "An error occurred while translating the change note",
-        "translationSuccess": "Change note translated successfully",
+        "changeNoteTranslationSuccess": "Change note translated successfully",
+        "releaseNoteTranslationSuccess": "Release note translated successfully",
         "copySuccess": "Content copied to clipboard",
         "copyError": "An error occurred while copying to clipboard",
         "summarizeSuccess": "Summarized successfully",
-        "summarizeError": "An error occurred while summarizing"
+        "summarizeError": "An error occurred while summarizing",
+        "commitToGitSuccess": "Release note committed to Git successfully",
+        "commitToGitError": "An error occurred while committing the release note to Git"
+    },
+    "validation": {
+        "changeImpact": {
+            "feature": "Please select a feature for every change impact",
+            "whatIsChanged": "Please describe what is changed for every change impact",
+            "whatShouldBeTested": "Please describe what should be tested for every change impact",
+            "testingNeed": "Please select a testing need for every change impact"
+        }
     },
     "deletePrompt": {
         "title": "Are you sure you want to delete?",
         "description": "This action cannot be undone."
     },
+    "commitPrompt": {
+        "title": "Are you sure you want to commit to Git?",
+        "description": "This action cannot be undone. This release note will be associated with the following change notes in Git:"
+    },
     "card": {
         "published": "Published",
-        "private": "Private",
+        "draft": "Draft",
         "containsChangeNotes": "no change notes | 1 change note | {count} change notes"
     },
     "input": {
@@ -107,7 +170,8 @@
         "customers": "An error occurred while loading customers"
     },
     "loading": {
-        "filter": "Loading filter..."
+        "filter": "Loading filter...",
+        "features": "Loading features..."
     },
     "notFound": {
         "resourceNotFound": "The resource you are trying to access has either been moved, or does not exist.",
@@ -126,7 +190,14 @@
         "noSummary": "No summary provided",
         "noChangeNotesAdded": "No change notes added",
         "noTitle": "No title",
-        "noDescription": "No description"
+        "noDescription": "No description",
+        "reference": "Reference",
+        "toBeDetermined": "To be determined",
+        "knownLimitation": "Limitation",
+        "noKnownLimitations": "No known limitations",
+        "filterByCustomer": "Filter by customer",
+        "noResults": "No results",
+        "noChangeImpacts": "No change impacts"
     },
     "repositories": {
         "title": "Git Repositories",
@@ -136,7 +207,7 @@
         "remove": "Remove",
         "id": "Id",
         "namePlaceholder": "Repository name",
-        "urlPlaceholder": "Git clone url",
+        "urlPlaceholder": "Git clone url (HTTP)",
         "deleteSuccess": "Repository removed successfully",
         "deleteError": "An error occurred while removing the repository",
         "createSuccess": "Repository added successfully",
@@ -173,8 +244,11 @@
     "tooltip": {
         "noCommits": "No associated git commits",
         "publishedNote": "Non-administrators can view this note",
-        "privateNote": "Only administrators can view this note",
-        "explainSummarize": "Use associated git diffs to summarize"
+        "draftNote": "Only administrators can view this draft",
+        "explainSummarize": "Use associated git diffs to summarize",
+        "reference": "Open the related Jira ticket",
+        "alreadyCommited": "Already committed to Git",
+        "noChangeNotesToCommit": "No change notes selected to commit"
     },
     "prompts": {
         "translationPrompt": "Translation Prompt",

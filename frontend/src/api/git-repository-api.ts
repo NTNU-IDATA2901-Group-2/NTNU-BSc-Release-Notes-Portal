@@ -163,3 +163,50 @@ export const useSyncRepository = (onFinished: OnMutationApiCallFinished) => {
     })
 }
 
+/**
+ * Commits a release note to Git by its ID.
+ *
+ * The release note is committed to every git repository associated with its change notes,
+ * plus any additional repositories explicitly requested.
+ *
+ * @param id The ID of the release note to commit to Git.
+ * @param additionalGitRepositoryIds Optional IDs of extra git repositories to commit to.
+ * @returns the data from the API response.
+ * @throws An error if the API request to commit the release note fails.
+ */
+const syncReleaseNoteToGit = async (id: number, additionalGitRepositoryIds?: number[]) => {
+    const response = await api.post(`git-repositories/${id}/sync-to-git`, additionalGitRepositoryIds);
+    return response.data;
+}
+
+/**
+ * Commits a release note to Git by its ID and handles the API call lifecycle.
+ *
+ * @param onFinished An object containing callback functions to be called on success, error, and settled states of the API call.
+ * @returns A mutation object that can be used to trigger committing a release note to Git.
+ */
+export const useSyncReleaseNoteToGit = (onFinished: OnMutationApiCallFinished) => {
+    const queryClient = useQueryClient();
+    interface SyncReleaseNoteToGitVariables {
+        id: number,
+        additionalGitRepositoryIds?: number[]
+    }
+
+    let id: number | undefined;
+    return useMutation({
+        mutationFn: (variables: SyncReleaseNoteToGitVariables) => {
+            id = variables.id;
+            return syncReleaseNoteToGit(variables.id, variables.additionalGitRepositoryIds);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['releaseNote', id?.toString()] });
+            onFinished.onSuccess()
+        },
+        onError: () => {
+            console.error("Failed to sync release note to git");
+            onFinished.onError();
+        },
+        onSettled: () => onFinished.onSettled?.(),
+    })
+}
+

@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +26,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import no.reliablesolutions.release_notes_portal.dto.CreateReleaseNoteDTO;
+import no.reliablesolutions.release_notes_portal.dto.PaginatedResponseDTO;
 import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteDTO;
+import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteFilterOptionsDTO;
 import no.reliablesolutions.release_notes_portal.service.ReleaseNoteService;
 
 /**
@@ -60,7 +63,7 @@ public class ReleaseNoteController {
   @PostMapping("")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<String> createReleaseNote(
-      @Parameter(name = "createReleaseNoteDTO", description = "Details of the release note to be created", required = true) @RequestBody CreateReleaseNoteDTO createReleaseNoteDTO) {
+      @Parameter(name = "createReleaseNoteDTO", description = "Details of the release note to be created", required = true) @Valid @RequestBody CreateReleaseNoteDTO createReleaseNoteDTO) {
     long id = releaseNoteService.createReleaseNote(createReleaseNoteDTO);
     logger.info("Release note created with id: {}", id);
     return ResponseEntity.status(HttpStatus.CREATED).body(String.valueOf(id));
@@ -92,8 +95,13 @@ public class ReleaseNoteController {
    * Retrieves a list of all non-archived release notes, with optional filters for
    * query, published status, and product.
    *
-   * @return a ResponseEntity with a 200 status and a list of ReleaseNoteDTOs in
-   *         the body
+   * @param filterOptions the filter options for querying release notes
+   * @param page          the zero-based page index to retrieve, or {@code null}
+   *                      to return all matching release notes unpaged
+   * @param size          the page size, or {@code null} to return all matching
+   *                      release notes unpaged
+   * @return a ResponseEntity with a 200 status and a {@link PaginatedResponseDTO}
+   *         wrapping the page of ReleaseNoteDTOs and the total item count
    */
   @Operation(summary = "Get all release notes, with optional filters", description = "Retrieves a list of all release notes with optional filters")
   @ApiResponses(value = {
@@ -102,13 +110,12 @@ public class ReleaseNoteController {
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   @GetMapping("")
-  public ResponseEntity<List<ReleaseNoteDTO>> getAllReleaseNotes(
-      @RequestParam(required = false) String query,
-      @RequestParam(required = false) Boolean published,
-      @RequestParam(required = false) List<Long> productIds) {
-    List<ReleaseNoteDTO> releaseNotes = releaseNoteService.getAllReleaseNotes(query, published, productIds);
-    logger.info("Retrieved {} release notes with filters - query: {}, published: {}, productIds: {}",
-        releaseNotes.size(), query, published, productIds);
+  public ResponseEntity<PaginatedResponseDTO<List<ReleaseNoteDTO>>> getAllReleaseNotes(
+      @ModelAttribute ReleaseNoteFilterOptionsDTO filterOptions,
+      @RequestParam (required = false) Integer page,
+      @RequestParam (required = false) Integer size) {
+    PaginatedResponseDTO<List<ReleaseNoteDTO>> releaseNotes = releaseNoteService.getAllReleaseNotes(filterOptions, page, size);
+    logger.info("Retrieved {} release notes with filters: {} and pagination parameters: Page {}, Size {}", releaseNotes.content().size(), filterOptions, page, size);
     return ResponseEntity.ok(releaseNotes);
   }
 
@@ -151,21 +158,21 @@ public class ReleaseNoteController {
   @PutMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<ReleaseNoteDTO> updateReleaseNote(@PathVariable long id,
-      @RequestBody CreateReleaseNoteDTO createReleaseNoteDTO) {
+      @Valid @RequestBody CreateReleaseNoteDTO createReleaseNoteDTO) {
     ReleaseNoteDTO releaseNote = releaseNoteService.updateReleaseNote(id, createReleaseNoteDTO);
     logger.info("Updated release note with id: {}", id);
     return ResponseEntity.ok(releaseNote);
   }
 
   /**
-   * Publishes an existing release note by its ID. Privates release note if
-   * publish is false.
-   * 
+   * Publishes an existing release note by its ID. Reverts release note to draft
+   * if publish is false.
+   *
    * @param id the ID of the release note to be published
-   * @param publish a boolean indicating whether to publish (true) or private (false)
+   * @param publish a boolean indicating whether to publish (true) or set as draft (false)
    * @return a ResponseEntity with the ID of the published release note in the body
    */
-  @Operation(summary = "Publish release note", description = "Publishes an existing release note by its ID. Privates release note if publish is false.")
+  @Operation(summary = "Publish release note", description = "Publishes an existing release note by its ID. Reverts release note to draft if publish is false.")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Release note published successfully"),
       @ApiResponse(responseCode = "404", description = "Release note not found"),

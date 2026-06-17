@@ -2,6 +2,7 @@ package no.reliablesolutions.release_notes_portal.runner;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 
 import org.eclipse.jgit.api.Git;
@@ -35,9 +36,9 @@ import no.reliablesolutions.release_notes_portal.util.ChangeNoteFileHandler;
  */
 @Component
 @Profile("!ci")
-public class SyncGitChangeNotes implements CommandLineRunner {
+public class ChangeNotesSyncHandler implements CommandLineRunner {
   
-  private final Logger logger = LoggerFactory.getLogger(SyncGitChangeNotes.class);
+  private final Logger logger = LoggerFactory.getLogger(ChangeNotesSyncHandler.class);
   private final GitRepositoryRepository gitRepositoryRepository;
   private final ChangeNoteService changeNoteService;
   private final ChangeNoteFileHandler changeNoteFileHandler;
@@ -54,7 +55,7 @@ public class SyncGitChangeNotes implements CommandLineRunner {
    * @param changeNoteFileHandler the utility for handling change note files
    * @param changeNoteDirectory the directory within the Git repository where change note files are located, injected from environment variable, must be set
    */
-  public SyncGitChangeNotes(
+  public ChangeNotesSyncHandler(
     GitRepositoryRepository gitRepositoryRepository,
     ChangeNoteService changeNoteService,
     ChangeNoteFileHandler changeNoteFileHandler,
@@ -284,7 +285,7 @@ public class SyncGitChangeNotes implements CommandLineRunner {
           if (changeNote != null) {
             changeNote.setGitRepository(gitRepository);
             changeNote.setGitCommitHash(commit.getName());
-            changeNote.setGitCommitTimestamp(commit.getCommitTime() * 1000L); // convert seconds to milliseconds
+            changeNote.setGitCommitTimestamp(Instant.ofEpochSecond(commit.getCommitTime())); // git commit time is epoch seconds
             try {
               changeNoteService.updateChangeNote(changeNote);
               logger.info("Created change note from file {} for commit {} in repository with id {}", changeNoteFile.getPath(), commit.getName(), gitRepository.getId());

@@ -1,0 +1,30 @@
+meta {
+  name: positive_get_all_filter_noCustomer
+  type: http
+  seq: 32
+}
+
+get {
+  url: {{baseurl}}/changenotes?includeUnassignedCustomer=true
+  body: none
+  auth: inherit
+}
+
+params:query {
+  includeUnassignedCustomer: true
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.body.content: length 1
+  res.status: eq 200
+  res.body.content[0].id: eq {{change_id_3}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

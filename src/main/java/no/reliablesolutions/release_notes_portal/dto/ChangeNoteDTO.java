@@ -1,10 +1,13 @@
 package no.reliablesolutions.release_notes_portal.dto;
 
+import java.util.List;
+
 /**
  * A data transfer object for representing a change note.
  */
 public record ChangeNoteDTO(
     long id,
+    String title,
     String reference,
     String description,
     String developerNotes,
@@ -16,5 +19,6 @@ public record ChangeNoteDTO(
     boolean published,
     Boolean viewableByEveryone,
     Long gitRepositoryId,
-    String gitCommitHash) {
+    String gitCommitHash,
+    List<Long> relatedReleaseNoteIds) {
 }

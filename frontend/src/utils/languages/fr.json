@@ -1,4 +1,26 @@
-{ 
+{
+    "filters": {
+        "none": "Aucun",
+        "dateRange": "Plage de dates",
+        "startRange": "Date de début",
+        "endRange": "Date de fin"
+    },
+    "pagination": {
+        "itemsPerPage": "{count} par page"
+    },
+    "pdf": {
+        "generated": "Généré",
+        "noTitle": "Aucun titre",
+        "noReference": "Aucune référence",
+        "ticketId": "ID du ticket",
+        "previewIntro": "Ceci est une version préliminaire de la prochaine release. Son objectif est de planifier les tests et de vérifier que la solution fonctionne comme prévu dans votre configuration avant la mise en production.",
+        "timeline": "Calendrier",
+        "previewTestingNotice": "Plusieurs des changements peuvent affecter les processus de travail existants ; des tests ciblés seront donc nécessaires.",
+        "featureDetails": "Fonctionnalités",
+        "otherFeature": "Autre",
+        "testingResponsibility": "Responsabilité des tests et du suivi",
+        "testingResponsibilityBody": "Afin d'assurer une transition en douceur vers la nouvelle version, nous vous demandons de tester votre configuration sur la base de cette Release Preview.\n\nCela signifie qu'en tant que client, vous êtes responsable de tester :\n\n- vos propres intégrations (autres systèmes tiers)\n- les fonctionnalités et la configuration utilisées dans votre usage quotidien\n- les processus métier critiques et les flux de bout en bout\n\nNous testons la solution standard dans des environnements contrôlés.\n\nNous vous recommandons de vérifier en particulier les fonctionnalités essentielles à votre utilisation réelle de la solution, y compris la configuration, les personnalisations et les rapports utilisés dans votre organisation.\n\nUn aperçu plus détaillé des domaines pertinents pour votre configuration peut être partagé et examiné séparément.\n\nLa mise en production suppose que les tests pertinents ont été réalisés de votre côté."
+    },
     "header": {
         "releaseNotesLink": "Notes de version",
         "changeNotesLink": "Notes de changement",
@@ -17,6 +39,8 @@
         "cancel": "Annuler",
         "delete": "Supprimer",
         "export": "Exporter en PDF",
+        "exportRelease": "Exporter la version en PDF",
+        "exportPreview": "Exporter l'aperçu en PDF",
         "publish": "Publier",
         "unpublish": "Dépublier",
         "none": "Aucun",
@@ -29,11 +53,15 @@
         "translate": "Traduire",
         "undo": "Annuler",
         "showGeneralChanges": "Afficher les changements généraux",
+        "showDraftChanges": "Afficher les brouillons",
         "confirm": "Confirmer",
         "summarize": "Résumer",
         "allCustomers": "Tous les clients",
         "updateRange": "Mettre à jour la plage",
-        "clearChangeNotes": "Effacer les notes de changement"
+        "clearChangeNotes": "Effacer les notes de changement",
+        "commitToGit": "Valider sur Git",
+        "addKnownLimitation": "Ajouter une limitation",
+        "addChangeImpact": "Ajouter un changement"
     },
     "title": {
         "title": "Titre",
@@ -52,7 +80,27 @@
         "from": "De",
         "to": "À",
         "addFromRepository": "Ajouter depuis le dépôt",
-        "fromRepository": "Depuis le dépôt"
+        "fromRepository": "Depuis le dépôt",
+        "reference": "Référence",
+        "releaseTimeline": "Calendrier de version",
+        "previewAvailableFrom": "Aperçu disponible à partir du",
+        "recommendedTestPhase": "Phase de test recommandée",
+        "recommendedTestPhaseFrom": "Phase de test recommandée à partir du",
+        "recommendedTestPhaseTo": "Phase de test recommandée jusqu'au",
+        "plannedProductionDeployment": "Mise en production prévue",
+        "knownLimitations": "Limitations connues",
+        "changeImpacts": "Aperçu des changements et de l'impact attendu",
+        "summary": "Résumé",
+        "whatIsChanged": "Ce qui a changé",
+        "whatShouldBeTested": "Ce qui doit être testé",
+        "testingNeed": "Besoin de test"
+    },
+    "testingNeeds": {
+        "low": "Faible",
+        "low_medium": "Faible-moyen",
+        "medium": "Moyen",
+        "medium_high": "Moyen-élevé",
+        "high": "Élevé"
     },
     "toast": {
         "changeNoteDeleted": "Note de changement supprimée avec succès",
@@ -80,19 +128,34 @@
         "releaseNoteUpdateError": "Une erreur s'est produite lors de la mise à jour de la note de version",
         "exportPdfError": "Une erreur s'est produite lors de l'export en PDF",
         "translationError": "Une erreur s'est produite lors de la traduction de la note de changement",
-        "translationSuccess": "Note de changement traduite avec succès",
+        "changeNoteTranslationSuccess": "Note de changement traduite avec succès",
+        "releaseNoteTranslationSuccess": "Note de version traduite avec succès",
         "copySuccess": "Contenu copié dans le presse-papiers",
         "copyError": "Une erreur s'est produite lors de la copie dans le presse-papiers",
         "summarizeSuccess": "Résumé effectué avec succès",
-        "summarizeError": "Une erreur s'est produite lors du résumé"
+        "summarizeError": "Une erreur s'est produite lors du résumé",
+        "commitToGitSuccess": "Note de version validée sur Git avec succès",
+        "commitToGitError": "Une erreur s'est produite lors de la validation de la note de version sur Git"
+    },
+    "validation": {
+        "changeImpact": {
+            "feature": "Veuillez sélectionner une fonctionnalité pour chaque changement",
+            "whatIsChanged": "Veuillez décrire ce qui a changé pour chaque changement",
+            "whatShouldBeTested": "Veuillez décrire ce qui doit être testé pour chaque changement",
+            "testingNeed": "Veuillez sélectionner un besoin de test pour chaque changement"
+        }
     },
     "deletePrompt": {
         "title": "Êtes-vous sûr de vouloir supprimer ?",
         "description": "Cette action ne peut pas être annulée."
     },
+    "commitPrompt": {
+        "title": "Êtes-vous sûr de vouloir valider sur Git ?",
+        "description": "Cette action ne peut pas être annulée. Cette note de version sera associée aux notes de changement suivantes dans Git :"
+    },
     "card": {
         "published": "Publié",
-        "private": "Privé",
+        "draft": "Brouillon",
         "containsChangeNotes": "aucune note de changement | 1 note de changement | {count} notes de changement"
     },
     "input": {
@@ -107,7 +170,8 @@
         "customers": "Une erreur s'est produite lors du chargement des clients"
     },
     "loading": {
-        "filter": "Chargement du filtre..."
+        "filter": "Chargement du filtre...",
+        "features": "Chargement des fonctionnalités..."
     },
     "notFound": {
         "resourceNotFound": "La ressource à laquelle vous essayez d'accéder a été déplacée ou n'existe pas.",
@@ -126,7 +190,14 @@
         "noSummary": "Aucun résumé fourni",
         "noChangeNotesAdded": "Aucune note de changement ajoutée",
         "noTitle": "Sans titre",
-        "noDescription": "Aucune description"
+        "noDescription": "Aucune description",
+        "reference": "Référence",
+        "toBeDetermined": "À déterminer",
+        "knownLimitation": "Limitation",
+        "noKnownLimitations": "Aucune limitation connue",
+        "filterByCustomer": "Filtrer par client",
+        "noResults": "Aucun résultat",
+        "noChangeImpacts": "Aucun changement"
     },
     "repositories": {
         "title": "Dépôts Git",
@@ -136,7 +207,7 @@
         "remove": "Supprimer",
         "id": "ID",
         "namePlaceholder": "Nom du dépôt",
-        "urlPlaceholder": "URL de clonage Git",
+        "urlPlaceholder": "URL de clonage Git (HTTP)",
         "deleteSuccess": "Dépôt supprimé avec succès",
         "deleteError": "Une erreur s'est produite lors de la suppression du dépôt",
         "createSuccess": "Dépôt ajouté avec succès",
@@ -173,8 +244,11 @@
     "tooltip": {
         "noCommits": "Aucun commit git associé",
         "publishedNote": "Les non-administrateurs peuvent voir cette note",
-        "privateNote": "Seuls les administrateurs peuvent voir cette note",
-        "explainSummarize": "Utilisez les diffs git associés pour résumer"
+        "draftNote": "Seuls les administrateurs peuvent voir ce brouillon",
+        "explainSummarize": "Utilisez les diffs git associés pour résumer",
+        "reference": "Ouvrir le ticket Jira associé",
+        "alreadyCommited": "Déjà validé sur Git",
+        "noChangeNotesToCommit": "Aucune note de changement sélectionnée à valider"
     },
     "prompts": {
         "translationPrompt": "Prompt de traduction",

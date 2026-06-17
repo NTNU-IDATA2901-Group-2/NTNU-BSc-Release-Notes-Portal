@@ -1,0 +1,30 @@
+meta {
+  name: positive_get_all_pagination_missing_size_returns_all
+  type: http
+  seq: 52
+}
+
+get {
+  url: {{baseurl}}/changenotes?page=0
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: 0
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 200
+  res.body.content: length 3
+  res.body.totalItems: eq 3
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

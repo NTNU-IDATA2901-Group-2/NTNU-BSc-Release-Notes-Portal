@@ -19,7 +19,21 @@ body:json {
     "changeNoteIds": [{{change_id_1}}, {{change_id_2}}],
     "tag": "v1.0.0",
     "summary": "Initial release with core features",
-    "published": true
+    "published": true,
+    "changeImpacts": [
+      {
+        "featureId": 1,
+        "whatIsChanged": "Invoicing totals recalculated",
+        "whatShouldBeTested": "Verify invoice totals match line items",
+        "testingNeed": "HIGH"
+      },
+      {
+        "featureId": 2,
+        "whatIsChanged": "Picking flow reordered",
+        "whatShouldBeTested": "Verify pick sequence is correct",
+        "testingNeed": "LOW"
+      }
+    ]
   }
 }
 
@@ -29,4 +43,7 @@ assert {
 
 script:post-response {
   bru.setEnvVar("release_id_1", res.body)
+  // Capture the calendar date (Europe/Oslo, the server's business zone) the note was
+  // created on, so the date-filter tests can build fromDate/toDate around it.
+  bru.setEnvVar("release_note_1_created_date", new Date().toLocaleDateString("en-CA", { timeZone: "Europe/Oslo" }))
 }

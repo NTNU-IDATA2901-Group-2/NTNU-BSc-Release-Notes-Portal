@@ -1,0 +1,25 @@
+meta {
+  name: positive_change_impacts_hidden_for_non_admin
+  type: http
+  seq: 35
+}
+
+get {
+  url: {{baseurl}}/releasenotes/{{release_id_1}}
+  body: none
+  auth: none
+}
+
+headers {
+  X-Test-Customers: Liddle
+}
+
+assert {
+  res.status: eq 200
+  res.body.changeImpacts: length 0
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

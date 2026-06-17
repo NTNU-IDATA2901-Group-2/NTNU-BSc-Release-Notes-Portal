@@ -3,7 +3,9 @@ INSERT INTO product (id, name) VALUES
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO feature (id, name) VALUES
-(1, 'Invoicing'), (2, 'Picking')
+(1, 'Invoicing'), (2, 'Picking'), (3, 'Putaway'), (4, 'Receiving'), (5, 'Cycle Counting'),
+(6, 'Replenishment'), (7, 'Route Planning'), (8, 'Carrier Management'), (9, 'Freight Tracking'),
+(10, 'Load Optimization'), (11, 'Order Fulfillment'), (12, 'Returns Management'), (13, 'Backorder Handling')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO customer (id, name) VALUES

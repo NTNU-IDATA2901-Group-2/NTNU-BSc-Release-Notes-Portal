@@ -5,7 +5,7 @@ import ChangeNoteCard from '@/components/ChangeNoteCard.vue';
 import CustomerFilter from '@/components/filters/CustomerFilter.vue';
 import FeatureFilter from '@/components/filters/FeatureFilter.vue';
 import ProductFilter from '@/components/filters/ProductFilter.vue';
-import PublicPrivateFilter from '@/components/filters/PublicPrivateFilter..vue';
+import PublishedDraftFilter from '@/components/filters/PublishedDraftFilter.vue';
 import ScopeFilter from '@/components/filters/ScopeFilter.vue';
 import MultiselectChangeNotes from '@/components/MultiselectChangeNotes.vue';
 import Button from '@/components/ui/button/Button.vue';
@@ -16,47 +16,72 @@ import Separator from '@/components/ui/separator/Separator.vue';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 import type { ChangeNote } from '@/utils/types';
 import { Eye, FilePlus, LayersPlus, ListFilterPlus, Search } from 'lucide-vue-next';
-import { computed, provide, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { useSearchParams } from '@/composables/useSearchParams';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue-sonner';
 import { isAdmin } from '@/utils/keycloak';
 import AllocatedFilter from '@/components/filters/AllocatedFilter.vue';
+import DateRangeFilter from '@/components/filters/DateRangeFilter.vue';
+import Pagination from '@/components/ui/pagination/Pagination.vue';
+import PaginationContent from '@/components/ui/pagination/PaginationContent.vue';
+import PaginationPrevious from '@/components/ui/pagination/PaginationPrevious.vue';
+import PaginationItem from '@/components/ui/pagination/PaginationItem.vue';
+import PaginationNext from '@/components/ui/pagination/PaginationNext.vue';
+import NativeSelectOption from '@/components/ui/native-select/NativeSelectOption.vue';
+import NativeSelect from '@/components/ui/native-select/NativeSelect.vue';
 
 const router = useRouter();
 const { t } = useI18n();
 
-const getInitialSelections = () => {
-  const url = new URL(globalThis.location.href);
-  return Object.fromEntries(url.searchParams.entries());
-}
 
-const initialSelections = getInitialSelections();
-const { selection, ...initialSearchParams } = initialSelections;
-const searchParams = ref(initialSearchParams);
-
-const { isLoading, isFetching, isError, data } = useGetChangeNotes(searchParams);
-
-const initialSelection = selection ?? '';
+const initialSelection = new URL(globalThis.location.href).searchParams.get('selection') ?? '';
 const selectedChangeNotes = ref<number[]>(initialSelection.split(',').map(id => Number.parseInt(id)).filter(id => !Number.isNaN(id)));
 const selectionString = computed(() => selectedChangeNotes.value.join(','));
 
-watch([searchParams, selectionString], () => {
-  let queryParams = { ...searchParams.value };
+const { params, single, csv, match, clear } = useSearchParams(router, {
+  exclude: ['selection'],
+  extraQuery: () => {
+    const extra: Record<string, string> = {};
+    if (selectedChangeNotes.value.length > 0) {
+      extra.selection = selectionString.value;
+    }
+    return extra;
+  },
+});
 
-  if (selectedChangeNotes.value.length > 0) {
-    queryParams.selection = selectionString.value;
-  }
+const productIds = csv('productIds');
+const includeUnassignedProduct = match('includeUnassignedProduct', 'true');
+const scopeIds = csv('scopeIds');
+const includeUnassignedScope = match('includeUnassignedScope', 'true');
+const featureIds = csv('featureIds');
+const includeUnassignedFeature = match('includeUnassignedFeature', 'true');
+const customerIds = csv('customerIds');
+const includeUnassignedCustomer = match('includeUnassignedCustomer', 'true');
+const published = single('published');
+const hasReleaseNote = match('hasReleaseNote', 'false');
+const fromDate = single('fromDate');
+const toDate = single('toDate');
 
-  router.replace({ query: queryParams });
-}, { deep: true });
+// Preserve the AllocatedFilter default: "unallocated" is pre-selected for admins.
+if (isAdmin.value && params.value.hasReleaseNote === undefined) {
+  hasReleaseNote.value = true;
+}
 
-provide('searchParams', searchParams);
+const pageIndex = ref(params.value.page ? parseInt(params.value.page) : 0);
+const pageSize = ref(params.value.size ? parseInt(params.value.size) : 10);
+const pageSizeOptions = [10, 20, 50, 100];
+watch([pageIndex, pageSize], () => {
+  params.value = { ...params.value, page: (pageIndex.value - 1).toString(), size: pageSize.value.toString() };
+});
 
-const search = ref<string>(searchParams.value.query || '');
+const { isLoading, isFetching, isError, data } = useGetChangeNotes(params);
+
+const search = ref<string>(params.value.query || '');
 
 const clearFilters = () => {
-  searchParams.value = {};
+  clear();
 }
 
 const isChangeNoteSelected = (changeNoteId: number) => {
@@ -110,7 +135,7 @@ const createReleaseNoteMutation = useCreateReleaseNote({
 })
 
 const onSearch = () => {
-  searchParams.value = { ...searchParams.value, query: search.value };
+  params.value = { ...params.value, query: search.value };
 }
 
 </script>
@@ -121,26 +146,28 @@ const onSearch = () => {
       <ScrollArea class="h-100 p-5">
         <Button class="mt-4" variant="outline" @click="clearFilters">{{ t('button.clearFilters')
         }}</Button>
-        <AllocatedFilter v-if="isAdmin" />
-        <PublicPrivateFilter v-if="isAdmin"/>
-        <ProductFilter />
-        <ScopeFilter />
-        <FeatureFilter />
-        <CustomerFilter v-if="isAdmin" />
+        <AllocatedFilter v-if="isAdmin" v-model="hasReleaseNote" />
+        <PublishedDraftFilter v-if="isAdmin" v-model="published" />
+        <ProductFilter v-model:selected="productIds" v-model:include-unassigned="includeUnassignedProduct" />
+        <ScopeFilter v-model:selected="scopeIds" v-model:include-unassigned="includeUnassignedScope" />
+        <FeatureFilter v-model:selected="featureIds" v-model:include-unassigned="includeUnassignedFeature" />
+        <CustomerFilter v-if="isAdmin" v-model:selected="customerIds" v-model:include-unassigned="includeUnassignedCustomer" />
+        <DateRangeFilter v-model:from="fromDate" v-model:to="toDate" />
       </ScrollArea>
     </DrawerContent>
-    <div class="min-h-screen w-full flex justify-center align-bottom mt-6">
-      <div class="flex gap-8 flex-col h-min w-full md:flex-row justify-center p-4">
-        <div class="h-min hidden md:block">
+    <div class="max-h-screen w-full flex justify-center align-bottom mt-6">
+      <div class="flex gap-8 flex-col min-h-full w-full md:flex-row justify-center p-4">
+        <ScrollArea class="h-[80vh] hidden md:block">
           <h1 class="text-3xl text-nowrap">{{ t('title.changeNotes') }}</h1>
-          <AllocatedFilter v-if="isAdmin" />
-          <PublicPrivateFilter v-if="isAdmin"/>
-          <ProductFilter />
-          <ScopeFilter />
-          <FeatureFilter />
-          <CustomerFilter v-if="isAdmin" />
+          <AllocatedFilter v-if="isAdmin" v-model="hasReleaseNote" />
+          <PublishedDraftFilter v-if="isAdmin" v-model="published" />
+          <ProductFilter v-model:selected="productIds" v-model:include-unassigned="includeUnassignedProduct" />
+          <ScopeFilter v-model:selected="scopeIds" v-model:include-unassigned="includeUnassignedScope" />
+          <FeatureFilter v-model:selected="featureIds" v-model:include-unassigned="includeUnassignedFeature" />
+          <CustomerFilter v-if="isAdmin" v-model:selected="customerIds" v-model:include-unassigned="includeUnassignedCustomer" />
+          <DateRangeFilter v-model:from="fromDate" v-model:to="toDate" />
           <Button class="mt-4" variant="outline" @click="clearFilters">{{ t('button.clearFilters') }}</Button>
-        </div>
+        </ScrollArea>
 
         <div class="flex flex-col w-full gap-4 max-w-4xl">
           <div class="w-full flex flex-col md:flex-row-reverse justify-center md:justify-end gap-2">
@@ -186,16 +213,44 @@ const onSearch = () => {
           <Spinner v-if="isLoading || isFetching" />
           <p v-else-if="isError">{{ t('loadingError.releaseNotes') }}</p>
 
-          <ScrollArea class="h-[75vh] w-full" v-else>
-            <p v-if="data?.length === 0" class="text-center">{{ t('placeholder.noChangeNotesFound') }}</p>
-            <div v-for="changeNote in data" :key="changeNote.id" class="flex flex-col">
-              <ChangeNoteCard 
-                class="my-4" :key="changeNote.id"
-                :model-value="isChangeNoteSelected(changeNote.id)" :change-note="changeNote"
-                @update:model-value="toggleSelection(changeNote)" />
-              <Separator />
-            </div>
-          </ScrollArea>
+          <div v-else>
+            <ScrollArea class="h-[60vh] w-full">
+              <p v-if="data?.content.length === 0" class="text-center">{{ t('placeholder.noChangeNotesFound') }}</p>
+              <div v-for="changeNote in data?.content" :key="changeNote.id" class="flex flex-col">
+                <ChangeNoteCard
+                  class="my-4" :key="changeNote.id"
+                  :model-value="isChangeNoteSelected(changeNote.id)" :change-note="changeNote"
+                  @update:model-value="toggleSelection(changeNote)" />
+                <Separator />
+              </div>
+            </ScrollArea>
+            <Pagination class="text-text-primary h-[10vh]" v-slot="{ page }" :items-per-page="pageSize" :total="data?.totalItems" :default-page="1">
+              <PaginationContent v-slot="{ items }">
+                <PaginationPrevious />
+                <template v-for="(item, index) in items" :key="index">
+                  <PaginationItem
+                    v-if="item.type === 'page'"
+                    :value="item.value"
+                    :is-active="item.value === page"
+                    @click="pageIndex = item.value"
+                  >
+                    {{ item.value }}
+                  </PaginationItem>
+                </template>
+                <PaginationNext />
+                <NativeSelect v-model="pageSize">
+                  <NativeSelectOption
+                    v-for="option in pageSizeOptions"
+                    :value="option"
+                    :key="option"
+                    @click="pageIndex = 1"
+                  >
+                    {{ t('pagination.itemsPerPage', { count: option }) }}
+                  </NativeSelectOption>
+                </NativeSelect>
+              </PaginationContent>
+            </Pagination>
+          </div>
         </div>
       </div>
     </div>

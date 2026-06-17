@@ -1,7 +1,7 @@
 meta {
   name: positive_put_update
   type: http
-  seq: 20
+  seq: 52
 }
 
 put {
@@ -19,7 +19,22 @@ body:json {
     "changeNoteIds": [{{change_id_2}}],
     "tag": "updated",
     "summary": "updated",
-    "published": true
+    "published": true,
+    "releaseTimeline": {
+      "previewAvailableFrom": "2026-07-01",
+      "recommendedTestPhaseFrom": "2026-07-08",
+      "recommendedTestPhaseTo": "2026-07-15",
+      "plannedProductionDeployment": "2026-08-01"
+    },
+    "knownLimitations": ["limitation-one", "limitation-two"],
+    "changeImpacts": [
+      {
+        "featureId": 1,
+        "whatIsChanged": "updated change",
+        "whatShouldBeTested": "updated test",
+        "testingNeed": "MEDIUM"
+      }
+    ]
   }
 }
 

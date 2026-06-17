@@ -1,0 +1,29 @@
+meta {
+  name: negative_get_all_pagination_negative_size
+  type: http
+  seq: 55
+}
+
+get {
+  url: {{baseurl}}/changenotes?page=0&size=-1
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: 0
+  size: -1
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 400
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

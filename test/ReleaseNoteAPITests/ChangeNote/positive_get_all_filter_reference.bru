@@ -1,7 +1,7 @@
 meta {
   name: positive_get_all_filter_reference
   type: http
-  seq: 13
+  seq: 15
 }
 
 get {
@@ -19,8 +19,8 @@ headers {
 }
 
 assert {
-  res.body[0].id: eq {{change_id_1}}
-  res.body: length 1
+  res.body.content[0].id: eq {{change_id_1}}
+  res.body.content: length 1
   res.status: eq 200
 }
 

@@ -1,7 +1,15 @@
 package no.reliablesolutions.release_notes_portal.service;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
@@ -14,9 +22,11 @@ import no.reliablesolutions.release_notes_portal.domain.repository.ScopeReposito
 import no.reliablesolutions.release_notes_portal.dto.ChangeNoteDTO;
 import no.reliablesolutions.release_notes_portal.dto.ChangeNoteFilterOptionsDTO;
 import no.reliablesolutions.release_notes_portal.dto.CreateChangeNoteDTO;
+import no.reliablesolutions.release_notes_portal.dto.PaginatedResponseDTO;
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.CustomerNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.FeatureNotFoundException;
+import no.reliablesolutions.release_notes_portal.exception.InvalidDateRangeException;
 import no.reliablesolutions.release_notes_portal.exception.ProductNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ScopeNotFoundException;
 import no.reliablesolutions.release_notes_portal.util.AccessScope;
@@ -31,11 +41,15 @@ import no.reliablesolutions.release_notes_portal.dto.GitCommitHashAndPreviousGit
 @Service
 @AllArgsConstructor
 public class ChangeNoteService {
+  private final Logger logger = LoggerFactory.getLogger(ChangeNoteService.class);
   private final ChangeNoteRepository changeNoteRepository;
   private final ProductRepository productRepository;
   private final ScopeRepository scopeRepository;
   private final FeatureRepository featureRepository;
   private final CustomerRepository customerRepository;
+
+  /** Zone used to resolve a calendar date filter into an absolute instant range. */
+  private static final ZoneId BUSINESS_ZONE = ZoneId.of("Europe/Oslo");
 
   /**
    * Creates a new change note based on the provided DTO. Empty fields in the provided DTO remains as default.
@@ -51,6 +65,7 @@ public class ChangeNoteService {
     ChangeNote changeNote = new ChangeNote();
 
     if (changeNoteDTO != null) {
+      changeNote.setTitle(changeNoteDTO.title());
       changeNote.setReference(changeNoteDTO.reference());
       changeNote.setDescription(changeNoteDTO.description());
       changeNote.setDeveloperNotes(changeNoteDTO.developerNotes());
@@ -108,42 +123,86 @@ public class ChangeNoteService {
   }
 
   /**
-   * Retrieves all change notes from the repository, with optional filtering based
-   * on query, published status, customer ID, feature ID, scope ID, and product
-   * ID.
-   * 
-   * @param filterOptions Optional filterOptions dto containing filter parameters such as query, published status, customer ID, feature ID, scope ID, and product ID.
-   * 
-   * @return a list of all change notes that match the provided filters, mapped to
-   *         ChangeNoteDTOs. If no filter is provided, returns all change notes accessible to the current user.
+   * Retrieves non-archived change notes matching the provided filter options,
+   * optionally paginated.
+   *
+   * <p>Admins see notes regardless of published status; non-admins are restricted
+   * to published notes and to the customer groups resolved from the current
+   * authentication, and have developer and upgrade notes stripped from the result.
+   * When {@code page} or {@code size} is {@code null} the result is returned
+   * unpaged (all matches in a single page).
+   *
+   * @param filterOptions optional filter parameters such as query, published
+   *                      status, customer ID, feature ID, scope ID, and product
+   *                      ID; {@code null} is treated as no filters
+   * @param page          the zero-based page index, or {@code null} to return all
+   *                      matches unpaged
+   * @param size          the page size, or {@code null} to return all matches
+   *                      unpaged
+   * @return a {@link PaginatedResponseDTO} wrapping the page of ChangeNoteDTOs and
+   *         the total item count
+   * @throws InvalidDateRangeException if {@code fromDate} is after {@code toDate}
+   * @throws IllegalArgumentException  if {@code page} is negative or {@code size}
+   *                                   is not positive
    */
-  public List<ChangeNoteDTO> getAllChangeNotes(ChangeNoteFilterOptionsDTO filterOptions) {
+  public PaginatedResponseDTO<List<ChangeNoteDTO>> getAllChangeNotes(ChangeNoteFilterOptionsDTO filterOptions, Integer page, Integer size) {
 
     if (filterOptions == null) {
-      filterOptions = new ChangeNoteFilterOptionsDTO(null, null, null, null, null, null, null, null, null);
+      filterOptions = new ChangeNoteFilterOptionsDTO(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 
+    LocalDate fromDate = filterOptions.fromDate();
+    LocalDate toDate = filterOptions.toDate();
+
+    if (fromDate != null && toDate != null && fromDate.isAfter(toDate)) {
+      throw new InvalidDateRangeException(fromDate, toDate);
+    }
+
+    Pageable pageable;
+    if (page == null || size == null) {
+      logger.warn("Page number or page size is null. Returning all change notes without pagination.");
+      pageable = Pageable.unpaged();
+    } else if (page < 0) {
+      throw new IllegalArgumentException("Page number cannot be negative");
+    } else if (size <= 0) {
+      throw new IllegalArgumentException("Page size must be greater than zero");
+    } else {
+      pageable = PageRequest.of(page, size);
+    }
+
+    Instant fromDateInstant = startOfDayInstant(fromDate, 0);
+    Instant toDateInstant = startOfDayInstant(toDate, 1);
+
     AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
-    
+
+    Page<ChangeNote> changeNotesPage;
+    List<ChangeNoteDTO> dtos;
     if (accessScope.isAdmin()) {
-      return changeNoteRepository.findByArchivedFalseAndMatchingFilterParameters(filterOptions).stream()
+      changeNotesPage = changeNoteRepository.findByArchivedFalseAndMatchingFilterParameters(filterOptions, fromDateInstant, toDateInstant, pageable);
+      dtos = changeNotesPage.getContent().stream()
           .map(changeNote -> ChangeNoteMapper.toDTO(changeNote, accessScope))
           .toList();
-
     } else {
       filterOptions = new ChangeNoteFilterOptionsDTO(
           filterOptions.query(),
           true,
           filterOptions.hasReleaseNote(),
+          filterOptions.includeUnassignedProduct(),
+          filterOptions.includeUnassignedScope(),
+          filterOptions.includeUnassignedFeature(),
+          filterOptions.includeUnassignedCustomer(),
           filterOptions.gitRepositoryIds(),
           filterOptions.filteredIds(),
           filterOptions.customerIds(),
           filterOptions.featureIds(),
           filterOptions.scopeIds(),
-          filterOptions.productIds()
+          filterOptions.productIds(),
+          fromDate,
+          toDate
       );
-      
-      return changeNoteRepository.findForCustomerNamesMatchingFilterParameters(accessScope.getCustomerGroups(), filterOptions).stream()
+
+      changeNotesPage = changeNoteRepository.findForCustomerNamesMatchingFilterParameters(accessScope.getCustomerGroups(), filterOptions, fromDateInstant, toDateInstant, pageable);
+      dtos = changeNotesPage.getContent().stream()
           .map(note -> {
             note.setDeveloperNotes(null);
             note.setUpgradeNotes(null);
@@ -152,6 +211,8 @@ public class ChangeNoteService {
           .map(changeNote -> ChangeNoteMapper.toDTO(changeNote, accessScope))
           .toList();
     }
+
+    return new PaginatedResponseDTO<>(dtos, changeNotesPage.getTotalElements());
   }
 
   /**
@@ -192,6 +253,7 @@ public class ChangeNoteService {
   public ChangeNoteDTO updateChangeNote(long id, CreateChangeNoteDTO createChangeNoteDTO) {
     ChangeNote changeNote = changeNoteRepository.findById(id).orElseThrow(() -> new ChangeNoteNotFoundException(id));
 
+    changeNote.setTitle(createChangeNoteDTO.title());
     changeNote.setReference(createChangeNoteDTO.reference());
     changeNote.setDescription(createChangeNoteDTO.description());
     changeNote.setDeveloperNotes(createChangeNoteDTO.developerNotes());
@@ -236,7 +298,7 @@ public class ChangeNoteService {
    * Alters the published status of a change note by ID to the provided state.
    * 
    * @param id the ID of the change note to change the published status of
-   * @param publish a boolean indicating whether to publish (true) or private (false)
+   * @param publish a boolean indicating whether to publish (true) or set as draft (false)
    * @throws ChangeNoteNotFoundException if no change note with the given ID
    *                                     exists
    */
@@ -264,6 +326,22 @@ public class ChangeNoteService {
    */
   public boolean hasCommitHash(List<Long> changeNoteIds) {
     return changeNoteRepository.hasCommitHashAndPreviousCommitHash(changeNoteIds);
+  }
+
+  /**
+   * Returns the start-of-day instant for {@code localDate} (in the business zone),
+   * after adding {@code plusDays}.
+   *
+   * @param localDate the calendar date to convert, or {@code null}
+   * @param plusDays  the number of days to add before taking the start of day
+   * @return the corresponding {@link Instant}, or {@code null} if {@code localDate}
+   *         is {@code null}
+   */
+  private Instant startOfDayInstant(LocalDate localDate, int plusDays) {
+    if (localDate == null) {
+      return null;
+    }
+    return localDate.plusDays(plusDays).atStartOfDay(BUSINESS_ZONE).toInstant();
   }
 
 }

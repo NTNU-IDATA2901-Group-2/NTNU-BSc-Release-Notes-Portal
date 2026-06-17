@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { useUpdateReleaseNote } from '@/api/release-note-api';
-import { EditReleaseNoteSchema } from '@/schemas';
-import type { GitRepository, ChangeNote, ReleaseNote } from '@/utils/types';
+import { ChangeImpactSchema, EditReleaseNoteSchema } from '@/schemas';
+import { type GitRepository, type ChangeNote, type ReleaseNote, type ChangeImpact } from '@/utils/types';
+import { z } from 'zod';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
 import { onBeforeUnmount, onMounted, computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { toast } from 'vue-sonner';
 import { Button } from '../ui/button';
-import { ArrowLeft, Ban, Save, Sparkles } from 'lucide-vue-next';
+import { ArrowLeft, Ban, Plus, Save, Sparkles, Trash2 } from 'lucide-vue-next';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../ui/breadcrumb';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
@@ -24,6 +25,8 @@ import TooltipContent from '../ui/tooltip/TooltipContent.vue';
 import DialogPrompt from '../DialogPrompt.vue';
 import { useGetGitRepositories } from '@/api/git-repository-api';
 import Spinner from '../ui/spinner/Spinner.vue';
+import DatePicker from '../DatePicker.vue';
+import ChangeImpactTable from '../ChangeImpactTable.vue';
 
 const { t } = useI18n();
 
@@ -39,13 +42,15 @@ const releaseNote = props.releaseNote;
 const changeNoteIdsWithinReleaseNote = ref<number[]>(releaseNote.changeNotes?.map(cn => cn.id) || [])
 
 const { data: availableGitRepositories } = useGetGitRepositories()
-const { data: availableChangeNotes } = useGetChangeNotes()
+const { data: availableChangeNotesPage } = useGetChangeNotes()
+const availableChangeNotes = computed(() => availableChangeNotesPage.value?.content ?? [])
 
 const gitRepository = ref<GitRepository | null>(null)
 const params = computed(() => {
   return { gitRepositoryIds: gitRepository.value?.id ? gitRepository.value?.id.toString() : '' }
 });
-const { data: currentGitRepositoryChangeNotes } = useGetChangeNotes(params)
+const { data: currentGitRepositoryChangeNotesPage, isFetched: isCurrentGitRepositoryChangeNotesFetched } = useGetChangeNotes(params)
+const currentGitRepositoryChangeNotes = computed(() => currentGitRepositoryChangeNotesPage.value?.content ?? [])
 
 const fromChangeNote = ref<ChangeNote | null>(null);
 const toChangeNote = ref<ChangeNote | null>(null);
@@ -130,13 +135,38 @@ const cancelEdit = () => {
 }
 
 const onSubmit = form.handleSubmit((values) => {
-  if (releaseNote !== undefined) {
-    const payload = {
-      ...values,
-      changeNoteIds: changeNoteIdsWithinReleaseNote.value,
-    }
-    updateReleaseNoteMutation.mutate({ id: releaseNote.id, dto: payload });
+  if (releaseNote === undefined) return;
+
+  const mappedChangeImpacts = changeImpacts.value.map(ci => ({
+    featureId: ci.feature?.id,
+    whatIsChanged: ci.whatIsChanged,
+    whatShouldBeTested: ci.whatShouldBeTested,
+    testingNeed: ci.testingNeed
+  }));
+
+  const changeImpactsResult = z.array(ChangeImpactSchema).safeParse(mappedChangeImpacts);
+  if (!changeImpactsResult.success) {
+    const messages = [...new Set(changeImpactsResult.error.issues.map(issue => issue.message))];
+    messages.forEach(message => toast.error(t(message)));
+    return;
   }
+
+  const payload = {
+    ...values,
+    changeNoteIds: changeNoteIdsWithinReleaseNote.value,
+    releaseTimeline: {
+      previewAvailableFrom: previewAvailableFrom.value,
+      recommendedTestPhaseFrom: recommendedTestPhaseFrom.value,
+      recommendedTestPhaseTo: recommendedTestPhaseTo.value,
+      plannedProductionDeployment: plannedProductionDeployment.value,
+    },
+    knownLimitations: knownLimitations.value.map(limitation => limitation.trim()).filter(limitation => limitation !== ''),
+    changeImpacts: changeImpactsResult.data
+  }
+  updateReleaseNoteMutation.mutate({ id: releaseNote.id, dto: payload });
+}, ({ errors }) => {
+    console.error('Change note edit validation failed', errors);
+    toast.error(t('toast.releaseNoteUpdateError'));
 })
 
 const updateReleaseNoteMutation = useUpdateReleaseNote({
@@ -169,6 +199,25 @@ onMounted(() => {
 onBeforeUnmount(() => {
   globalThis.removeEventListener('beforeunload', beforeUnloadListener);
 })
+
+const releaseTimeline = releaseNote.releaseTimeline
+const previewAvailableFrom = ref<string | undefined>(releaseTimeline?.previewAvailableFrom);
+const recommendedTestPhaseFrom = ref<string | undefined>(releaseTimeline?.recommendedTestPhaseFrom);
+const recommendedTestPhaseTo = ref<string | undefined>(releaseTimeline?.recommendedTestPhaseTo);
+const plannedProductionDeployment = ref<string | undefined>(releaseTimeline?.plannedProductionDeployment);
+
+const knownLimitations = ref<string[]>([...(releaseNote.knownLimitations ?? [])]);
+
+const addKnownLimitation = () => {
+  knownLimitations.value.push('');
+}
+
+const removeKnownLimitation = (index: number) => {
+  knownLimitations.value.splice(index, 1);
+}
+
+const changeImpacts = ref<ChangeImpact[]>([...(releaseNote.changeImpacts ?? [])]);
+
 </script>
 
 
@@ -179,18 +228,18 @@ onBeforeUnmount(() => {
     :description-key="'releaseNoteEdit.cancelDescription'" @update:open="cancelDialogOpen = false"
     @confirm="cancelEdit" />
   <div class="flex flex-col w-full items-center px-4 mb-20">
-    <div class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10 flex items-center gap-4">
-      <Button variant="outline" class="" @click="$router.back()">
+    <div class="mb-4 absolute left-4 mt-4 lg:left-10 lg:mt-10 flex items-center gap-4 max-w-[calc(100%-2rem)] lg:max-w-[calc(100%-5rem)]">
+      <Button variant="outline" class="shrink-0" @click="$router.back()">
         <ArrowLeft />{{ t('button.previous') }}
       </Button>
-      <Breadcrumb class="text-text-primary">
-        <BreadcrumbList>
-          <BreadcrumbItem>
+      <Breadcrumb class="text-text-primary min-w-0">
+        <BreadcrumbList class="min-w-0">
+          <BreadcrumbItem class="shrink-0">
             <BreadcrumbLink href="/">{{ t('title.releaseNotes') }}</BreadcrumbLink>
           </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            {{ releaseNote?.tag }}
+          <BreadcrumbSeparator class="shrink-0" />
+          <BreadcrumbItem class="min-w-0">
+            <span class="truncate">{{ releaseNote?.tag }}</span>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -200,7 +249,7 @@ onBeforeUnmount(() => {
       <div 
       ref="releaseNoteRef"
         class="flex flex-col gap-16 flex-1 w-full items-center mt-16 mx-4 lg:w-4xl md:mt-42">
-        <div class="flex flex-col gap-4 w-full">
+        <div class="flex flex-col gap-8 w-full">
           <div data-pdf-exclude class="flex sm:hidden gap-4 ml-auto">
             <Button 
             :disabled="disableSummarizeButton" type="button"
@@ -262,6 +311,38 @@ onBeforeUnmount(() => {
             class="w-full" v-model="summary"
               :placeholder="t('placeholder.description')" />
           </div>
+          <div class="flex flex-col gap-1">
+            <h1 class="text-lg">{{ t('title.releaseTimeline') }}</h1>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 w-fit">
+              <p class="self-center">{{ `${t('title.previewAvailableFrom')}:` }}</p>
+              <DatePicker v-model="previewAvailableFrom" :placeholder="t('placeholder.toBeDetermined')"/>
+              <p class="self-center">{{ `${t('title.recommendedTestPhaseFrom')}:` }}</p>
+              <DatePicker v-model="recommendedTestPhaseFrom" :max="recommendedTestPhaseTo" :placeholder="t('placeholder.toBeDetermined')"/>
+              <p class="self-center">{{ `${t('title.recommendedTestPhaseTo')}:` }}</p>
+              <DatePicker v-model="recommendedTestPhaseTo" :min="recommendedTestPhaseFrom" :placeholder="t('placeholder.toBeDetermined')"/>
+              <p class="self-center">{{ `${t('title.plannedProductionDeployment')}:` }}</p>
+              <DatePicker v-model="plannedProductionDeployment" :placeholder="t('placeholder.toBeDetermined')"/>
+            </div>
+          </div>
+          <div class="flex flex-col gap-1">
+            <h1 class="text-lg">{{ t('title.changeImpacts') }}</h1>
+            <ChangeImpactTable v-model="changeImpacts" :editable="true"/>
+          </div>
+          <div class="flex flex-col gap-1">
+            <h1 class="text-lg">{{ t('title.knownLimitations') }}</h1>
+            <div class="flex flex-col gap-2">
+              <div v-for="(_, index) in knownLimitations" :key="index" class="flex flex-row gap-2">
+                <Input class="w-full" v-model="knownLimitations[index]" :placeholder="t('placeholder.knownLimitation')" />
+                <Button type="button" variant="outline" size="icon" @click="removeKnownLimitation(index)">
+                  <Trash2 />
+                </Button>
+              </div>
+              <Button type="button" variant="outline" class="w-fit" @click="addKnownLimitation">
+                {{ t('button.addKnownLimitation') }}
+                <Plus />
+              </Button>
+            </div>
+          </div>
         </div>
         <div class="flex flex-col w-full gap-10">
           <div class="flex flex-col gap-4">
@@ -280,7 +361,7 @@ onBeforeUnmount(() => {
               </Button>
             </div>
             <div class="flex flex-col gap-1">
-              <h2 class="text-xl">{{ t('title.addFromRepository') }}</h2>
+              <h2 class="text-lg">{{ t('title.addFromRepository') }}</h2>
               <p
                 v-if="availableGitRepositories == undefined || availableGitRepositories.length < 1">
                 {{ t('repositories.noGitRepositories') }}</p>
@@ -298,7 +379,9 @@ onBeforeUnmount(() => {
                   @click.stop="onChangeNoteRangeChange(gitRepository?.id ?? -1)">{{
                     t('button.updateRange') }}</Button>
               </div>
-              <p v-if="gitRepository !== null && (currentGitRepositoryChangeNotes === undefined || currentGitRepositoryChangeNotes.length === 0)">{{ t('repositories.noChangeNotesInRepository') }}</p>
+              <p v-if="gitRepository !== null && !currentGitRepositoryChangeNotes?.length && isCurrentGitRepositoryChangeNotesFetched">
+                {{ t('repositories.noChangeNotesInRepository') }}
+              </p>
             </div>
           </div>
         </div>

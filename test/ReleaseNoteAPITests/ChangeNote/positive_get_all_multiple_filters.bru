@@ -1,7 +1,7 @@
 meta {
   name: positive_get_all_multiple_filters
   type: http
-  seq: 28
+  seq: 42
 }
 
 get {
@@ -20,7 +20,7 @@ headers {
 }
 
 assert {
-  res.body: length 0
+  res.body.content: length 0
   res.status: eq 200
 }
 

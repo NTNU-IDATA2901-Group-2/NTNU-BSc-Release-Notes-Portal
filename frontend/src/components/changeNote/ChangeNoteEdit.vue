@@ -40,18 +40,20 @@ const viewAbleByEveryone = ref(props.changeNote.viewableByEveryone);
 const { handleSubmit, defineField } = useForm({
   validationSchema: toTypedSchema(EditChangeNoteSchema),
   initialValues: {
-    reference: props.changeNote.reference,
-    description: props.changeNote.description,
+    title: props.changeNote.title ?? '',
+    reference: props.changeNote.reference ?? '',
+    description: props.changeNote.description ?? '',
     productId: props.changeNote.product?.id,
     scopeId: props.changeNote.scope?.id,
     featureId: props.changeNote.feature?.id,
     customerId: props.changeNote.customer?.id,
-    developerNotes: props.changeNote.developerNotes,
-    upgradeNotes: props.changeNote.upgradeNotes,
-    viewableByEveryone: props.changeNote.viewableByEveryone,
+    developerNotes: props.changeNote.developerNotes ?? '',
+    upgradeNotes: props.changeNote.upgradeNotes ?? '',
+    viewableByEveryone: props.changeNote.viewableByEveryone ?? false,
 }
 });
 
+const [title] = defineField('title');
 const [reference] = defineField('reference');
 const [description] = defineField('description');
 const [productId] = defineField('productId');
@@ -80,7 +82,10 @@ const onSubmit = handleSubmit((values : PersistChangeNoteDTO) => {
     values.featureId = values.featureId === -1 ? undefined : values.featureId;
     values.customerId = values.customerId === -1 ? undefined : values.customerId;
     values.viewableByEveryone = values.customerId === -1 ? undefined : viewAbleByEveryone.value;
-  updateChangeNoteMutation.mutate({ id: props.changeNote.id, dto: values });
+    updateChangeNoteMutation.mutate({ id: props.changeNote.id.toString(), relatedReleaseNoteIds: props.changeNote.relatedReleaseNoteIds?.map(String), dto: values });
+}, ({ errors }) => {
+    console.error('Change note edit validation failed', errors);
+    toast.error(t('toast.changeNoteUpdateError'));
 });
 
 const onCancel = () => {
@@ -174,7 +179,7 @@ onBeforeUnmount(() => {
             </div>
             <h1 class="text-lg">{{ t('title.title') }}</h1>
             <div class="flex gap-4">
-            <Input class="w-45" v-model="reference" :placeholder="t('placeholder.title')" />
+            <Input class="w-45" v-model="title" :placeholder="t('placeholder.title')" />
             <div class="hidden sm:flex ml-auto gap-4">
                 <Tooltip>
                     <TooltipTrigger as-child>
@@ -210,6 +215,11 @@ onBeforeUnmount(() => {
         </div>
         </div>
         
+        </div>
+
+        <div class="flex flex-col gap-1">
+            <h1 class="text-lg">{{ t('title.reference') }}</h1>
+            <Input :placeholder="t('placeholder.reference')" class="w-45" v-model="reference"/>
         </div>
 
         <div class="flex flex-col gap-1">

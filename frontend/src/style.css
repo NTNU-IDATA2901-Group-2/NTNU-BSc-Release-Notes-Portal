@@ -66,6 +66,10 @@
   p {
     font-size: 14px;
   }
+
+  ul {
+    color: var(--text);
+  }
 }
 
 @layer components {

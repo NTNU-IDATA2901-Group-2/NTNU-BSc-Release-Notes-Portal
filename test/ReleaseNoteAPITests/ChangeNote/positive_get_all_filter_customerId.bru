@@ -1,7 +1,7 @@
 meta {
   name: positive_get_all_filter_customerId
   type: http
-  seq: 25
+  seq: 30
 }
 
 get {
@@ -19,8 +19,8 @@ headers {
 }
 
 assert {
-  res.body[0].id: eq {{change_id_2}}
-  res.body: length 1
+  res.body.content[0].id: eq {{change_id_2}}
+  res.body.content: length 1
   res.status: eq 200
 }
 

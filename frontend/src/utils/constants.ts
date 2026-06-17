@@ -3,6 +3,7 @@ const prod = {
   KC_URL: 'PROD_URL',
   KC_REALM: 'PROD_REALM',
   KC_CLIENT_ID: 'PROD_CLIENT_ID',
+  JIRA_BASE_URL: 'PROD_JIRA_BASE_URL',
 }
 
 async function getProdConfig() {
@@ -17,6 +18,7 @@ async function getProdConfig() {
   prod.KC_CLIENT_ID = configData.KC_CLIENT_ID;
   prod.KC_REALM = configData.KC_REALM;
   prod.KC_URL = configData.KC_URL;
+  prod.JIRA_BASE_URL = configData.JIRA_BASE_URL;
 
   return prod;
 }
@@ -26,6 +28,7 @@ const dev = {
   KC_URL: 'http://localhost:8081',
   KC_REALM: 'dev',
   KC_CLIENT_ID: 'release-note',
+  JIRA_BASE_URL: import.meta.env.VITE_JIRA_BASE_URL ?? '',
 }
 
 

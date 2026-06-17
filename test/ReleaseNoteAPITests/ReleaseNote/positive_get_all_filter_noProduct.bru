@@ -1,0 +1,30 @@
+meta {
+  name: positive_get_all_filter_noProduct
+  type: http
+  seq: 18
+}
+
+get {
+  url: {{baseurl}}/releasenotes?includeUnassignedProduct=true
+  body: none
+  auth: inherit
+}
+
+params:query {
+  includeUnassignedProduct: true
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 200
+  res.body.content.length: eq 1
+  res.body.content[0].id: eq {{release_id_1}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
