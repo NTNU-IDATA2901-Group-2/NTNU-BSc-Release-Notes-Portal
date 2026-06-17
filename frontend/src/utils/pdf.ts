@@ -400,5 +400,5 @@ export async function exportToPdf(releaseNote: ReleaseNote, changeNotes: ChangeN
     defaultStyle: { font: 'Roboto', lineHeight: 1.3 },
   };
 
-  pdfMake.createPdf(documentDefinition).download(`${releaseNote.tag}.pdf`);
+  pdfMake.createPdf(documentDefinition).download(`${releaseNote.published ? 'Release' : 'Preview'} ${releaseNote.tag}.pdf`);
 }
