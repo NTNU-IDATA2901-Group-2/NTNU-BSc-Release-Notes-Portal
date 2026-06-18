@@ -38,18 +38,27 @@ const published = single('published');
 const fromDate = single('fromDate');
 const toDate = single('toDate');
 
-const pageIndex = ref(params.value.page ? parseInt(params.value.page) : 0);
-const pageSize = ref(params.value.size ? parseInt(params.value.size) : 10);
 const pageSizeOptions = [10, 20, 50, 100];
-watch([pageIndex, pageSize], () => {
-  params.value = { ...params.value, page: (pageIndex.value - 1).toString(), size: pageSize.value.toString() };
-});
+const defaultPage = 1;
+const defaultPageSize = 10;
+// <Pagination> is 1-based; the backend `page` query param is 0-based.
+const page = ref(params.value.page ? parseInt(params.value.page) + 1 : defaultPage);
+const pageSize = ref(params.value.size ? parseInt(params.value.size) : defaultPageSize);
+const updatePaginationParams = (newPage: number, newPageSize: number) => {
+  page.value = newPage;
+  pageSize.value = newPageSize;
+  params.value = { ...params.value, page: (page.value - 1).toString(), size: pageSize.value.toString() };
+};
+updatePaginationParams(page.value, pageSize.value);
+watch([page, pageSize], ([newPage, newSize]) => updatePaginationParams(newPage, newSize));
 
 const { data, isLoading, isFetching, isError } = useGetReleaseNotes(params);
 const search = ref(params.value.query || '');
 
 const clearFilters = () => {
   clear();
+  updatePaginationParams(defaultPage, defaultPageSize);
+  search.value = '';
 }
 
 const onSearch = () => {
@@ -118,7 +127,7 @@ const createReleaseNoteMutation = useCreateReleaseNote({
               </DrawerTrigger>
             </div>
           </div>
-          <Spinner v-if="isLoading || isFetching" />
+          <Spinner v-if="isLoading || isFetching" class="w-full"/>
           <p v-else-if="isError">{{ t('loadingError.releaseNotes') }}</p>
           <div v-else>
             <ScrollArea class="h-[70vh] w-full">
@@ -130,7 +139,7 @@ const createReleaseNoteMutation = useCreateReleaseNote({
               <Separator />
             </div>
           </ScrollArea>
-          <Pagination class="text-text-primary h-[10vh]" v-slot="{ page }" :items-per-page="pageSize" :total="data?.totalItems" :default-page="1">
+          <Pagination class="text-text-primary h-[10vh]" v-model:page="page" :items-per-page="pageSize" :total="data?.totalItems">
             <PaginationContent v-slot="{ items }">
               <PaginationPrevious />
               <template v-for="(item, index) in items" :key="index">
@@ -138,7 +147,6 @@ const createReleaseNoteMutation = useCreateReleaseNote({
                   v-if="item.type === 'page'"
                   :value="item.value"
                   :is-active="item.value === page"
-                  @click="pageIndex = item.value"
                 >
                   {{ item.value }}
                 </PaginationItem>
@@ -149,7 +157,7 @@ const createReleaseNoteMutation = useCreateReleaseNote({
                   v-for="option in pageSizeOptions"
                   :value="option"
                   :key="option"
-                  @click="pageIndex = 1"
+                  @click="page = 1"
                 >
                   {{ t('pagination.itemsPerPage', { count: option }) }}
                 </NativeSelectOption>
