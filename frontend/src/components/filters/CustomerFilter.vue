@@ -32,7 +32,8 @@ const toggle = (id: string, checked: boolean) => {
           <p v-else-if="isError">{{ t('loadingError.customers') }}</p>
           <div v-else class="flex gap-3 flex-col">
             <FilterListItem v-model="includeUnassigned" :label="t('filters.none')" />
-            <FilterListItem v-for="customer in customers" :key="customer.id"
+            <FilterListItem
+              v-for="customer in customers" :key="customer.id"
               :model-value="selected.includes(customer.id.toString())" :label="customer.name"
               @update:model-value="(checked) => toggle(customer.id.toString(), checked)" />
           </div>

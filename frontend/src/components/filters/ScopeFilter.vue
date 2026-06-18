@@ -32,7 +32,8 @@ const toggle = (id: string, checked: boolean) => {
           <p v-else-if="isError">{{ t('loadingError.scopes') }}</p>
           <div v-else class="flex gap-3 flex-col">
             <FilterListItem v-model="includeUnassigned" :label="t('filters.none')" />
-            <FilterListItem v-for="scope in scopes" :key="scope.id"
+            <FilterListItem
+              v-for="scope in scopes" :key="scope.id"
               :model-value="selected.includes(scope.id.toString())" :label="scope.name"
               @update:model-value="(checked) => toggle(scope.id.toString(), checked)" />
           </div>

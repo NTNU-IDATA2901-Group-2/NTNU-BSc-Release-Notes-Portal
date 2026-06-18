@@ -32,10 +32,12 @@ const set = (val: string, checked: boolean) => {
         </AccordionTrigger>
         <AccordionContent class="mt-4 accordion-content">
           <div class="flex gap-3 flex-col">
-            <FilterListItem v-for="option in options.published" :key="option.val"
+            <FilterListItem
+              v-for="option in options.published" :key="option.val"
               :model-value="published === option.val" :label="option.name"
               @update:model-value="(checked) => set(option.val, checked)" />
-            <FilterListItem v-for="option in options.draft" :key="option.val"
+            <FilterListItem
+              v-for="option in options.draft" :key="option.val"
               :model-value="published === option.val" :label="option.name"
               @update:model-value="(checked) => set(option.val, checked)" />
           </div>
