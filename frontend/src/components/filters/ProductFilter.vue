@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { useGetProducts } from '@/api/products-api';
 import { Accordion } from '../ui/accordion';
 import { AccordionContent, AccordionItem, AccordionTrigger } from 'reka-ui';
+import { ChevronDown } from 'lucide-vue-next';
 
 const selected = defineModel<string[]>('selected', { default: () => [] });
 const includeUnassigned = defineModel<boolean>('includeUnassigned', { default: false });
@@ -22,8 +23,10 @@ const toggle = (id: string, checked: boolean) => {
   <div class="flex gap-3 flex-col mt-4">
     <Accordion type="single" collapsible>
       <AccordionItem value="product">
-        <AccordionTrigger>
+        <AccordionTrigger class="flex items-center justify-between w-full">
           <h4 class="text-xl hover:underline">{{ t('title.product') }}</h4>
+          <ChevronDown class="text-text-primary accordion-chevron"/>
+
         </AccordionTrigger>
         <AccordionContent class="mt-4 accordion-content">
           <p v-if="isLoading">{{ t('loading.filter') }}</p>
