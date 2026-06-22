@@ -13,6 +13,7 @@
         "noTitle": "Ingen tittel",
         "noReference": "Ingen referanse",
         "ticketId": "Saks-ID",
+        "serviceRequest": "Serviceforespørsel",
         "previewIntro": "Dette er en forhåndsversjon av kommende release. Formålet er å planlegge for testing og verifisere at løsningen fungerer som forventet i deres oppsett før produksjonssetting.",
         "timeline": "Tidslinje",
         "previewTestingNotice": "Flere av endringene kan påvirke eksisterende arbeidsprosesser, og det vil derfor være behov for målrettet testing.",

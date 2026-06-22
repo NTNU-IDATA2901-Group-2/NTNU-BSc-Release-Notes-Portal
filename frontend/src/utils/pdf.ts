@@ -2,6 +2,7 @@ import solwrLogo from '@/assets/solwr_logo.svg?raw';
 import md from './markdown-it';
 import { i18n } from './i18n';
 import { getLocaleDateString } from './format-date';
+import { jiraTicketUrl } from './jira';
 import type { ChangeImpact, ChangeNote, ReleaseNote, ReleaseTimeline } from './types';
 import pdfMake from "pdfmake/build/pdfmake";
 import vfs from "pdfmake/build/vfs_fonts";
@@ -31,6 +32,14 @@ const MARKDOWN_BODY_SIZE = 11;
 // render larger than the note's own heading.
 const NOTE_HEADING_SIZE = 13;
 
+// Link runs render in this blue with an underline, matching the in-app styling.
+const LINK_COLOR = '#0b5cff';
+
+/** A clickable text run linking a Jira issue/service-request key to its browse page. */
+function jiraLink(key: string): ContentText {
+  return { text: key, link: jiraTicketUrl(key), color: LINK_COLOR, decoration: 'underline' };
+}
+
 /**
  * Flattens an `inline` token's children into a pdfmake text run, carrying bold,
  * italic and link styling through nested emphasis.
@@ -57,7 +66,7 @@ function inlineToRuns(inline: Token): ContentText[] {
           text: child.content,
           bold: bold > 0,
           italics: italics > 0,
-          ...(link ? { link, color: '#0b5cff', decoration: 'underline' } : {}),
+          ...(link ? { link, color: LINK_COLOR, decoration: 'underline' } : {}),
         });
         break;
     }
@@ -231,11 +240,12 @@ function renderChangeImpactTable(changeImpacts: ChangeImpact[]): Content {
  * Renders the change-details section: its `sectionTitle` heading followed by
  * the change notes grouped by feature, one sub-heading per feature in
  * first-seen order, with featureless notes collected under "Other" at the end.
- * Each note leads with its reference and title, then the markdown description.
+ * Each note leads with its reference — and its linked Jira service request when
+ * one exists — and title, then the markdown description.
  * The section heading is owned here (rather than emitted by the caller) so it
  * can be glued to the first feature group and never stranded above a page break.
  */
-function renderFeatureDetails(changeNotes: ChangeNote[], sectionTitle: string): Content[] {
+function renderFeatureDetails(changeNotes: ChangeNote[], sectionTitle: string, serviceRequestKeys: Record<string, string>): Content[] {
   const groups: { name: string; notes: ChangeNote[] }[] = [];
   const groupsByFeatureId = new Map<number, { name: string; notes: ChangeNote[] }>();
   const featurelessNotes: ChangeNote[] = [];
@@ -265,12 +275,21 @@ function renderFeatureDetails(changeNotes: ChangeNote[], sectionTitle: string): 
   }
 
   // Each note leads with its reference — shown as a bold "Ticket ID:" label
-  // followed by the value — and its title; if both are missing it falls back to
+  // followed by the value, and the linked "Service request:" key next to it when
+  // the issue has one — and its title; if everything is missing it falls back to
   // a placeholder so the note still has a visible label.
   const renderNote = (changeNote: ChangeNote): Content => {
     const label: ContentText[] = [];
     if (changeNote.reference) {
-      label.push({ text: `${t('pdf.ticketId')}: `, bold: true }, { text: changeNote.reference });
+      label.push({ text: `${t('pdf.ticketId')}: `, bold: true }, jiraLink(changeNote.reference));
+      const serviceRequest = serviceRequestKeys[changeNote.reference];
+      if (serviceRequest) {
+        label.push(
+          { text: ' · ' },
+          { text: `${t('pdf.serviceRequest')}: `, bold: true },
+          jiraLink(serviceRequest),
+        );
+      }
     }
     if (changeNote.title) label.push({ text: label.length ? ` ${changeNote.title}` : changeNote.title });
     if (label.length === 0) label.push({ text: t('pdf.noTitle'), italics: true });
@@ -308,7 +327,7 @@ function renderFeatureDetails(changeNotes: ChangeNote[], sectionTitle: string): 
  * testing responsibilities — leaving the summary, the change details and the
  * known limitations.
  */
-function buildBody(releaseNote: ReleaseNote, changeNotes: ChangeNote[]): Content[] {
+function buildBody(releaseNote: ReleaseNote, changeNotes: ChangeNote[], serviceRequestKeys: Record<string, string>): Content[] {
   const isPreview = !releaseNote.published;
   return [
     ...(isPreview ? [{ text: t('pdf.previewIntro'), style: 'intro' } as Content] : []),
@@ -323,7 +342,7 @@ function buildBody(releaseNote: ReleaseNote, changeNotes: ChangeNote[]): Content
           renderChangeImpactTable(releaseNote.changeImpacts),
         ]
       : []),
-    ...renderFeatureDetails(changeNotes, t('pdf.featureDetails')),
+    ...renderFeatureDetails(changeNotes, t('pdf.featureDetails'), serviceRequestKeys),
     ...(isPreview
       ? [sectionHeading(t('pdf.testingResponsibility')), ...markdownToContent(t('pdf.testingResponsibilityBody'))]
       : []),
@@ -349,12 +368,14 @@ function renderKnownLimitations(knownLimitations: string[]): Content {
  * extra sections (intro, timeline, expected-impact overview and testing
  * responsibilities) and labels its title accordingly; both are authored from
  * the supplied change notes, which the caller has already filtered and
- * optionally translated.
+ * optionally translated. The `serviceRequestKeys` map links each change note's
+ * reference to its Jira service-request key and is rendered next to the
+ * reference on the notes that have one.
  *
  * This PDF is customer-facing, so it deliberately omits the change notes'
  * developer notes and upgrade requirements, which are internal-only.
  */
-export async function exportToPdf(releaseNote: ReleaseNote, changeNotes: ChangeNote[]) {
+export async function exportToPdf(releaseNote: ReleaseNote, changeNotes: ChangeNote[], serviceRequestKeys: Record<string, string> = {}) {
   const now = new Date();
   const generatedDate = [
     String(now.getDate()).padStart(2, '0'),
@@ -378,7 +399,7 @@ export async function exportToPdf(releaseNote: ReleaseNote, changeNotes: ChangeN
     // The preview title spans the row on its own; the generated date sits below.
     content.push({ text: title, style: 'tag' }, generated);
   }
-  content.push(...buildBody(releaseNote, changeNotes));
+  content.push(...buildBody(releaseNote, changeNotes, serviceRequestKeys));
 
   const documentDefinition: TDocumentDefinitions = {
     info: { title: releaseNote.tag },

@@ -13,6 +13,7 @@
         "noTitle": "No title",
         "noReference": "No reference",
         "ticketId": "Ticket ID",
+        "serviceRequest": "Service request",
         "previewIntro": "This is a preview version of the upcoming release. Its purpose is to plan for testing and verify that the solution works as expected in your setup before production deployment.",
         "timeline": "Timeline",
         "previewTestingNotice": "Several of the changes may affect existing work processes, and there will therefore be a need for targeted testing.",

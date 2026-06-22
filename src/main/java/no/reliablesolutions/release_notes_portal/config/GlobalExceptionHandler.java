@@ -24,6 +24,7 @@ import no.reliablesolutions.release_notes_portal.exception.FailedSyncGitChangeNo
 import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityException;
 import no.reliablesolutions.release_notes_portal.exception.FeatureNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.InvalidDateRangeException;
+import no.reliablesolutions.release_notes_portal.exception.JiraCommunicationException;
 import no.reliablesolutions.release_notes_portal.exception.ProductNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteAlreadySyncedException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
@@ -325,5 +326,16 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
     logger.warn("Request method not supported: {}", e.getMethod());
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Request method not supported: " + e.getMethod());
+  }
+
+  /**
+   * Handles the case where communication with Jira fails. Logs the event and returns a 502 response indicating the upstream Jira request failed.
+   * @param e the exception containing the Jira issue key and failure details
+   * @return a ResponseEntity with a 502 status and a message indicating communication with Jira failed
+   */
+  @ExceptionHandler(value = {JiraCommunicationException.class})
+  public ResponseEntity<String> handleJiraCommunicationException(JiraCommunicationException e) {
+    logger.error("Failed to communicate with Jira for issue {}", e.getIssueKey(), e);
+    return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(String.format("Failed to communicate with Jira for issue %s", e.getIssueKey()));
   }
 }
