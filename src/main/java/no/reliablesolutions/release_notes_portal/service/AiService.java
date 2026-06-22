@@ -34,12 +34,12 @@ public class AiService {
     * <h1>Translates the given text to the specified locale</h1>
     * <h2>Supported Locales:</h2>
     * <ul>
-    *   <li>en - English</li>
-    *   <li>no - Norwegian Bokmål</li>
-    *   <li>fr - French</li>
+    *   <li>en-GB - English</li>
+    *   <li>nb-NO - Norwegian Bokmål</li>
+    *   <li>fr-FR - French</li>
     * </ul>
     * 
-    * @param locale the target locale for translation (e.g., "en", "no", "fr")
+    * @param locale the target locale for translation (e.g., "en-GB", "nb-NO", "fr-FR")
     * @param text the text to be translated
     * @return the translated text
     * @throws IllegalArgumentException if locale or text is null or empty
@@ -52,9 +52,9 @@ public class AiService {
         
         String lang = "";
         switch (locale) {
-            case "en" -> lang = "English";
-            case "no" -> lang = "Norwegian Bokmål";
-            case "fr" -> lang = "French";
+            case "en-GB" -> lang = "English";
+            case "nb-NO" -> lang = "Norwegian Bokmål";
+            case "fr-FR" -> lang = "French";
             default -> throw new LocaleNotSupportedException(locale);
         }
 

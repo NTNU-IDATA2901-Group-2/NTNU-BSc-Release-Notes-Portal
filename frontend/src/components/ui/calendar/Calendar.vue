@@ -8,6 +8,7 @@ import { CalendarRoot, useDateFormatter, useForwardPropsEmits } from "reka-ui"
 import { createYear, createYearRange, toDate } from "reka-ui/date"
 import { computed, toRaw } from "vue"
 import { cn } from '@/utils/utils'
+import { i18n } from '@/utils/i18n'
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import { CalendarCell, CalendarCellTrigger, CalendarGrid, CalendarGridBody, CalendarGridHead, CalendarGridRow, CalendarHeadCell, CalendarHeader, CalendarHeading, CalendarNextButton, CalendarPrevButton } from "."
 
@@ -17,6 +18,8 @@ const props = withDefaults(defineProps<CalendarRootProps & { class?: HTMLAttribu
 })
 const emits = defineEmits<CalendarRootEmits>()
 
+const locale = computed(() => i18n.global.locale)
+
 const delegatedProps = reactiveOmit(props, "class", "layout", "placeholder")
 
 const placeholder = useVModel(props, "placeholder", emits, {
@@ -24,8 +27,7 @@ const placeholder = useVModel(props, "placeholder", emits, {
   defaultValue: props.defaultPlaceholder ?? today(getLocalTimeZone()),
 }) as Ref<DateValue>
 
-const formatter = useDateFormatter(props.locale ?? "en")
-
+const formatter = useDateFormatter(locale.value)
 const yearRange = computed(() => {
   return props.yearRange ?? createYearRange({
     start: props?.minValue ?? (toRaw(props.placeholder) ?? props.defaultPlaceholder ?? today(getLocalTimeZone()))
@@ -92,6 +94,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
   <CalendarRoot
     v-slot="{ grid, weekDays, date }"
     v-bind="forwarded"
+    :locale="locale"
     v-model:placeholder="placeholder"
     data-slot="calendar"
     :class="cn('p-3 text-text-primary', props.class)"

@@ -169,7 +169,7 @@ onBeforeUnmount(() => {
                   {{ t('tooltip.reference') }}
               </TooltipContent>
             </Tooltip>
-            <Button :disabled="isTranslating" v-if="!(locale === 'en')" variant="glow" @click="onTranslate">{{hasTranslation ? t('button.undo') : t('button.translate') }}
+            <Button :disabled="isTranslating" v-if="!(locale === 'en-GB')" variant="glow" @click="onTranslate">{{hasTranslation ? t('button.undo') : t('button.translate') }}
               <Spinner v-if="isTranslating" class="h-4 dark:text-text-primary"/>
               <Sparkles v-else/> 
             </Button>

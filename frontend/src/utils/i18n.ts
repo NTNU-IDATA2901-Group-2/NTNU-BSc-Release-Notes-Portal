@@ -11,20 +11,20 @@ const detectUserLanguage = () => {
 
     const userLang = navigator.language
     if (userLang.startsWith('no') || userLang.startsWith('nb') || userLang.startsWith('nn')) {
-        return 'no';
+        return 'nb-NO';
     }
     if (userLang.startsWith('fr')) {
-        return 'fr';
+        return 'fr-FR';
     }
-    return 'en';
+    return 'en-GB';
 }
 
 export const i18n = createI18n({
     locale: detectUserLanguage(),
-    fallbackLocale: 'en',
+    fallbackLocale: 'en-GB',
     messages: {
-        en,
-        no,
-        fr
+        'en-GB': en,
+        'nb-NO': no,
+        'fr-FR': fr,
     }
 });
