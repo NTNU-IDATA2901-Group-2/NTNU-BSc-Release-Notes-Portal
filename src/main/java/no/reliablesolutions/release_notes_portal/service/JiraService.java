@@ -7,6 +7,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -15,6 +16,7 @@ import no.reliablesolutions.release_notes_portal.exception.JiraCommunicationExce
 import tools.jackson.databind.JsonNode;
 
 @Service
+@Profile("!ci")
 public class JiraService {
   private static final Logger logger = LoggerFactory.getLogger(JiraService.class);
   private final String JIRA_BASE_URL;
