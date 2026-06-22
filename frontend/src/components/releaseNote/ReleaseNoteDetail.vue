@@ -297,7 +297,7 @@ v-for="change in releaseNote.changeNotes" :key="change.id"
               </TooltipContent>
             </Tooltip>
             <Button
-type="button" v-if="!(locale === 'en')" variant="glow" @click="onTranslate"
+type="button" v-if="!(locale === 'en-GB')" variant="glow" @click="onTranslate"
               :disabled="isTranslating" class="inline-flex items-center gap-2">
               {{ hasTranslation ? t('button.undo') : t('button.translate') }}
               <Spinner v-if="isTranslating" class="h-4 dark:text-text-primary" />

@@ -41,7 +41,7 @@ const firstLetters = computed(() => {
 	return firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase();
 })
 
-const handleLocalChange = (locale : "en" | "no" | "fr") => {
+const handleLocalChange = (locale : "en-GB" | "nb-NO" | "fr-FR") => {
 	i18n.global.locale = locale;
   localStorage.setItem('locale', locale);
 }
@@ -81,13 +81,13 @@ const handleLogoClick = () => {
 							{{ t('header.language') }}
 						</MenubarSubTrigger>
 						<MenubarSubContent>
-							<MenubarItem @click="handleLocalChange('en')">
+							<MenubarItem @click="handleLocalChange('en-GB')">
 								English
 							</MenubarItem>
-							<MenubarItem @click="handleLocalChange('no')">
+							<MenubarItem @click="handleLocalChange('nb-NO')">
 								Norsk
 							</MenubarItem>
-							<MenubarItem @click="handleLocalChange('fr')">
+							<MenubarItem @click="handleLocalChange('fr-FR')">
 								Français
 							</MenubarItem>
 						</MenubarSubContent>
