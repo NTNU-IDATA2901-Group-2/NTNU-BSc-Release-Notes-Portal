@@ -1,14 +1,16 @@
 package no.reliablesolutions.release_notes_portal.service;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientResponseException;
 
-import no.reliablesolutions.release_notes_portal.exception.JiraServiceRequestNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.JiraCommunicationException;
 import tools.jackson.databind.JsonNode;
 
@@ -32,39 +34,62 @@ public class JiraService {
         .baseUrl(JIRA_BASE_URL)
         .defaultHeaders(h -> h.setBasicAuth(JIRA_EMAIL, JIRA_API_TOKEN))
         .build();
-
   }
 
-  public String getServiceRequest(String issueKey) {
-    String propertyName = "/fields/issuelinks/0/inwardIssue/key"; // Assuming where the service request key is located in Jira issue JSON structure
+  /**
+   * Fetches the inward-linked service-request key for each given Jira issue in a single bulk
+   * request.
+   *
+   * @param issueKeys the issue keys to look up
+   * @return a map from each requested issue key to its first inward-linked service-request key.
+   *         Issues with no inward link (or that Jira could not return) are absent from the map
+   */
+  public Map<String, String> getServiceRequests(List<String> issueKeys) {
+    record BulkFetchRequest(List<String> issueIdsOrKeys, List<String> fields) {
+    }
     try {
-      JsonNode body = restClient.get()
-          .uri("/rest/api/latest/issue/{key}", issueKey)
+      JsonNode body = restClient.post()
+          .uri("/rest/api/latest/issue/bulkfetch")
+          .contentType(MediaType.APPLICATION_JSON)
+          .body(new BulkFetchRequest(issueKeys, List.of("issuelinks")))
           .retrieve()
           .body(JsonNode.class);
 
       if (body == null) {
-        throw new JiraServiceRequestNotFoundException(issueKey);
+        throw new JiraCommunicationException(String.join(", ", issueKeys),
+            new IllegalStateException("empty response body from bulkfetch"));
       }
 
-      JsonNode sr = body.at(propertyName);
-      if (sr.isMissingNode()) {
-        throw new JiraServiceRequestNotFoundException(issueKey);
+      JsonNode issueErrors = body.at("/issueErrors");
+      if (issueErrors.isArray() && !issueErrors.isEmpty()) {
+        logger.warn("Jira bulkfetch returned errors for some of {}: {}", issueKeys, issueErrors);
       }
-      logger.info("Successfully fetched Jira issue with key {}: Service Request {}", issueKey, sr);
-      return sr.asString();
 
-    } catch (RestClientResponseException e) {
-      // Jira returns 404 when the issue doesn't exist or the token can't see it; anything
-      // else (401/403/429/5xx) is an upstream/communication problem, not a missing issue.
-      if (e.getStatusCode().isSameCodeAs(HttpStatus.NOT_FOUND)) {
-        throw new JiraServiceRequestNotFoundException(issueKey, e);
+      Map<String, String> serviceRequestKeys = new LinkedHashMap<>();
+      for (JsonNode issue : body.at("/issues")) {
+        JsonNode issueKey = issue.at("/key");
+        if (issueKey.isMissingNode()) {
+          continue;
+        }
+        for (JsonNode link : issue.at("/fields/issuelinks")) {
+          JsonNode inwardKey = link.at("/inwardIssue/key");
+          if (!inwardKey.isMissingNode()) {
+            serviceRequestKeys.put(issueKey.asString(), inwardKey.asString());
+            break; // first inward-linked issue per Jira issue
+          }
+        }
       }
-      throw new JiraCommunicationException(issueKey, e);
-    } catch (JiraServiceRequestNotFoundException e) {
+      logger.info("Resolved {} service request(s) for {} requested issue(s)",
+          serviceRequestKeys.size(), issueKeys.size());
+      if (serviceRequestKeys.isEmpty()) {
+        logger.warn("No service requests found for {}. Ensure the API key is valid", issueKeys);
+      }
+      return serviceRequestKeys;
+
+    } catch (JiraCommunicationException e) {
       throw e;
     } catch (Exception e) {
-      throw new JiraCommunicationException(issueKey, e);
+      throw new JiraCommunicationException(String.join(", ", issueKeys), e);
     }
   }
 

@@ -13,6 +13,7 @@
         "noTitle": "Aucun titre",
         "noReference": "Aucune référence",
         "ticketId": "ID du ticket",
+        "serviceRequest": "Demande de service",
         "previewIntro": "Ceci est une version préliminaire de la prochaine release. Son objectif est de planifier les tests et de vérifier que la solution fonctionne comme prévu dans votre configuration avant la mise en production.",
         "timeline": "Calendrier",
         "previewTestingNotice": "Plusieurs des changements peuvent affecter les processus de travail existants ; des tests ciblés seront donc nécessaires.",

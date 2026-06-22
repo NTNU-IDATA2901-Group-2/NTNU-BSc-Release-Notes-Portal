@@ -25,7 +25,6 @@ import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityExc
 import no.reliablesolutions.release_notes_portal.exception.FeatureNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.InvalidDateRangeException;
 import no.reliablesolutions.release_notes_portal.exception.JiraCommunicationException;
-import no.reliablesolutions.release_notes_portal.exception.JiraServiceRequestNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ProductNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteAlreadySyncedException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
@@ -327,17 +326,6 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
     logger.warn("Request method not supported: {}", e.getMethod());
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Request method not supported: " + e.getMethod());
-  }
-
-  /**
-   * Handles the case where no service request is linked to the given Jira issue. Logs the event and returns a 404 response with a message.
-   * @param e the exception containing the Jira issue key
-   * @return a ResponseEntity with a 404 status and a message indicating no service request was found for the issue
-   */
-  @ExceptionHandler(value = {JiraServiceRequestNotFoundException.class})
-  public ResponseEntity<String> handleJiraServiceRequestNotFoundException(JiraServiceRequestNotFoundException e) {
-    logger.warn("Jira service request not found: {}", e.getIssueKey());
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("No service request found for Jira issue %s", e.getIssueKey()));
   }
 
   /**
