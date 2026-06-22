@@ -2,6 +2,7 @@ import solwrLogo from '@/assets/solwr_logo.svg?raw';
 import md from './markdown-it';
 import { i18n } from './i18n';
 import { getLocaleDateString } from './format-date';
+import { jiraTicketUrl } from './jira';
 import type { ChangeImpact, ChangeNote, ReleaseNote, ReleaseTimeline } from './types';
 import pdfMake from "pdfmake/build/pdfmake";
 import vfs from "pdfmake/build/vfs_fonts";
@@ -31,6 +32,14 @@ const MARKDOWN_BODY_SIZE = 11;
 // render larger than the note's own heading.
 const NOTE_HEADING_SIZE = 13;
 
+// Link runs render in this blue with an underline, matching the in-app styling.
+const LINK_COLOR = '#0b5cff';
+
+/** A clickable text run linking a Jira issue/service-request key to its browse page. */
+function jiraLink(key: string): ContentText {
+  return { text: key, link: jiraTicketUrl(key), color: LINK_COLOR, decoration: 'underline' };
+}
+
 /**
  * Flattens an `inline` token's children into a pdfmake text run, carrying bold,
  * italic and link styling through nested emphasis.
@@ -57,7 +66,7 @@ function inlineToRuns(inline: Token): ContentText[] {
           text: child.content,
           bold: bold > 0,
           italics: italics > 0,
-          ...(link ? { link, color: '#0b5cff', decoration: 'underline' } : {}),
+          ...(link ? { link, color: LINK_COLOR, decoration: 'underline' } : {}),
         });
         break;
     }
@@ -272,13 +281,13 @@ function renderFeatureDetails(changeNotes: ChangeNote[], sectionTitle: string, s
   const renderNote = (changeNote: ChangeNote): Content => {
     const label: ContentText[] = [];
     if (changeNote.reference) {
-      label.push({ text: `${t('pdf.ticketId')}: `, bold: true }, { text: changeNote.reference });
+      label.push({ text: `${t('pdf.ticketId')}: `, bold: true }, jiraLink(changeNote.reference));
       const serviceRequest = serviceRequestKeys[changeNote.reference];
       if (serviceRequest) {
         label.push(
           { text: ' · ' },
           { text: `${t('pdf.serviceRequest')}: `, bold: true },
-          { text: serviceRequest },
+          jiraLink(serviceRequest),
         );
       }
     }
