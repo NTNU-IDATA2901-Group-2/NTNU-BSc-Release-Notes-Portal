@@ -161,7 +161,7 @@ const onTranslate = async () => {
           locale: locale.value
         })
       }
-    )
+      )
     )
   }
 
@@ -280,16 +280,13 @@ const customerFilter = ref<number>(-1);
 
 <template>
   <div class="flex flex-col w-full items-center px-4 mb-20">
-    <DialogPrompt
-v-model:open="deletePromptOpen" :mode="'delete'" :title-key="'deletePrompt.title'"
+    <DialogPrompt v-model:open="deletePromptOpen" :mode="'delete'" :title-key="'deletePrompt.title'"
       :description-key="'deletePrompt.description'" :on-confirm="() => archiveReleaseNote()" />
-    <DialogPrompt
-v-model:open="commitPromptOpen" :mode="'confirm'" :title-key="'commitPrompt.title'"
+    <DialogPrompt v-model:open="commitPromptOpen" :mode="'confirm'" :title-key="'commitPrompt.title'"
       :description-key="'commitPrompt.description'"
       :on-confirm="() => commitReleaseNoteToGit.mutate({ id: releaseNote.id, additionalGitRepositoryIds: [] })">
       <ScrollArea class="max-h-60 border">
-        <p
-v-for="change in releaseNote.changeNotes" :key="change.id"
+        <p v-for="change in releaseNote.changeNotes" :key="change.id"
           :class="(!change.title && !change.reference) ? 'text-text-primary/50' : ''">
           {{ getLabelFromChangeNote(change) || t('placeholder.noTitle') }}
         </p>
@@ -317,34 +314,33 @@ v-for="change in releaseNote.changeNotes" :key="change.id"
       <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-col sm:flex-row items-start justify-between max-w-full gap-4">
           <h1 v-if="!releaseNote.tag" class="text-4xl text-text-primary/50 leading-normal">{{ t('placeholder.noTitle')
-          }}</h1>
+            }}</h1>
           <h1 v-else class="text-3xl md:text-4xl truncate max-w-full leading-normal">{{
             releaseNote.tag }}
           </h1>
           <div class="flex sm:gap-4 w-full sm:w-auto sm:grow items-center self-center">
             <div class="flex flex-row gap-2 items-center mr-auto">
-                          <Tooltip v-if="isAdmin">
-              <TooltipTrigger as-child>
-                <Badge class="h-6 w-fit" :variant="releaseNote.published ? 'success' : 'destructive'">
-                  {{ releaseNote.published ? t('card.published') : t('card.draft') }}
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent>
-                {{ releaseNote.published ? t('tooltip.publishedNote') : t('tooltip.draftNote') }}
-              </TooltipContent>
-            </Tooltip>
-                    <Tooltip v-if="releaseNote.product">
-          <TooltipTrigger as-child>
-            <Badge variant="outline" class="w-fit">{{ releaseNote.product.name }}</Badge>
-          </TooltipTrigger>
-          <TooltipContent>
-            {{ t('title.product') }}
-          </TooltipContent>
-        </Tooltip>
+              <Tooltip v-if="isAdmin">
+                <TooltipTrigger as-child>
+                  <Badge class="h-6 w-fit" :variant="releaseNote.published ? 'success' : 'destructive'">
+                    {{ releaseNote.published ? t('card.published') : t('card.draft') }}
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {{ releaseNote.published ? t('tooltip.publishedNote') : t('tooltip.draftNote') }}
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip v-if="releaseNote.product">
+                <TooltipTrigger as-child>
+                  <Badge variant="outline" class="w-fit">{{ releaseNote.product.name }}</Badge>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {{ t('title.product') }}
+                </TooltipContent>
+              </Tooltip>
 
             </div>
-            <Button
-type="button" v-if="!(locale === 'en-GB')" variant="glow" @click="onTranslate"
+            <Button type="button" v-if="!(locale === 'en-GB')" variant="glow" @click="onTranslate"
               :disabled="isTranslating" class="inline-flex items-center gap-2">
               {{ hasTranslation ? t('button.undo') : t('button.translate') }}
               <Spinner v-if="isTranslating" class="h-4 dark:text-text-primary" />
@@ -389,7 +385,7 @@ type="button" v-if="!(locale === 'en-GB')" variant="glow" @click="onTranslate"
                   </TooltipTrigger>
                   <TooltipContent v-if="releaseNote.syncedToGit">{{ t('tooltip.alreadyCommited') }}</TooltipContent>
                   <TooltipContent v-else-if="releaseNote.changeNotes.length === 0">{{ t('tooltip.noChangeNotesToCommit')
-                  }}</TooltipContent>
+                    }}</TooltipContent>
                 </Tooltip>
                 <DropdownMenuItem @click="handleExport">
                   <div class="w-full flex gap-2">
@@ -407,8 +403,7 @@ type="button" v-if="!(locale === 'en-GB')" variant="glow" @click="onTranslate"
           <p v-if="releaseNote.summary" v-html="md.render(translatedSummary ?? releaseNote.summary)">
           </p>
           <p class="text-text-primary/50" v-else>{{ t('placeholder.noSummary') }}</p>
-          <Button
-class="size-fit" variant="outline"
+          <Button class="size-fit" variant="outline"
             @click="handleCopy(hasTranslation ? translatedSummary ?? '' : releaseNote.summary, 'summary')">
             <component :is="copiedKey === 'summary' ? Check : Copy" />
           </Button>
@@ -466,7 +461,8 @@ class="size-fit" variant="outline"
           <div class="flex flex-col gap-4 w-full">
             <h2 class="text-3xl truncate max-w-full leading-normal">{{ t('title.knownLimitations') }}</h2>
             <ul v-if="releaseNote.knownLimitations?.length" class="list-disc pl-6 flex flex-col gap-2">
-              <li v-for="(limitation, index) in translatedKnownLimitations ?? releaseNote.knownLimitations" :key="index">
+              <li v-for="(limitation, index) in translatedKnownLimitations ?? releaseNote.knownLimitations"
+                :key="index">
                 {{ limitation }}
               </li>
             </ul>
@@ -513,12 +509,11 @@ class="size-fit" variant="outline"
           <div class="flex flex-col gap-10">
             <p class="text-text-primary/50" v-if="releaseNote.changeNotes.length === 0">{{
               t('placeholder.noChangeNotesAdded')
-            }}</p>
+              }}</p>
             <template v-for="change in translatedChangeNotes ?? releaseNote.changeNotes" :key="change.id">
               <div v-if="shouldShowChangeNote(change)" class="flex flex-col gap-2">
                 <div class="flex items-center gap-4">
-                  <RouterLink
-class="text-2xl dark:text-text-dark-static text-text-light-static hover:underline"
+                  <RouterLink class="text-2xl dark:text-text-dark-static text-text-light-static hover:underline"
                     :to="`${routeNames.changeNotes}/${change.id}`">{{ change.title || t('placeholder.noTitle') }}
                   </RouterLink>
 
@@ -533,8 +528,7 @@ class="text-2xl dark:text-text-dark-static text-text-light-static hover:underlin
 
                   <Tooltip v-if="isAdmin && change.reference">
                     <TooltipTrigger as-child>
-                      <Badge
-class="h-6 hover:cursor-pointer hover:underline" variant="outline"
+                      <Badge class="h-6 hover:cursor-pointer hover:underline" variant="outline"
                         @click="() => openJiraTicket(change.reference)">
                         {{ change.reference }}
                       </Badge>
@@ -553,8 +547,7 @@ class="h-6 hover:cursor-pointer hover:underline" variant="outline"
                       <h3 class="text-xl">{{ t('title.description') }}</h3>
                       <p class="ml-4" v-if="change.description" v-html="md.render(change.description)"></p>
                     </div>
-                    <Button
-variant="outline" size="icon-sm"
+                    <Button variant="outline" size="icon-sm"
                       @click="handleCopy(hasTranslation ? translatedChangeNotes?.find(c => c.id === change.id)?.description ?? '' : change.description ?? '', `change-${change.id}`)">
                       <component :is="copiedKey === `change-${change.id}` ? Check : Copy" />
                     </Button>
