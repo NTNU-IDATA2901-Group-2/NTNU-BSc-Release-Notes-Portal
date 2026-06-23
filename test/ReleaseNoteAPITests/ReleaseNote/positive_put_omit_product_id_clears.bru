@@ -1,12 +1,12 @@
 meta {
-  name: negative_get_patched
+  name: positive_put_omit_product_id_clears
   type: http
-  seq: 59
+  seq: 36
 }
 
-get {
+put {
   url: {{baseurl}}/releasenotes/{{release_id_1}}
-  body: none
+  body: json
   auth: inherit
 }
 
@@ -14,8 +14,15 @@ headers {
   X-Test-Role: Admin
 }
 
+body:json {
+  {
+    "published": false
+  }
+}
+
 assert {
-  res.status: eq 404
+  res.status: eq 200
+  res.body.product: isNull
 }
 
 settings {

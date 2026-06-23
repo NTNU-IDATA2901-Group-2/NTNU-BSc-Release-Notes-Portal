@@ -1,7 +1,7 @@
 meta {
   name: positive_get_updated
   type: http
-  seq: 53
+  seq: 54
 }
 
 get {
@@ -32,6 +32,7 @@ assert {
   res.body.changeImpacts[0].whatIsChanged: eq "updated change"
   res.body.changeImpacts[0].whatShouldBeTested: eq "updated test"
   res.body.changeImpacts[0].testingNeed: eq MEDIUM
+  res.body.product.id: eq 2
 }
 
 settings {
