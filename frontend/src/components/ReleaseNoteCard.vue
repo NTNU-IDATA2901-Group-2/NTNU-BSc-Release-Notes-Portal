@@ -28,7 +28,7 @@ const { t } = useI18n();
         <Tooltip v-if="isAdmin">
           <TooltipTrigger as-child>
             <Badge 
-              data-pdf-exclude  class="h-6"
+              class="h-6"
               :variant="releaseNote.published ? 'success' : 'destructive'"
             >
               {{ releaseNote.published ? t('card.published') : t('card.draft') }}
@@ -39,7 +39,19 @@ const { t } = useI18n();
           </TooltipContent>
         </Tooltip>
       </div>
-      <p>{{ t('card.containsChangeNotes', { count: releaseNote.changeNotes.length }) }}</p>
+      <div class="flex flex-row items-center gap-2 min-w-0">
+        <p class="text-nowrap">{{ t('card.containsChangeNotes', { count: releaseNote.changeNotes.length }) }}</p>
+                            <Tooltip v-if="releaseNote.product">
+          <TooltipTrigger as-child>
+                    <Badge variant="outline" class="truncate">{{ releaseNote.product.name }}</Badge>
+
+          </TooltipTrigger>
+          <TooltipContent>
+            {{ t('title.product') }}
+          </TooltipContent>
+        </Tooltip>
+
+      </div>
     </div>
   </RouterLink>
 </template>

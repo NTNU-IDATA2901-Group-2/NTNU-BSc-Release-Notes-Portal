@@ -330,6 +330,9 @@ function renderFeatureDetails(changeNotes: ChangeNote[], sectionTitle: string, s
 function buildBody(releaseNote: ReleaseNote, changeNotes: ChangeNote[], serviceRequestKeys: Record<string, string>): Content[] {
   const isPreview = !releaseNote.published;
   return [
+    ...(releaseNote.product
+      ? [{ text: [{ text: `${t('title.product')}: `, bold: true }, releaseNote.product.name], margin: [0, 0, 0, 16] } as Content]
+      : []),
     ...(isPreview ? [{ text: t('pdf.previewIntro'), style: 'intro' } as Content] : []),
     ...(isPreview ? [sectionHeading(t('pdf.timeline')), renderTimeline(releaseNote.releaseTimeline)] : []),
     ...(releaseNote.summary

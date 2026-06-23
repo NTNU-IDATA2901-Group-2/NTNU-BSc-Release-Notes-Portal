@@ -322,9 +322,10 @@ v-for="change in releaseNote.changeNotes" :key="change.id"
             releaseNote.tag }}
           </h1>
           <div class="flex sm:gap-4 w-full sm:w-auto sm:grow items-center self-center">
-            <Tooltip v-if="isAdmin">
+            <div class="flex flex-row gap-2 items-center mr-auto">
+                          <Tooltip v-if="isAdmin">
               <TooltipTrigger as-child>
-                <Badge class="h-6 w-fit mr-auto" :variant="releaseNote.published ? 'success' : 'destructive'">
+                <Badge class="h-6 w-fit" :variant="releaseNote.published ? 'success' : 'destructive'">
                   {{ releaseNote.published ? t('card.published') : t('card.draft') }}
                 </Badge>
               </TooltipTrigger>
@@ -332,6 +333,16 @@ v-for="change in releaseNote.changeNotes" :key="change.id"
                 {{ releaseNote.published ? t('tooltip.publishedNote') : t('tooltip.draftNote') }}
               </TooltipContent>
             </Tooltip>
+                    <Tooltip v-if="releaseNote.product">
+          <TooltipTrigger as-child>
+            <Badge variant="outline" class="w-fit">{{ releaseNote.product.name }}</Badge>
+          </TooltipTrigger>
+          <TooltipContent>
+            {{ t('title.product') }}
+          </TooltipContent>
+        </Tooltip>
+
+            </div>
             <Button
 type="button" v-if="!(locale === 'en-GB')" variant="glow" @click="onTranslate"
               :disabled="isTranslating" class="inline-flex items-center gap-2">
