@@ -33,6 +33,11 @@ public class ReleaseNoteMapper {
     List<ChangeNoteDTO> changeNoteDTOs = releaseNote.getChangeNotes()
         .stream()
         .filter(changeNote -> {
+
+          if (changeNote.isArchived()) {
+            return false;
+          }
+
           if (accessScope.isAdmin()) {
             return true;
           }

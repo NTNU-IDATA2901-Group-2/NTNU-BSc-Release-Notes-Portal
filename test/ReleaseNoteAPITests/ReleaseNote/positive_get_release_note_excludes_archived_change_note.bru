@@ -1,7 +1,7 @@
 meta {
-  name: negative_get_patched
+  name: positive_get_release_note_excludes_archived_change_note
   type: http
-  seq: 61
+  seq: 59
 }
 
 get {
@@ -15,7 +15,9 @@ headers {
 }
 
 assert {
-  res.status: eq 404
+  res.status: eq 200
+  res.body.changeNotes: length 1
+  res.body.changeNotes[0].id: eq {{change_id_2}}
 }
 
 settings {
