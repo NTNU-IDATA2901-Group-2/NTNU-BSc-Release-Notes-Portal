@@ -25,6 +25,7 @@
     "header": {
         "releaseNotesLink": "Notes de version",
         "changeNotesLink": "Notes de changement",
+        "compareReleasesLink": "Comparer les versions",
         "toggleTheme": "Changer de thème",
         "signOut": "Se déconnecter",
         "language": "Langue",
@@ -266,7 +267,8 @@
     },
     "compareReleaseNotes": {
         "product": "Produit",
-        "fromReleaseNote": "Depuis la note de version",
-        "toReleaseNote": "Jusqu'à la note de version"
+        "releaseNoteOne": "Note de version un",
+        "releaseNoteTwo": "Note de version deux",
+        "compare": "Comparer"
     }
 }

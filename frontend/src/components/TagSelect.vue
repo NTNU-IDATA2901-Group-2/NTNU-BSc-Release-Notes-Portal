@@ -22,6 +22,7 @@ const props = defineProps<PrimitiveProps & {
     selectedId?: number,
     modelValue?: number
     searchParams?: Record<string, string>
+    disabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -63,7 +64,7 @@ const currentValue = () => (props.modelValue ?? props.selectedId ?? -1).toString
 </script>
 
 <template>
-    <Select :model-value="currentValue()" @update:model-value="(val) => emit('update:modelValue', val ? parseInt(val as string) : -1)">
+    <Select :model-value="currentValue()" :disabled="disabled" @update:model-value="(val) => emit('update:modelValue', val ? parseInt(val as string) : -1)">
     <SelectTrigger class="w-45">
         <SelectValue 
         :text-value="getTagFromId(parseInt(currentValue()))"/>

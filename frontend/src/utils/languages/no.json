@@ -25,6 +25,7 @@
     "header": {
         "releaseNotesLink": "Utgivelsesnotater",
         "changeNotesLink": "Endringsnotater",
+        "compareReleasesLink": "Sammenlign utgivelser",
         "toggleTheme": "Bytt tema",
         "signOut": "Logg ut",
         "language": "Språk",
@@ -267,7 +268,8 @@
     },
     "compareReleaseNotes": {
         "product": "Produkt",
-        "fromReleaseNote": "Fra utgivelsesnotat",
-        "toReleaseNote": "Til utgivelsesnotat"
+        "releaseNoteOne": "Utgivelsesnotat én",
+        "releaseNoteTwo": "Utgivelsesnotat to",
+        "compare": "Sammenlign"
     }
 }

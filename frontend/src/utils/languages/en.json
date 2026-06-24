@@ -25,6 +25,7 @@
     "header": {
         "releaseNotesLink": "Release Notes",
         "changeNotesLink": "Change Notes",
+        "compareReleasesLink": "Compare Releases",
         "toggleTheme": "Toggle Theme",
         "signOut": "Sign Out",
         "language": "Language",
@@ -266,7 +267,8 @@
     },
     "compareReleaseNotes": {
         "product": "Product",
-        "fromReleaseNote": "From release note",
-        "toReleaseNote": "To release note"
+        "releaseNoteOne": "Release note one",
+        "releaseNoteTwo": "Release note two",
+        "compare": "Compare"
     }
 }
