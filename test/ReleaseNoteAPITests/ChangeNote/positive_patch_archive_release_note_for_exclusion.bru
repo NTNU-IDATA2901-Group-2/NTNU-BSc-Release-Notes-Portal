@@ -1,0 +1,24 @@
+meta {
+  name: positive_patch_archive_release_note_for_exclusion
+  type: http
+  seq: 71
+}
+
+patch {
+  url: {{baseurl}}/releasenotes/{{release_id_exclusion}}/archive
+  body: none
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

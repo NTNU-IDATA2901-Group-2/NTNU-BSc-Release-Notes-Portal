@@ -1,0 +1,35 @@
+meta {
+  name: positive_post_change_note_for_rn_exclusion
+  type: http
+  seq: 68
+}
+
+post {
+  url: {{baseurl}}/changenotes
+  body: json
+  auth: none
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "title": "Change note for archived release note exclusion",
+    "published": true
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+script:post-response {
+  bru.setEnvVar("change_id_rn_exclusion", res.body)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

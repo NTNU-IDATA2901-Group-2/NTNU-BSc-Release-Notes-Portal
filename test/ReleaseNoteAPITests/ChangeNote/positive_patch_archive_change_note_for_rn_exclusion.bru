@@ -1,0 +1,24 @@
+meta {
+  name: positive_patch_archive_change_note_for_rn_exclusion
+  type: http
+  seq: 73
+}
+
+patch {
+  url: {{baseurl}}/changenotes/{{change_id_rn_exclusion}}/archive
+  body: none
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,5 +1,7 @@
 package no.reliablesolutions.release_notes_portal.util;
 
+import java.util.List;
+
 import no.reliablesolutions.release_notes_portal.domain.entity.ChangeNote;
 import no.reliablesolutions.release_notes_portal.dto.ChangeNoteDTO;
 import no.reliablesolutions.release_notes_portal.dto.CustomerDTO;
@@ -28,6 +30,11 @@ public class ChangeNoteMapper {
    *         included or excluded based on the user's access scope
    */
   public static ChangeNoteDTO toDTO(ChangeNote changeNote, AccessScope accessScope) {
+    List<Long> relatedReleaseNoteIds = changeNote.getReleaseNotes().stream()
+        .filter(rn -> !Boolean.TRUE.equals(rn.getArchived()))
+        .map(rn -> rn.getId())
+        .toList();
+
     if (!accessScope.isAdmin()) {
       return new ChangeNoteDTO(
           changeNote.getId(),
@@ -44,7 +51,7 @@ public class ChangeNoteMapper {
           null,
           changeNote.getGitRepository() != null ? changeNote.getGitRepository().getId() : null,
           changeNote.getGitCommitHash(),
-          changeNote.getReleaseNotes().stream().map(rn -> rn.getId()).toList());
+          relatedReleaseNoteIds);
     } else {
       return new ChangeNoteDTO(
           changeNote.getId(),
@@ -61,7 +68,7 @@ public class ChangeNoteMapper {
           changeNote.isViewableByEveryone(),
           changeNote.getGitRepository() != null ? changeNote.getGitRepository().getId() : null,
           changeNote.getGitCommitHash(),
-          changeNote.getReleaseNotes().stream().map(rn -> rn.getId()).toList());
+          relatedReleaseNoteIds);
     }
   }
 }
