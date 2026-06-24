@@ -161,7 +161,7 @@ const onTranslate = async () => {
           locale: locale.value
         })
       }
-    )
+      )
     )
   }
 
@@ -317,21 +317,32 @@ v-for="change in releaseNote.changeNotes" :key="change.id"
       <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-col sm:flex-row items-start justify-between max-w-full gap-4">
           <h1 v-if="!releaseNote.tag" class="text-4xl text-text-primary/50 leading-normal">{{ t('placeholder.noTitle')
-          }}</h1>
+            }}</h1>
           <h1 v-else class="text-3xl md:text-4xl truncate max-w-full leading-normal">{{
             releaseNote.tag }}
           </h1>
           <div class="flex sm:gap-4 w-full sm:w-auto sm:grow items-center self-center">
-            <Tooltip v-if="isAdmin">
-              <TooltipTrigger as-child>
-                <Badge class="h-6 w-fit mr-auto" :variant="releaseNote.published ? 'success' : 'destructive'">
-                  {{ releaseNote.published ? t('card.published') : t('card.draft') }}
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent>
-                {{ releaseNote.published ? t('tooltip.publishedNote') : t('tooltip.draftNote') }}
-              </TooltipContent>
-            </Tooltip>
+            <div class="flex flex-row gap-2 items-center mr-auto">
+              <Tooltip v-if="isAdmin">
+                <TooltipTrigger as-child>
+                  <Badge class="h-6 w-fit" :variant="releaseNote.published ? 'success' : 'destructive'">
+                    {{ releaseNote.published ? t('card.published') : t('card.draft') }}
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {{ releaseNote.published ? t('tooltip.publishedNote') : t('tooltip.draftNote') }}
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip v-if="releaseNote.product">
+                <TooltipTrigger as-child>
+                  <Badge variant="outline" class="w-fit">{{ releaseNote.product.name }}</Badge>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {{ t('title.product') }}
+                </TooltipContent>
+              </Tooltip>
+
+            </div>
             <Button
 type="button" v-if="!(locale === 'en-GB')" variant="glow" @click="onTranslate"
               :disabled="isTranslating" class="inline-flex items-center gap-2">
@@ -378,7 +389,7 @@ type="button" v-if="!(locale === 'en-GB')" variant="glow" @click="onTranslate"
                   </TooltipTrigger>
                   <TooltipContent v-if="releaseNote.syncedToGit">{{ t('tooltip.alreadyCommited') }}</TooltipContent>
                   <TooltipContent v-else-if="releaseNote.changeNotes.length === 0">{{ t('tooltip.noChangeNotesToCommit')
-                  }}</TooltipContent>
+                    }}</TooltipContent>
                 </Tooltip>
                 <DropdownMenuItem @click="handleExport">
                   <div class="w-full flex gap-2">
@@ -455,7 +466,9 @@ class="size-fit" variant="outline"
           <div class="flex flex-col gap-4 w-full">
             <h2 class="text-3xl truncate max-w-full leading-normal">{{ t('title.knownLimitations') }}</h2>
             <ul v-if="releaseNote.knownLimitations?.length" class="list-disc pl-6 flex flex-col gap-2">
-              <li v-for="(limitation, index) in translatedKnownLimitations ?? releaseNote.knownLimitations" :key="index">
+              <li
+v-for="(limitation, index) in translatedKnownLimitations ?? releaseNote.knownLimitations"
+                :key="index">
                 {{ limitation }}
               </li>
             </ul>
@@ -502,7 +515,7 @@ class="size-fit" variant="outline"
           <div class="flex flex-col gap-10">
             <p class="text-text-primary/50" v-if="releaseNote.changeNotes.length === 0">{{
               t('placeholder.noChangeNotesAdded')
-            }}</p>
+              }}</p>
             <template v-for="change in translatedChangeNotes ?? releaseNote.changeNotes" :key="change.id">
               <div v-if="shouldShowChangeNote(change)" class="flex flex-col gap-2">
                 <div class="flex items-center gap-4">

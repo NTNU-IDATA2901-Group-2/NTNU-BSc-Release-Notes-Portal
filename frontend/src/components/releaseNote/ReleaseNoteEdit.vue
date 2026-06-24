@@ -27,6 +27,7 @@ import { useGetGitRepositories } from '@/api/git-repository-api';
 import Spinner from '../ui/spinner/Spinner.vue';
 import DatePicker from '../DatePicker.vue';
 import ChangeImpactTable from '../ChangeImpactTable.vue';
+import TagSelect from '../TagSelect.vue';
 
 const { t } = useI18n();
 
@@ -122,6 +123,7 @@ const form = useForm({
     tag: releaseNote.tag || '',
     summary: releaseNote.summary || '',
     changeNoteIds: changeNoteIdsWithinReleaseNote.value,
+    productId: releaseNote.product?.id ?? -1,
     published: releaseNote.published,
   }
 })
@@ -154,6 +156,7 @@ const onSubmit = form.handleSubmit((values) => {
   const payload = {
     ...values,
     changeNoteIds: changeNoteIdsWithinReleaseNote.value,
+    productId: values.productId === -1 ? undefined : values.productId,
     releaseTimeline: {
       previewAvailableFrom: previewAvailableFrom.value,
       recommendedTestPhaseFrom: recommendedTestPhaseFrom.value,
@@ -181,6 +184,7 @@ const updateReleaseNoteMutation = useUpdateReleaseNote({
 
 const [tag] = form.defineField('tag');
 const [summary] = form.defineField('summary');
+const [productId] = form.defineField('productId');
 
 // Warn user of unsaved changes when trying to leave the page
 const beforeUnloadListener = (event: BeforeUnloadEvent) => {
@@ -307,9 +311,13 @@ const changeImpacts = ref<ChangeImpact[]>([...(releaseNote.changeImpacts ?? [])]
 
           <div class="flex flex-col gap-1">
             <h1 class="text-lg">{{ t('title.description') }}</h1>
-            <Textarea 
+            <Textarea
             class="w-full" v-model="summary"
               :placeholder="t('placeholder.description')" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <h1 class="text-lg">{{ t('title.product') }}</h1>
+            <TagSelect mode="product" v-model="productId" />
           </div>
           <div class="flex flex-col gap-1">
             <h1 class="text-lg">{{ t('title.releaseTimeline') }}</h1>

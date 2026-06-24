@@ -21,6 +21,7 @@ import no.reliablesolutions.release_notes_portal.domain.entity.Feature;
 import no.reliablesolutions.release_notes_portal.domain.entity.ReleaseNote;
 import no.reliablesolutions.release_notes_portal.domain.entity.ReleaseTimeline;
 import no.reliablesolutions.release_notes_portal.domain.repository.ChangeNoteRepository;
+import no.reliablesolutions.release_notes_portal.domain.repository.ProductRepository;
 import no.reliablesolutions.release_notes_portal.domain.repository.ReleaseNoteRepository;
 import no.reliablesolutions.release_notes_portal.dto.CreateChangeImpactDTO;
 import no.reliablesolutions.release_notes_portal.dto.CreateReleaseNoteDTO;
@@ -30,6 +31,7 @@ import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteFilterOptionsDTO
 import no.reliablesolutions.release_notes_portal.dto.ReleaseTimelineDTO;
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.InvalidDateRangeException;
+import no.reliablesolutions.release_notes_portal.exception.ProductNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.util.AccessScope;
 import no.reliablesolutions.release_notes_portal.util.AccessScopeFactory;
@@ -47,6 +49,7 @@ public class ReleaseNoteService {
   private final Logger logger = LoggerFactory.getLogger(ReleaseNoteService.class);
   private final ReleaseNoteRepository releaseNoteRepository;
   private final ChangeNoteRepository changeNoteRepository;
+  private final ProductRepository productRepository;
   private final FeatureService featureService;
 
   /** Zone used to resolve a calendar date filter into an absolute instant range. */
@@ -67,6 +70,11 @@ public class ReleaseNoteService {
     releaseNote.setTag(createReleaseNoteDTO.tag());
     releaseNote.setSummary(createReleaseNoteDTO.summary());
     releaseNote.setPublished(createReleaseNoteDTO.published() != null && createReleaseNoteDTO.published());
+
+    if (createReleaseNoteDTO.productId() != null) {
+      releaseNote.setProduct(productRepository.findById(createReleaseNoteDTO.productId())
+          .orElseThrow(() -> new ProductNotFoundException(createReleaseNoteDTO.productId())));
+    }
 
     if (createReleaseNoteDTO.knownLimitations() != null) {
       releaseNote.setKnownLimitations(new ArrayList<>(createReleaseNoteDTO.knownLimitations()));
@@ -155,10 +163,7 @@ public class ReleaseNoteService {
 
     AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
 
-    Page<ReleaseNote> releaseNotesPage;
-    if (accessScope.isAdmin()) {
-      releaseNotesPage = releaseNoteRepository.findByArchivedFalseAndMatchingFilterParameters(filterOptions, fromDateInstant, toDateInstant, pageable);
-    } else {
+    if (!accessScope.isAdmin()) {
       filterOptions = new ReleaseNoteFilterOptionsDTO(
           filterOptions.query(),
           true,
@@ -167,11 +172,11 @@ public class ReleaseNoteService {
           fromDate,
           toDate
       );
-      List<String> customerGroups = AuthenticationUtil.getCustomerGroups();
-      
-      releaseNotesPage = releaseNoteRepository
-          .findByArchivedFalseAndMatchingFilterParametersForCustomers(filterOptions, fromDateInstant, toDateInstant, customerGroups, pageable);
     }
+
+    Page<ReleaseNote> releaseNotesPage = releaseNoteRepository
+        .findByArchivedFalseAndMatchingFilterParameters(filterOptions, fromDateInstant, toDateInstant, pageable);
+
     List<ReleaseNoteDTO> dtos = releaseNotesPage.getContent()
       .stream()
       .map(rn -> ReleaseNoteMapper.toDTO(rn, accessScope)).toList();
@@ -246,6 +251,13 @@ public class ReleaseNoteService {
     for (ChangeNote changeNote : changeNotesInReleaseNote) {
       changeNote.addReleaseNote(releaseNote);
       changeNoteRepository.save(changeNote);
+    }
+
+    if (createReleaseNoteDTO.productId() != null) {
+      releaseNote.setProduct(productRepository.findById(createReleaseNoteDTO.productId())
+          .orElseThrow(() -> new ProductNotFoundException(createReleaseNoteDTO.productId())));
+    } else {
+      releaseNote.setProduct(null);
     }
 
     releaseNote.setChangeNotes(changeNotesInReleaseNote);

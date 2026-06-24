@@ -91,6 +91,7 @@ export interface ReleaseNote {
     summary: string,
     published: boolean,
     changeNotes: ChangeNote[],
+    product?: Product,
     syncedToGit: boolean,
     releaseTimeline: ReleaseTimeline,
     knownLimitations: string[],
@@ -104,6 +105,7 @@ export interface PersistReleaseNoteDTO {
     description?: string,
     published?: boolean,
     changeNoteIds?: number[],
+    productId?: number,
     releaseTimeline?: ReleaseTimeline,
     knownLimitations?: string[]
 }

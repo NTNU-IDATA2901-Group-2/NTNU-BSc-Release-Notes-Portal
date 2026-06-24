@@ -9,6 +9,7 @@ import java.util.List;
 public record ReleaseNoteDTO(
     long id,
     List<ChangeNoteDTO> changeNotes,
+    ProductDTO product,
     String tag,
     String summary,
     boolean published,

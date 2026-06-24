@@ -1,0 +1,25 @@
+meta {
+  name: negative_post_invalid_product_id
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseurl}}/releasenotes
+  body: json
+  auth: none
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "productId": -999
+  }
+}
+
+assert {
+  res.status: eq 404
+}
