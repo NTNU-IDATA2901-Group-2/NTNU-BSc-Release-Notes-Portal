@@ -264,5 +264,10 @@
         "promptPlaceholder": "Skriv inn prompten",
         "saveSuccess": "Prompts oppdatert",
         "saveError": "Det oppsto en feil under oppdatering av prompts"
+    },
+    "compareReleaseNotes": {
+        "product": "Produkt",
+        "fromReleaseNote": "Fra utgivelsesnotat",
+        "toReleaseNote": "Til utgivelsesnotat"
     }
 }

@@ -263,5 +263,10 @@
         "promptPlaceholder": "Enter the prompt",
         "saveSuccess": "Prompts updated successfully",
         "saveError": "An error occurred while updating prompts"
+    },
+    "compareReleaseNotes": {
+        "product": "Product",
+        "fromReleaseNote": "From release note",
+        "toReleaseNote": "To release note"
     }
 }
