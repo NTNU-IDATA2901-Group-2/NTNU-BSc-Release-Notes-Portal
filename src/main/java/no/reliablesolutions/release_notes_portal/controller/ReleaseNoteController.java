@@ -140,6 +140,32 @@ public class ReleaseNoteController {
   }
 
   /**
+   * Compares two release notes and returns the release notes that are new since
+   * the earlier of the two. The two notes must belong to the same product.
+   *
+   * @param releaseNoteOneId the ID of one release note to compare
+   * @param releaseNoteTwoId the ID of the other release note to compare
+   * @return a ResponseEntity with a 200 status and the list of ReleaseNoteDTOs in
+   *         the range, ordered by creation time descending
+   */
+  @Operation(summary = "Compare release notes", description = "Returns the release notes that are new since the earlier of two release notes of the same product")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Release notes compared successfully"),
+      @ApiResponse(responseCode = "404", description = "Release note not found"),
+      @ApiResponse(responseCode = "400", description = "Missing parameters or release notes of different products"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
+  @GetMapping("/compare")
+  public ResponseEntity<List<ReleaseNoteDTO>> compareReleaseNotes(
+      @RequestParam(required = true) Long releaseNoteOneId,
+      @RequestParam(required = true) Long releaseNoteTwoId) {
+    List<ReleaseNoteDTO> releaseNotes = releaseNoteService.getReleaseNotesBetween(releaseNoteOneId, releaseNoteTwoId);
+    logger.info("Compared release notes {} and {}, found {} release note(s) in range", releaseNoteOneId,
+        releaseNoteTwoId, releaseNotes.size());
+    return ResponseEntity.ok(releaseNotes);
+  }
+
+  /**
    * Updates an existing release note with new details.
    *
    * @param id                   the ID of the release note to be updated

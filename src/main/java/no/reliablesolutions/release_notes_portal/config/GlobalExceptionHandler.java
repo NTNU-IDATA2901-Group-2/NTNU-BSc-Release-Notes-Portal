@@ -25,6 +25,7 @@ import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityExc
 import no.reliablesolutions.release_notes_portal.exception.FeatureNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.InvalidDateRangeException;
 import no.reliablesolutions.release_notes_portal.exception.JiraCommunicationException;
+import no.reliablesolutions.release_notes_portal.exception.MismatchedProductException;
 import no.reliablesolutions.release_notes_portal.exception.ProductNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteAlreadySyncedException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
@@ -69,6 +70,17 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleProductNotFoundException(ProductNotFoundException e) {
     logger.warn("Product not found: {}", e.getProductId());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Product with ID %d not found", e.getProductId()));
+  }
+
+  /**
+   * Handles the case where two release notes being compared belong to different products. Logs the event and returns a 400 response with a message.
+   * @param e the exception containing the IDs of the mismatched release notes
+   * @return a ResponseEntity with a 400 status and a message indicating the release notes do not share a product
+   */
+  @ExceptionHandler(value = {MismatchedProductException.class})
+  public ResponseEntity<String> handleMismatchedProductException(MismatchedProductException e) {
+    logger.warn("Mismatched product when comparing release notes: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
   }
 
   /**

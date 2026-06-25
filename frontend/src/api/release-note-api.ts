@@ -88,6 +88,32 @@ export const useGetReleaseNotes = (searchParams?: MaybeRefOrGetter<Record<string
   queryFn: () => getReleaseNotes(new URLSearchParams(toValue(searchParams)))
 });
 
+/**
+ * Retrieves the release notes that are new since the earlier of the two given
+ * release notes. Both notes must belong to the same product.
+ *
+ * @param releaseNoteOneId the ID of one release note to compare.
+ * @param releaseNoteTwoId the ID of the other release note to compare.
+ * @throws An error if the API request fails.
+ * @returns A promise that resolves to the release notes in the range.
+ */
+const compareReleaseNotes = async (releaseNoteOneId: number, releaseNoteTwoId: number): Promise<ReleaseNote[]> => {
+  const response = await api.get(`releasenotes/compare`, {
+    params: { releaseNoteOneId, releaseNoteTwoId },
+  });
+  return response.data as ReleaseNote[];
+};
+
+/**
+ * Custom hook for comparing two release notes.
+ *
+ * @returns A mutation resolving to the release notes that are new since the earlier note.
+ */
+export const useCompareReleaseNotes = () =>
+  useMutation<ReleaseNote[], unknown, { releaseNoteOneId: number; releaseNoteTwoId: number }>({
+    mutationFn: ({ releaseNoteOneId, releaseNoteTwoId }) => compareReleaseNotes(releaseNoteOneId, releaseNoteTwoId),
+  });
+
 
 /**
  * Custom hook for archiving a release note by its ID and handling the API call lifecycle.
