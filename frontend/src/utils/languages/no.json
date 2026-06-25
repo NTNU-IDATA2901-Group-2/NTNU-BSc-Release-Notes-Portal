@@ -131,6 +131,7 @@
         "releaseNoteUpdatedSuccess": "Utgivelsesnotat oppdatert",
         "releaseNoteUpdateError": "Det oppsto en feil under oppdatering av utgivelsesnotat",
         "exportPdfError": "Det oppsto en feil under eksportering til PDF",
+        "compareReleaseNotesError": "Det oppsto en feil under sammenligning av utgivelsesnotater",
         "translationError": "Det oppsto en feil under oversettelse av endringsnotat",
         "changeNoteTranslationSuccess": "Endringsnotat oversatt",
         "releaseNoteTranslationSuccess": "Utgivelsesnotat oversatt",

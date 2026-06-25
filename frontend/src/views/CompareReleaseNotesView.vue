@@ -30,6 +30,14 @@ const noProductSelected = computed(
   () => productId.value === -1 || productId.value === undefined
 )
 
+const canCompare = computed(() => {
+  const one = releaseNoteOneId.value;
+  const two = releaseNoteTwoId.value;
+  return one !== undefined && one !== -1
+    && two !== undefined && two !== -1
+    && one !== two;
+})
+
 const searchParams = computed(() =>
   noProductSelected.value ? undefined : { productIds: String(productId.value) }
 )
@@ -96,7 +104,10 @@ watch(productId, () => {
 })
 
 const onSubmit = handleSubmit((values) => {
-  compare({ releaseNoteOneId: values.releaseNoteOneId, releaseNoteTwoId: values.releaseNoteTwoId })
+  compare(
+    { releaseNoteOneId: values.releaseNoteOneId, releaseNoteTwoId: values.releaseNoteTwoId },
+    { onError: () => toast.error(t('toast.compareReleaseNotesError')) },
+  )
 });
 
 </script>
@@ -116,7 +127,7 @@ const onSubmit = handleSubmit((values) => {
         <h2 class="text-lg">{{ t('compareReleaseNotes.releaseNoteTwo') }}</h2>
         <TagSelect mode="releaseNote" v-model="releaseNoteTwoId" :search-params="searchParams" :disabled="noProductSelected" />
       </div>
-      <Button type="submit" class="mt-auto" variant="solidaccent" :disabled="!productId || !releaseNoteOneId || !releaseNoteTwoId">
+      <Button type="submit" class="mt-auto" variant="solidaccent" :disabled="!canCompare">
         {{ t('compareReleaseNotes.compare') }}
       </Button>
     </form>

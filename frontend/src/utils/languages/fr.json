@@ -130,6 +130,7 @@
         "releaseNoteUpdatedSuccess": "Note de version mise à jour avec succès",
         "releaseNoteUpdateError": "Une erreur s'est produite lors de la mise à jour de la note de version",
         "exportPdfError": "Une erreur s'est produite lors de l'export en PDF",
+        "compareReleaseNotesError": "Une erreur s'est produite lors de la comparaison des notes de version",
         "translationError": "Une erreur s'est produite lors de la traduction de la note de changement",
         "changeNoteTranslationSuccess": "Note de changement traduite avec succès",
         "releaseNoteTranslationSuccess": "Note de version traduite avec succès",

@@ -130,6 +130,7 @@
         "releaseNoteUpdatedSuccess": "Release note updated successfully",
         "releaseNoteUpdateError": "An error occurred while updating the release note",
         "exportPdfError": "An error occurred while exporting to PDF",
+        "compareReleaseNotesError": "An error occurred while comparing release notes",
         "translationError": "An error occurred while translating the change note",
         "changeNoteTranslationSuccess": "Change note translated successfully",
         "releaseNoteTranslationSuccess": "Release note translated successfully",
