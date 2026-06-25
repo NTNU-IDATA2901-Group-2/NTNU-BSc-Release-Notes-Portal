@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import TagSelect from '@/components/TagSelect.vue';
-import { computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { CompareReleaseNotesSchema as CompareReleaseNotesSchema } from '@/schemas';
 import Button from '@/components/ui/button/Button.vue';
+import ChangeNoteList from '@/components/changeNote/ChangeNoteList.vue';
+import ChangeNoteListFilters from '@/components/changeNote/ChangeNoteListFilters.vue';
+import { uniqueCustomers } from '@/utils/change-note';
 import { useCompareReleaseNotes } from '@/api/release-note-api';
 
 const { t } = useI18n();
@@ -27,6 +30,13 @@ const searchParams = computed(() =>
 )
 
 const { mutate: compare, data: comparedReleaseNotes, reset } = useCompareReleaseNotes()
+
+const generalChangesChecked = ref(true);
+const draftChangesChecked = ref(true);
+const customerFilter = ref<number>(-1);
+
+const changeNoteCustomers = computed(() =>
+  uniqueCustomers((comparedReleaseNotes.value ?? []).flatMap(releaseNote => releaseNote.changeNotes)))
 
 watch(productId, () => {
   releaseNoteOneId.value = undefined
@@ -60,9 +70,25 @@ const onSubmit = handleSubmit((values) => {
       </Button>
     </form>
 
-    <ul v-if="comparedReleaseNotes && comparedReleaseNotes.length" class="mt-6 flex flex-col gap-1">
-      <li v-for="releaseNote in comparedReleaseNotes" :key="releaseNote.id">{{ releaseNote.tag }}</li>
-    </ul>
+    <div
+      v-if="comparedReleaseNotes && comparedReleaseNotes.length"
+      class="mt-16 flex flex-col gap-16 w-full max-w-4xl px-4">
+      <ChangeNoteListFilters
+        class="self-end"
+        v-model:general-changes-checked="generalChangesChecked"
+        v-model:draft-changes-checked="draftChangesChecked"
+        v-model:customer-filter="customerFilter"
+        :customers="changeNoteCustomers" />
+      <section v-for="releaseNote in comparedReleaseNotes" :key="releaseNote.id" class="flex flex-col gap-10">
+        <h1 v-if="!releaseNote.tag" class="text-4xl text-text-primary/50 leading-normal">{{ t('placeholder.noTitle') }}</h1>
+        <h1 v-else class="text-3xl md:text-4xl leading-normal">{{ releaseNote.tag }}</h1>
+        <ChangeNoteList
+          :change-notes="releaseNote.changeNotes"
+          :general-changes-checked="generalChangesChecked"
+          :draft-changes-checked="draftChangesChecked"
+          :customer-filter="customerFilter" />
+      </section>
+    </div>
   </div>
 
 

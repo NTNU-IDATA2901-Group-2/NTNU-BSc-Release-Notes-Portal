@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { exportToPdf } from '@/utils/pdf';
 import { useArchiveReleaseNote, usePublishReleaseNote } from '@/api/release-note-api';
 import type { ChangeNote, ReleaseNote, ChangeImpact } from '@/utils/types';
@@ -20,12 +20,13 @@ import Spinner from '../ui/spinner/Spinner.vue';
 import DialogPrompt from '../DialogPrompt.vue';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import ScrollArea from '../ui/scroll-area/ScrollArea.vue';
-import { getLabelFromChangeNote } from '@/utils/change-note.ts';
+import { getLabelFromChangeNote, uniqueCustomers } from '@/utils/change-note.ts';
 import { useSyncReleaseNoteToGit } from '@/api/git-repository-api.ts';
 import { useGetJiraServiceRequestKeys } from '@/api/jira-api.ts';
 import { getLocaleDateString } from '@/utils/format-date.ts';
 import ChangeImpactTable from '../ChangeImpactTable.vue';
 import ChangeNoteList from '../changeNote/ChangeNoteList.vue';
+import ChangeNoteListFilters from '../changeNote/ChangeNoteListFilters.vue';
 import { useCopyToClipboard } from '@/composables/useCopyToClipboard';
 
 const props = defineProps<{
@@ -199,6 +200,12 @@ const handleExport = () => {
 const { copiedKey, copy } = useCopyToClipboard();
 
 const changeNoteList = ref<InstanceType<typeof ChangeNoteList> | null>(null);
+
+const generalChangesChecked = ref(true);
+const draftChangesChecked = ref(true);
+const customerFilter = ref<number>(-1);
+
+const changeNoteCustomers = computed(() => uniqueCustomers(releaseNote.changeNotes));
 </script>
 
 <template>
@@ -400,11 +407,24 @@ v-for="(limitation, index) in translatedKnownLimitations ?? releaseNote.knownLim
         </template>
       </div>
       <Separator class="w-full h-2" />
-      <ChangeNoteList
-        ref="changeNoteList"
-        :change-notes="releaseNote.changeNotes"
-        :translated-change-notes="translatedChangeNotes"
-        :has-translation="hasTranslation" />
+      <div class="flex flex-col w-full gap-10">
+        <div class="flex gap-4 flex-col md:flex-row justify-between items-start">
+          <h2 class="text-3xl">{{ t('title.changeNotes') }}</h2>
+          <ChangeNoteListFilters
+            v-model:general-changes-checked="generalChangesChecked"
+            v-model:draft-changes-checked="draftChangesChecked"
+            v-model:customer-filter="customerFilter"
+            :customers="changeNoteCustomers" />
+        </div>
+        <ChangeNoteList
+          ref="changeNoteList"
+          :change-notes="releaseNote.changeNotes"
+          :general-changes-checked="generalChangesChecked"
+          :draft-changes-checked="draftChangesChecked"
+          :customer-filter="customerFilter"
+          :translated-change-notes="translatedChangeNotes"
+          :has-translation="hasTranslation" />
+      </div>
     </div>
   </div>
 </template>
