@@ -182,15 +182,17 @@ const onTranslate = async () => {
   hasToastedSuccess = false;
 }
 
-const changeNoteReferences = [...new Set(
-  releaseNote.changeNotes.map(change => change.reference).filter(reference => reference.length > 0),
-)];
-const { data: serviceRequestKeys } = useGetJiraServiceRequestKeys(changeNoteReferences)
+const { mutateAsync: fetchServiceRequestKeys } = useGetJiraServiceRequestKeys();
 
-const handleExport = () => {
+const handleExport = async () => {
   if (!releaseNote) return;
   try {
-    exportToPdf(releaseNote, changeNoteList.value?.filteredChangeNotes ?? [], serviceRequestKeys.value ?? {});
+    const changeNotes = changeNoteList.value?.filteredChangeNotes ?? [];
+    const references = [...new Set(
+      changeNotes.map(change => change.reference).filter(reference => reference.length > 0),
+    )];
+    const serviceRequestKeys = await fetchServiceRequestKeys(references);
+    exportToPdf(releaseNote, changeNotes, serviceRequestKeys);
   } catch (error) {
     console.error('Error exporting to PDF:', error);
     toast.error(t('toast.exportPdfError'));

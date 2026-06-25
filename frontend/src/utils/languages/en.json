@@ -18,6 +18,7 @@
         "timeline": "Timeline",
         "previewTestingNotice": "Several of the changes may affect existing work processes, and there will therefore be a need for targeted testing.",
         "featureDetails": "Features",
+        "comparisonTitle": "Changes {product}: {fromTag}-{toTag}",
         "otherFeature": "Other",
         "testingResponsibility": "Responsibility for testing and follow-up",
         "testingResponsibilityBody": "To ensure a smooth transition to the new version, we ask you to test your setup based on this Release Preview.\n\nThis means that you, as a customer, are responsible for testing:\n\n- your own integrations (other third-party systems)\n- functionality and configuration used in your daily operations\n- critical business processes and end-to-end flows\n\nWe test the standard solution in controlled environments.\n\nWe recommend that you pay particular attention to verifying functionality that is central to your actual use of the solution, including configuration, customizations and reporting used in your organization.\n\nA more detailed overview of the relevant areas for your setup can be shared and reviewed separately.\n\nProduction deployment requires that the relevant testing has been completed on your side."

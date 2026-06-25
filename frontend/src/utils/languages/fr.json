@@ -18,6 +18,7 @@
         "timeline": "Calendrier",
         "previewTestingNotice": "Plusieurs des changements peuvent affecter les processus de travail existants ; des tests ciblés seront donc nécessaires.",
         "featureDetails": "Fonctionnalités",
+        "comparisonTitle": "Changements {product} : {fromTag}-{toTag}",
         "otherFeature": "Autre",
         "testingResponsibility": "Responsabilité des tests et du suivi",
         "testingResponsibilityBody": "Afin d'assurer une transition en douceur vers la nouvelle version, nous vous demandons de tester votre configuration sur la base de cette Release Preview.\n\nCela signifie qu'en tant que client, vous êtes responsable de tester :\n\n- vos propres intégrations (autres systèmes tiers)\n- les fonctionnalités et la configuration utilisées dans votre usage quotidien\n- les processus métier critiques et les flux de bout en bout\n\nNous testons la solution standard dans des environnements contrôlés.\n\nNous vous recommandons de vérifier en particulier les fonctionnalités essentielles à votre utilisation réelle de la solution, y compris la configuration, les personnalisations et les rapports utilisés dans votre organisation.\n\nUn aperçu plus détaillé des domaines pertinents pour votre configuration peut être partagé et examiné séparément.\n\nLa mise en production suppose que les tests pertinents ont été réalisés de votre côté."

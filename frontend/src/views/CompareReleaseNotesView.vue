@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import TagSelect from '@/components/TagSelect.vue';
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, type ComponentPublicInstance } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
@@ -9,7 +9,12 @@ import Button from '@/components/ui/button/Button.vue';
 import ChangeNoteList from '@/components/changeNote/ChangeNoteList.vue';
 import ChangeNoteListFilters from '@/components/changeNote/ChangeNoteListFilters.vue';
 import { uniqueCustomers } from '@/utils/change-note';
-import { useCompareReleaseNotes } from '@/api/release-note-api';
+import { exportComparisonToPdf } from '@/utils/pdf';
+import { useCompareReleaseNotes, useGetReleaseNotes } from '@/api/release-note-api';
+import { useGetJiraServiceRequestKeys } from '@/api/jira-api';
+import Spinner from '@/components/ui/spinner/Spinner.vue';
+import { toast } from 'vue-sonner';
+import { FileDown } from 'lucide-vue-next';
 
 const { t } = useI18n();
 
@@ -29,7 +34,11 @@ const searchParams = computed(() =>
   noProductSelected.value ? undefined : { productIds: String(productId.value) }
 )
 
+const { data: productReleaseNotes } = useGetReleaseNotes(computed(() => searchParams.value ?? {}))
+
 const { mutate: compare, data: comparedReleaseNotes, reset } = useCompareReleaseNotes()
+
+const { mutateAsync: fetchServiceRequestKeys, isPending: isFetchingServiceRequests } = useGetJiraServiceRequestKeys()
 
 const generalChangesChecked = ref(true);
 const draftChangesChecked = ref(true);
@@ -37,6 +46,48 @@ const customerFilter = ref<number>(-1);
 
 const changeNoteCustomers = computed(() =>
   uniqueCustomers((comparedReleaseNotes.value ?? []).flatMap(releaseNote => releaseNote.changeNotes)))
+
+type ChangeNoteListInstance = InstanceType<typeof ChangeNoteList>;
+const changeNoteLists = new Map<number, ChangeNoteListInstance>();
+const refSetters = new Map<number, (el: Element | ComponentPublicInstance | null) => void>();
+
+const setChangeNoteListRef = (id: number) => {
+  let setter = refSetters.get(id);
+  if (!setter) {
+    setter = (el) => {
+      if (el) changeNoteLists.set(id, el as ChangeNoteListInstance);
+      else changeNoteLists.delete(id);
+    };
+    refSetters.set(id, setter);
+  }
+  return setter;
+};
+
+const handleExport = async () => {
+  const releaseNotes = comparedReleaseNotes.value;
+  if (!releaseNotes?.length) return;
+  const mostRecent = releaseNotes[0];
+  if (!mostRecent) return;
+  try {
+    const oldestExcludedId = mostRecent.id === releaseNoteOneId.value
+      ? releaseNoteTwoId.value
+      : releaseNoteOneId.value;
+    const fromTag = productReleaseNotes.value?.content.find(note => note.id === oldestExcludedId)?.tag ?? '';
+    const comparison = releaseNotes.map(releaseNote => ({
+      releaseNote,
+      changeNotes: changeNoteLists.get(releaseNote.id)?.filteredChangeNotes ?? [],
+    }));
+    const references = [...new Set(
+      comparison.flatMap(({ changeNotes }) => changeNotes.map(note => note.reference))
+        .filter(reference => reference.length > 0),
+    )];
+    const serviceRequestKeys = await fetchServiceRequestKeys(references);
+    exportComparisonToPdf(comparison, fromTag, mostRecent.tag, serviceRequestKeys);
+  } catch (error) {
+    console.error('Error exporting comparison to PDF:', error);
+    toast.error(t('toast.exportPdfError'));
+  }
+};
 
 watch(productId, () => {
   releaseNoteOneId.value = undefined
@@ -73,16 +124,22 @@ const onSubmit = handleSubmit((values) => {
     <div
       v-if="comparedReleaseNotes && comparedReleaseNotes.length"
       class="mt-16 flex flex-col gap-16 w-full max-w-4xl px-4">
-      <ChangeNoteListFilters
-        class="self-end"
-        v-model:general-changes-checked="generalChangesChecked"
-        v-model:draft-changes-checked="draftChangesChecked"
-        v-model:customer-filter="customerFilter"
-        :customers="changeNoteCustomers" />
+      <div class="flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <Button variant="outline" :disabled="isFetchingServiceRequests" @click="handleExport">
+          <Spinner v-if="isFetchingServiceRequests" class="h-4 dark:text-text-primary" />
+          <FileDown v-else /> {{ t('button.export') }}
+        </Button>
+        <ChangeNoteListFilters
+          v-model:general-changes-checked="generalChangesChecked"
+          v-model:draft-changes-checked="draftChangesChecked"
+          v-model:customer-filter="customerFilter"
+          :customers="changeNoteCustomers" />
+      </div>
       <section v-for="releaseNote in comparedReleaseNotes" :key="releaseNote.id" class="flex flex-col gap-10">
         <h1 v-if="!releaseNote.tag" class="text-4xl text-text-primary/50 leading-normal">{{ t('placeholder.noTitle') }}</h1>
         <h1 v-else class="text-3xl md:text-4xl leading-normal">{{ releaseNote.tag }}</h1>
         <ChangeNoteList
+          :ref="setChangeNoteListRef(releaseNote.id)"
           :change-notes="releaseNote.changeNotes"
           :general-changes-checked="generalChangesChecked"
           :draft-changes-checked="draftChangesChecked"
