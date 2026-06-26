@@ -1,0 +1,29 @@
+meta {
+  name: negative_compare_invalid_id
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseurl}}/releasenotes/compare?releaseNoteOneId={{compare_rn_old}}&releaseNoteTwoId=-99999
+  body: none
+  auth: inherit
+}
+
+params:query {
+  releaseNoteOneId: {{compare_rn_old}}
+  releaseNoteTwoId: -99999
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 404
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

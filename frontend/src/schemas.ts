@@ -56,3 +56,9 @@ export const UpdatePromptsSchema = z.object({
     prompt: z.string(),
   }))
 })
+
+export const CompareReleaseNotesSchema = z.object({
+  productId: z.number(),
+  releaseNoteOneId: z.number(),
+  releaseNoteTwoId: z.number(),
+})

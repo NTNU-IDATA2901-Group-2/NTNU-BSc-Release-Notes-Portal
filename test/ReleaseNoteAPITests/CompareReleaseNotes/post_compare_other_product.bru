@@ -1,0 +1,32 @@
+meta {
+  name: post_compare_other_product
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseurl}}/releasenotes
+  body: json
+  auth: none
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "tag": "compare-other-v1.0.0",
+    "summary": "Release note belonging to a different product",
+    "published": true,
+    "productId": 2
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+script:post-response {
+  bru.setEnvVar("compare_rn_other_product", res.body)
+}

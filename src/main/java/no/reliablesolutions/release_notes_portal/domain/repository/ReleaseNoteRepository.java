@@ -1,6 +1,7 @@
 package no.reliablesolutions.release_notes_portal.domain.repository;
 
 import java.time.Instant;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -50,4 +51,30 @@ public interface ReleaseNoteRepository extends JpaRepository<ReleaseNote, Long> 
       @Param("fromDate") Instant fromDate,
       @Param("toDate") Instant toDate,
       Pageable pageable);
+
+  /**
+   * Finds non-archived release notes for the given product created in the range
+   * {@code (fromCreatedAt, toCreatedAt]}, optionally limited to published ones.
+   *
+   * @param productId     the product ID to match
+   * @param fromCreatedAt the exclusive lower bound for the creation timestamp
+   * @param toCreatedAt   the inclusive upper bound for the creation timestamp
+   * @param publishedOnly whether to return only published release notes
+   * @return the matching release notes, ordered by creation time descending
+   */
+  @Query("""
+      SELECT r
+      FROM ReleaseNote r
+      WHERE r.archived = false
+        AND r.product.id = :productId
+        AND r.createdAt > :fromCreatedAt
+        AND r.createdAt <= :toCreatedAt
+        AND (:publishedOnly = false OR r.published = true)
+      ORDER BY r.createdAt DESC
+      """)
+  public List<ReleaseNote> findByProductBetweenCreatedAt(
+      @Param("productId") Long productId,
+      @Param("fromCreatedAt") Instant fromCreatedAt,
+      @Param("toCreatedAt") Instant toCreatedAt,
+      @Param("publishedOnly") boolean publishedOnly);
 }

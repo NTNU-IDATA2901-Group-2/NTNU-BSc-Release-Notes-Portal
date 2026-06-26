@@ -18,6 +18,7 @@
         "timeline": "Tidslinje",
         "previewTestingNotice": "Flere av endringene kan påvirke eksisterende arbeidsprosesser, og det vil derfor være behov for målrettet testing.",
         "featureDetails": "Funksjoner",
+        "comparisonTitle": "Endringer {product}: {fromTag}-{toTag}",
         "otherFeature": "Annet",
         "testingResponsibility": "Ansvar for testing og oppfølging",
         "testingResponsibilityBody": "For å sikre en god overgang til ny versjon, ber vi dere gjennomføre testing av deres oppsett basert på denne Release Previewen.\n\nDette innebærer at dere som kunde har ansvar for å teste:\n\n- egne integrasjoner (andre tredjepartssystemer)\n- funksjonalitet og oppsett som benyttes i deres daglige bruk\n- kritiske forretningsprosesser og ende-til-ende flyt\n\nVi tester standardløsningen i kontrollerte miljøer.\n\nVi anbefaler at dere spesielt verifiserer funksjonalitet som er sentral for deres faktiske bruk av løsningen, inkludert konfigurasjon, tilpasninger og rapportering som benyttes i deres organisasjon.\n\nEn nærmere oversikt over relevante områder for deres oppsett kan deles og gjennomgås separat.\n\nProduksjonssetting forutsetter at relevant testing er gjennomført på deres side."
@@ -25,6 +26,7 @@
     "header": {
         "releaseNotesLink": "Utgivelsesnotater",
         "changeNotesLink": "Endringsnotater",
+        "compareReleasesLink": "Sammenlign utgivelser",
         "toggleTheme": "Bytt tema",
         "signOut": "Logg ut",
         "language": "Språk",
@@ -129,6 +131,7 @@
         "releaseNoteUpdatedSuccess": "Utgivelsesnotat oppdatert",
         "releaseNoteUpdateError": "Det oppsto en feil under oppdatering av utgivelsesnotat",
         "exportPdfError": "Det oppsto en feil under eksportering til PDF",
+        "compareReleaseNotesError": "Det oppsto en feil under sammenligning av utgivelsesnotater",
         "translationError": "Det oppsto en feil under oversettelse av endringsnotat",
         "changeNoteTranslationSuccess": "Endringsnotat oversatt",
         "releaseNoteTranslationSuccess": "Utgivelsesnotat oversatt",
@@ -264,5 +267,11 @@
         "promptPlaceholder": "Skriv inn prompten",
         "saveSuccess": "Prompts oppdatert",
         "saveError": "Det oppsto en feil under oppdatering av prompts"
+    },
+    "compareReleaseNotes": {
+        "product": "Produkt",
+        "releaseNoteOne": "Utgivelsesnotat én",
+        "releaseNoteTwo": "Utgivelsesnotat to",
+        "compare": "Sammenlign"
     }
 }

@@ -18,6 +18,7 @@ import lombok.AllArgsConstructor;
 import no.reliablesolutions.release_notes_portal.domain.entity.ChangeImpact;
 import no.reliablesolutions.release_notes_portal.domain.entity.ChangeNote;
 import no.reliablesolutions.release_notes_portal.domain.entity.Feature;
+import no.reliablesolutions.release_notes_portal.domain.entity.Product;
 import no.reliablesolutions.release_notes_portal.domain.entity.ReleaseNote;
 import no.reliablesolutions.release_notes_portal.domain.entity.ReleaseTimeline;
 import no.reliablesolutions.release_notes_portal.domain.repository.ChangeNoteRepository;
@@ -31,6 +32,7 @@ import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteFilterOptionsDTO
 import no.reliablesolutions.release_notes_portal.dto.ReleaseTimelineDTO;
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.InvalidDateRangeException;
+import no.reliablesolutions.release_notes_portal.exception.MismatchedProductException;
 import no.reliablesolutions.release_notes_portal.exception.ProductNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.util.AccessScope;
@@ -206,6 +208,67 @@ public class ReleaseNoteService {
     }
 
     return ReleaseNoteMapper.toDTO(releaseNote, accessScope);
+  }
+
+  /**
+   * Retrieves the release notes that are new since the earlier of the two given
+   * release notes: all non-archived release notes of their shared product
+   * created after the earlier note, up to and including the later note.
+   *
+   * @param releaseNoteOneId the ID of one release note to compare
+   * @param releaseNoteTwoId the ID of the other release note to compare
+   * @return the release notes in the range, ordered by creation time descending
+   * @throws IllegalArgumentException     if either ID is {@code null}
+   * @throws ReleaseNoteNotFoundException if either release note does not exist or
+   *                                      is not accessible to the current user
+   * @throws MismatchedProductException   if the two release notes do not share a
+   *                                      product
+   */
+  public List<ReleaseNoteDTO> getReleaseNotesBetween(Long releaseNoteOneId, Long releaseNoteTwoId) {
+    if (releaseNoteOneId == null || releaseNoteTwoId == null) {
+      throw new IllegalArgumentException("Both release note IDs must be provided");
+    }
+
+    AccessScope accessScope = AccessScopeFactory.fromCurrentUser();
+    ReleaseNote one = getAccessibleReleaseNote(releaseNoteOneId, accessScope.isAdmin());
+    ReleaseNote two = getAccessibleReleaseNote(releaseNoteTwoId, accessScope.isAdmin());
+
+    Product productOne = one.getProduct();
+    Product productTwo = two.getProduct();
+    if (productOne == null || productTwo == null || !productOne.getId().equals(productTwo.getId())) {
+      throw new MismatchedProductException(releaseNoteOneId, releaseNoteTwoId);
+    }
+
+    ReleaseNote earlier = one.getCreatedAt().isAfter(two.getCreatedAt()) ? two : one;
+    ReleaseNote later = earlier == one ? two : one;
+
+    List<ReleaseNote> between = releaseNoteRepository.findByProductBetweenCreatedAt(
+        productOne.getId(), earlier.getCreatedAt(), later.getCreatedAt(), !accessScope.isAdmin());
+
+    return between.stream().map(rn -> ReleaseNoteMapper.toDTO(rn, accessScope)).toList();
+  }
+
+  /**
+   * Retrieves a non-archived release note by ID, applying the same visibility
+   * rules as {@link #getReleaseNoteById(long)}.
+   *
+   * @param id      the ID of the release note
+   * @param isAdmin whether the current user is an admin
+   * @return the matching release note entity
+   * @throws ReleaseNoteNotFoundException if the note does not exist, is archived,
+   *                                      or is an unpublished note requested by a
+   *                                      non-admin
+   */
+  private ReleaseNote getAccessibleReleaseNote(long id, boolean isAdmin) {
+    ReleaseNote releaseNote = releaseNoteRepository.findById(id)
+        .orElseThrow(() -> new ReleaseNoteNotFoundException(id));
+    if (Boolean.TRUE.equals(releaseNote.getArchived())) {
+      throw new ReleaseNoteNotFoundException(id);
+    }
+    if (!isAdmin && Boolean.FALSE.equals(releaseNote.getPublished())) {
+      throw new ReleaseNoteNotFoundException(id);
+    }
+    return releaseNote;
   }
 
   /**
