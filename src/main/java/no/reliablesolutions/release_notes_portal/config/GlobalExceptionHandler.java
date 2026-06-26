@@ -11,6 +11,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -37,6 +38,17 @@ import no.reliablesolutions.release_notes_portal.exception.ScopeNotFoundExceptio
 @ControllerAdvice
 public class GlobalExceptionHandler {
   Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+  /**
+   * Handles the case where a required request parameter is missing. Logs the event and returns a 400 response with a message indicating the missing parameter.
+   * @param e the exception containing details about the missing request parameter
+   * @return a ResponseEntity with a 400 status and a message indicating the missing request parameter
+   */
+  @ExceptionHandler(value = {MissingServletRequestParameterException.class})
+  public ResponseEntity<String> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+    logger.warn("Missing request parameter: {}", e.getParameterName());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing request parameter: " + e.getParameterName());
+  }
 
   /**
    * Handles the case where a customer is not found. Logs the event and returns a 404 response with a message indicating the customer was not found.

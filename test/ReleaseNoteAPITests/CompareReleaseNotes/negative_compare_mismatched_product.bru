@@ -1,0 +1,29 @@
+meta {
+  name: negative_compare_mismatched_product
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseurl}}/releasenotes/compare?releaseNoteOneId={{compare_rn_old}}&releaseNoteTwoId={{compare_rn_other_product}}
+  body: none
+  auth: inherit
+}
+
+params:query {
+  releaseNoteOneId: {{compare_rn_old}}
+  releaseNoteTwoId: {{compare_rn_other_product}}
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 400
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

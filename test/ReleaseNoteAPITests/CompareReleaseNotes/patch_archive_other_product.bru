@@ -1,0 +1,19 @@
+meta {
+  name: patch_archive_other_product
+  type: http
+  seq: 15
+}
+
+patch {
+  url: {{baseurl}}/releasenotes/{{compare_rn_other_product}}/archive
+  body: json
+  auth: none
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 200
+}
