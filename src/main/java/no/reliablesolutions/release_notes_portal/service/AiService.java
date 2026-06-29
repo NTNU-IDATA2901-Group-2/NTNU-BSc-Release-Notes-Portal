@@ -72,45 +72,6 @@ public class AiService {
                 .content();
     }
     
-    /**
-    * Summarizes the change notes with the given IDs using an AI model. The summary is generated based on the git diff of the change notes.
-    *
-    * @param changeNoteIds the IDs of the change notes to be summarized
-    * @return a string summarizing the contents of the change notes
-    */
-    public String summarizeChangeNote(List<Long> changeNoteIds) {
-        StringBuilder diffs = new StringBuilder();
-        ChangeNoteGitInspectionService changeNoteGitInspectionService = changeNoteGitInspectionServiceProvider.getIfAvailable();
-
-        if (changeNoteGitInspectionService == null) {
-            logger.error("ChangeNoteGitInspectionService bean is not available. Cannot summarize change notes.");
-            throw new IllegalStateException("ChangeNoteGitInspectionService is not available");
-        }
-
-        for (Long changeNoteId : changeNoteIds) {
-            GitCommitHashAndPreviousGitCommitHash commits = changeNoteService.getGitCommitHashAndPreviousGitCommitHash(changeNoteId);
-            if (commits == null || commits.getGitCommitHash() == null || commits.getPreviousGitCommitHash() == null) {
-                logger.warn("Change note with ID {} is missing associated git commits. Skipping summarization for this change note.", changeNoteId);
-                continue;
-            }
-            GitRepository gitRepository = gitRepositoryService.getGitRepositoryForChangeNote(changeNoteId);
-            String diffString = changeNoteGitInspectionService.getDiffString(commits.getGitCommitHash(), commits.getPreviousGitCommitHash(), gitRepository);
-            diffs.append(diffString).append("\n");
-        }
-        String diffsString = diffs.toString().trim();
-        
-        Prompt summarizeChangeNotePrompt = promptRepository.findByName("Change Notes Summary");
-
-        if (summarizeChangeNotePrompt == null) {
-            throw new IllegalStateException("Summarize change note prompt not found in database");
-        }
-        
-        return diffsString.isEmpty() ? "" : builder.build().prompt().system(summarizeChangeNotePrompt.getPrompt())
-        .user(diffsString)
-        .call()
-        .content();
-    }
-
     public String summarizeChangeNotesWithAgent(List<Long> changeNoteIds) {
         return summarizeChangeNoteAgent.summarizeChangeNotes(changeNoteIds);
     }

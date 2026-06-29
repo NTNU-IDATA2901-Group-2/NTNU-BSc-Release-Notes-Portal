@@ -2,7 +2,6 @@ package no.reliablesolutions.release_notes_portal.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,11 +60,6 @@ public class SummarizeChangeNoteAgent {
 
   }
 
-  private record AgentResponse(
-  String action,
-    String toolName,
-    Map<String, String> arguments,
-    String answer,
-    String title) {
-}
+  private record AgentResponse(String answer, String title) {
+  }
 }
