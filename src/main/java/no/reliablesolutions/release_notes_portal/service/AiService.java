@@ -15,6 +15,7 @@ import no.reliablesolutions.release_notes_portal.domain.repository.PromptReposit
 import no.reliablesolutions.release_notes_portal.dto.GitCommitHashAndPreviousGitCommitHash;
 import no.reliablesolutions.release_notes_portal.dto.PromptDTO;
 import no.reliablesolutions.release_notes_portal.exception.LocaleNotSupportedException;
+import no.reliablesolutions.release_notes_portal.util.SummarizeChangeNoteAgent;
 
 /**
  * Service class for handling AI-related operations, such as translating text and summarizing change notes.
@@ -27,6 +28,7 @@ public class AiService {
     private final ObjectProvider<DiffService> diffServiceProvider;
     private final GitRepositoryService gitRepositoryService;
     private final PromptRepository promptRepository;
+    private final SummarizeChangeNoteAgent summarizeChangeNoteAgent;
 
     private final Logger logger = LoggerFactory.getLogger(AiService.class);
     
@@ -107,6 +109,10 @@ public class AiService {
         .user(diffsString)
         .call()
         .content();
+    }
+
+    public String summarizeChangeNotesWithAgent(List<Long> changeNoteIds) {
+        return summarizeChangeNoteAgent.summarizeChangeNotes(changeNoteIds);
     }
 
     /**

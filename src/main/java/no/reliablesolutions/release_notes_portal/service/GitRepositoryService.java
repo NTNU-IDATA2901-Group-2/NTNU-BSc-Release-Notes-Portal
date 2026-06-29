@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
@@ -134,6 +135,7 @@ public class GitRepositoryService {
      * @param changeNoteId the ID of the change note for which to retrieve the associated Git repository
      * @return the Git repository associated with the specified change note ID, or null if no repository is associated
      */
+    @Tool(name = "getGitRepositoryForChangeNote", description = "Get the Git repository associated with a specific change note ID")
     public GitRepository getGitRepositoryForChangeNote(long changeNoteId) {
       return gitRepositoryRepository.findByChangeNoteId(changeNoteId);
     }

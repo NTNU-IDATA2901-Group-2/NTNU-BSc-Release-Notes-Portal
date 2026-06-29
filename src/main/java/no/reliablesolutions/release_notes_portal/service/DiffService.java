@@ -12,6 +12,7 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ import no.reliablesolutions.release_notes_portal.exception.DiffStringGenerationE
  */
 @Service
 @Profile("!ci")
-class DiffService {
+public class DiffService {
   private final Logger logger = LoggerFactory.getLogger(DiffService.class);
   private final String changeNoteDirectory;
 
@@ -50,6 +51,7 @@ class DiffService {
    * @throws IllegalArgumentException if any of the parameters are null or if the repository directory does not exist
    * @throws RuntimeException if there is an error while generating the diff string
    */
+  @Tool(name = "generateDiffString", description = "Generates a diff string between two commits for a given git repository")
   public String getDiffString(String commitHash, String previousCommitHash, GitRepository gitRepository) throws DiffStringGenerationException {
     if (commitHash == null || previousCommitHash == null) {
       throw new IllegalArgumentException("Commit hashes cannot be null");
