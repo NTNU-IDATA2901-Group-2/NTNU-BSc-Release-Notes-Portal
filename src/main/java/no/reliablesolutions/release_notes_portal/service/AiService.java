@@ -25,7 +25,7 @@ import no.reliablesolutions.release_notes_portal.util.SummarizeChangeNoteAgent;
 public class AiService {
     private final ChatClient.Builder builder;
     private final ChangeNoteService changeNoteService;
-    private final ObjectProvider<DiffService> diffServiceProvider;
+    private final ObjectProvider<ChangeNoteGitInspectionService> changeNoteGitInspectionServiceProvider;
     private final GitRepositoryService gitRepositoryService;
     private final PromptRepository promptRepository;
     private final SummarizeChangeNoteAgent summarizeChangeNoteAgent;
@@ -80,11 +80,11 @@ public class AiService {
     */
     public String summarizeChangeNote(List<Long> changeNoteIds) {
         StringBuilder diffs = new StringBuilder();
-        DiffService diffService = diffServiceProvider.getIfAvailable();
+        ChangeNoteGitInspectionService changeNoteGitInspectionService = changeNoteGitInspectionServiceProvider.getIfAvailable();
 
-        if (diffService == null) {
-            logger.error("DiffService bean is not available. Cannot summarize change notes.");
-            throw new IllegalStateException("DiffService is not available");
+        if (changeNoteGitInspectionService == null) {
+            logger.error("ChangeNoteGitInspectionService bean is not available. Cannot summarize change notes.");
+            throw new IllegalStateException("ChangeNoteGitInspectionService is not available");
         }
 
         for (Long changeNoteId : changeNoteIds) {
@@ -94,7 +94,7 @@ public class AiService {
                 continue;
             }
             GitRepository gitRepository = gitRepositoryService.getGitRepositoryForChangeNote(changeNoteId);
-            String diffString = diffService.getDiffString(commits.getGitCommitHash(), commits.getPreviousGitCommitHash(), gitRepository);
+            String diffString = changeNoteGitInspectionService.getDiffString(commits.getGitCommitHash(), commits.getPreviousGitCommitHash(), gitRepository);
             diffs.append(diffString).append("\n");
         }
         String diffsString = diffs.toString().trim();

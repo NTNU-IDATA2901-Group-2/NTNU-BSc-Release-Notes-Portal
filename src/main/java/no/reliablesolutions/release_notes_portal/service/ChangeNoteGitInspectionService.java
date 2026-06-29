@@ -26,16 +26,16 @@ import no.reliablesolutions.release_notes_portal.exception.DiffStringGenerationE
  */
 @Service
 @Profile("!ci")
-public class DiffService {
-  private final Logger logger = LoggerFactory.getLogger(DiffService.class);
+public class ChangeNoteGitInspectionService {
+  private final Logger logger = LoggerFactory.getLogger(ChangeNoteGitInspectionService.class);
   private final String changeNoteDirectory;
 
   /**
-   * Constructor for DiffService.
+   * Constructor for ChangeNoteGitInspectionService.
    *
    * @param repositoryDirectoriesPath the base path where local git repositories are stored, injected from application properties
    */
-  public DiffService(
+  public ChangeNoteGitInspectionService(
     @Value("${CHANGE_NOTE_DIRECTORY}") String changeNoteDirectory
   ) {
     this.changeNoteDirectory = changeNoteDirectory;

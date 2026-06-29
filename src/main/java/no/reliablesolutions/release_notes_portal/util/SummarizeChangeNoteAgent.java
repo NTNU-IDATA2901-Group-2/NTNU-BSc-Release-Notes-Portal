@@ -16,23 +16,23 @@ import org.springframework.stereotype.Component;
 import no.reliablesolutions.release_notes_portal.domain.repository.PromptRepository;
 import no.reliablesolutions.release_notes_portal.service.ChangeNoteService;
 import no.reliablesolutions.release_notes_portal.service.GitRepositoryService;
-import no.reliablesolutions.release_notes_portal.service.DiffService;
+import no.reliablesolutions.release_notes_portal.service.ChangeNoteGitInspectionService;
 
 @Component
 public class SummarizeChangeNoteAgent {
   private final ChatClient chatClient;
   private final ChangeNoteService changeNoteService;
   private final GitRepositoryService gitRepositoryService;
-  private final DiffService diffService;
+  private final ChangeNoteGitInspectionService changeNoteGitInspectionService;
   private final PromptRepository promptRepository;
   private final Logger logger = LoggerFactory.getLogger(SummarizeChangeNoteAgent.class);
 
   public SummarizeChangeNoteAgent(ChatClient.Builder chatClientBuilder, ChangeNoteService changeNoteService,
-      GitRepositoryService gitRepositoryService, DiffService diffService, PromptRepository promptRepository) {
+      GitRepositoryService gitRepositoryService, ChangeNoteGitInspectionService changeNoteGitInspectionService, PromptRepository promptRepository) {
     this.chatClient = chatClientBuilder.build();
     this.changeNoteService = changeNoteService;
     this.gitRepositoryService = gitRepositoryService;
-    this.diffService = diffService;
+    this.changeNoteGitInspectionService = changeNoteGitInspectionService;
     this.promptRepository = promptRepository;
   }  
 
@@ -42,7 +42,7 @@ public class SummarizeChangeNoteAgent {
       MethodToolCallbackProvider.builder().toolObjects(
         changeNoteService,
         gitRepositoryService,
-        diffService
+        changeNoteGitInspectionService
       ).build()
     )
     .call()
