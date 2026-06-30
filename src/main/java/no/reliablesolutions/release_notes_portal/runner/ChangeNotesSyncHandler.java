@@ -155,12 +155,11 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
       throw new IllegalArgumentException("Repository directory cannot be null");
     }
     
-    try {
-      logger.info("Cloning repository {} with id {}", gitRepository.getName(), gitRepository.getId());
-      Git.cloneRepository()
-      .setURI(gitRepository.getUrl())
-      .setDirectory(repositoryDirectory) 
-      .call();
+    logger.info("Cloning repository {} with id {}", gitRepository.getName(), gitRepository.getId());
+    try (Git git = Git.cloneRepository()
+        .setURI(gitRepository.getUrl())
+        .setDirectory(repositoryDirectory)
+        .call()) {
     } catch (GitAPIException e) {
       logger.error("Failed to clone repository with id {}", gitRepository.getId(), e);
     } catch (Exception e) {
@@ -207,8 +206,8 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
     }
     
     try (Git git = Git.open(repositoryDirectory);
-    Repository repository = git.getRepository();
-    RevWalk revWalk = new RevWalk(repository);) {
+    RevWalk revWalk = new RevWalk(git.getRepository());) {
+      Repository repository = git.getRepository();
       if (gitRepository.getLastCheckedCommitHash() != null) {
         ObjectId lastCheckedCommitId = repository.resolve(gitRepository.getLastCheckedCommitHash()); 
         RevCommit lastCheckedCommit = revWalk.parseCommit(lastCheckedCommitId);       

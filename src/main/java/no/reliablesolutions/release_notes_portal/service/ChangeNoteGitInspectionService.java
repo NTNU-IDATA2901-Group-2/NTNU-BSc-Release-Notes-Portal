@@ -89,9 +89,9 @@ public class ChangeNoteGitInspectionService {
     StringBuilder diffStringBuilder = new StringBuilder();
 
     try (Git git = Git.open(repositoryDirectory);
-        Repository repository = git.getRepository();
         OutputStream outputStream = new ByteArrayOutputStream();
         DiffFormatter diffFormatter = new DiffFormatter(outputStream);) {
+      Repository repository = git.getRepository();
 
       diffFormatter.setRepository(repository);
 
@@ -147,10 +147,12 @@ public class ChangeNoteGitInspectionService {
           "Repository directory does not exist: " + repositoryDirectory.getAbsolutePath());
     }
 
-    try (Git git = Git.open(repositoryDirectory);
-        Repository repository = git.getRepository()) {
+    try (Git git = Git.open(repositoryDirectory)) {
+      Repository repository = git.getRepository();
 
       RevCommit commit = repository.parseCommit(repository.resolve(commitHash));
+
+      logger.info("Retrieved commit message for commit {} in repository {}", commitHash, repositoryPath);
       return commit.getFullMessage();
     } catch (Exception e) {
       throw new GitInspectionException(String.format(
@@ -194,8 +196,8 @@ public class ChangeNoteGitInspectionService {
     }
 
     try (Git git = Git.open(repositoryDirectory);
-        Repository repository = git.getRepository();
-        RevWalk walk = new RevWalk(repository);) {
+        RevWalk walk = new RevWalk(git.getRepository());) {
+      Repository repository = git.getRepository();
 
       RevCommit startCommit = walk.parseCommit(repository.resolve(startCommitHash));
       RevCommit endCommit = walk.parseCommit(repository.resolve(endCommitHash));
@@ -207,6 +209,8 @@ public class ChangeNoteGitInspectionService {
       for (RevCommit commit : walk) {
         commitMessages.append(commit.getFullMessage()).append("\n");
       }
+
+      logger.info("Retrieved commit messages between {} and {} in repository {}", startCommitHash, endCommitHash, repositoryPath);
       return commitMessages.toString().trim();
     } catch (Exception e) {
       throw new GitInspectionException(String.format(
@@ -248,8 +252,8 @@ public class ChangeNoteGitInspectionService {
     }
 
     try (Git git = Git.open(repositoryDirectory);
-        Repository repository = git.getRepository();
-        TreeWalk treeWalk = new TreeWalk(repository);) {
+        TreeWalk treeWalk = new TreeWalk(git.getRepository());) {
+      Repository repository = git.getRepository();
 
       RevCommit commit = repository.parseCommit(repository.resolve(commitHash));
       RevTree tree = commit.getTree();
