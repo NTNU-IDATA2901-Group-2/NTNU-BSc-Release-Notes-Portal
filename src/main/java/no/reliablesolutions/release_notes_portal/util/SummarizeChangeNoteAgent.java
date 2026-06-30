@@ -10,6 +10,7 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.tool.method.MethodToolCallbackProvider;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import no.reliablesolutions.release_notes_portal.domain.repository.PromptRepository;
@@ -18,6 +19,7 @@ import no.reliablesolutions.release_notes_portal.service.GitRepositoryService;
 import no.reliablesolutions.release_notes_portal.service.ChangeNoteGitInspectionService;
 
 @Component
+@Profile("!ci")
 public class SummarizeChangeNoteAgent {
   private final ChatClient chatClient;
   private final ChangeNoteService changeNoteService;
