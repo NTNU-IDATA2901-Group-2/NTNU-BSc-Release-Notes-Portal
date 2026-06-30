@@ -21,11 +21,11 @@ import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
 import no.reliablesolutions.release_notes_portal.exception.GitInspectionException;
 
 /**
@@ -54,10 +54,9 @@ public class ChangeNoteGitInspectionService {
   /**
    * Generates a diff string between two commits for a given git repository.
    *
-   * @param commitHash         the hash of the new commit
-   * @param previousCommitHash the hash of the previous commit
-   * @param gitRepository      the git repository for which the diff is to be
-   *                           generated
+   * @param commitHash         the hash of the newer commit
+   * @param previousCommitHash the hash of the older baseline commit to diff against
+   * @param repositoryPath     the local path of the git repository
    * @param filePath           the path of the file to generate the diff for, or
    *                           null to generate the diff for all files
    * @return a string representation of the diff between the two commits
@@ -67,18 +66,21 @@ public class ChangeNoteGitInspectionService {
    *                                  diff string
    */
   @Tool(name = "generateDiffString", description = "Generates a diff string between two commits for a given git repository. Optionally, a specific file path can be provided to generate the diff for that file only.")
-  public String getDiffString(String commitHash, String previousCommitHash, GitRepository gitRepository,
-      String filePath)
+  public String getDiffString(
+      @ToolParam(description = "The newer commit hash whose changes are being described") String commitHash,
+      @ToolParam(description = "The older baseline commit hash to diff against") String previousCommitHash,
+      @ToolParam(description = "The repository's local path, as returned by getRepositoryPathForChangeNote") String repositoryPath,
+      @ToolParam(required = false, description = "Optional path of a single file to restrict the diff to; omit for the full diff") String filePath)
       throws GitInspectionException {
     if (commitHash == null || previousCommitHash == null) {
       throw new IllegalArgumentException("Commit hashes cannot be null");
     }
 
-    if (gitRepository == null) {
-      throw new IllegalArgumentException("Git repository cannot be null");
+    if (repositoryPath == null) {
+      throw new IllegalArgumentException("Repository path cannot be null");
     }
 
-    File repositoryDirectory = new File(gitRepository.getLocalPath());
+    File repositoryDirectory = new File(repositoryPath);
     if (!repositoryDirectory.exists()) {
       throw new IllegalArgumentException(
           "Repository directory does not exist: " + repositoryDirectory.getAbsolutePath());
@@ -108,19 +110,19 @@ public class ChangeNoteGitInspectionService {
     } catch (Exception e) {
       throw new GitInspectionException(String.format(
           "Error generating diff string for commit %s and previous commit %s in repository %s: %s",
-          commitHash, previousCommitHash, gitRepository.getName(), e.getMessage()), e);
+          commitHash, previousCommitHash, repositoryPath, e.getMessage()), e);
     }
 
     logger.info("Generated diff string for commit {} and previous commit {} in repository {}",
-        commitHash, previousCommitHash, gitRepository.getName());
+        commitHash, previousCommitHash, repositoryPath);
     return diffStringBuilder.toString();
   }
 
   /**
    * Retrieves the full commit message for a given commit in a git repository.
    *
-   * @param commitHash    the hash of the commit whose message is to be retrieved
-   * @param gitRepository the git repository the commit belongs to
+   * @param commitHash     the hash of the commit whose message is to be retrieved
+   * @param repositoryPath the local path of the git repository
    * @return the full commit message
    * @throws IllegalArgumentException if any of the parameters are null or if the
    *                                  repository directory does not exist
@@ -128,16 +130,18 @@ public class ChangeNoteGitInspectionService {
    *                                  commit message
    */
   @Tool(name = "getCommitMessage", description = "Retrieves the full commit message for a given commit in a git repository")
-  public String getCommitMessage(String commitHash, GitRepository gitRepository) {
+  public String getCommitMessage(
+      @ToolParam(description = "The hash of the commit whose message to retrieve") String commitHash,
+      @ToolParam(description = "The repository's local path, as returned by getRepositoryPathForChangeNote") String repositoryPath) {
     if (commitHash == null) {
       throw new IllegalArgumentException("Commit hash cannot be null");
     }
 
-    if (gitRepository == null) {
-      throw new IllegalArgumentException("Git repository cannot be null");
+    if (repositoryPath == null) {
+      throw new IllegalArgumentException("Repository path cannot be null");
     }
 
-    File repositoryDirectory = new File(gitRepository.getLocalPath());
+    File repositoryDirectory = new File(repositoryPath);
     if (!repositoryDirectory.exists()) {
       throw new IllegalArgumentException(
           "Repository directory does not exist: " + repositoryDirectory.getAbsolutePath());
@@ -151,7 +155,7 @@ public class ChangeNoteGitInspectionService {
     } catch (Exception e) {
       throw new GitInspectionException(String.format(
           "Error retrieving commit message for commit %s in repository %s: %s",
-          commitHash, gitRepository.getName(), e.getMessage()), e);
+          commitHash, repositoryPath, e.getMessage()), e);
     }
   }
 
@@ -162,7 +166,7 @@ public class ChangeNoteGitInspectionService {
    *
    * @param startCommitHash the hash of the older boundary commit (exclusive)
    * @param endCommitHash   the hash of the newer boundary commit (inclusive)
-   * @param gitRepository   the git repository the commits belong to
+   * @param repositoryPath  the local path of the git repository
    * @return a string containing the commit messages in the range, newest first,
    *         separated by newlines; empty if the range contains no commits
    * @throws IllegalArgumentException if any of the parameters are null or if the
@@ -171,17 +175,19 @@ public class ChangeNoteGitInspectionService {
    *                                  commit messages
    */
   @Tool(name = "getCommitMessagesBetweenRange", description = "Retrieves the commit messages for all commits between two specified commits in a git repository")
-  public String getCommitMessageBetweenRange(String startCommitHash, String endCommitHash,
-      GitRepository gitRepository) {
+  public String getCommitMessageBetweenRange(
+      @ToolParam(description = "The older boundary commit hash, exclusive — its own message is not returned") String startCommitHash,
+      @ToolParam(description = "The newer boundary commit hash, inclusive") String endCommitHash,
+      @ToolParam(description = "The repository's local path, as returned by getRepositoryPathForChangeNote") String repositoryPath) {
     if (startCommitHash == null || endCommitHash == null) {
       throw new IllegalArgumentException("Start and end commit hashes cannot be null");
     }
 
-    if (gitRepository == null) {
-      throw new IllegalArgumentException("Git repository cannot be null");
+    if (repositoryPath == null) {
+      throw new IllegalArgumentException("Repository path cannot be null");
     }
 
-    File repositoryDirectory = new File(gitRepository.getLocalPath());
+    File repositoryDirectory = new File(repositoryPath);
     if (!repositoryDirectory.exists()) {
       throw new IllegalArgumentException(
           "Repository directory does not exist: " + repositoryDirectory.getAbsolutePath());
@@ -205,16 +211,16 @@ public class ChangeNoteGitInspectionService {
     } catch (Exception e) {
       throw new GitInspectionException(String.format(
           "Error retrieving commit messages between %s and %s in repository %s: %s",
-          startCommitHash, endCommitHash, gitRepository.getName(), e.getMessage()), e);
+          startCommitHash, endCommitHash, repositoryPath, e.getMessage()), e);
     }
   }
 
   /**
    * Retrieves the content of a file at a specific commit in a git repository.
    *
-   * @param commitHash    the hash of the commit
-   * @param filePath      the path of the file relative to the repository root
-   * @param gitRepository the git repository the file belongs to
+   * @param commitHash     the hash of the commit
+   * @param filePath       the path of the file relative to the repository root
+   * @param repositoryPath the local path of the git repository
    * @return the content of the file as a string
    * @throws IllegalArgumentException if any of the parameters are null or if the
    *                                  repository directory does not exist
@@ -223,16 +229,19 @@ public class ChangeNoteGitInspectionService {
    *                                  retrieving the file content
    */
   @Tool(name = "getFileAtCommit", description = "Retrieves the content of a file at a specific commit in a git repository")
-  public String getFileAtCommit(String commitHash, String filePath, GitRepository gitRepository) {
+  public String getFileAtCommit(
+      @ToolParam(description = "The hash of the commit to read the file at") String commitHash,
+      @ToolParam(description = "Path of the file relative to the repository root") String filePath,
+      @ToolParam(description = "The repository's local path, as returned by getRepositoryPathForChangeNote") String repositoryPath) {
     if (commitHash == null || filePath == null) {
       throw new IllegalArgumentException("Commit hash and file path cannot be null");
     }
 
-    if (gitRepository == null) {
-      throw new IllegalArgumentException("Git repository cannot be null");
+    if (repositoryPath == null) {
+      throw new IllegalArgumentException("Repository path cannot be null");
     }
 
-    File repositoryDirectory = new File(gitRepository.getLocalPath());
+    File repositoryDirectory = new File(repositoryPath);
     if (!repositoryDirectory.exists()) {
       throw new IllegalArgumentException(
           "Repository directory does not exist: " + repositoryDirectory.getAbsolutePath());
@@ -251,17 +260,17 @@ public class ChangeNoteGitInspectionService {
       if (!treeWalk.next()) {
         throw new GitInspectionException(String.format(
             "File %s does not exist at commit %s in repository %s",
-            filePath, commitHash, gitRepository.getName()));
+            filePath, commitHash, repositoryPath));
       }
       ObjectId blobId = treeWalk.getObjectId(0);
       ObjectLoader loader = repository.open(blobId);
-      logger.info("Retrieved file {} at commit {} in repository {}", filePath, commitHash, gitRepository.getName());
+      logger.info("Retrieved file {} at commit {} in repository {}", filePath, commitHash, repositoryPath);
       return new String(loader.getBytes());
 
     } catch (Exception e) {
       throw new GitInspectionException(String.format(
           "Error retrieving file %s at commit %s in repository %s: %s",
-          filePath, commitHash, gitRepository.getName(), e.getMessage()), e);
+          filePath, commitHash, repositoryPath, e.getMessage()), e);
     }
   }
 
@@ -269,9 +278,9 @@ public class ChangeNoteGitInspectionService {
    * Retrieves the list of files changed between a commit and its previous commit
    * in a git repository. Paths within the change note directory are excluded.
    *
-   * @param commitHash         the hash of the (newer) commit
-   * @param previousCommitHash the hash of the previous commit to diff against
-   * @param gitRepository      the git repository the commits belong to
+   * @param commitHash         the hash of the newer commit
+   * @param previousCommitHash the hash of the older baseline commit to diff against
+   * @param repositoryPath     the local path of the git repository
    * @return the changed file paths separated by newlines, or a message stating
    *         that no files changed when the range is empty
    * @throws IllegalArgumentException if any parameter is null, the repository
@@ -281,12 +290,15 @@ public class ChangeNoteGitInspectionService {
    *                                  changed files
    */
   @Tool(name = "getChangedFilesInCommit", description = "Lists the files changed between a commit and its previous commit, one path per line")
-  public String getChangedFilesInCommit(String commitHash, String previousCommitHash, GitRepository gitRepository) {
-    if (commitHash == null || previousCommitHash == null || gitRepository == null) {
-      throw new IllegalArgumentException("Commit hashes and git repository cannot be null");
+  public String getChangedFilesInCommit(
+      @ToolParam(description = "The newer commit hash") String commitHash,
+      @ToolParam(description = "The older baseline commit hash to diff against") String previousCommitHash,
+      @ToolParam(description = "The repository's local path, as returned by getRepositoryPathForChangeNote") String repositoryPath) {
+    if (commitHash == null || previousCommitHash == null || repositoryPath == null) {
+      throw new IllegalArgumentException("Commit hashes and repository path cannot be null");
     }
 
-    File repositoryDirectory = new File(gitRepository.getLocalPath());
+    File repositoryDirectory = new File(repositoryPath);
     if (!repositoryDirectory.exists()) {
       throw new IllegalArgumentException(
           "Repository directory does not exist: " + repositoryDirectory.getAbsolutePath());
@@ -316,7 +328,7 @@ public class ChangeNoteGitInspectionService {
             .toList();
 
         logger.info("Found {} changed files between {} and {} in repository {}",
-            diffs.size(), previousCommitHash, commitHash, gitRepository.getName());
+            diffs.size(), previousCommitHash, commitHash, repositoryPath);
         return diffs.stream()
             .map(DiffEntry::getNewPath)
             .reduce((a, b) -> a + "\n" + b)
@@ -325,7 +337,7 @@ public class ChangeNoteGitInspectionService {
     } catch (Exception e) {
       throw new GitInspectionException(String.format(
           "Error retrieving changed files between %s and %s in repository %s: %s",
-          previousCommitHash, commitHash, gitRepository.getName(), e.getMessage()), e);
+          previousCommitHash, commitHash, repositoryPath, e.getMessage()), e);
     }
 
   }
