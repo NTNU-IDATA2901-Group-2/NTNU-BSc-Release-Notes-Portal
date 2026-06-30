@@ -5,14 +5,11 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
-import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
 import no.reliablesolutions.release_notes_portal.domain.entity.Prompt;
 import no.reliablesolutions.release_notes_portal.domain.repository.PromptRepository;
-import no.reliablesolutions.release_notes_portal.dto.GitCommitHashAndPreviousGitCommitHash;
 import no.reliablesolutions.release_notes_portal.dto.PromptDTO;
 import no.reliablesolutions.release_notes_portal.exception.LocaleNotSupportedException;
 import no.reliablesolutions.release_notes_portal.util.SummarizeChangeNoteAgent;
@@ -24,9 +21,6 @@ import no.reliablesolutions.release_notes_portal.util.SummarizeChangeNoteAgent;
 @AllArgsConstructor
 public class AiService {
     private final ChatClient.Builder builder;
-    private final ChangeNoteService changeNoteService;
-    private final ObjectProvider<ChangeNoteGitInspectionService> changeNoteGitInspectionServiceProvider;
-    private final GitRepositoryService gitRepositoryService;
     private final PromptRepository promptRepository;
     private final SummarizeChangeNoteAgent summarizeChangeNoteAgent;
 

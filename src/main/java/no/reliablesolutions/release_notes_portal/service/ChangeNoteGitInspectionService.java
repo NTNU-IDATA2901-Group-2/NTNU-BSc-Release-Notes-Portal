@@ -29,7 +29,9 @@ import org.springframework.stereotype.Service;
 import no.reliablesolutions.release_notes_portal.exception.GitInspectionException;
 
 /**
- * Service for generating diff strings between git commits.
+ * Service for inspecting local git repositories to provide context for change
+ * note summarization: generating diffs, listing changed files, and reading
+ * commit messages and file contents.
  * This service is only active in non-CI profiles, as it relies on local git
  * repositories being available.
  */
@@ -42,9 +44,9 @@ public class ChangeNoteGitInspectionService {
   /**
    * Constructor for ChangeNoteGitInspectionService.
    *
-   * @param repositoryDirectoriesPath the base path where local git repositories
-   *                                  are stored, injected from application
-   *                                  properties
+   * @param changeNoteDirectory the repository-relative directory holding change
+   *                            note files, excluded from generated diffs;
+   *                            injected from application properties
    */
   public ChangeNoteGitInspectionService(
       @Value("${CHANGE_NOTE_DIRECTORY}") String changeNoteDirectory) {
