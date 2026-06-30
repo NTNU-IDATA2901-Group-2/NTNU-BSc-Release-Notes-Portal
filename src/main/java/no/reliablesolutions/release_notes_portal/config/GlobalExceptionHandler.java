@@ -20,7 +20,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteHasNoGitCommitsException;
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.CustomerNotFoundException;
-import no.reliablesolutions.release_notes_portal.exception.DiffStringGenerationException;
+import no.reliablesolutions.release_notes_portal.exception.GitInspectionException;
 import no.reliablesolutions.release_notes_portal.exception.FailedSyncGitChangeNotesException;
 import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityException;
 import no.reliablesolutions.release_notes_portal.exception.FeatureNotFoundException;
@@ -140,14 +140,14 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * Handles the case where there is an error during the generation of a diff string. Logs the event and returns a 500 response with a message indicating the error generating the diff string.
-   * @param e the exception containing details about the error generating the diff string
-   * @return a ResponseEntity with a 500 status and a message indicating the error generating the diff string
+   * Handles the case where a git inspection operation (diff generation, commit message retrieval, listing changed files, etc.) fails. Logs the event and returns a 500 response indicating the error.
+   * @param e the exception containing details about the failed git inspection
+   * @return a ResponseEntity with a 500 status and a message indicating the git inspection error
    */
-  @ExceptionHandler(value = {DiffStringGenerationException.class})
-  public ResponseEntity<String> handleDiffStringGenerationException(DiffStringGenerationException e) {
-    logger.warn("Error generating diff string: {}", e.getMessage());
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error generating diff string");
+  @ExceptionHandler(value = {GitInspectionException.class})
+  public ResponseEntity<String> handleGitInspectionException(GitInspectionException e) {
+    logger.warn("Error during git inspection: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error during git inspection");
   }
 
 

@@ -32,8 +32,14 @@ services:
       - DB_URL=
       - OPENAI_URL=
       - OPENAI_API_KEY=
+      - OPENAI_CHAT_COMPLETIONS_PATH=
       - OPENAI_MODEL=
       - JIRA_BASE_URL=
+      - JIRA_EMAIL=
+      - JIRA_API_TOKEN=
+      - CHANGE_NOTE_DIRECTORY=
+      - RELEASE_NOTE_DIRECTORY=
+      - GITHUB_RW_PAT=
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.5.2

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
@@ -129,13 +130,15 @@ public class GitRepositoryService {
     }
 
     /**
-     * Retrieves the Git repository associated with a specific change note ID.
+     * Retrieves the local path of the Git repository associated with a specific change note ID.
      *
-     * @param changeNoteId the ID of the change note for which to retrieve the associated Git repository
-     * @return the Git repository associated with the specified change note ID, or null if no repository is associated
+     * @param changeNoteId the ID of the change note for which to retrieve the repository path
+     * @return the local path of the associated Git repository, or null if no repository is associated
      */
-    public GitRepository getGitRepositoryForChangeNote(long changeNoteId) {
-      return gitRepositoryRepository.findByChangeNoteId(changeNoteId);
+    @Tool(name = "getRepositoryPathForChangeNote", description = "Get the local path of the Git repository associated with a change note ID. Pass this path to the diff, commit-message, file, and changed-files tools.")
+    public String getRepositoryPathForChangeNote(long changeNoteId) {
+      GitRepository gitRepository = gitRepositoryRepository.findByChangeNoteId(changeNoteId);
+      return gitRepository == null ? null : gitRepository.getLocalPath();
     }
 
 
