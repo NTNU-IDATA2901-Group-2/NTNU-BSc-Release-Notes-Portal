@@ -103,7 +103,7 @@ public class ChangeNoteGitInspectionService {
       List<DiffEntry> diffs = diffFormatter.scan(oldCommit.getTree(), newCommit.getTree());
       for (DiffEntry diff : diffs) {
         if (diff.getNewPath().startsWith(changeNoteDirectory)
-            || filePath != null && !diff.getNewPath().equals(filePath)) {
+            || (filePath != null && !diff.getNewPath().equals(filePath))) {
           continue;
         }
         diffFormatter.format(diff);
