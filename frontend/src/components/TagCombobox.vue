@@ -61,7 +61,7 @@ useInfiniteScroll(
     if (props.mode === 'releaseNote') await fetchNextPage()
   },
   {
-    distance: 80,
+    distance: 200,
     canLoadMore: () =>
       props.mode === 'releaseNote' && hasNextPage.value && !isFetchingNextPage.value,
   }

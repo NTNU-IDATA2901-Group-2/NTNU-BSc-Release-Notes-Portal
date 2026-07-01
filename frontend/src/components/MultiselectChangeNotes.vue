@@ -8,11 +8,12 @@ import {
   ListboxRoot,
   useFilter,
 } from 'reka-ui'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue'
+import { unrefElement, useInfiniteScroll } from '@vueuse/core'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { TagsInput, TagsInputInput, TagsInputItem, TagsInputItemDelete } from '@/components/ui/tags-input'
-import { useGetChangeNotes } from '@/api/change-note-api'
+import { useGetChangeNotes, useGetChangeNotesInfinite } from '@/api/change-note-api'
 import { useI18n } from 'vue-i18n'
 import { getLabelFromChangeNote } from '@/utils/change-note'
 
@@ -23,10 +24,27 @@ const model = defineModel<number[]>({ required: true })
 const params = computed(() => { return { filteredIds : model.value.join(',') } })
 const { data: selectedChangeNotes } = useGetChangeNotes(params)
 
-const { data: availableChangeNotes } = useGetChangeNotes()
+const {
+  data: availableChangeNotes,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
+} = useGetChangeNotesInfinite()
 
 const changeNoteOptions = computed(() =>
-  (availableChangeNotes.value?.content ?? []).map((cn) => ({ value: cn.id, label: getLabelFromChangeNote(cn) }))
+  (availableChangeNotes.value?.pages.flatMap((page) => page.content) ?? [])
+    .map((cn) => ({ value: cn.id, label: getLabelFromChangeNote(cn) }))
+)
+
+const listboxContentRef = useTemplateRef('listboxContent')
+
+useInfiniteScroll(
+  () => unrefElement(listboxContentRef),
+  async () => { await fetchNextPage() },
+  {
+    distance: 200,
+    canLoadMore: () => hasNextPage.value && !isFetchingNextPage.value,
+  }
 )
 
 
@@ -104,6 +122,7 @@ onUnmounted(() => {
         @open-auto-focus.prevent
       >
         <ListboxContent
+          ref="listboxContent"
           class="max-h-75 scroll-py-1 overflow-x-hidden overflow-y-auto empty:after:content-['No_options'] empty:p-1 empty:after:block"
           tabindex="0"
         >

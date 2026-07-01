@@ -1,7 +1,7 @@
 import type { ChangeNote, OnMutationApiCallFinished, PaginatedResponse, PersistChangeNoteDTO } from "@/utils/types";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import api from "./api";
-import { unref, type MaybeRef, type Ref } from "vue";
+import { toValue, unref, type MaybeRef, type MaybeRefOrGetter, type Ref } from "vue";
 
 
 /**
@@ -254,6 +254,30 @@ const getChangeNotes = async (params?: URLSearchParams): Promise<PaginatedRespon
   const response = await api.get(`changenotes`, { params });
   return response.data as PaginatedResponse<ChangeNote[]>;
 }
+
+const CHANGE_NOTES_PAGE_SIZE = 20;
+
+/**
+ * Custom hook for retrieving change notes as an infinite, paginated list.
+ * Successive pages are fetched on demand using the backend's page/size pagination.
+ *
+ * @param searchParams Optional search parameters to filter the change notes.
+ * @returns An infinite query resolving to pages of change note data.
+ */
+export const useGetChangeNotesInfinite = (searchParams?: MaybeRefOrGetter<Record<string, string>>) => useInfiniteQuery({
+  queryKey: ['changeNotesInfinite', searchParams],
+  queryFn: ({ pageParam }) => {
+    const params = new URLSearchParams(toValue(searchParams));
+    params.set('page', String(pageParam));
+    params.set('size', String(CHANGE_NOTES_PAGE_SIZE));
+    return getChangeNotes(params);
+  },
+  initialPageParam: 0,
+  getNextPageParam: (lastPage, allPages, lastPageParam) => {
+    const loaded = allPages.reduce((total, page) => total + page.content.length, 0);
+    return loaded < lastPage.totalItems ? lastPageParam + 1 : undefined;
+  },
+});
 
 /**
  * Checks if a list of change notes has any associated Git commits.
