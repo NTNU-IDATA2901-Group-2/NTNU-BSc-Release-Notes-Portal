@@ -201,7 +201,10 @@
         "noKnownLimitations": "Aucune limitation connue",
         "filterByCustomer": "Filtrer par client",
         "noResults": "Aucun résultat",
-        "noChangeImpacts": "Aucun changement"
+        "noChangeImpacts": "Aucun changement",
+        "select": "Sélectionner…",
+        "search": "Rechercher…",
+        "unnamed": "Sans nom"
     },
     "repositories": {
         "title": "Dépôts Git",

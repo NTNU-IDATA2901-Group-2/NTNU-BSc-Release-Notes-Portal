@@ -202,7 +202,10 @@
         "noKnownLimitations": "Ingen kjente begrensninger",
         "filterByCustomer": "Filtrer etter kunde",
         "noResults": "Ingen resultater",
-        "noChangeImpacts": "Ingen endringer"
+        "noChangeImpacts": "Ingen endringer",
+        "select": "Velg…",
+        "search": "Søk…",
+        "unnamed": "Uten navn"
     },
     "repositories": {
         "title": "Git Repositorier",

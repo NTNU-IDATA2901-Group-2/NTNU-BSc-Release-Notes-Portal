@@ -1,5 +1,5 @@
 import type { OnMutationApiCallFinished, PaginatedResponse, PersistReleaseNoteDTO, ReleaseNote } from "@/utils/types"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import api from "./api";
 import { toValue, type MaybeRefOrGetter } from "vue";
 
@@ -87,6 +87,24 @@ export const useGetReleaseNotes = (searchParams?: MaybeRefOrGetter<Record<string
   queryKey: ['releaseNotes', searchParams],
   queryFn: () => getReleaseNotes(new URLSearchParams(toValue(searchParams)))
 });
+
+const RELEASE_NOTES_PAGE_SIZE = 20;
+
+export const useGetReleaseNotesInfinite = (searchParams?: MaybeRefOrGetter<Record<string, string>>) => useInfiniteQuery({
+  queryKey: ['releaseNotesInfinite', searchParams],
+  queryFn: ({ pageParam }) => {
+    const params = new URLSearchParams(toValue(searchParams));
+    params.set('page', String(pageParam));
+    params.set('size', String(RELEASE_NOTES_PAGE_SIZE));
+    return getReleaseNotes(params);
+  },
+  initialPageParam: 0,
+  getNextPageParam: (lastPage, allPages, lastPageParam) => {
+    const loaded = allPages.reduce((total, page) => total + page.content.length, 0);
+    return loaded < lastPage.totalItems ? lastPageParam + 1 : undefined;
+  },
+})
+
 
 /**
  * Retrieves the release notes that are new since the earlier of the two given

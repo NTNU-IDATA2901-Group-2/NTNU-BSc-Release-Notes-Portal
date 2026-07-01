@@ -201,7 +201,10 @@
         "noKnownLimitations": "No known limitations",
         "filterByCustomer": "Filter by customer",
         "noResults": "No results",
-        "noChangeImpacts": "No change impacts"
+        "noChangeImpacts": "No change impacts",
+        "select": "Select…",
+        "search": "Search…",
+        "unnamed": "Unnamed"
     },
     "repositories": {
         "title": "Git Repositories",
