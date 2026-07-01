@@ -264,16 +264,18 @@ function renderNoteSection(label: string, body: string): Content {
 }
 
 /**
- * Renders the change-details section: its `sectionTitle` heading followed by
- * the change notes grouped by feature, one sub-heading per feature in
- * first-seen order, with featureless notes collected under "Other" at the end.
- * Each note leads with its reference — and its linked Jira service request when
- * one exists — and title, then the markdown description. The technical variant
- * additionally appends each note's developer notes and upgrade requirements.
- * The section heading is owned here (rather than emitted by the caller) so it
- * can be glued to the first feature group and never stranded above a page break.
+ * Renders the change-details section: an optional `sectionTitle` heading
+ * followed by the change notes grouped by feature, one sub-heading per feature
+ * in first-seen order, with featureless notes collected under "Other" at the
+ * end. Each note leads with its reference — and its linked Jira service request
+ * when one exists — and title, then the markdown description. The technical
+ * variant additionally appends each note's developer notes and upgrade
+ * requirements. When `sectionTitle` is omitted no section heading is rendered
+ * (the diff export flattens its releases into a single headingless list); when
+ * present it is owned here (rather than emitted by the caller) so it can be
+ * glued to the first feature group and never stranded above a page break.
  */
-function renderFeatureDetails(changeNotes: ChangeNote[], sectionTitle: string, serviceRequestKeys: Record<string, string>, variant: PdfVariant): Content[] {
+function renderFeatureDetails(changeNotes: ChangeNote[], sectionTitle: string | undefined, serviceRequestKeys: Record<string, string>, variant: PdfVariant): Content[] {
   const groups: { name: string; notes: ChangeNote[] }[] = [];
   const groupsByFeatureId = new Map<number, { name: string; notes: ChangeNote[] }>();
   const featurelessNotes: ChangeNote[] = [];
@@ -297,7 +299,7 @@ function renderFeatureDetails(changeNotes: ChangeNote[], sectionTitle: string, s
 
   if (groups.length === 0) {
     return [
-      sectionHeading(sectionTitle),
+      ...(sectionTitle ? [sectionHeading(sectionTitle)] : []),
       { text: t('placeholder.noChangeNotesAdded'), italics: true, color: '#666666', margin: [0, 0, 0, 16] },
     ];
   }
@@ -340,7 +342,7 @@ function renderFeatureDetails(changeNotes: ChangeNote[], sectionTitle: string, s
   return groups.flatMap((group, index) => {
     const notes = group.notes.map(renderNote);
     const block: Content[] = [{ text: group.name, style: 'featureHeading' }, notes[0]!];
-    if (index === 0) block.unshift(sectionHeading(sectionTitle));
+    if (index === 0 && sectionTitle) block.unshift(sectionHeading(sectionTitle));
     return [
       { stack: block, unbreakable: true },
       ...notes.slice(1),
@@ -489,13 +491,14 @@ export async function exportToPdf(
 
 /**
  * Exports a diff of several release notes to downloaded PDF files, one per
- * requested `variant`, titled "Changes {product}: {fromTag}-{toTag}": one
- * section per release note, headed by its tag and listing its change notes
- * grouped by feature. Like the single-release export, the customer variant omits
- * developer and upgrade notes while the technical variant appends them and marks
- * its title and file name with `TECHNICAL_SUFFIX`. The change notes are supplied
- * already filtered; `serviceRequestKeys` links references to their Jira service
- * requests when provided.
+ * requested `variant`, titled "Changes {product}: {fromTag}-{toTag}". The change
+ * notes from every release are flattened, in the given order, into a single
+ * feature-grouped list with no per-release headings. Like the single-release
+ * export, the customer variant omits developer and upgrade notes while the
+ * technical variant appends them and marks its title and file name with
+ * `TECHNICAL_SUFFIX`. The change notes are supplied already filtered;
+ * `serviceRequestKeys` links references to their Jira service requests when
+ * provided.
  *
  * @param fromTag the tag of the older release the diff starts after (excluded).
  * @param toTag   the tag of the most recent release in the diff (included).
@@ -510,14 +513,19 @@ export async function exportDiffToPdf(
   const productName = diff[0]?.releaseNote.product?.name;
   const baseTitle = t('pdf.diffTitle', { product: productName ?? '', fromTag, toTag });
 
+  // Flatten every release's change notes into one list, de-duplicating notes
+  // shared across releases while keeping first-seen order.
+  const changeNotes = [
+    ...new Map(diff.flatMap(({ changeNotes }) => changeNotes).map((note) => [note.id, note])).values(),
+  ];
+
   for (const variant of variants) {
     const title = variant === 'technical' ? `${baseTitle}${TECHNICAL_SUFFIX}` : baseTitle;
 
     const content: Content[] = [
       { svg: blackLogo, width: 160, margin: [0, 0, 0, 24], alignment: 'right' },
       { columns: [{ text: title, style: 'tag' }, generatedLine()] },
-      ...diff.flatMap(({ releaseNote, changeNotes }) =>
-        renderFeatureDetails(changeNotes, releaseNote.tag || t('pdf.noTitle'), serviceRequestKeys, variant)),
+      ...renderFeatureDetails(changeNotes, undefined, serviceRequestKeys, variant),
     ];
 
     downloadDocument(title, content, `${title}.pdf`);
