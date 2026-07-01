@@ -9,7 +9,8 @@ import Button from '@/components/ui/button/Button.vue';
 import ChangeNoteList from '@/components/changeNote/ChangeNoteList.vue';
 import ChangeNoteListFilters from '@/components/changeNote/ChangeNoteListFilters.vue';
 import { uniqueCustomers } from '@/utils/change-note';
-import { exportDiffToPdf } from '@/utils/pdf';
+import { exportDiffToPdf, type PdfVariant } from '@/utils/pdf';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useDiffReleaseNotes, useGetReleaseNotes } from '@/api/release-note-api';
 import { useGetJiraServiceRequestKeys } from '@/api/jira-api';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
@@ -44,7 +45,7 @@ const searchParams = computed(() =>
 
 const { data: productReleaseNotes } = useGetReleaseNotes(computed(() => searchParams.value ?? {}))
 
-const { mutate: diff, data: diffedReleaseNotes, reset } = useDiffReleaseNotes()
+const { mutate: diff, data: diffedReleaseNotes, reset, isPending: diffPending} = useDiffReleaseNotes()
 
 const { mutateAsync: fetchServiceRequestKeys, isPending: isFetchingServiceRequests } = useGetJiraServiceRequestKeys()
 
@@ -71,7 +72,7 @@ const setChangeNoteListRef = (id: number) => {
   return setter;
 };
 
-const handleExport = async () => {
+const handleExport = async (variants: PdfVariant[] = ['customer', 'technical']) => {
   const releaseNotes = diffedReleaseNotes.value;
   if (!releaseNotes?.length) return;
   const mostRecent = releaseNotes[0];
@@ -90,7 +91,7 @@ const handleExport = async () => {
         .filter(reference => reference && reference.length > 0),
     )];
     const serviceRequestKeys = await fetchServiceRequestKeys(references);
-    exportDiffToPdf(diff, fromTag, mostRecent.tag, serviceRequestKeys);
+    exportDiffToPdf(diff, fromTag, mostRecent.tag, serviceRequestKeys, variants);
   } catch (error) {
     console.error('Error exporting diff to PDF:', error);
     toast.error(t('toast.exportPdfError'));
@@ -127,8 +128,9 @@ const onSubmit = handleSubmit((values) => {
         <h2 class="text-lg">{{ t('diffReleaseNotes.releaseNoteTwo') }}</h2>
         <TagCombobox mode="releaseNote" v-model="releaseNoteTwoId" :search-params="searchParams" :disabled="noProductSelected" />
       </div>
-      <Button type="submit" class="mt-auto" variant="solidaccent" :disabled="!canDiff">
+      <Button type="submit" class="mt-auto" variant="outline" :disabled="!canDiff">
         {{ t('diffReleaseNotes.diff') }}
+        <Spinner v-if="diffPending" class="size-4 my-0" />
       </Button>
     </form>
 
@@ -136,10 +138,26 @@ const onSubmit = handleSubmit((values) => {
       v-if="diffedReleaseNotes && diffedReleaseNotes.length"
       class="mt-16 flex flex-col gap-16 w-full max-w-4xl px-4">
       <div class="flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <Button variant="outline" :disabled="isFetchingServiceRequests" @click="handleExport">
-          <Spinner v-if="isFetchingServiceRequests" class="h-4 dark:text-text-primary" />
-          <FileDown v-else /> {{ t('button.export') }}
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger as-child>
+            <Button variant="solidaccent" :disabled="isFetchingServiceRequests">
+              {{ t('button.export') }}
+              <Spinner v-if="isFetchingServiceRequests" class="size-4 my-0" />
+              <FileDown v-else /> 
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem @click="handleExport()">
+              <p class="text-text-primary">{{ t('button.exportBoth') }}</p>
+            </DropdownMenuItem>
+            <DropdownMenuItem @click="handleExport(['customer'])">
+              <p class="text-text-primary">{{ t('button.exportCustomer') }}</p>
+            </DropdownMenuItem>
+            <DropdownMenuItem @click="handleExport(['technical'])">
+              <p class="text-text-primary">{{ t('button.exportTechnical') }}</p>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <ChangeNoteListFilters
           v-model:general-changes-checked="generalChangesChecked"
           v-model:draft-changes-checked="draftChangesChecked"
