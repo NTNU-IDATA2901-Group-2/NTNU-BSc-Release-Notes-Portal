@@ -237,9 +237,13 @@ const getChangeNote = async (id: string): Promise<ChangeNote> => {
  * @param params Optional URL search parameters to filter the change notes.
  * @returns An array of change note data that matches the provided search parameters.
  */
-export const useGetChangeNotes = (searchParams?: Ref<Record<string, string>> | URLSearchParams) => useQuery<PaginatedResponse<ChangeNote[]>>({
+export const useGetChangeNotes = (
+  searchParams?: Ref<Record<string, string>> | URLSearchParams,
+  enabled?: MaybeRefOrGetter<boolean>,
+) => useQuery<PaginatedResponse<ChangeNote[]>>({
   queryKey: ['changeNotes', searchParams],
   queryFn: () => getChangeNotes(new URLSearchParams(searchParams instanceof URLSearchParams ? searchParams : searchParams?.value)),
+  enabled,
 });
 
 
@@ -265,7 +269,7 @@ const CHANGE_NOTES_PAGE_SIZE = 20;
  * @returns An infinite query resolving to pages of change note data.
  */
 export const useGetChangeNotesInfinite = (searchParams?: MaybeRefOrGetter<Record<string, string>>) => useInfiniteQuery({
-  queryKey: ['changeNotesInfinite', searchParams],
+  queryKey: ['changeNotes', 'infinite', searchParams],
   queryFn: ({ pageParam }) => {
     const params = new URLSearchParams(toValue(searchParams));
     params.set('page', String(pageParam));

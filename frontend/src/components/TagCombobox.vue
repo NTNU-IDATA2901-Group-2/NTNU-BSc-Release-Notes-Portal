@@ -6,9 +6,9 @@ import { useGetReleaseNotesInfinite } from '@/api/release-note-api';
 import { useGetScopes } from '@/api/scopes-api';
 import type { Tag } from '@/utils/types';
 import { Button } from './ui/button';
-import type { PrimitiveProps } from 'reka-ui';
+import { ListboxFilter, type PrimitiveProps } from 'reka-ui';
 import { computed, ref, useTemplateRef } from 'vue';
-import { unrefElement, useInfiniteScroll } from '@vueuse/core';
+import { refDebounced, unrefElement, useInfiniteScroll } from '@vueuse/core';
 import { useI18n } from 'vue-i18n';
 import {
   Command,
@@ -24,7 +24,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { cn } from '@/utils/utils';
-import { ChevronsUpDownIcon } from 'lucide-vue-next';
+import { CheckIcon, ChevronsUpDownIcon, Search } from 'lucide-vue-next';
 
 const props = defineProps<PrimitiveProps & {
   mode: SelectMode,
@@ -48,7 +48,12 @@ const hookMap = {
   releaseNote: useGetReleaseNotesInfinite
 } as const
 
-const searchParams = computed(() => props.searchParams ?? {})
+const searchTerm = ref('')
+const debouncedSearch = refDebounced(searchTerm, 300)
+const searchParams = computed(() => ({
+  ...(props.searchParams ?? {}),
+  ...(props.mode === 'releaseNote' ? { query: debouncedSearch.value } : {}),
+}))
 
 const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
   hookMap[props.mode](searchParams) as ReturnType<typeof useGetReleaseNotesInfinite>
@@ -102,7 +107,20 @@ const open = ref(false);
     </PopoverTrigger>
     <PopoverContent class="w-[200px] p-0">
       <Command>
-        <CommandInput :placeholder="t('placeholder.search')" />
+        <div
+          v-if="props.mode === 'releaseNote'"
+          data-slot="command-input-wrapper"
+          class="flex h-9 items-center gap-2 border-b px-3"
+        >
+          <Search class="size-4 shrink-0 opacity-50 text-text-primary" />
+          <ListboxFilter
+            v-model="searchTerm"
+            auto-focus
+            :placeholder="t('placeholder.search')"
+            class="placeholder:text-text-primary/50 text-text-primary flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
+          />
+        </div>
+        <CommandInput v-else :placeholder="t('placeholder.search')" />
         <CommandList ref="commandList">
           <CommandEmpty>{{ t('placeholder.noResults') }}</CommandEmpty>
           <CommandGroup>
