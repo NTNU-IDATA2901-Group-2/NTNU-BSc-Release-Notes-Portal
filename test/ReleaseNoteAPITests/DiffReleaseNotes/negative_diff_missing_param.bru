@@ -1,17 +1,17 @@
 meta {
-  name: negative_compare_missing_param
+  name: negative_diff_missing_param
   type: http
   seq: 8
 }
 
 get {
-  url: {{baseurl}}/releasenotes/compare?releaseNoteOneId={{compare_rn_old}}
+  url: {{baseurl}}/releasenotes/diff?releaseNoteOneId={{diff_rn_old}}
   body: none
   auth: inherit
 }
 
 params:query {
-  releaseNoteOneId: {{compare_rn_old}}
+  releaseNoteOneId: {{diff_rn_old}}
 }
 
 headers {

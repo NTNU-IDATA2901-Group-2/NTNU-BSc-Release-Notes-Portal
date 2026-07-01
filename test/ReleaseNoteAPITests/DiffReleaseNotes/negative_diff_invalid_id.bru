@@ -1,17 +1,17 @@
 meta {
-  name: negative_compare_invalid_id
+  name: negative_diff_invalid_id
   type: http
   seq: 11
 }
 
 get {
-  url: {{baseurl}}/releasenotes/compare?releaseNoteOneId={{compare_rn_old}}&releaseNoteTwoId=-99999
+  url: {{baseurl}}/releasenotes/diff?releaseNoteOneId={{diff_rn_old}}&releaseNoteTwoId=-99999
   body: none
   auth: inherit
 }
 
 params:query {
-  releaseNoteOneId: {{compare_rn_old}}
+  releaseNoteOneId: {{diff_rn_old}}
   releaseNoteTwoId: -99999
 }
 

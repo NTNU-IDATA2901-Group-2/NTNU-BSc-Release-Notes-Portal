@@ -3,7 +3,7 @@ package no.reliablesolutions.release_notes_portal.exception;
 import lombok.Getter;
 
 /**
- * Exception thrown when two release notes that are being compared do not belong
+ * Exception thrown when two release notes that are being diffed do not belong
  * to the same product.
  */
 @Getter

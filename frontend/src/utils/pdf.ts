@@ -441,7 +441,7 @@ export async function exportToPdf(releaseNote: ReleaseNote, changeNotes: ChangeN
 }
 
 /**
- * Exports a comparison of several release notes to a downloaded PDF, titled
+ * Exports a diff of several release notes to a downloaded PDF, titled
  * "Changes {product}: {fromTag}-{toTag}": one section per
  * release note, headed by its tag and listing its change notes grouped by
  * feature. Like the single-release export it is customer-facing and omits
@@ -449,22 +449,22 @@ export async function exportToPdf(releaseNote: ReleaseNote, changeNotes: ChangeN
  * `serviceRequestKeys` links references to their Jira service requests when
  * provided.
  *
- * @param fromTag the tag of the older release the comparison starts after (excluded).
- * @param toTag   the tag of the most recent release in the comparison (included).
+ * @param fromTag the tag of the older release the diff starts after (excluded).
+ * @param toTag   the tag of the most recent release in the diff (included).
  */
-export async function exportComparisonToPdf(
-  comparison: { releaseNote: ReleaseNote; changeNotes: ChangeNote[] }[],
+export async function exportDiffToPdf(
+  diff: { releaseNote: ReleaseNote; changeNotes: ChangeNote[] }[],
   fromTag: string,
   toTag: string,
   serviceRequestKeys: Record<string, string> = {},
 ) {
-  const productName = comparison[0]?.releaseNote.product?.name;
-  const title = t('pdf.comparisonTitle', { product: productName ?? '', fromTag, toTag });
+  const productName = diff[0]?.releaseNote.product?.name;
+  const title = t('pdf.diffTitle', { product: productName ?? '', fromTag, toTag });
 
   const content: Content[] = [
     { svg: blackLogo, width: 160, margin: [0, 0, 0, 24], alignment: 'right' },
     { columns: [{ text: title, style: 'tag' }, generatedLine()] },
-    ...comparison.flatMap(({ releaseNote, changeNotes }) =>
+    ...diff.flatMap(({ releaseNote, changeNotes }) =>
       renderFeatureDetails(changeNotes, releaseNote.tag || t('pdf.noTitle'), serviceRequestKeys)),
   ];
 

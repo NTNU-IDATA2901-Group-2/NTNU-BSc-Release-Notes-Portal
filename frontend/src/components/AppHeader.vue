@@ -60,7 +60,7 @@ const handleLogoClick = () => {
 	    <nav class="hidden md:flex flex-row gap-12">
 		<RouterLink v-if="isAuthenticated" class="text-md text-text-dark-static hover:underline" :to="routeNames.releaseNotes">{{ t('header.releaseNotesLink') }}</RouterLink>
 		<RouterLink v-if="isAuthenticated" class="text-md text-text-dark-static hover:underline" :to="routeNames.changeNotes">{{ t('header.changeNotesLink') }}</RouterLink>
-		<RouterLink v-if="isAuthenticated" class="text-md text-text-dark-static hover:underline" :to="routeNames.compareReleases">{{ t('header.compareReleasesLink') }}</RouterLink>
+		<RouterLink v-if="isAuthenticated" class="text-md text-text-dark-static hover:underline" :to="routeNames.diffReleases">{{ t('header.diffReleasesLink') }}</RouterLink>
 	    </nav>
 		<Menubar v-if="isAuthenticated" class="ml-auto">
 			<MenubarMenu>
