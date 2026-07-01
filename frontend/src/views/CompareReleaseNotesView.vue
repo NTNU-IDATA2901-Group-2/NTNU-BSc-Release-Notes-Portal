@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import TagSelect from '@/components/TagSelect.vue';
+import TagCombobox from '@/components/TagCombobox.vue';
 import { computed, ref, watch, type ComponentPublicInstance } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useForm } from 'vee-validate';
@@ -117,15 +117,15 @@ const onSubmit = handleSubmit((values) => {
     <form class="flex flex-row gap-8" @submit="onSubmit">
       <div class="flex flex-col gap-2">
         <h2 class="text-lg">{{ t('compareReleaseNotes.product') }}</h2>
-        <TagSelect mode="product" v-model="productId" />
+        <TagCombobox mode="product" v-model="productId" />
       </div>
       <div class="flex flex-col gap-2">
         <h2 class="text-lg">{{ t('compareReleaseNotes.releaseNoteOne') }}</h2>
-        <TagSelect mode="releaseNote" v-model="releaseNoteOneId" :search-params="searchParams" :disabled="noProductSelected" />
+        <TagCombobox mode="releaseNote" v-model="releaseNoteOneId" :search-params="searchParams" :disabled="noProductSelected" />
       </div>
       <div class="flex flex-col gap-2">
         <h2 class="text-lg">{{ t('compareReleaseNotes.releaseNoteTwo') }}</h2>
-        <TagSelect mode="releaseNote" v-model="releaseNoteTwoId" :search-params="searchParams" :disabled="noProductSelected" />
+        <TagCombobox mode="releaseNote" v-model="releaseNoteTwoId" :search-params="searchParams" :disabled="noProductSelected" />
       </div>
       <Button type="submit" class="mt-auto" variant="solidaccent" :disabled="!canCompare">
         {{ t('compareReleaseNotes.compare') }}
