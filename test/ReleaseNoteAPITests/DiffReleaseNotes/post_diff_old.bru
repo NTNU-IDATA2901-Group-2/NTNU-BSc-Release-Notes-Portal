@@ -1,7 +1,7 @@
 meta {
-  name: post_compare_mid
+  name: post_diff_old
   type: http
-  seq: 2
+  seq: 1
 }
 
 post {
@@ -16,8 +16,8 @@ headers {
 
 body:json {
   {
-    "tag": "compare-v1.1.0",
-    "summary": "Middle release in the comparison range",
+    "tag": "diff-v1.0.0",
+    "summary": "Oldest release in the diff range",
     "published": true,
     "productId": 1
   }
@@ -28,5 +28,6 @@ assert {
 }
 
 script:post-response {
-  bru.setEnvVar("compare_rn_mid", res.body)
+  // Created first, so this is the oldest note and the excluded "from" of the range.
+  bru.setEnvVar("diff_rn_old", res.body)
 }

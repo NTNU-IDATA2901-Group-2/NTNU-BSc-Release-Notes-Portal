@@ -1,0 +1,32 @@
+meta {
+  name: post_diff_mid
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseurl}}/releasenotes
+  body: json
+  auth: none
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "tag": "diff-v1.1.0",
+    "summary": "Middle release in the diff range",
+    "published": true,
+    "productId": 1
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+script:post-response {
+  bru.setEnvVar("diff_rn_mid", res.body)
+}

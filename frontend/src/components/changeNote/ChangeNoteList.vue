@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { isAdmin } from '@/utils/keycloak';
 import { routeNames } from '@/utils/router';
@@ -10,7 +10,7 @@ import type { ChangeNote } from '@/utils/types';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
-import { Check, Copy } from 'lucide-vue-next';
+import { Check, Copy, Eye, EyeOff } from 'lucide-vue-next';
 
 const props = defineProps<{
   changeNotes: ChangeNote[];
@@ -20,6 +20,16 @@ const props = defineProps<{
   translatedChangeNotes?: ChangeNote[] | null;
   hasTranslation?: boolean;
 }>();
+
+const deselectedIds = ref(new Set<number>());
+
+const toggleSelected = (id: number) => {
+  if (deselectedIds.value.has(id)) {
+    deselectedIds.value.delete(id);
+  } else {
+    deselectedIds.value.add(id);
+  }
+};
 
 const { t } = useI18n();
 const { copiedKey, copy } = useCopyToClipboard();
@@ -40,7 +50,10 @@ const shouldShowChangeNote = (change: ChangeNote) => {
 const filteredChangeNotes = computed(() =>
   (props.translatedChangeNotes ?? props.changeNotes).filter(shouldShowChangeNote));
 
-defineExpose({ filteredChangeNotes });
+const selectedChangeNotes = computed(() =>
+  filteredChangeNotes.value.filter(change => !deselectedIds.value.has(change.id)));
+
+defineExpose({ selectedChangeNotes });
 </script>
 
 <template>
@@ -48,7 +61,9 @@ defineExpose({ filteredChangeNotes });
     <p class="text-text-primary/50" v-if="changeNotes.length === 0">{{
       t('placeholder.noChangeNotesAdded')
       }}</p>
-    <div v-for="change in filteredChangeNotes" :key="change.id" class="flex flex-col gap-2">
+    <div
+v-for="change in filteredChangeNotes" :key="change.id" class="flex flex-col gap-2"
+      :class="deselectedIds.has(change.id) ? 'opacity-50' : ''">
       <div class="flex items-center gap-4">
         <RouterLink
 class="text-2xl dark:text-text-dark-static text-text-light-static hover:underline"
@@ -74,6 +89,17 @@ class="h-6 hover:cursor-pointer hover:underline" variant="outline"
           </TooltipTrigger>
           <TooltipContent>
             {{ t('tooltip.reference') }}
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button variant="outline" size="icon-sm" class="ml-auto" @click="toggleSelected(change.id)">
+              <component :is="deselectedIds.has(change.id) ? EyeOff : Eye" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            {{ deselectedIds.has(change.id) ? t('tooltip.includeInExport') : t('tooltip.excludeFromExport') }}
           </TooltipContent>
         </Tooltip>
 

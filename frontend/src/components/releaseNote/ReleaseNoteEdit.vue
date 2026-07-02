@@ -27,7 +27,7 @@ import { useGetGitRepositories } from '@/api/git-repository-api';
 import Spinner from '../ui/spinner/Spinner.vue';
 import DatePicker from '../DatePicker.vue';
 import ChangeImpactTable from '../ChangeImpactTable.vue';
-import TagSelect from '../TagSelect.vue';
+import TagCombobox from '../TagCombobox.vue';
 
 const { t } = useI18n();
 
@@ -317,7 +317,7 @@ const changeImpacts = ref<ChangeImpact[]>([...(releaseNote.changeImpacts ?? [])]
           </div>
           <div class="flex flex-col gap-1">
             <h1 class="text-lg">{{ t('title.product') }}</h1>
-            <TagSelect mode="product" v-model="productId" />
+            <TagCombobox mode="product" v-model="productId" />
           </div>
           <div class="flex flex-col gap-1">
             <h1 class="text-lg">{{ t('title.releaseTimeline') }}</h1>

@@ -1,5 +1,5 @@
 meta {
-  name: post_compare_other_product
+  name: post_diff_other_product
   type: http
   seq: 4
 }
@@ -16,7 +16,7 @@ headers {
 
 body:json {
   {
-    "tag": "compare-other-v1.0.0",
+    "tag": "diff-other-v1.0.0",
     "summary": "Release note belonging to a different product",
     "published": true,
     "productId": 2
@@ -28,5 +28,5 @@ assert {
 }
 
 script:post-response {
-  bru.setEnvVar("compare_rn_other_product", res.body)
+  bru.setEnvVar("diff_rn_other_product", res.body)
 }

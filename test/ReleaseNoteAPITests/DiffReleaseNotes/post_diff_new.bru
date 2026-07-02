@@ -1,5 +1,5 @@
 meta {
-  name: post_compare_new
+  name: post_diff_new
   type: http
   seq: 3
 }
@@ -16,8 +16,8 @@ headers {
 
 body:json {
   {
-    "tag": "compare-v2.0.0",
-    "summary": "Newest release in the comparison range",
+    "tag": "diff-v2.0.0",
+    "summary": "Newest release in the diff range",
     "published": true,
     "productId": 1
   }
@@ -29,5 +29,5 @@ assert {
 
 script:post-response {
   // Created last, so this is the most recent note and the included "to" of the range.
-  bru.setEnvVar("compare_rn_new", res.body)
+  bru.setEnvVar("diff_rn_new", res.body)
 }

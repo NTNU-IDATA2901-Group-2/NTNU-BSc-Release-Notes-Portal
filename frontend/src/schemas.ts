@@ -57,7 +57,7 @@ export const UpdatePromptsSchema = z.object({
   }))
 })
 
-export const CompareReleaseNotesSchema = z.object({
+export const DiffReleaseNotesSchema = z.object({
   productId: z.number(),
   releaseNoteOneId: z.number(),
   releaseNoteTwoId: z.number(),

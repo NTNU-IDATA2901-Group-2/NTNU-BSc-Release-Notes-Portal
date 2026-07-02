@@ -85,13 +85,13 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * Handles the case where two release notes being compared belong to different products. Logs the event and returns a 400 response with a message.
+   * Handles the case where two release notes being diffed belong to different products. Logs the event and returns a 400 response with a message.
    * @param e the exception containing the IDs of the mismatched release notes
    * @return a ResponseEntity with a 400 status and a message indicating the release notes do not share a product
    */
   @ExceptionHandler(value = {MismatchedProductException.class})
   public ResponseEntity<String> handleMismatchedProductException(MismatchedProductException e) {
-    logger.warn("Mismatched product when comparing release notes: {}", e.getMessage());
+    logger.warn("Mismatched product when diffing release notes: {}", e.getMessage());
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
   }
 

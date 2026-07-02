@@ -1,11 +1,11 @@
 meta {
-  name: patch_archive_other_product
+  name: patch_archive_old
   type: http
-  seq: 15
+  seq: 12
 }
 
 patch {
-  url: {{baseurl}}/releasenotes/{{compare_rn_other_product}}/archive
+  url: {{baseurl}}/releasenotes/{{diff_rn_old}}/archive
   body: json
   auth: none
 }

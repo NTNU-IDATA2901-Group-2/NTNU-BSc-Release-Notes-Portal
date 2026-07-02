@@ -215,8 +215,8 @@ public class ReleaseNoteService {
    * release notes: all non-archived release notes of their shared product
    * created after the earlier note, up to and including the later note.
    *
-   * @param releaseNoteOneId the ID of one release note to compare
-   * @param releaseNoteTwoId the ID of the other release note to compare
+   * @param releaseNoteOneId the ID of one release note to diff
+   * @param releaseNoteTwoId the ID of the other release note to diff
    * @return the release notes in the range, ordered by creation time descending
    * @throws IllegalArgumentException     if either ID is {@code null}
    * @throws ReleaseNoteNotFoundException if either release note does not exist or

@@ -6,13 +6,13 @@ import {
   ListboxItem,
   ListboxItemIndicator,
   ListboxRoot,
-  useFilter,
 } from 'reka-ui'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, reactive, ref, useTemplateRef, watch, watchEffect } from 'vue'
+import { refDebounced, unrefElement, useInfiniteScroll } from '@vueuse/core'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { TagsInput, TagsInputInput, TagsInputItem, TagsInputItemDelete } from '@/components/ui/tags-input'
-import { useGetChangeNotes } from '@/api/change-note-api'
+import { useGetChangeNotes, useGetChangeNotesInfinite } from '@/api/change-note-api'
 import { useI18n } from 'vue-i18n'
 import { getLabelFromChangeNote } from '@/utils/change-note'
 
@@ -20,65 +20,68 @@ const { t } = useI18n();
 
 const model = defineModel<number[]>({ required: true })
 
-const params = computed(() => { return { filteredIds : model.value.join(',') } })
-const { data: selectedChangeNotes } = useGetChangeNotes(params)
+const searchTerm = ref('')
+const debouncedSearch = refDebounced(searchTerm, 300)
+const searchParams = computed(() => ({ query: debouncedSearch.value }))
 
-const { data: availableChangeNotes } = useGetChangeNotes()
+const {
+  data: availableChangeNotes,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
+} = useGetChangeNotesInfinite(searchParams)
 
 const changeNoteOptions = computed(() =>
-  (availableChangeNotes.value?.content ?? []).map((cn) => ({ value: cn.id, label: getLabelFromChangeNote(cn) }))
+  (availableChangeNotes.value?.pages.flatMap((page) => page.content) ?? [])
+    .map((cn) => ({ value: cn.id, label: getLabelFromChangeNote(cn) }))
 )
 
+const initialFilter = ref({ filteredIds: model.value.join(',') })
+const { data: initialSelected } = useGetChangeNotes(initialFilter, model.value.length > 0)
 
-const searchTerm = ref('')
+const referenceById = reactive(new Map<number, string>())
+watchEffect(() => {
+  const notes = [
+    ...(availableChangeNotes.value?.pages.flatMap((page) => page.content) ?? []),
+    ...(initialSelected.value?.content ?? []),
+  ]
+  for (const cn of notes) referenceById.set(cn.id, cn.reference)
+})
+
+const selectedTags = computed(() =>
+  model.value.map((id) => ({ id, reference: referenceById.get(id) ?? '' }))
+)
+
 const open = ref(false)
-const { contains } = useFilter({ sensitivity: 'base' })
-
-const filteredChangenotes = computed(() =>
-  searchTerm.value === ''
-    ? changeNoteOptions.value
-    : changeNoteOptions.value.filter((option) => contains(option.label ?? '', searchTerm.value)),
-)
 
 watch(searchTerm, (value) => {
   if (value) open.value = true
 })
 
-// Resizing
-const anchorRef = ref()
-const width = ref(0)
-const contentWidth = computed(() => (width.value ? `${width.value}px` : 'auto'))
+const listboxContentRef = useTemplateRef('listboxContent')
 
-let resizeObserver: ResizeObserver
-
-onMounted(() => {
-  const el = anchorRef.value?.$el as HTMLElement
-  if (el) {
-    resizeObserver = new ResizeObserver(() => {
-      width.value = el.clientWidth
-    })
-    resizeObserver.observe(el)
-    width.value = el.clientWidth
+useInfiniteScroll(
+  () => unrefElement(listboxContentRef),
+  async () => { await fetchNextPage() },
+  {
+    distance: 200,
+    canLoadMore: () => hasNextPage.value && !isFetchingNextPage.value,
   }
-})
-
-onUnmounted(() => {
-  resizeObserver?.disconnect()
-})
+)
 </script>
 
 <template>
   <Popover v-model:open="open">
     <ListboxRoot v-model="model" highlight-on-hover multiple>
-      <PopoverAnchor ref="anchorRef" class="inline-flex w-full">
+      <PopoverAnchor class="inline-flex w-full">
         <TagsInput v-model="model" class="w-full" @click="open = true">
           <TagsInputItem
-            v-for="changeNote in selectedChangeNotes?.content"
-            :key="changeNote.id"
-            :value="changeNote.id"
+            v-for="tag in selectedTags"
+            :key="tag.id"
+            :value="tag.id"
             class="bg-border/20 dark:bg-border p-2"
           >
-            <span class="py-0.5 px-2 text-sm rounded bg-transparent">{{ changeNote.reference }}</span>
+            <span class="py-0.5 px-2 text-sm rounded bg-transparent">{{ tag.reference }}</span>
             <TagsInputItemDelete @click.stop class="cursor-pointer" />
           </TagsInputItem>
 
@@ -99,16 +102,16 @@ onUnmounted(() => {
       </PopoverAnchor>
 
       <PopoverContent
-        class="p-1 border border-border"
-        :style="`width: ${contentWidth} !important`"
+        class="w-[var(--reka-popper-anchor-width)] p-1 border border-border"
         @open-auto-focus.prevent
       >
         <ListboxContent
+          ref="listboxContent"
           class="max-h-75 scroll-py-1 overflow-x-hidden overflow-y-auto empty:after:content-['No_options'] empty:p-1 empty:after:block"
           tabindex="0"
         >
           <ListboxItem
-            v-for="item in filteredChangenotes"
+            v-for="item in changeNoteOptions"
             :key="item.value"
             :value="item.value"
             class="min-w-0 truncate text-text-primary data-highlighted:bg-border/25 [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"

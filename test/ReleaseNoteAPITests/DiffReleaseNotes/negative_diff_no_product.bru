@@ -1,0 +1,29 @@
+meta {
+  name: negative_diff_no_product
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseurl}}/releasenotes/diff?releaseNoteOneId={{diff_rn_old}}&releaseNoteTwoId={{diff_rn_no_product}}
+  body: none
+  auth: inherit
+}
+
+params:query {
+  releaseNoteOneId: {{diff_rn_old}}
+  releaseNoteTwoId: {{diff_rn_no_product}}
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 400
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

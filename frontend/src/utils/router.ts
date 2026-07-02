@@ -9,7 +9,7 @@ import NotFoundView from '@/views/NotFoundView.vue'
 import keycloak from './keycloak'
 import GitRepositoriesView from '@/views/GitRepositoriesView.vue'
 import EditPromptsView from '@/views/EditPromptsView.vue'
-import CompareReleaseNotesView from '@/views/CompareReleaseNotesView.vue'
+import DiffReleaseNotesView from '@/views/DiffReleaseNotesView.vue'
 
 export const routeNames = {
   releaseNotes: '/',
@@ -20,7 +20,7 @@ export const routeNames = {
   notFound: '/:pathMatch(.*)*',
   gitRepositories: '/git-repositories',
   editPrompts: '/edit-prompts',
-  compareReleases: '/compare-releases'
+  diffReleases: '/diff-releases'
 }
 
 const routes = [
@@ -32,7 +32,7 @@ const routes = [
   { path: routeNames.notFound, component: NotFoundView },
   { path: routeNames.gitRepositories, component: GitRepositoriesView, meta: { requiresAuth: true } },
   { path: routeNames.editPrompts, component: EditPromptsView, meta: { requiresAuth: true } },
-  { path: routeNames.compareReleases, component: CompareReleaseNotesView, meta: { requiresAuth: true } }
+  { path: routeNames.diffReleases, component: DiffReleaseNotesView, meta: { requiresAuth: true } }
 ]
 
 export const router = createRouter({

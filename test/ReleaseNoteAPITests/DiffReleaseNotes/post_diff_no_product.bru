@@ -1,5 +1,5 @@
 meta {
-  name: post_compare_no_product
+  name: post_diff_no_product
   type: http
   seq: 5
 }
@@ -16,7 +16,7 @@ headers {
 
 body:json {
   {
-    "tag": "compare-noproduct-v1.0.0",
+    "tag": "diff-noproduct-v1.0.0",
     "summary": "Release note without a product",
     "published": true
   }
@@ -27,5 +27,5 @@ assert {
 }
 
 script:post-response {
-  bru.setEnvVar("compare_rn_no_product", res.body)
+  bru.setEnvVar("diff_rn_no_product", res.body)
 }

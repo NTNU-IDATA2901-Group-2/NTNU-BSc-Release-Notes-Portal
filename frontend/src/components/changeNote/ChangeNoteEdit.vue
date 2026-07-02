@@ -4,7 +4,7 @@ import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { Ban, Save, Sparkles } from 'lucide-vue-next';
 import { Textarea } from '../ui/textarea';
-import TagSelect from '../TagSelect.vue';
+import TagCombobox from '../TagCombobox.vue';
 import { Separator } from '../ui/separator';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
@@ -230,19 +230,19 @@ onBeforeUnmount(() => {
         <div class="flex flex-wrap justify-between gap-4">
         <div class="flex flex-col gap-1">
             <h1 class="text-lg">{{ t('title.product') }}</h1>
-            <TagSelect mode="product" v-model="productId"/>
+            <TagCombobox mode="product" v-model="productId"/>
         </div>
         <div class="flex flex-col gap-1">
             <h1 class="text-lg">{{ t('title.scope') }}</h1>
-            <TagSelect mode="scope" v-model="scopeId"/>
+            <TagCombobox mode="scope" v-model="scopeId"/>
         </div>
         <div class="flex flex-col gap-1">
             <h1 class="text-lg">{{ t('title.feature') }}</h1>
-            <TagSelect mode="feature" v-model="featureId"/>
+            <TagCombobox mode="feature" v-model="featureId"/>
         </div>
         <div class="flex flex-col gap-1">
             <h1 class="text-lg">{{ t('title.customer') }}</h1>
-            <TagSelect mode="customer" v-model="customerId"/>
+            <TagCombobox mode="customer" v-model="customerId"/>
         </div>
         </div>
         <div v-if="customerId !== -1 && customerId !== undefined" class="flex flex-col gap-2">

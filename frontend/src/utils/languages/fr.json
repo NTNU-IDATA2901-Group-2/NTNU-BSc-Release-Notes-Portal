@@ -18,7 +18,7 @@
         "timeline": "Calendrier",
         "previewTestingNotice": "Plusieurs des changements peuvent affecter les processus de travail existants ; des tests ciblés seront donc nécessaires.",
         "featureDetails": "Fonctionnalités",
-        "comparisonTitle": "Changements {product} : {fromTag}-{toTag}",
+        "diffTitle": "Changements {product} : {fromTag}-{toTag}",
         "otherFeature": "Autre",
         "testingResponsibility": "Responsabilité des tests et du suivi",
         "testingResponsibilityBody": "Afin d'assurer une transition en douceur vers la nouvelle version, nous vous demandons de tester votre configuration sur la base de cette Release Preview.\n\nCela signifie qu'en tant que client, vous êtes responsable de tester :\n\n- vos propres intégrations (autres systèmes tiers)\n- les fonctionnalités et la configuration utilisées dans votre usage quotidien\n- les processus métier critiques et les flux de bout en bout\n\nNous testons la solution standard dans des environnements contrôlés.\n\nNous vous recommandons de vérifier en particulier les fonctionnalités essentielles à votre utilisation réelle de la solution, y compris la configuration, les personnalisations et les rapports utilisés dans votre organisation.\n\nUn aperçu plus détaillé des domaines pertinents pour votre configuration peut être partagé et examiné séparément.\n\nLa mise en production suppose que les tests pertinents ont été réalisés de votre côté."
@@ -26,7 +26,7 @@
     "header": {
         "releaseNotesLink": "Notes de version",
         "changeNotesLink": "Notes de changement",
-        "compareReleasesLink": "Comparer les versions",
+        "diffReleasesLink": "Diff des versions",
         "toggleTheme": "Changer de thème",
         "signOut": "Se déconnecter",
         "language": "Langue",
@@ -44,6 +44,9 @@
         "export": "Exporter en PDF",
         "exportRelease": "Exporter la version en PDF",
         "exportPreview": "Exporter l'aperçu en PDF",
+        "exportBoth": "Les deux PDF",
+        "exportCustomer": "PDF client",
+        "exportTechnical": "PDF technique",
         "publish": "Publier",
         "unpublish": "Dépublier",
         "none": "Aucun",
@@ -130,7 +133,7 @@
         "releaseNoteUpdatedSuccess": "Note de version mise à jour avec succès",
         "releaseNoteUpdateError": "Une erreur s'est produite lors de la mise à jour de la note de version",
         "exportPdfError": "Une erreur s'est produite lors de l'export en PDF",
-        "compareReleaseNotesError": "Une erreur s'est produite lors de la comparaison des notes de version",
+        "diffReleaseNotesError": "Une erreur s'est produite lors du diff des notes de version",
         "translationError": "Une erreur s'est produite lors de la traduction de la note de changement",
         "changeNoteTranslationSuccess": "Note de changement traduite avec succès",
         "releaseNoteTranslationSuccess": "Note de version traduite avec succès",
@@ -201,7 +204,10 @@
         "noKnownLimitations": "Aucune limitation connue",
         "filterByCustomer": "Filtrer par client",
         "noResults": "Aucun résultat",
-        "noChangeImpacts": "Aucun changement"
+        "noChangeImpacts": "Aucun changement",
+        "select": "Sélectionner…",
+        "search": "Rechercher…",
+        "unnamed": "Sans nom"
     },
     "repositories": {
         "title": "Dépôts Git",
@@ -252,7 +258,9 @@
         "explainSummarize": "Utilisez les diffs git associés pour résumer",
         "reference": "Ouvrir le ticket Jira associé",
         "alreadyCommited": "Déjà validé sur Git",
-        "noChangeNotesToCommit": "Aucune note de changement sélectionnée à valider"
+        "noChangeNotesToCommit": "Aucune note de changement sélectionnée à valider",
+        "includeInExport": "Inclure dans l'export PDF",
+        "excludeFromExport": "Exclure de l'export PDF"
     },
     "prompts": {
         "translationPrompt": "Prompt de traduction",
@@ -267,10 +275,10 @@
         "saveSuccess": "Prompts mis à jour avec succès",
         "saveError": "Une erreur s'est produite lors de la mise à jour des prompts"
     },
-    "compareReleaseNotes": {
+    "diffReleaseNotes": {
         "product": "Produit",
         "releaseNoteOne": "Note de version un",
         "releaseNoteTwo": "Note de version deux",
-        "compare": "Comparer"
+        "diff": "Diff"
     }
 }

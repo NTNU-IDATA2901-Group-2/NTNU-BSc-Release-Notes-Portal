@@ -1,5 +1,5 @@
 import type { OnMutationApiCallFinished, PaginatedResponse, PersistReleaseNoteDTO, ReleaseNote } from "@/utils/types"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import api from "./api";
 import { toValue, type MaybeRefOrGetter } from "vue";
 
@@ -88,30 +88,48 @@ export const useGetReleaseNotes = (searchParams?: MaybeRefOrGetter<Record<string
   queryFn: () => getReleaseNotes(new URLSearchParams(toValue(searchParams)))
 });
 
+const RELEASE_NOTES_PAGE_SIZE = 20;
+
+export const useGetReleaseNotesInfinite = (searchParams?: MaybeRefOrGetter<Record<string, string>>) => useInfiniteQuery({
+  queryKey: ['releaseNotesInfinite', searchParams],
+  queryFn: ({ pageParam }) => {
+    const params = new URLSearchParams(toValue(searchParams));
+    params.set('page', String(pageParam));
+    params.set('size', String(RELEASE_NOTES_PAGE_SIZE));
+    return getReleaseNotes(params);
+  },
+  initialPageParam: 0,
+  getNextPageParam: (lastPage, allPages, lastPageParam) => {
+    const loaded = allPages.reduce((total, page) => total + page.content.length, 0);
+    return loaded < lastPage.totalItems ? lastPageParam + 1 : undefined;
+  },
+})
+
+
 /**
  * Retrieves the release notes that are new since the earlier of the two given
  * release notes. Both notes must belong to the same product.
  *
- * @param releaseNoteOneId the ID of one release note to compare.
- * @param releaseNoteTwoId the ID of the other release note to compare.
+ * @param releaseNoteOneId the ID of one release note to diff.
+ * @param releaseNoteTwoId the ID of the other release note to diff.
  * @throws An error if the API request fails.
  * @returns A promise that resolves to the release notes in the range.
  */
-const compareReleaseNotes = async (releaseNoteOneId: number, releaseNoteTwoId: number): Promise<ReleaseNote[]> => {
-  const response = await api.get(`releasenotes/compare`, {
+const diffReleaseNotes = async (releaseNoteOneId: number, releaseNoteTwoId: number): Promise<ReleaseNote[]> => {
+  const response = await api.get(`releasenotes/diff`, {
     params: { releaseNoteOneId, releaseNoteTwoId },
   });
   return response.data as ReleaseNote[];
 };
 
 /**
- * Custom hook for comparing two release notes.
+ * Custom hook for diffing two release notes.
  *
  * @returns A mutation resolving to the release notes that are new since the earlier note.
  */
-export const useCompareReleaseNotes = () =>
+export const useDiffReleaseNotes = () =>
   useMutation<ReleaseNote[], unknown, { releaseNoteOneId: number; releaseNoteTwoId: number }>({
-    mutationFn: ({ releaseNoteOneId, releaseNoteTwoId }) => compareReleaseNotes(releaseNoteOneId, releaseNoteTwoId),
+    mutationFn: ({ releaseNoteOneId, releaseNoteTwoId }) => diffReleaseNotes(releaseNoteOneId, releaseNoteTwoId),
   });
 
 

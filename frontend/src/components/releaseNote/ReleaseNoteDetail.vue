@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { exportToPdf } from '@/utils/pdf';
+import { exportToPdf, type PdfVariant } from '@/utils/pdf';
 import { useArchiveReleaseNote, usePublishReleaseNote } from '@/api/release-note-api';
 import type { ChangeNote, ReleaseNote, ChangeImpact } from '@/utils/types';
 import { useRouter } from 'vue-router';
@@ -12,7 +12,7 @@ import { Pencil, Trash2, Eye, EyeOff, FileDown, ArrowLeft, EllipsisVertical, Spa
 import md from '@/utils/markdown-it';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../ui/breadcrumb';
 import { Badge } from '../ui/badge';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { Separator } from '../ui/separator';
 import { Button } from '../ui/button';
 import { useTranslate } from '@/api/ai-api';
@@ -182,17 +182,17 @@ const onTranslate = async () => {
   hasToastedSuccess = false;
 }
 
-const { mutateAsync: fetchServiceRequestKeys } = useGetJiraServiceRequestKeys();
+const { mutateAsync: fetchServiceRequestKeys, isPending: isPendingServiceRequestKeys } = useGetJiraServiceRequestKeys();
 
-const handleExport = async () => {
+const handleExport = async (variants: PdfVariant[] = ['customer', 'technical']) => {
   if (!releaseNote) return;
   try {
-    const changeNotes = changeNoteList.value?.filteredChangeNotes ?? [];
+    const changeNotes = changeNoteList.value?.selectedChangeNotes ?? [];
     const references = [...new Set(
-      changeNotes.map(change => change.reference).filter(reference => reference.length > 0),
+      changeNotes.map(change => change.reference).filter(reference => reference && reference.length > 0),
     )];
     const serviceRequestKeys = await fetchServiceRequestKeys(references);
-    exportToPdf(releaseNote, changeNotes, serviceRequestKeys);
+    exportToPdf(releaseNote, changeNotes, serviceRequestKeys, variants);
   } catch (error) {
     console.error('Error exporting to PDF:', error);
     toast.error(t('toast.exportPdfError'));
@@ -249,7 +249,7 @@ v-for="change in releaseNote.changeNotes" :key="change.id"
       <div class="flex flex-col gap-4 w-full">
         <div class="flex flex-col sm:flex-row items-start justify-between max-w-full gap-4">
           <h1 v-if="!releaseNote.tag" class="text-4xl text-text-primary/50 leading-normal">{{ t('placeholder.noTitle')
-            }}</h1>
+          }}</h1>
           <h1 v-else class="text-3xl md:text-4xl truncate max-w-full leading-normal">{{
             releaseNote.tag }}
           </h1>
@@ -321,15 +321,29 @@ type="button" v-if="!(locale === 'en-GB')" variant="glow" @click="onTranslate"
                   </TooltipTrigger>
                   <TooltipContent v-if="releaseNote.syncedToGit">{{ t('tooltip.alreadyCommited') }}</TooltipContent>
                   <TooltipContent v-else-if="releaseNote.changeNotes.length === 0">{{ t('tooltip.noChangeNotesToCommit')
-                    }}</TooltipContent>
+                  }}</TooltipContent>
                 </Tooltip>
-                <DropdownMenuItem @click="handleExport">
-                  <div class="w-full flex gap-2">
-                    <p class="ml-auto text-text-primary">{{ releaseNote.published ? t('button.exportRelease') :
-                      t('button.exportPreview') }}</p>
-                    <FileDown class="text-text-primary" />
-                  </div>
-                </DropdownMenuItem>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger @click="handleExport()" class="focus:bg-text-primary/10 cursor-pointer">
+                    <div class="flex gap-2 items-center">
+                      <p class="text-text-primary">{{ releaseNote.published ? t('button.exportRelease') :
+                        t('button.exportPreview') }}</p>
+                      <Spinner v-if="isPendingServiceRequestKeys" class="size-4 my-0" />
+                      <FileDown v-else class="text-text-primary" />
+                    </div>
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuItem @click="handleExport()">
+                      <p class="text-text-primary">{{ t('button.exportBoth') }}</p>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem @click="handleExport(['customer'])">
+                      <p class="text-text-primary">{{ t('button.exportCustomer') }}</p>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem @click="handleExport(['technical'])">
+                      <p class="text-text-primary">{{ t('button.exportTechnical') }}</p>
+                    </DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -413,18 +427,14 @@ v-for="(limitation, index) in translatedKnownLimitations ?? releaseNote.knownLim
         <div class="flex gap-4 flex-col md:flex-row justify-between items-start">
           <h2 class="text-3xl">{{ t('title.changeNotes') }}</h2>
           <ChangeNoteListFilters
-            v-model:general-changes-checked="generalChangesChecked"
-            v-model:draft-changes-checked="draftChangesChecked"
-            v-model:customer-filter="customerFilter"
+v-model:general-changes-checked="generalChangesChecked"
+            v-model:draft-changes-checked="draftChangesChecked" v-model:customer-filter="customerFilter"
             :customers="changeNoteCustomers" />
         </div>
         <ChangeNoteList
-          ref="changeNoteList"
-          :change-notes="releaseNote.changeNotes"
-          :general-changes-checked="generalChangesChecked"
-          :draft-changes-checked="draftChangesChecked"
-          :customer-filter="customerFilter"
-          :translated-change-notes="translatedChangeNotes"
+ref="changeNoteList" :change-notes="releaseNote.changeNotes"
+          :general-changes-checked="generalChangesChecked" :draft-changes-checked="draftChangesChecked"
+          :customer-filter="customerFilter" :translated-change-notes="translatedChangeNotes"
           :has-translation="hasTranslation" />
       </div>
     </div>
