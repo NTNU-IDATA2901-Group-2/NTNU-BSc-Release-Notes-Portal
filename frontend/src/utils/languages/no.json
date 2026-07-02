@@ -259,7 +259,9 @@
         "explainSummarize": "Bruk tilknyttede git diffs for å oppsummere",
         "reference": "Åpne den tilknyttede Jira-saken",
         "alreadyCommited": "Allerede committet til Git",
-        "noChangeNotesToCommit": "Ingen endringsnotater valgt for commit"
+        "noChangeNotesToCommit": "Ingen endringsnotater valgt for commit",
+        "includeInExport": "Ta med i PDF-eksport",
+        "excludeFromExport": "Utelat fra PDF-eksport"
     },
     "prompts": {
         "translationPrompt": "Oversettelsesprompt",

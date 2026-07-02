@@ -84,7 +84,7 @@ const handleExport = async (variants: PdfVariant[] = ['customer', 'technical']) 
     const fromTag = productReleaseNotes.value?.content.find(note => note.id === oldestExcludedId)?.tag ?? '';
     const diff = releaseNotes.map(releaseNote => ({
       releaseNote,
-      changeNotes: changeNoteLists.get(releaseNote.id)?.filteredChangeNotes ?? [],
+      changeNotes: changeNoteLists.get(releaseNote.id)?.selectedChangeNotes ?? [],
     }));
     const references = [...new Set(
       diff.flatMap(({ changeNotes }) => changeNotes.map(note => note.reference))

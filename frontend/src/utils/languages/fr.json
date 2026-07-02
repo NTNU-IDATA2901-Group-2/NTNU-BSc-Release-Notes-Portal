@@ -258,7 +258,9 @@
         "explainSummarize": "Utilisez les diffs git associés pour résumer",
         "reference": "Ouvrir le ticket Jira associé",
         "alreadyCommited": "Déjà validé sur Git",
-        "noChangeNotesToCommit": "Aucune note de changement sélectionnée à valider"
+        "noChangeNotesToCommit": "Aucune note de changement sélectionnée à valider",
+        "includeInExport": "Inclure dans l'export PDF",
+        "excludeFromExport": "Exclure de l'export PDF"
     },
     "prompts": {
         "translationPrompt": "Prompt de traduction",

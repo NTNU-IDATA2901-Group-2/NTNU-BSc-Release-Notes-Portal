@@ -258,7 +258,9 @@
         "explainSummarize": "Use associated git diffs to summarize",
         "reference": "Open the related Jira ticket",
         "alreadyCommited": "Already committed to Git",
-        "noChangeNotesToCommit": "No change notes selected to commit"
+        "noChangeNotesToCommit": "No change notes selected to commit",
+        "includeInExport": "Include in PDF export",
+        "excludeFromExport": "Exclude from PDF export"
     },
     "prompts": {
         "translationPrompt": "Translation Prompt",

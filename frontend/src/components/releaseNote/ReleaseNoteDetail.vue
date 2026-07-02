@@ -187,7 +187,7 @@ const { mutateAsync: fetchServiceRequestKeys, isPending: isPendingServiceRequest
 const handleExport = async (variants: PdfVariant[] = ['customer', 'technical']) => {
   if (!releaseNote) return;
   try {
-    const changeNotes = changeNoteList.value?.filteredChangeNotes ?? [];
+    const changeNotes = changeNoteList.value?.selectedChangeNotes ?? [];
     const references = [...new Set(
       changeNotes.map(change => change.reference).filter(reference => reference && reference.length > 0),
     )];
