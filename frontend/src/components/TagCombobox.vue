@@ -124,24 +124,26 @@ const open = ref(false);
         <CommandList ref="commandList">
           <CommandEmpty>{{ t('placeholder.noResults') }}</CommandEmpty>
           <CommandGroup>
-            <CommandItem :key="-1" :value="-1" @select="() => {
-              modelValue = -1;
+            <CommandItem
+:key="-1" :value="-1" @select="() => {
               emit('update:modelValue', -1)
               open = false
             }">
-              <CheckIcon :class="cn(
+              <CheckIcon
+:class="cn(
                 'mr-2 h-4 w-4',
                 -1 === modelValue ? 'opacity-100' : 'opacity-0',
               )" />
               {{ t('button.none') }}
 
             </CommandItem>
-            <CommandItem v-for="tag in tags" :key="tag.id" :value="tag" @select="() => {
-              modelValue = tag.id;
+            <CommandItem
+v-for="tag in tags" :key="tag.id" :value="tag" @select="() => {
               emit('update:modelValue', tag.id)
               open = false
             }">
-              <CheckIcon :class="cn(
+              <CheckIcon
+:class="cn(
                 'mr-2 h-4 w-4',
                 tag.id === modelValue ? 'opacity-100' : 'opacity-0',
               )" />

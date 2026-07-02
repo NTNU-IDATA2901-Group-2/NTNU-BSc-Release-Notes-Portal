@@ -122,12 +122,14 @@ const onSubmit = handleSubmit((values) => {
       </div>
       <div class="flex flex-col gap-2">
         <h2 class="text-lg">{{ t('diffReleaseNotes.releaseNoteOne') }}</h2>
-        <TagCombobox mode="releaseNote" v-model="releaseNoteOneId" :search-params="searchParams"
+        <TagCombobox
+mode="releaseNote" v-model="releaseNoteOneId" :search-params="searchParams"
           :disabled="noProductSelected" />
       </div>
       <div class="flex flex-col gap-2">
         <h2 class="text-lg">{{ t('diffReleaseNotes.releaseNoteTwo') }}</h2>
-        <TagCombobox mode="releaseNote" v-model="releaseNoteTwoId" :search-params="searchParams"
+        <TagCombobox
+mode="releaseNote" v-model="releaseNoteTwoId" :search-params="searchParams"
           :disabled="noProductSelected" />
       </div>
       <Button type="submit" class="mt-auto" variant="outline" :disabled="!canDiff">
@@ -136,11 +138,13 @@ const onSubmit = handleSubmit((values) => {
       </Button>
     </form>
 
-    <div v-if="diffedReleaseNotes && diffedReleaseNotes.length"
+    <div
+v-if="diffedReleaseNotes && diffedReleaseNotes.length"
       class="mt-16 flex flex-col gap-16 w-full max-w-4xl px-4">
       <div class="flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex flex-row justify-center">
-          <Button variant="solidaccent" class="rounded-r-none" :disabled="isFetchingServiceRequests"
+          <Button
+variant="solidaccent" class="rounded-r-none" :disabled="isFetchingServiceRequests"
             @click="handleExport()">
             {{ t('button.export') }}
             <Spinner v-if="isFetchingServiceRequests" class="size-4 my-0" />
@@ -166,7 +170,8 @@ const onSubmit = handleSubmit((values) => {
           </DropdownMenu>
 
         </div>
-        <ChangeNoteListFilters v-model:general-changes-checked="generalChangesChecked"
+        <ChangeNoteListFilters
+v-model:general-changes-checked="generalChangesChecked"
           v-model:draft-changes-checked="draftChangesChecked" v-model:customer-filter="customerFilter"
           :customers="changeNoteCustomers" />
       </div>
@@ -174,7 +179,8 @@ const onSubmit = handleSubmit((values) => {
         <h1 v-if="!releaseNote.tag" class="text-4xl text-text-primary/50 leading-normal">{{ t('placeholder.noTitle') }}
         </h1>
         <h1 v-else class="text-3xl md:text-4xl leading-normal">{{ releaseNote.tag }}</h1>
-        <ChangeNoteList :ref="setChangeNoteListRef(releaseNote.id)" :change-notes="releaseNote.changeNotes"
+        <ChangeNoteList
+:ref="setChangeNoteListRef(releaseNote.id)" :change-notes="releaseNote.changeNotes"
           :general-changes-checked="generalChangesChecked" :draft-changes-checked="draftChangesChecked"
           :customer-filter="customerFilter" />
       </section>

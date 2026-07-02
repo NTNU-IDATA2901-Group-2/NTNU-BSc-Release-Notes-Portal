@@ -212,13 +212,16 @@ const changeNoteCustomers = computed(() => uniqueCustomers(releaseNote.changeNot
 
 <template>
   <div class="flex flex-col w-full items-center px-4 mb-20">
-    <DialogPrompt v-model:open="deletePromptOpen" :mode="'delete'" :title-key="'deletePrompt.title'"
+    <DialogPrompt
+v-model:open="deletePromptOpen" :mode="'delete'" :title-key="'deletePrompt.title'"
       :description-key="'deletePrompt.description'" :on-confirm="() => archiveReleaseNote()" />
-    <DialogPrompt v-model:open="commitPromptOpen" :mode="'confirm'" :title-key="'commitPrompt.title'"
+    <DialogPrompt
+v-model:open="commitPromptOpen" :mode="'confirm'" :title-key="'commitPrompt.title'"
       :description-key="'commitPrompt.description'"
       :on-confirm="() => commitReleaseNoteToGit.mutate({ id: releaseNote.id, additionalGitRepositoryIds: [] })">
       <ScrollArea class="max-h-60 border">
-        <p v-for="change in releaseNote.changeNotes" :key="change.id"
+        <p
+v-for="change in releaseNote.changeNotes" :key="change.id"
           :class="(!change.title && !change.reference) ? 'text-text-primary/50' : ''">
           {{ getLabelFromChangeNote(change) || t('placeholder.noTitle') }}
         </p>
@@ -272,7 +275,8 @@ const changeNoteCustomers = computed(() => uniqueCustomers(releaseNote.changeNot
               </Tooltip>
 
             </div>
-            <Button type="button" v-if="!(locale === 'en-GB')" variant="glow" @click="onTranslate"
+            <Button
+type="button" v-if="!(locale === 'en-GB')" variant="glow" @click="onTranslate"
               :disabled="isTranslating" class="inline-flex items-center gap-2">
               {{ hasTranslation ? t('button.undo') : t('button.translate') }}
               <Spinner v-if="isTranslating" class="h-4 dark:text-text-primary" />
@@ -349,7 +353,8 @@ const changeNoteCustomers = computed(() => uniqueCustomers(releaseNote.changeNot
           <p v-if="releaseNote.summary" v-html="md.render(translatedSummary ?? releaseNote.summary)">
           </p>
           <p class="text-text-primary/50" v-else>{{ t('placeholder.noSummary') }}</p>
-          <Button class="size-fit" variant="outline"
+          <Button
+class="size-fit" variant="outline"
             @click="copy(hasTranslation ? translatedSummary ?? '' : releaseNote.summary, 'summary')">
             <component :is="copiedKey === 'summary' ? Check : Copy" />
           </Button>
@@ -407,7 +412,8 @@ const changeNoteCustomers = computed(() => uniqueCustomers(releaseNote.changeNot
           <div class="flex flex-col gap-4 w-full">
             <h2 class="text-3xl truncate max-w-full leading-normal">{{ t('title.knownLimitations') }}</h2>
             <ul v-if="releaseNote.knownLimitations?.length" class="list-disc pl-6 flex flex-col gap-2">
-              <li v-for="(limitation, index) in translatedKnownLimitations ?? releaseNote.knownLimitations"
+              <li
+v-for="(limitation, index) in translatedKnownLimitations ?? releaseNote.knownLimitations"
                 :key="index">
                 {{ limitation }}
               </li>
@@ -420,11 +426,13 @@ const changeNoteCustomers = computed(() => uniqueCustomers(releaseNote.changeNot
       <div class="flex flex-col w-full gap-10">
         <div class="flex gap-4 flex-col md:flex-row justify-between items-start">
           <h2 class="text-3xl">{{ t('title.changeNotes') }}</h2>
-          <ChangeNoteListFilters v-model:general-changes-checked="generalChangesChecked"
+          <ChangeNoteListFilters
+v-model:general-changes-checked="generalChangesChecked"
             v-model:draft-changes-checked="draftChangesChecked" v-model:customer-filter="customerFilter"
             :customers="changeNoteCustomers" />
         </div>
-        <ChangeNoteList ref="changeNoteList" :change-notes="releaseNote.changeNotes"
+        <ChangeNoteList
+ref="changeNoteList" :change-notes="releaseNote.changeNotes"
           :general-changes-checked="generalChangesChecked" :draft-changes-checked="draftChangesChecked"
           :customer-filter="customerFilter" :translated-change-notes="translatedChangeNotes"
           :has-translation="hasTranslation" />

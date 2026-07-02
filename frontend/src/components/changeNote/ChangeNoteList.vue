@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { isAdmin } from '@/utils/keycloak';
 import { routeNames } from '@/utils/router';
@@ -61,7 +61,8 @@ defineExpose({ selectedChangeNotes });
     <p class="text-text-primary/50" v-if="changeNotes.length === 0">{{
       t('placeholder.noChangeNotesAdded')
       }}</p>
-    <div v-for="change in filteredChangeNotes" :key="change.id" class="flex flex-col gap-2"
+    <div
+v-for="change in filteredChangeNotes" :key="change.id" class="flex flex-col gap-2"
       :class="deselectedIds.has(change.id) ? 'opacity-50' : ''">
       <div class="flex items-center gap-4">
         <RouterLink
