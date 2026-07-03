@@ -7,7 +7,7 @@ import { useRouter } from 'vue-router';
 import { routeNames } from '@/utils/router';
 import { toast } from 'vue-sonner';
 import { useI18n } from 'vue-i18n';
-import { isAdmin } from '@/utils/keycloak';
+import { isAdmin } from '@/utils/auth';
 import { Pencil, Trash2, Eye, EyeOff, FileDown, ArrowLeft, EllipsisVertical, Sparkles, Copy, Check, GitBranch } from "lucide-vue-next"
 import md from '@/utils/markdown-it';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '../ui/breadcrumb';

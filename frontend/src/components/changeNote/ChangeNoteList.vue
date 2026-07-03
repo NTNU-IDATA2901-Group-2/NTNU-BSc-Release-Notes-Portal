@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { isAdmin } from '@/utils/keycloak';
+import { isAdmin } from '@/utils/auth';
 import { routeNames } from '@/utils/router';
 import md from '@/utils/markdown-it';
 import { openJiraTicket } from '@/utils/jira.ts';

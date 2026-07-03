@@ -16,7 +16,7 @@ import { useArchiveChangeNote, usePublishChangeNote } from '@/api/change-note-ap
 import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';
 import { useI18n } from 'vue-i18n';
-import { isAdmin } from '@/utils/keycloak';
+import { isAdmin } from '@/utils/auth';
 import md from '@/utils/markdown-it';
 import { useTranslate } from '@/api/ai-api';
 import Button from '../ui/button/Button.vue';

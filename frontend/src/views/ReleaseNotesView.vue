@@ -14,7 +14,7 @@ import ProductFilter from '@/components/filters/ProductFilter.vue';
 import PublishedDraftFilter from '@/components/filters/PublishedDraftFilter.vue';
 import { useRouter } from 'vue-router';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
-import { isAdmin } from '@/utils/keycloak';
+import { isAdmin } from '@/utils/auth';
 import { toast } from 'vue-sonner';
 import DateRangeFilter from '@/components/filters/DateRangeFilter.vue';
 import Pagination from '@/components/ui/pagination/Pagination.vue';
