@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -314,6 +315,7 @@ public class ChangeNoteService {
    * @param changeNoteId the ID of the change note
    * @return the commit hashes
    */
+  @Tool(name = "getGitCommitHashAndPreviousGitCommitHash", description = "Retrieves the git commit hash and the previous git commit hash for a given change note ID.")
   public GitCommitHashAndPreviousGitCommitHash getGitCommitHashAndPreviousGitCommitHash(Long changeNoteId) {
     return changeNoteRepository.findCommitHashAndPreviousCommitHash(changeNoteId);
   }

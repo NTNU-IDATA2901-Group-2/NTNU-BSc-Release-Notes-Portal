@@ -68,7 +68,7 @@ public class AiController {
     @GetMapping("/summarize-changenotes/{changeNoteIds}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> summarizeChangeNotes(@PathVariable List<Long> changeNoteIds) {
-        String summary = aiService.summarizeChangeNote(changeNoteIds);
+        String summary = aiService.summarizeChangeNotesWithAgent(changeNoteIds);
         return ResponseEntity.ok(summary);
     }
 

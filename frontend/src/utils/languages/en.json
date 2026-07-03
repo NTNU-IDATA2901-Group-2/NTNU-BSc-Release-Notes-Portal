@@ -13,10 +13,12 @@
         "noTitle": "No title",
         "noReference": "No reference",
         "ticketId": "Ticket ID",
+        "serviceRequest": "Service request",
         "previewIntro": "This is a preview version of the upcoming release. Its purpose is to plan for testing and verify that the solution works as expected in your setup before production deployment.",
         "timeline": "Timeline",
         "previewTestingNotice": "Several of the changes may affect existing work processes, and there will therefore be a need for targeted testing.",
         "featureDetails": "Features",
+        "diffTitle": "Changes {product}: {fromTag}-{toTag}",
         "otherFeature": "Other",
         "testingResponsibility": "Responsibility for testing and follow-up",
         "testingResponsibilityBody": "To ensure a smooth transition to the new version, we ask you to test your setup based on this Release Preview.\n\nThis means that you, as a customer, are responsible for testing:\n\n- your own integrations (other third-party systems)\n- functionality and configuration used in your daily operations\n- critical business processes and end-to-end flows\n\nWe test the standard solution in controlled environments.\n\nWe recommend that you pay particular attention to verifying functionality that is central to your actual use of the solution, including configuration, customizations and reporting used in your organization.\n\nA more detailed overview of the relevant areas for your setup can be shared and reviewed separately.\n\nProduction deployment requires that the relevant testing has been completed on your side."
@@ -24,6 +26,7 @@
     "header": {
         "releaseNotesLink": "Release Notes",
         "changeNotesLink": "Change Notes",
+        "diffReleasesLink": "Diff Releases",
         "toggleTheme": "Toggle Theme",
         "signOut": "Sign Out",
         "language": "Language",
@@ -41,6 +44,9 @@
         "export": "Export PDF",
         "exportRelease": "Export release to PDF",
         "exportPreview": "Export preview to PDF",
+        "exportBoth": "Both PDFs",
+        "exportCustomer": "Customer PDF",
+        "exportTechnical": "Technical PDF",
         "publish": "Publish",
         "unpublish": "Unpublish",
         "none": "None",
@@ -127,6 +133,7 @@
         "releaseNoteUpdatedSuccess": "Release note updated successfully",
         "releaseNoteUpdateError": "An error occurred while updating the release note",
         "exportPdfError": "An error occurred while exporting to PDF",
+        "diffReleaseNotesError": "An error occurred while diffing release notes",
         "translationError": "An error occurred while translating the change note",
         "changeNoteTranslationSuccess": "Change note translated successfully",
         "releaseNoteTranslationSuccess": "Release note translated successfully",
@@ -197,7 +204,10 @@
         "noKnownLimitations": "No known limitations",
         "filterByCustomer": "Filter by customer",
         "noResults": "No results",
-        "noChangeImpacts": "No change impacts"
+        "noChangeImpacts": "No change impacts",
+        "select": "Select…",
+        "search": "Search…",
+        "unnamed": "Unnamed"
     },
     "repositories": {
         "title": "Git Repositories",
@@ -248,7 +258,9 @@
         "explainSummarize": "Use associated git diffs to summarize",
         "reference": "Open the related Jira ticket",
         "alreadyCommited": "Already committed to Git",
-        "noChangeNotesToCommit": "No change notes selected to commit"
+        "noChangeNotesToCommit": "No change notes selected to commit",
+        "includeInExport": "Include in PDF export",
+        "excludeFromExport": "Exclude from PDF export"
     },
     "prompts": {
         "translationPrompt": "Translation Prompt",
@@ -262,5 +274,11 @@
         "promptPlaceholder": "Enter the prompt",
         "saveSuccess": "Prompts updated successfully",
         "saveError": "An error occurred while updating prompts"
+    },
+    "diffReleaseNotes": {
+        "product": "Product",
+        "releaseNoteOne": "Release note one",
+        "releaseNoteTwo": "Release note two",
+        "diff": "Diff"
     }
 }

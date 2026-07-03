@@ -1,17 +1,13 @@
 meta {
-  name: positive_get_all_filter_productIds
+  name: positive_change_note_excludes_archived_release_note
   type: http
-  seq: 17
+  seq: 72
 }
 
 get {
-  url: {{baseurl}}/releasenotes?productIds=1,2
+  url: {{baseurl}}/changenotes/{{change_id_rn_exclusion}}
   body: none
   auth: inherit
-}
-
-params:query {
-  productIds: 1,2
 }
 
 headers {
@@ -20,7 +16,7 @@ headers {
 
 assert {
   res.status: eq 200
-  res.body.content.length: eq 2
+  res.body.relatedReleaseNoteIds: length 0
 }
 
 settings {

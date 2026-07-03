@@ -9,12 +9,11 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
-import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
 import no.reliablesolutions.release_notes_portal.domain.entity.Prompt;
 import no.reliablesolutions.release_notes_portal.domain.repository.PromptRepository;
-import no.reliablesolutions.release_notes_portal.dto.GitCommitHashAndPreviousGitCommitHash;
 import no.reliablesolutions.release_notes_portal.dto.PromptDTO;
 import no.reliablesolutions.release_notes_portal.exception.LocaleNotSupportedException;
+import no.reliablesolutions.release_notes_portal.util.SummarizeChangeNoteAgent;
 
 /**
  * Service class for handling AI-related operations, such as translating text and summarizing change notes.
@@ -23,10 +22,8 @@ import no.reliablesolutions.release_notes_portal.exception.LocaleNotSupportedExc
 @AllArgsConstructor
 public class AiService {
     private final ChatClient.Builder builder;
-    private final ChangeNoteService changeNoteService;
-    private final ObjectProvider<DiffService> diffServiceProvider;
-    private final GitRepositoryService gitRepositoryService;
     private final PromptRepository promptRepository;
+    private final ObjectProvider<SummarizeChangeNoteAgent> summarizeChangeNoteAgentProvider;
 
     private final Logger logger = LoggerFactory.getLogger(AiService.class);
     
@@ -34,12 +31,12 @@ public class AiService {
     * <h1>Translates the given text to the specified locale</h1>
     * <h2>Supported Locales:</h2>
     * <ul>
-    *   <li>en - English</li>
-    *   <li>no - Norwegian Bokmål</li>
-    *   <li>fr - French</li>
+    *   <li>en-GB - English</li>
+    *   <li>nb-NO - Norwegian Bokmål</li>
+    *   <li>fr-FR - French</li>
     * </ul>
     * 
-    * @param locale the target locale for translation (e.g., "en", "no", "fr")
+    * @param locale the target locale for translation (e.g., "en-GB", "nb-NO", "fr-FR")
     * @param text the text to be translated
     * @return the translated text
     * @throws IllegalArgumentException if locale or text is null or empty
@@ -52,9 +49,9 @@ public class AiService {
         
         String lang = "";
         switch (locale) {
-            case "en" -> lang = "English";
-            case "no" -> lang = "Norwegian Bokmål";
-            case "fr" -> lang = "French";
+            case "en-GB" -> lang = "English";
+            case "nb-NO" -> lang = "Norwegian Bokmål";
+            case "fr-FR" -> lang = "French";
             default -> throw new LocaleNotSupportedException(locale);
         }
 
@@ -71,42 +68,18 @@ public class AiService {
     }
     
     /**
-    * Summarizes the change notes with the given IDs using an AI model. The summary is generated based on the git diff of the change notes.
-    *
-    * @param changeNoteIds the IDs of the change notes to be summarized
-    * @return a string summarizing the contents of the change notes
-    */
-    public String summarizeChangeNote(List<Long> changeNoteIds) {
-        StringBuilder diffs = new StringBuilder();
-        DiffService diffService = diffServiceProvider.getIfAvailable();
-
-        if (diffService == null) {
-            logger.error("DiffService bean is not available. Cannot summarize change notes.");
-            throw new IllegalStateException("DiffService is not available");
+     * Summarizes the change notes with the given IDs using the SummarizeChangeNoteAgent.
+     *
+     * @param changeNoteIds a list of change note IDs to summarize
+     * @return a summary of the change notes
+     * @throws IllegalStateException if the SummarizeChangeNoteAgent is not available
+     */
+    public String summarizeChangeNotesWithAgent(List<Long> changeNoteIds) {
+        SummarizeChangeNoteAgent summarizeChangeNoteAgent = summarizeChangeNoteAgentProvider.getIfAvailable();
+        if (summarizeChangeNoteAgent == null) {
+            throw new IllegalStateException("SummarizeChangeNoteAgent is not available");
         }
-
-        for (Long changeNoteId : changeNoteIds) {
-            GitCommitHashAndPreviousGitCommitHash commits = changeNoteService.getGitCommitHashAndPreviousGitCommitHash(changeNoteId);
-            if (commits == null || commits.getGitCommitHash() == null || commits.getPreviousGitCommitHash() == null) {
-                logger.warn("Change note with ID {} is missing associated git commits. Skipping summarization for this change note.", changeNoteId);
-                continue;
-            }
-            GitRepository gitRepository = gitRepositoryService.getGitRepositoryForChangeNote(changeNoteId);
-            String diffString = diffService.getDiffString(commits.getGitCommitHash(), commits.getPreviousGitCommitHash(), gitRepository);
-            diffs.append(diffString).append("\n");
-        }
-        String diffsString = diffs.toString().trim();
-        
-        Prompt summarizeChangeNotePrompt = promptRepository.findByName("Change Notes Summary");
-
-        if (summarizeChangeNotePrompt == null) {
-            throw new IllegalStateException("Summarize change note prompt not found in database");
-        }
-        
-        return diffsString.isEmpty() ? "" : builder.build().prompt().system(summarizeChangeNotePrompt.getPrompt())
-        .user(diffsString)
-        .call()
-        .content();
+        return summarizeChangeNoteAgent.summarizeChangeNotes(changeNoteIds);
     }
 
     /**

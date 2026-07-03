@@ -21,20 +21,34 @@ services:
       - "8080"
     environment:
       - CORS_ALLOWED_ORIGINS=
-      - KC_URL=
-      - KC_ISSUER_URL=
-      - KC_JWK_SET_URI=
-      - KC_CLIENT_ID=
-      - KC_REALM=
+      # OIDC provider (any spec-compliant IdP; see README "Identity Provider Configuration")
+      - OIDC_ISSUER_URI=
+      - OIDC_CLIENT_ID=
+      - OIDC_SCOPES=openid profile
+      # - OIDC_AUDIENCE=
+      # - OIDC_ROLES_CLAIM=roles
+      # - OIDC_CUSTOMER_CLAIM=groups
+      # - OIDC_CUSTOMER_PREFIX=/Customers/
+      # Set only if the app must fetch the JWKS from an internal URL that
+      # differs from the public issuer (e.g. IdP behind the reverse proxy)
+      # - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=
       - DB_USERNAME=
       - DB_PASSWORD=
       - DB_DATABASE=
       - DB_URL=
       - OPENAI_URL=
       - OPENAI_API_KEY=
+      - OPENAI_CHAT_COMPLETIONS_PATH=
       - OPENAI_MODEL=
       - JIRA_BASE_URL=
+      - JIRA_EMAIL=
+      - JIRA_API_TOKEN=
+      - CHANGE_NOTE_DIRECTORY=
+      - RELEASE_NOTE_DIRECTORY=
+      - GITHUB_RW_PAT=
 
+  # Example IdP — remove this service (and the Caddy auth host) when using an
+  # external OIDC provider such as Entra ID
   keycloak:
     image: quay.io/keycloak/keycloak:26.5.2
     environment:

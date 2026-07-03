@@ -15,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderColumn;
 import lombok.Getter;
@@ -40,6 +41,9 @@ public class ReleaseNote {
     inverseJoinColumns = @JoinColumn(name = "change_note_id")
   )
   private List<ChangeNote> changeNotes;
+
+  @ManyToOne(optional = true)
+  private Product product;
 
   private String tag = "";
   @Column(columnDefinition = "TEXT")

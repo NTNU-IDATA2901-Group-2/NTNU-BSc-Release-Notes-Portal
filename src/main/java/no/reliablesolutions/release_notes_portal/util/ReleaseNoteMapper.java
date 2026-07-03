@@ -5,6 +5,7 @@ import java.util.List;
 import no.reliablesolutions.release_notes_portal.domain.entity.ReleaseNote;
 import no.reliablesolutions.release_notes_portal.dto.ChangeImpactDTO;
 import no.reliablesolutions.release_notes_portal.dto.ChangeNoteDTO;
+import no.reliablesolutions.release_notes_portal.dto.ProductDTO;
 import no.reliablesolutions.release_notes_portal.dto.ReleaseNoteDTO;
 import no.reliablesolutions.release_notes_portal.dto.ReleaseTimelineDTO;
 
@@ -32,6 +33,11 @@ public class ReleaseNoteMapper {
     List<ChangeNoteDTO> changeNoteDTOs = releaseNote.getChangeNotes()
         .stream()
         .filter(changeNote -> {
+
+          if (changeNote.isArchived()) {
+            return false;
+          }
+
           if (accessScope.isAdmin()) {
             return true;
           }
@@ -57,6 +63,7 @@ public class ReleaseNoteMapper {
     return new ReleaseNoteDTO(
         releaseNote.getId(),
         changeNoteDTOs,
+        releaseNote.getProduct() != null ? ProductDTO.fromProduct(releaseNote.getProduct()) : null,
         releaseNote.getTag(),
         releaseNote.getSummary(),
         releaseNote.getPublished(),

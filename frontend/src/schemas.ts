@@ -19,6 +19,7 @@ export const EditReleaseNoteSchema = z.object({
   tag: z.string().optional(),
   summary: z.string().optional(),
   changeNoteIds: z.array(z.number()).optional(),
+  productId: z.number().optional(),
   published: z.boolean(),
   releaseTimeline: z.object({
     previewAvailableFrom: z.string().optional(),
@@ -54,4 +55,10 @@ export const UpdatePromptsSchema = z.object({
     name: z.string(),
     prompt: z.string(),
   }))
+})
+
+export const DiffReleaseNotesSchema = z.object({
+  productId: z.number(),
+  releaseNoteOneId: z.number(),
+  releaseNoteTwoId: z.number(),
 })

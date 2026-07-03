@@ -1,0 +1,36 @@
+meta {
+  name: positive_post_release_note_for_exclusion
+  type: http
+  seq: 69
+}
+
+post {
+  url: {{baseurl}}/releasenotes
+  body: json
+  auth: none
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "changeNoteIds": [{{change_id_rn_exclusion}}],
+    "tag": "rn-to-archive",
+    "published": false
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+script:post-response {
+  bru.setEnvVar("release_id_exclusion", res.body)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

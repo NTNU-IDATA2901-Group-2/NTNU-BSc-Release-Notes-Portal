@@ -1,0 +1,26 @@
+meta {
+  name: positive_change_note_has_related_release_note
+  type: http
+  seq: 70
+}
+
+get {
+  url: {{baseurl}}/changenotes/{{change_id_rn_exclusion}}
+  body: none
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 200
+  res.body.relatedReleaseNoteIds: length 1
+  res.body.relatedReleaseNoteIds[0]: eq {{release_id_exclusion}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

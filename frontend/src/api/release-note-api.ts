@@ -1,7 +1,7 @@
 import type { OnMutationApiCallFinished, PaginatedResponse, PersistReleaseNoteDTO, ReleaseNote } from "@/utils/types"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import api from "./api";
-import type { Ref } from "vue";
+import { toValue, type MaybeRefOrGetter } from "vue";
 
 /**
  * Creates a new release note.
@@ -83,10 +83,54 @@ const getReleaseNotes = async (params?: URLSearchParams): Promise<PaginatedRespo
  * @param searchParams A reactive reference to an object containing search parameters to filter the release notes.
  * @returns A promise that resolves to an array of release note data retrieved from the API.
  */
-export const useGetReleaseNotes = (searchParams: Ref<Record<string, string>>) => useQuery<PaginatedResponse<ReleaseNote[]>>({
+export const useGetReleaseNotes = (searchParams?: MaybeRefOrGetter<Record<string, string>>) => useQuery<PaginatedResponse<ReleaseNote[]>>({
   queryKey: ['releaseNotes', searchParams],
-  queryFn: () => getReleaseNotes(new URLSearchParams(searchParams.value))
+  queryFn: () => getReleaseNotes(new URLSearchParams(toValue(searchParams)))
 });
+
+const RELEASE_NOTES_PAGE_SIZE = 20;
+
+export const useGetReleaseNotesInfinite = (searchParams?: MaybeRefOrGetter<Record<string, string>>) => useInfiniteQuery({
+  queryKey: ['releaseNotesInfinite', searchParams],
+  queryFn: ({ pageParam }) => {
+    const params = new URLSearchParams(toValue(searchParams));
+    params.set('page', String(pageParam));
+    params.set('size', String(RELEASE_NOTES_PAGE_SIZE));
+    return getReleaseNotes(params);
+  },
+  initialPageParam: 0,
+  getNextPageParam: (lastPage, allPages, lastPageParam) => {
+    const loaded = allPages.reduce((total, page) => total + page.content.length, 0);
+    return loaded < lastPage.totalItems ? lastPageParam + 1 : undefined;
+  },
+})
+
+
+/**
+ * Retrieves the release notes that are new since the earlier of the two given
+ * release notes. Both notes must belong to the same product.
+ *
+ * @param releaseNoteOneId the ID of one release note to diff.
+ * @param releaseNoteTwoId the ID of the other release note to diff.
+ * @throws An error if the API request fails.
+ * @returns A promise that resolves to the release notes in the range.
+ */
+const diffReleaseNotes = async (releaseNoteOneId: number, releaseNoteTwoId: number): Promise<ReleaseNote[]> => {
+  const response = await api.get(`releasenotes/diff`, {
+    params: { releaseNoteOneId, releaseNoteTwoId },
+  });
+  return response.data as ReleaseNote[];
+};
+
+/**
+ * Custom hook for diffing two release notes.
+ *
+ * @returns A mutation resolving to the release notes that are new since the earlier note.
+ */
+export const useDiffReleaseNotes = () =>
+  useMutation<ReleaseNote[], unknown, { releaseNoteOneId: number; releaseNoteTwoId: number }>({
+    mutationFn: ({ releaseNoteOneId, releaseNoteTwoId }) => diffReleaseNotes(releaseNoteOneId, releaseNoteTwoId),
+  });
 
 
 /**

@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
  */
 public record CreateReleaseNoteDTO(
     List<Long> changeNoteIds,
+    Long productId,
     String tag,
     String summary,
     Boolean published,

@@ -6,9 +6,11 @@ import ReleaseNoteView from '@/views/ReleaseNoteView.vue'
 import ChangeNoteView from '@/views/ChangeNoteView.vue'
 import SignInView from '@/views/SignInView.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
-import keycloak from './keycloak'
+import AuthCallbackView from '@/views/AuthCallbackView.vue'
+import { isAuthenticated } from './auth'
 import GitRepositoriesView from '@/views/GitRepositoriesView.vue'
 import EditPromptsView from '@/views/EditPromptsView.vue'
+import DiffReleaseNotesView from '@/views/DiffReleaseNotesView.vue'
 
 export const routeNames = {
   releaseNotes: '/',
@@ -16,9 +18,11 @@ export const routeNames = {
   releaseNote: '/release-notes/:id',
   changeNote: '/change-notes/:id',
   signIn: '/sign-in',
+  authCallback: '/auth/callback',
   notFound: '/:pathMatch(.*)*',
   gitRepositories: '/git-repositories',
   editPrompts: '/edit-prompts',
+  diffReleases: '/diff-releases'
 }
 
 const routes = [
@@ -27,9 +31,11 @@ const routes = [
   { path: routeNames.releaseNote, component: ReleaseNoteView, meta: { requiresAuth: true } },
   { path: routeNames.changeNote, component: ChangeNoteView, meta: { requiresAuth: true } },
   { path: routeNames.signIn, component: SignInView },
+  { path: routeNames.authCallback, component: AuthCallbackView },
   { path: routeNames.notFound, component: NotFoundView },
   { path: routeNames.gitRepositories, component: GitRepositoriesView, meta: { requiresAuth: true } },
   { path: routeNames.editPrompts, component: EditPromptsView, meta: { requiresAuth: true } },
+  { path: routeNames.diffReleases, component: DiffReleaseNotesView, meta: { requiresAuth: true } }
 ]
 
 export const router = createRouter({
@@ -40,7 +46,7 @@ export const router = createRouter({
 
 router.beforeEach(async (to, _from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (keycloak.authenticated) {
+    if (isAuthenticated.value) {
       next();
     } else {
       console.warn("User is not authenticated. Redirecting to sign-in page.");

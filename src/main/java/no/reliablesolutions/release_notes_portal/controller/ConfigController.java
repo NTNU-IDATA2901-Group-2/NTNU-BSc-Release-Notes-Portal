@@ -21,22 +21,25 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 @Profile({ "dev", "prod" })
 public class ConfigController {
 
-  @Value("${KC_URL}")
-  private String kcUrl;
+  @Value("${OIDC_ISSUER_URI}")
+  private String oidcIssuerUri;
 
-  @Value("${KC_REALM}")
-  private String kcRealm;
+  @Value("${OIDC_CLIENT_ID}")
+  private String oidcClientId;
 
-  @Value("${KC_CLIENT_ID}")
-  private String kcClientId;
+  @Value("${OIDC_SCOPES:openid profile}")
+  private String oidcScopes;
+
+  @Value("${OIDC_ROLES_CLAIM:roles}")
+  private String oidcRolesClaim;
 
   @Value("${JIRA_BASE_URL}")
   private String jiraBaseUrl;
 
   /**
    * Endpoint to retrieve public configuration values for the frontend, such as
-   * Keycloak settings.
-   * 
+   * OIDC settings.
+   *
    * @return A map containing the configuration values.
    */
   @Operation(summary = "Get configuration", description = "Returns public configuration values for the frontend")
@@ -47,9 +50,10 @@ public class ConfigController {
   @GetMapping
   public ResponseEntity<Map<String, String>> getConfig() {
     Map<String, String> env = Map.of(
-        "KC_URL", kcUrl,
-        "KC_REALM", kcRealm,
-        "KC_CLIENT_ID", kcClientId,
+        "OIDC_ISSUER_URI", oidcIssuerUri,
+        "OIDC_CLIENT_ID", oidcClientId,
+        "OIDC_SCOPES", oidcScopes,
+        "OIDC_ROLES_CLAIM", oidcRolesClaim,
         "JIRA_BASE_URL", jiraBaseUrl);
 
     return ResponseEntity.ok(env);

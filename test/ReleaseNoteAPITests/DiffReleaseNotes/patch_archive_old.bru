@@ -1,0 +1,19 @@
+meta {
+  name: patch_archive_old
+  type: http
+  seq: 12
+}
+
+patch {
+  url: {{baseurl}}/releasenotes/{{diff_rn_old}}/archive
+  body: json
+  auth: none
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 200
+}

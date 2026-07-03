@@ -6,7 +6,7 @@ import Avatar from './ui/avatar/Avatar.vue';
 import Separator from './ui/separator/Separator.vue';
 import { GitBranch, SunMoon, LogOut, Sparkles } from "lucide-vue-next"
 import { useTheme } from '@/utils/theme';
-import keycloak, { isAuthenticated, jwtTokenDecoded, isAdmin } from '@/utils/keycloak';
+import { isAuthenticated, userProfile, isAdmin, logout } from '@/utils/auth';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import MenubarSub from './ui/menubar/MenubarSub.vue';
@@ -24,24 +24,22 @@ const { theme } = useTheme()
 const { t } = useI18n()
 
 const handleLogOut = () => {
-	keycloak.logout({
-		redirectUri: `${globalThis.location.origin}${routeNames.signIn}`
-	}).then(() => {
-	}).catch(err => {
-		console.error('Keycloak logout error:', err);
+	logout().catch(err => {
+		console.error('Sign-out error:', err);
 	});
 }
 
 const firstLetters = computed(() => {
 	if (!isAuthenticated.value) return '';
-	if (!jwtTokenDecoded.value) return '';
+	if (!userProfile.value) return '';
 
-	const firstName = jwtTokenDecoded.value.given_name || '';
-	const lastName = jwtTokenDecoded.value.family_name || '';
+	const nameParts = (userProfile.value.name || '').split(' ');
+	const firstName = userProfile.value.given_name || nameParts[0] || '';
+	const lastName = userProfile.value.family_name || (nameParts.length > 1 && nameParts[nameParts.length - 1]) || '';
 	return firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase();
 })
 
-const handleLocalChange = (locale : "en" | "no" | "fr") => {
+const handleLocalChange = (locale : "en-GB" | "nb-NO" | "fr-FR") => {
 	i18n.global.locale = locale;
   localStorage.setItem('locale', locale);
 }
@@ -60,6 +58,7 @@ const handleLogoClick = () => {
 	    <nav class="hidden md:flex flex-row gap-12">
 		<RouterLink v-if="isAuthenticated" class="text-md text-text-dark-static hover:underline" :to="routeNames.releaseNotes">{{ t('header.releaseNotesLink') }}</RouterLink>
 		<RouterLink v-if="isAuthenticated" class="text-md text-text-dark-static hover:underline" :to="routeNames.changeNotes">{{ t('header.changeNotesLink') }}</RouterLink>
+		<RouterLink v-if="isAuthenticated" class="text-md text-text-dark-static hover:underline" :to="routeNames.diffReleases">{{ t('header.diffReleasesLink') }}</RouterLink>
 	    </nav>
 		<Menubar v-if="isAuthenticated" class="ml-auto">
 			<MenubarMenu>
@@ -81,13 +80,13 @@ const handleLogoClick = () => {
 							{{ t('header.language') }}
 						</MenubarSubTrigger>
 						<MenubarSubContent>
-							<MenubarItem @click="handleLocalChange('en')">
+							<MenubarItem @click="handleLocalChange('en-GB')">
 								English
 							</MenubarItem>
-							<MenubarItem @click="handleLocalChange('no')">
+							<MenubarItem @click="handleLocalChange('nb-NO')">
 								Norsk
 							</MenubarItem>
-							<MenubarItem @click="handleLocalChange('fr')">
+							<MenubarItem @click="handleLocalChange('fr-FR')">
 								Français
 							</MenubarItem>
 						</MenubarSubContent>

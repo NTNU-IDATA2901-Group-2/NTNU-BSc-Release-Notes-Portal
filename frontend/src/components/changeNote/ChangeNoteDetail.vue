@@ -16,7 +16,7 @@ import { useArchiveChangeNote, usePublishChangeNote } from '@/api/change-note-ap
 import { toast } from 'vue-sonner';
 import { router } from '@/utils/router';
 import { useI18n } from 'vue-i18n';
-import { isAdmin } from '@/utils/keycloak';
+import { isAdmin } from '@/utils/auth';
 import md from '@/utils/markdown-it';
 import { useTranslate } from '@/api/ai-api';
 import Button from '../ui/button/Button.vue';
@@ -169,7 +169,7 @@ onBeforeUnmount(() => {
                   {{ t('tooltip.reference') }}
               </TooltipContent>
             </Tooltip>
-            <Button :disabled="isTranslating" v-if="!(locale === 'en')" variant="glow" @click="onTranslate">{{hasTranslation ? t('button.undo') : t('button.translate') }}
+            <Button :disabled="isTranslating" v-if="!(locale === 'en-GB')" variant="glow" @click="onTranslate">{{hasTranslation ? t('button.undo') : t('button.translate') }}
               <Spinner v-if="isTranslating" class="h-4 dark:text-text-primary"/>
               <Sparkles v-else/> 
             </Button>

@@ -11,6 +11,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -19,11 +20,13 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteHasNoGitCommitsException;
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.CustomerNotFoundException;
-import no.reliablesolutions.release_notes_portal.exception.DiffStringGenerationException;
+import no.reliablesolutions.release_notes_portal.exception.GitInspectionException;
 import no.reliablesolutions.release_notes_portal.exception.FailedSyncGitChangeNotesException;
 import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityException;
 import no.reliablesolutions.release_notes_portal.exception.FeatureNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.InvalidDateRangeException;
+import no.reliablesolutions.release_notes_portal.exception.JiraCommunicationException;
+import no.reliablesolutions.release_notes_portal.exception.MismatchedProductException;
 import no.reliablesolutions.release_notes_portal.exception.ProductNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteAlreadySyncedException;
 import no.reliablesolutions.release_notes_portal.exception.ReleaseNoteNotFoundException;
@@ -35,6 +38,17 @@ import no.reliablesolutions.release_notes_portal.exception.ScopeNotFoundExceptio
 @ControllerAdvice
 public class GlobalExceptionHandler {
   Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+  /**
+   * Handles the case where a required request parameter is missing. Logs the event and returns a 400 response with a message indicating the missing parameter.
+   * @param e the exception containing details about the missing request parameter
+   * @return a ResponseEntity with a 400 status and a message indicating the missing request parameter
+   */
+  @ExceptionHandler(value = {MissingServletRequestParameterException.class})
+  public ResponseEntity<String> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+    logger.warn("Missing request parameter: {}", e.getParameterName());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing request parameter: " + e.getParameterName());
+  }
 
   /**
    * Handles the case where a customer is not found. Logs the event and returns a 404 response with a message indicating the customer was not found.
@@ -68,6 +82,17 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleProductNotFoundException(ProductNotFoundException e) {
     logger.warn("Product not found: {}", e.getProductId());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Product with ID %d not found", e.getProductId()));
+  }
+
+  /**
+   * Handles the case where two release notes being diffed belong to different products. Logs the event and returns a 400 response with a message.
+   * @param e the exception containing the IDs of the mismatched release notes
+   * @return a ResponseEntity with a 400 status and a message indicating the release notes do not share a product
+   */
+  @ExceptionHandler(value = {MismatchedProductException.class})
+  public ResponseEntity<String> handleMismatchedProductException(MismatchedProductException e) {
+    logger.warn("Mismatched product when diffing release notes: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
   }
 
   /**
@@ -115,14 +140,14 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * Handles the case where there is an error during the generation of a diff string. Logs the event and returns a 500 response with a message indicating the error generating the diff string.
-   * @param e the exception containing details about the error generating the diff string
-   * @return a ResponseEntity with a 500 status and a message indicating the error generating the diff string
+   * Handles the case where a git inspection operation (diff generation, commit message retrieval, listing changed files, etc.) fails. Logs the event and returns a 500 response indicating the error.
+   * @param e the exception containing details about the failed git inspection
+   * @return a ResponseEntity with a 500 status and a message indicating the git inspection error
    */
-  @ExceptionHandler(value = {DiffStringGenerationException.class})
-  public ResponseEntity<String> handleDiffStringGenerationException(DiffStringGenerationException e) {
-    logger.warn("Error generating diff string: {}", e.getMessage());
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error generating diff string");
+  @ExceptionHandler(value = {GitInspectionException.class})
+  public ResponseEntity<String> handleGitInspectionException(GitInspectionException e) {
+    logger.warn("Error during git inspection: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error during git inspection");
   }
 
 
@@ -325,5 +350,16 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
     logger.warn("Request method not supported: {}", e.getMethod());
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Request method not supported: " + e.getMethod());
+  }
+
+  /**
+   * Handles the case where communication with Jira fails. Logs the event and returns a 502 response indicating the upstream Jira request failed.
+   * @param e the exception containing the Jira issue key and failure details
+   * @return a ResponseEntity with a 502 status and a message indicating communication with Jira failed
+   */
+  @ExceptionHandler(value = {JiraCommunicationException.class})
+  public ResponseEntity<String> handleJiraCommunicationException(JiraCommunicationException e) {
+    logger.error("Failed to communicate with Jira for issue {}", e.getIssueKey(), e);
+    return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(String.format("Failed to communicate with Jira for issue %s", e.getIssueKey()));
   }
 }

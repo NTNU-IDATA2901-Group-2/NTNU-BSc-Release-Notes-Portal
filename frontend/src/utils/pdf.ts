@@ -2,12 +2,14 @@ import solwrLogo from '@/assets/solwr_logo.svg?raw';
 import md from './markdown-it';
 import { i18n } from './i18n';
 import { getLocaleDateString } from './format-date';
+import { jiraTicketUrl } from './jira';
 import type { ChangeImpact, ChangeNote, ReleaseNote, ReleaseTimeline } from './types';
 import pdfMake from "pdfmake/build/pdfmake";
 import vfs from "pdfmake/build/vfs_fonts";
 import type { Content, ContentText, TableCell, TDocumentDefinitions } from "pdfmake/interfaces";
 
-const t = (key: string) => i18n.global.t(key);
+const t = (key: string, named?: Record<string, unknown>) =>
+  named === undefined ? i18n.global.t(key) : i18n.global.t(key, named);
 
 pdfMake.addVirtualFileSystem(vfs);
 
@@ -30,6 +32,25 @@ const MARKDOWN_BODY_SIZE = 11;
 // Kept above MARKDOWN_H1_SIZE so a markdown heading in the description can't
 // render larger than the note's own heading.
 const NOTE_HEADING_SIZE = 13;
+
+// Link runs render in this blue with an underline, matching the in-app styling.
+const LINK_COLOR = '#0b5cff';
+
+/**
+ * Which audience a PDF is built for. The customer variant is the outward-facing
+ * document; the technical variant is the same document plus each change note's
+ * developer notes and upgrade requirements, which are internal-only.
+ */
+export type PdfVariant = 'customer' | 'technical';
+
+// Appended to the technical variant's title and file name. Left untranslated so
+// the two downloads stay distinguishable regardless of locale.
+const TECHNICAL_SUFFIX = ' (technical)';
+
+/** A clickable text run linking a Jira issue/service-request key to its browse page. */
+function jiraLink(key: string): ContentText {
+  return { text: key, link: jiraTicketUrl(key), color: LINK_COLOR, decoration: 'underline' };
+}
 
 /**
  * Flattens an `inline` token's children into a pdfmake text run, carrying bold,
@@ -57,7 +78,7 @@ function inlineToRuns(inline: Token): ContentText[] {
           text: child.content,
           bold: bold > 0,
           italics: italics > 0,
-          ...(link ? { link, color: '#0b5cff', decoration: 'underline' } : {}),
+          ...(link ? { link, color: LINK_COLOR, decoration: 'underline' } : {}),
         });
         break;
     }
@@ -228,14 +249,33 @@ function renderChangeImpactTable(changeImpacts: ChangeImpact[]): Content {
 }
 
 /**
- * Renders the change-details section: its `sectionTitle` heading followed by
- * the change notes grouped by feature, one sub-heading per feature in
- * first-seen order, with featureless notes collected under "Other" at the end.
- * Each note leads with its reference and title, then the markdown description.
- * The section heading is owned here (rather than emitted by the caller) so it
- * can be glued to the first feature group and never stranded above a page break.
+ * A labelled markdown sub-block under a change note — a bold caption over its
+ * rendered body — used for the technical variant's developer notes and upgrade
+ * requirements. Indented to line up with the note's description.
  */
-function renderFeatureDetails(changeNotes: ChangeNote[], sectionTitle: string): Content[] {
+function renderNoteSection(label: string, body: string): Content {
+  return {
+    stack: [
+      { text: label, bold: true, fontSize: MARKDOWN_BODY_SIZE, margin: [0, 0, 0, 2] },
+      ...markdownToContent(body),
+    ],
+    margin: [12, 0, 0, 8],
+  };
+}
+
+/**
+ * Renders the change-details section: an optional `sectionTitle` heading
+ * followed by the change notes grouped by feature, one sub-heading per feature
+ * in first-seen order, with featureless notes collected under "Other" at the
+ * end. Each note leads with its reference — and its linked Jira service request
+ * when one exists — and title, then the markdown description. The technical
+ * variant additionally appends each note's developer notes and upgrade
+ * requirements. When `sectionTitle` is omitted no section heading is rendered
+ * (the diff export flattens its releases into a single headingless list); when
+ * present it is owned here (rather than emitted by the caller) so it can be
+ * glued to the first feature group and never stranded above a page break.
+ */
+function renderFeatureDetails(changeNotes: ChangeNote[], sectionTitle: string | undefined, serviceRequestKeys: Record<string, string>, variant: PdfVariant): Content[] {
   const groups: { name: string; notes: ChangeNote[] }[] = [];
   const groupsByFeatureId = new Map<number, { name: string; notes: ChangeNote[] }>();
   const featurelessNotes: ChangeNote[] = [];
@@ -259,18 +299,27 @@ function renderFeatureDetails(changeNotes: ChangeNote[], sectionTitle: string): 
 
   if (groups.length === 0) {
     return [
-      sectionHeading(sectionTitle),
+      ...(sectionTitle ? [sectionHeading(sectionTitle)] : []),
       { text: t('placeholder.noChangeNotesAdded'), italics: true, color: '#666666', margin: [0, 0, 0, 16] },
     ];
   }
 
   // Each note leads with its reference — shown as a bold "Ticket ID:" label
-  // followed by the value — and its title; if both are missing it falls back to
+  // followed by the value, and the linked "Service request:" key next to it when
+  // the issue has one — and its title; if everything is missing it falls back to
   // a placeholder so the note still has a visible label.
   const renderNote = (changeNote: ChangeNote): Content => {
     const label: ContentText[] = [];
     if (changeNote.reference) {
-      label.push({ text: `${t('pdf.ticketId')}: `, bold: true }, { text: changeNote.reference });
+      label.push({ text: `${t('pdf.ticketId')}: `, bold: true }, jiraLink(changeNote.reference));
+      const serviceRequest = serviceRequestKeys[changeNote.reference];
+      if (serviceRequest) {
+        label.push(
+          { text: ' · ' },
+          { text: `${t('pdf.serviceRequest')}: `, bold: true },
+          jiraLink(serviceRequest),
+        );
+      }
     }
     if (changeNote.title) label.push({ text: label.length ? ` ${changeNote.title}` : changeNote.title });
     if (label.length === 0) label.push({ text: t('pdf.noTitle'), italics: true });
@@ -278,6 +327,10 @@ function renderFeatureDetails(changeNotes: ChangeNote[], sectionTitle: string): 
     const note: Content[] = [{ text: label, fontSize: NOTE_HEADING_SIZE, margin: [0, 0, 0, 2] }];
     if (changeNote.description) {
       note.push({ stack: markdownToContent(changeNote.description), margin: [12, 0, 0, 8] });
+    }
+    if (variant === 'technical') {
+      if (changeNote.developerNotes) note.push(renderNoteSection(t('title.developerNotes'), changeNote.developerNotes));
+      if (changeNote.upgradeNotes) note.push(renderNoteSection(t('title.upgradeRequirements'), changeNote.upgradeNotes));
     }
     return { stack: note, unbreakable: true, margin: [0, 6, 0, 0] };
   };
@@ -289,7 +342,7 @@ function renderFeatureDetails(changeNotes: ChangeNote[], sectionTitle: string): 
   return groups.flatMap((group, index) => {
     const notes = group.notes.map(renderNote);
     const block: Content[] = [{ text: group.name, style: 'featureHeading' }, notes[0]!];
-    if (index === 0) block.unshift(sectionHeading(sectionTitle));
+    if (index === 0 && sectionTitle) block.unshift(sectionHeading(sectionTitle));
     return [
       { stack: block, unbreakable: true },
       ...notes.slice(1),
@@ -307,10 +360,17 @@ function renderFeatureDetails(changeNotes: ChangeNote[], sectionTitle: string): 
  * sections — the intro, the timeline, the expected-impact overview and the
  * testing responsibilities — leaving the summary, the change details and the
  * known limitations.
+ *
+ * The `variant` controls the change details: the technical variant additionally
+ * carries each change note's developer notes and upgrade requirements, which the
+ * customer variant omits.
  */
-function buildBody(releaseNote: ReleaseNote, changeNotes: ChangeNote[]): Content[] {
+function buildBody(releaseNote: ReleaseNote, changeNotes: ChangeNote[], serviceRequestKeys: Record<string, string>, variant: PdfVariant): Content[] {
   const isPreview = !releaseNote.published;
   return [
+    ...(releaseNote.product
+      ? [{ text: [{ text: `${t('title.product')}: `, bold: true }, releaseNote.product.name], margin: [0, 0, 0, 16] } as Content]
+      : []),
     ...(isPreview ? [{ text: t('pdf.previewIntro'), style: 'intro' } as Content] : []),
     ...(isPreview ? [sectionHeading(t('pdf.timeline')), renderTimeline(releaseNote.releaseTimeline)] : []),
     ...(releaseNote.summary
@@ -323,7 +383,7 @@ function buildBody(releaseNote: ReleaseNote, changeNotes: ChangeNote[]): Content
           renderChangeImpactTable(releaseNote.changeImpacts),
         ]
       : []),
-    ...renderFeatureDetails(changeNotes, t('pdf.featureDetails')),
+    ...renderFeatureDetails(changeNotes, t('pdf.featureDetails'), serviceRequestKeys, variant),
     ...(isPreview
       ? [sectionHeading(t('pdf.testingResponsibility')), ...markdownToContent(t('pdf.testingResponsibilityBody'))]
       : []),
@@ -340,48 +400,24 @@ function renderKnownLimitations(knownLimitations: string[]): Content {
   return { ul: knownLimitations.map((limitation) => ({ text: limitation })), fontSize: MARKDOWN_BODY_SIZE };
 }
 
-/**
- * Exports a release note to a downloaded PDF file.
- *
- * The layout depends on the release note's publication state: a published note
- * produces the customer-facing release document, while a draft produces a
- * preview aimed at planning testing before deployment. The preview carries
- * extra sections (intro, timeline, expected-impact overview and testing
- * responsibilities) and labels its title accordingly; both are authored from
- * the supplied change notes, which the caller has already filtered and
- * optionally translated.
- *
- * This PDF is customer-facing, so it deliberately omits the change notes'
- * developer notes and upgrade requirements, which are internal-only.
- */
-export async function exportToPdf(releaseNote: ReleaseNote, changeNotes: ChangeNote[]) {
+/** The "Generated: <date>" line shown under a document title. */
+function generatedLine() {
   const now = new Date();
   const generatedDate = [
     String(now.getDate()).padStart(2, '0'),
     String(now.getMonth() + 1).padStart(2, '0'),
     now.getFullYear(),
   ].join('.');
+  return { text: `${t('pdf.generated')}: ${generatedDate}`, style: 'generated', width: 'auto', noWrap: true };
+}
 
-  // A preview is labelled as such in the title. The label is intentionally not
-  // translated so the document reads the same across locales.
-  const title = releaseNote.published ? releaseNote.tag : `Release preview: ${releaseNote.tag}`;
-  const generated = { text: `${t('pdf.generated')}: ${generatedDate}`, style: 'generated', width: 'auto', noWrap: true };
-
-  const content: Content[] = [
-    { svg: blackLogo, width: 160, margin: [0, 0, 0, 24], alignment: 'right' },
-  ];
-
-  if (releaseNote.published) {
-    // The release title and the generated date share the top row.
-    content.push({ columns: [{ text: title, style: 'tag' }, generated] });
-  } else {
-    // The preview title spans the row on its own; the generated date sits below.
-    content.push({ text: title, style: 'tag' }, generated);
-  }
-  content.push(...buildBody(releaseNote, changeNotes));
-
+/**
+ * Wraps the shared document scaffolding — the heading-aware page-break rule and
+ * the style sheet — around the given content and downloads it as `fileName`.
+ */
+function downloadDocument(infoTitle: string, content: Content[], fileName: string) {
   const documentDefinition: TDocumentDefinitions = {
-    info: { title: releaseNote.tag },
+    info: { title: infoTitle },
     content,
     // Keep every heading with its content: a heading marked with headlineLevel
     // moves to the next page when nothing — or only further headings — would
@@ -400,5 +436,98 @@ export async function exportToPdf(releaseNote: ReleaseNote, changeNotes: ChangeN
     defaultStyle: { font: 'Roboto', lineHeight: 1.3 },
   };
 
-  pdfMake.createPdf(documentDefinition).download(`${releaseNote.published ? 'Release' : 'Preview'} ${releaseNote.tag}.pdf`);
+  pdfMake.createPdf(documentDefinition).download(fileName);
+}
+
+/**
+ * Exports a release note to downloaded PDF files, one per requested `variant`.
+ *
+ * The layout depends on the release note's publication state: a published note
+ * produces the customer-facing release document, while a draft produces a
+ * preview aimed at planning testing before deployment. The preview carries
+ * extra sections (intro, timeline, expected-impact overview and testing
+ * responsibilities) and labels its title accordingly; both are authored from
+ * the supplied change notes, which the caller has already filtered and
+ * optionally translated. The `serviceRequestKeys` map links each change note's
+ * reference to its Jira service-request key and is rendered next to the
+ * reference on the notes that have one.
+ *
+ * By default both the customer and technical variants are downloaded. The
+ * customer variant deliberately omits the change notes' developer notes and
+ * upgrade requirements, which are internal-only; the technical variant appends
+ * them and marks its title and file name with `TECHNICAL_SUFFIX`.
+ */
+export async function exportToPdf(
+  releaseNote: ReleaseNote,
+  changeNotes: ChangeNote[],
+  serviceRequestKeys: Record<string, string> = {},
+  variants: PdfVariant[] = ['customer', 'technical'],
+) {
+  for (const variant of variants) {
+    // A preview is labelled as such in the title. The label is intentionally
+    // not translated so the document reads the same across locales.
+    const baseTitle = releaseNote.published ? releaseNote.tag : `Release preview: ${releaseNote.tag}`;
+    const title = variant === 'technical' ? `${baseTitle}${TECHNICAL_SUFFIX}` : baseTitle;
+    const generated = generatedLine();
+
+    const content: Content[] = [
+      { svg: blackLogo, width: 160, margin: [0, 0, 0, 24], alignment: 'right' },
+    ];
+
+    if (releaseNote.published) {
+      // The release title and the generated date share the top row.
+      content.push({ columns: [{ text: title, style: 'tag' }, generated] });
+    } else {
+      // The preview title spans the row on its own; the generated date sits below.
+      content.push({ text: title, style: 'tag' }, generated);
+    }
+    content.push(...buildBody(releaseNote, changeNotes, serviceRequestKeys, variant));
+
+    const baseFileName = `${releaseNote.published ? 'Release' : 'Preview'} ${releaseNote.tag}`;
+    const fileName = `${baseFileName}${variant === 'technical' ? TECHNICAL_SUFFIX : ''}.pdf`;
+    downloadDocument(releaseNote.tag, content, fileName);
+  }
+}
+
+/**
+ * Exports a diff of several release notes to downloaded PDF files, one per
+ * requested `variant`, titled "Changes {product}: {fromTag}-{toTag}". The change
+ * notes from every release are flattened, in the given order, into a single
+ * feature-grouped list with no per-release headings. Like the single-release
+ * export, the customer variant omits developer and upgrade notes while the
+ * technical variant appends them and marks its title and file name with
+ * `TECHNICAL_SUFFIX`. The change notes are supplied already filtered;
+ * `serviceRequestKeys` links references to their Jira service requests when
+ * provided.
+ *
+ * @param fromTag the tag of the older release the diff starts after (excluded).
+ * @param toTag   the tag of the most recent release in the diff (included).
+ */
+export async function exportDiffToPdf(
+  diff: { releaseNote: ReleaseNote; changeNotes: ChangeNote[] }[],
+  fromTag: string,
+  toTag: string,
+  serviceRequestKeys: Record<string, string> = {},
+  variants: PdfVariant[] = ['customer', 'technical'],
+) {
+  const productName = diff[0]?.releaseNote.product?.name;
+  const baseTitle = t('pdf.diffTitle', { product: productName ?? '', fromTag, toTag });
+
+  // Flatten every release's change notes into one list, de-duplicating notes
+  // shared across releases while keeping first-seen order.
+  const changeNotes = [
+    ...new Map(diff.flatMap(({ changeNotes }) => changeNotes).map((note) => [note.id, note])).values(),
+  ];
+
+  for (const variant of variants) {
+    const title = variant === 'technical' ? `${baseTitle}${TECHNICAL_SUFFIX}` : baseTitle;
+
+    const content: Content[] = [
+      { svg: blackLogo, width: 160, margin: [0, 0, 0, 24], alignment: 'right' },
+      { columns: [{ text: title, style: 'tag' }, generatedLine()] },
+      ...renderFeatureDetails(changeNotes, undefined, serviceRequestKeys, variant),
+    ];
+
+    downloadDocument(title, content, `${title}.pdf`);
+  }
 }

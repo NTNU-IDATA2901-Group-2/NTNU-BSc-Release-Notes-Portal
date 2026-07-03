@@ -1,0 +1,33 @@
+meta {
+  name: post_diff_new
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseurl}}/releasenotes
+  body: json
+  auth: none
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "tag": "diff-v2.0.0",
+    "summary": "Newest release in the diff range",
+    "published": true,
+    "productId": 1
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+script:post-response {
+  // Created last, so this is the most recent note and the included "to" of the range.
+  bru.setEnvVar("diff_rn_new", res.body)
+}

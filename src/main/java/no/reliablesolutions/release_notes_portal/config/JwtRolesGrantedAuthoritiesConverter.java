@@ -10,30 +10,37 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 /**
- * Custom converter for mapping jwt roles and groups to Spring Security granted authorities.
+ * Custom converter for mapping jwt roles and customer entries to Spring
+ * Security granted authorities. The claim names and customer prefix are
+ * provided by {@link AuthClaimsProperties} so any OIDC provider can be used.
  */
 public class JwtRolesGrantedAuthoritiesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
-  private static final String ROLES_CLAIM = "roles";
-  private static final String GROUPS_CLAIM = "groups";
-  private static final String CUSTOMER_GROUP_PREFIX = "/Customers/";
   private static final String CUSTOMER_PREFIX = "CUSTOMER_";
   private static final String ROLE_PREFIX = "ROLE_";
+
+  private final AuthClaimsProperties claims;
+
+  public JwtRolesGrantedAuthoritiesConverter(AuthClaimsProperties claims) {
+    this.claims = claims;
+  }
 
   @Override
   public List<GrantedAuthority> convert(Jwt jwt) {
     ArrayList<String> roles = new ArrayList<>();
-    List<String> roleStrings = jwt.getClaimAsStringList(ROLES_CLAIM);
+    List<String> roleStrings = jwt.getClaimAsStringList(claims.rolesClaim());
     if (roleStrings != null) {
       roleStrings.stream()
           .filter(role -> !role.isBlank())
+          // Customer entries may share the roles claim (e.g. Entra app roles)
+          .filter(role -> !role.startsWith(claims.customerPrefix()))
           .forEach(role -> roles.add(role.toUpperCase()));
     }
 
-    List<String> groups = jwt.getClaimAsStringList(GROUPS_CLAIM);
+    List<String> groups = jwt.getClaimAsStringList(claims.customerClaim());
     if (groups != null) {
       groups.stream()
-          .filter(group -> group.startsWith(CUSTOMER_GROUP_PREFIX))
-          .map(group -> group.substring(CUSTOMER_GROUP_PREFIX.length()))
+          .filter(group -> group.startsWith(claims.customerPrefix()))
+          .map(group -> group.substring(claims.customerPrefix().length()))
           .filter(group -> !group.isBlank())
           .forEach(group -> roles.add(CUSTOMER_PREFIX + group.toUpperCase()));
     }

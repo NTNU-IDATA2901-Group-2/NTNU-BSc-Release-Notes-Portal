@@ -1,0 +1,31 @@
+meta {
+  name: positive_put_omit_product_id_clears
+  type: http
+  seq: 36
+}
+
+put {
+  url: {{baseurl}}/releasenotes/{{release_id_1}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "published": false
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.product: isNull
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
