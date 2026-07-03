@@ -21,7 +21,7 @@ import { useSearchParams } from '@/composables/useSearchParams';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue-sonner';
-import { isAdmin } from '@/utils/keycloak';
+import { isAdmin } from '@/utils/auth';
 import AllocatedFilter from '@/components/filters/AllocatedFilter.vue';
 import DateRangeFilter from '@/components/filters/DateRangeFilter.vue';
 import Pagination from '@/components/ui/pagination/Pagination.vue';

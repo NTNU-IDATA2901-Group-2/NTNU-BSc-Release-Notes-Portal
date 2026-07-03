@@ -6,7 +6,7 @@ import Avatar from './ui/avatar/Avatar.vue';
 import Separator from './ui/separator/Separator.vue';
 import { GitBranch, SunMoon, LogOut, Sparkles } from "lucide-vue-next"
 import { useTheme } from '@/utils/theme';
-import keycloak, { isAuthenticated, jwtTokenDecoded, isAdmin } from '@/utils/keycloak';
+import { isAuthenticated, userProfile, isAdmin, logout } from '@/utils/auth';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import MenubarSub from './ui/menubar/MenubarSub.vue';
@@ -24,20 +24,18 @@ const { theme } = useTheme()
 const { t } = useI18n()
 
 const handleLogOut = () => {
-	keycloak.logout({
-		redirectUri: `${globalThis.location.origin}${routeNames.signIn}`
-	}).then(() => {
-	}).catch(err => {
-		console.error('Keycloak logout error:', err);
+	logout().catch(err => {
+		console.error('Sign-out error:', err);
 	});
 }
 
 const firstLetters = computed(() => {
 	if (!isAuthenticated.value) return '';
-	if (!jwtTokenDecoded.value) return '';
+	if (!userProfile.value) return '';
 
-	const firstName = jwtTokenDecoded.value.given_name || '';
-	const lastName = jwtTokenDecoded.value.family_name || '';
+	const nameParts = (userProfile.value.name || '').split(' ');
+	const firstName = userProfile.value.given_name || nameParts[0] || '';
+	const lastName = userProfile.value.family_name || (nameParts.length > 1 && nameParts[nameParts.length - 1]) || '';
 	return firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase();
 })
 

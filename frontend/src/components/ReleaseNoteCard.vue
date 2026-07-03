@@ -4,7 +4,7 @@ import Badge from './ui/badge/Badge.vue';
 import type { ReleaseNote } from '@/utils/types';
 import { RouterLink } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { isAdmin } from '@/utils/keycloak';
+import { isAdmin } from '@/utils/auth';
 import Tooltip from './ui/tooltip/Tooltip.vue';
 import TooltipTrigger from './ui/tooltip/TooltipTrigger.vue';
 import TooltipContent from './ui/tooltip/TooltipContent.vue';

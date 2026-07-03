@@ -1,5 +1,5 @@
 import axios from "axios";
-import keycloak from "../utils/keycloak";
+import { getAccessToken } from "../utils/auth";
 import { config } from "@/utils/constants";
 
 const api = axios.create({
@@ -7,9 +7,11 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(async (config) => {
-  await keycloak.updateToken(30);
+  const token = await getAccessToken();
 
-  config.headers.Authorization = `Bearer ${keycloak.token}`;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
   return config;
 });
 

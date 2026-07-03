@@ -1,16 +1,12 @@
 <script setup lang="ts">
 import Button from '@/components/ui/button/Button.vue';
-import keycloak from '@/utils/keycloak';
+import { login } from '@/utils/auth';
 import { LogIn } from 'lucide-vue-next';
 import { useI18n } from 'vue-i18n';
 
 const handleSignIn = () => {
-  keycloak.login({
-    redirectUri: `${window.location.origin}/`
-  }).then(() => {
-
-  }).catch(err => {
-    console.error('Keycloak login error:', err);
+  login().catch(err => {
+    console.error('Sign-in error:', err);
   });
 }
 

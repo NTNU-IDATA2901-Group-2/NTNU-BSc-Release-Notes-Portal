@@ -4,7 +4,7 @@ import Badge from './ui/badge/Badge.vue';
 import type { ChangeNote } from '@/utils/types';
 import { Checkbox } from './ui/checkbox';
 import { useI18n } from 'vue-i18n';
-import { isAdmin } from '@/utils/keycloak';
+import { isAdmin } from '@/utils/auth';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import { openJiraTicket } from '@/utils/jira.ts';
 

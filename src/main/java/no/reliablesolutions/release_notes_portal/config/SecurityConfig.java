@@ -1,5 +1,6 @@
 package no.reliablesolutions.release_notes_portal.config;
 
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -17,8 +18,15 @@ import org.springframework.security.web.SecurityFilterChain;
  */
 @Configuration
 @EnableMethodSecurity()
+@EnableConfigurationProperties(AuthClaimsProperties.class)
 @Profile({ "dev", "prod" }) // Only load this configuration for 'dev' and 'prod' profiles
 public class SecurityConfig {
+
+  private final AuthClaimsProperties authClaimsProperties;
+
+  public SecurityConfig(AuthClaimsProperties authClaimsProperties) {
+    this.authClaimsProperties = authClaimsProperties;
+  }
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) {
@@ -37,10 +45,9 @@ public class SecurityConfig {
     return http.build();
   }
 
-  // Map Keycloak realm roles to Spring Security authorities
   private JwtAuthenticationConverter jwtAuthenticationConverter() {
     JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-    converter.setJwtGrantedAuthoritiesConverter(new JwtRolesGrantedAuthoritiesConverter());
+    converter.setJwtGrantedAuthoritiesConverter(new JwtRolesGrantedAuthoritiesConverter(authClaimsProperties));
     return converter;
   }
 }
