@@ -18,7 +18,6 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -45,26 +44,22 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
   
   // local directory for git repositories, relative to the application working directory
   public static final String REPOSITORY_DIRECTORIES_PATH = "git_repositories";
-  private final String changeNoteDirectory;
 
   /**
    * Constructor for SyncGitChangeNotes.
-   * 
+   *
    * @param gitRepositoryRepository the repository for accessing GitRepository entities
    * @param changeNoteService the service for managing change notes
    * @param changeNoteFileHandler the utility for handling change note files
-   * @param changeNoteDirectory the directory within the Git repository where change note files are located, injected from environment variable, must be set
    */
   public ChangeNotesSyncHandler(
     GitRepositoryRepository gitRepositoryRepository,
     ChangeNoteService changeNoteService,
-    ChangeNoteFileHandler changeNoteFileHandler,
-    @Value("${CHANGE_NOTE_DIRECTORY}") String changeNoteDirectory
+    ChangeNoteFileHandler changeNoteFileHandler
   ) {
     this.gitRepositoryRepository = gitRepositoryRepository;
     this.changeNoteService = changeNoteService;
     this.changeNoteFileHandler = changeNoteFileHandler;
-    this.changeNoteDirectory = changeNoteDirectory;
   }
 
   /**
@@ -99,13 +94,16 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
     if (gitRepository == null) {
       throw new IllegalArgumentException("Git repository cannot be null");
     }
+    if (gitRepository.getChangeNoteDirectory() == null || gitRepository.getChangeNoteDirectory().isBlank()) {
+      throw new IllegalStateException("No change note directory configured for Git repository " + gitRepository.getName());
+    }
 
     File repositoriesDirectory = new File(REPOSITORY_DIRECTORIES_PATH);
     if (!repositoriesDirectory.exists()) {
       repositoriesDirectory.mkdirs();
     }
 
-    logger.info("Updating Git repository {} using change note directory: {}", gitRepository.getName(), changeNoteDirectory);
+    logger.info("Updating Git repository {} using change note directory: {}", gitRepository.getName(), gitRepository.getChangeNoteDirectory());
     File repositoryDirectory = new File(gitRepository.getLocalPath());
     prepareGitRepository(gitRepository, repositoryDirectory);
     syncFromGitRepository(gitRepository, repositoryDirectory);
@@ -268,7 +266,7 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
         List<DiffEntry> diffEntries = diffFormatter.scan(parentCommit.getTree(), commit.getTree());
         List<File> newChangeNoteFiles = diffEntries.stream()
           .filter(diffEntry -> diffEntry.getChangeType() == DiffEntry.ChangeType.ADD)
-          .filter(diffEntry -> diffEntry.getNewPath().startsWith(changeNoteDirectory + "/"))
+          .filter(diffEntry -> diffEntry.getNewPath().startsWith(gitRepository.getChangeNoteDirectory() + "/"))
           .filter(diffEntry -> diffEntry.getNewPath().endsWith(".yaml") || diffEntry.getNewPath().endsWith(".yml"))
           .map(diffEntry -> new File(repositoryDirectory, diffEntry.getNewPath()))
           .toList();

@@ -15,11 +15,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
 import no.reliablesolutions.release_notes_portal.dto.CreateGitRepositoryDTO;
+import no.reliablesolutions.release_notes_portal.dto.UpdateGitRepositoryPatDTO;
 import no.reliablesolutions.release_notes_portal.service.GitRepositoryService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -93,6 +95,28 @@ public class GitRepositoryController {
   public ResponseEntity<List<GitRepository>> getAllGitRepositories() {
     List<GitRepository> gitRepositories = gitRepositoryService.getAllGitRepositories();
     return ResponseEntity.ok(gitRepositories);
+  }
+
+  /**
+   * Replaces the personal access token of an existing Git repository, for example when the previous token has expired.
+   *
+   * @param id the ID of the Git repository to update
+   * @param dto the DTO containing the new personal access token
+   * @return ResponseEntity indicating the success of the update operation
+   */
+  @Operation(summary = "Update Git repository PAT", description = "Replaces the personal access token of an existing Git repository")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Personal access token updated successfully"),
+      @ApiResponse(responseCode = "400", description = "Invalid request payload"),
+      @ApiResponse(responseCode = "404", description = "Git repository not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
+  @PatchMapping("/{id}/pat")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<String> updateGitRepositoryPat(@PathVariable long id, @RequestBody UpdateGitRepositoryPatDTO dto) {
+    gitRepositoryService.updateGitRepositoryPat(id, dto.pat());
+    logger.info("Personal access token updated for Git repository with id: {}", id);
+    return ResponseEntity.ok("Personal access token updated successfully");
   }
 
   /**

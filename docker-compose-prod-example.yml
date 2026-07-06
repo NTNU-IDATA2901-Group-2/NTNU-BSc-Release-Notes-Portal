@@ -43,9 +43,7 @@ services:
       - JIRA_BASE_URL=
       - JIRA_EMAIL=
       - JIRA_API_TOKEN=
-      - CHANGE_NOTE_DIRECTORY=
       - RELEASE_NOTE_DIRECTORY=
-      - GITHUB_RW_PAT=
 
   # Example IdP — remove this service (and the Caddy auth host) when using an
   # external OIDC provider such as Entra ID
