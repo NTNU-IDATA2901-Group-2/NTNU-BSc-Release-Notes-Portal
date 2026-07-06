@@ -13,4 +13,14 @@ public class FailedToSaveEntityException extends RuntimeException {
   public FailedToSaveEntityException(String message) {
     super(message);
   }
+
+  /**
+   * Constructs a new FailedToSaveEntityException with the specified detail message and cause.
+   *
+   * @param message the detail message
+   * @param cause the underlying cause of the failure
+   */
+  public FailedToSaveEntityException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

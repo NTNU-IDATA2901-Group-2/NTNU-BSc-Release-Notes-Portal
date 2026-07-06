@@ -32,8 +32,8 @@ public class FeatureService {
     feature.setName(featureDTO.name());
     try {
       return featureRepository.save(feature).getId();
-    } catch (Exception _) {
-      throw new FailedToSaveEntityException("Failed to create feature");
+    } catch (Exception e) {
+      throw new FailedToSaveEntityException("Failed to create feature", e);
     }
   }
 
@@ -96,8 +96,8 @@ public class FeatureService {
     feature.setName(featureDTO.name());
     try {
       return FeatureDTO.fromFeature(featureRepository.save(feature));
-    } catch (Exception _) {
-      throw new FailedToSaveEntityException("Failed to update feature with ID " + id);
+    } catch (Exception e) {
+      throw new FailedToSaveEntityException("Failed to update feature with ID " + id, e);
     }
   }
 
