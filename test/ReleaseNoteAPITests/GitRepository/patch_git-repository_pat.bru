@@ -1,0 +1,30 @@
+meta {
+  name: patch_git-repository_pat
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{baseurl}}/git-repositories/{{createdGitRepositoryId}}/pat
+  body: json
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "pat": "replacement_test_pat"
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
