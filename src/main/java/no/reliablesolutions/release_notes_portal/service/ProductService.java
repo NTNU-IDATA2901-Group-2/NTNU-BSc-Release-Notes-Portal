@@ -32,8 +32,8 @@ public class ProductService {
     product.setName(productDTO.name());
     try {
       return productRepository.save(product).getId();
-    } catch (Exception _) {
-      throw new FailedToSaveEntityException("Failed to create product");
+    } catch (Exception e) {
+      throw new FailedToSaveEntityException("Failed to create product", e);
     }
   }
 
@@ -76,8 +76,8 @@ public class ProductService {
     product.setName(productDTO.name());
     try {
       return ProductDTO.fromProduct(productRepository.save(product));
-    } catch (Exception _) {
-      throw new FailedToSaveEntityException("Failed to update product with ID " + id);
+    } catch (Exception e) {
+      throw new FailedToSaveEntityException("Failed to update product with ID " + id, e);
     }
   }
 
