@@ -166,7 +166,7 @@
         "draft": "Utkast",
         "containsChangeNotes": "ingen endringsnotater | 1 endringsnotat | {count} endringsnotater"
     },
-      "input": {
+    "input": {
         "addChangeNotes": "Legg til endringsnotater"
     },
     "loadingError": {
@@ -233,7 +233,18 @@
         "noGitRepositories": "Ingen git repositoryer tilgjengelig, vennligst legg til en repository på repositorysiden",
         "noChangeNotesInRepository": "Ingen endringsnotater funnet i den valgte repositoryen",
         "deleteTitle": "Slett Repository",
-        "deleteDescription": "Er du sikker på at du vil slette dette repositoryet? Alle relaterte endringsnotater vil bli frakoblet. Denne handlingen kan ikke angres."
+        "deleteDescription": "Er du sikker på at du vil slette dette repositoryet? Alle relaterte endringsnotater vil bli frakoblet. Denne handlingen kan ikke angres.",
+        "changeNoteDirectory": "Endringsnotatmappe",
+        "changeNoteDirectoryPlaceholder": "f.eks. change_notes",
+        "pat": "Tilgangstoken",
+        "patPlaceholder": "Personlig tilgangstoken",
+        "patSet": "Satt",
+        "patNotSet": "Ikke satt",
+        "updatePat": "Oppdater tilgangstoken",
+        "updatePatTitle": "Oppdater tilgangstoken",
+        "updatePatDescription": "Skriv inn et nytt personlig tilgangstoken for dette repositoryet. Det forrige tokenet vil bli erstattet.",
+        "updatePatSuccess": "Tilgangstoken oppdatert",
+        "updatePatError": "Det oppsto en feil under oppdatering av tilgangstokenet"
     },
     "ai": {
         "translationDisclaimer": "Oversettelsen er generert av KI. Vennligst sjekk viktige fakta."

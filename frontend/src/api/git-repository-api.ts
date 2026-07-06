@@ -95,6 +95,41 @@ export const useDeleteGitRepository = (onFinished: OnMutationApiCallFinished) =>
 }
 
 /**
+ * Replaces the personal access token of a git repository.
+ *
+ * @param id The ID of the git repository to update.
+ * @param pat The new personal access token.
+ * @returns the data from the API response when the update is successful.
+ * @throws An error if the API request to update the access token fails.
+ */
+const updateGitRepositoryPat = async (id: number, pat: string) => {
+    const response = await api.patch(`git-repositories/${id}/pat`, { pat });
+    return response.data;
+}
+
+/**
+ * Replaces the personal access token of a git repository and handles the API call lifecycle.
+ *
+ * @param onFinished An object containing callback functions to be called on success, error, and settled states of the API call.
+ * @returns A mutation object that can be used to trigger the access token update.
+ */
+export const useUpdateGitRepositoryPat = (onFinished: OnMutationApiCallFinished) => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, pat }: { id: number, pat: string }) => updateGitRepositoryPat(id, pat),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['git-repositories'] });
+            onFinished.onSuccess();
+        },
+        onError: () => {
+            console.error("Failed to update git repository access token");
+            onFinished.onError();
+        },
+        onSettled: () => onFinished.onSettled?.(),
+    })
+}
+
+/**
  * Synchronizes all git repositories.
  *
  * @returns the data from the API response.

@@ -13,4 +13,14 @@ public class FailedSyncGitChangeNotesException extends RuntimeException {
   public FailedSyncGitChangeNotesException(String message) {
     super(message);
   }
+
+  /**
+   * Creates a new FailedSyncGitChangeNotesException with the specified detail message and cause.
+   *
+   * @param message the detail message explaining the reason for the failure
+   * @param cause the underlying cause of the failure
+   */
+  public FailedSyncGitChangeNotesException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

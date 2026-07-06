@@ -232,7 +232,18 @@
         "noGitRepositories": "Aucun dépôt git disponible, veuillez ajouter un dépôt sur la page des dépôts",
         "noChangeNotesInRepository": "Aucune note de changement trouvée dans le dépôt sélectionné",
         "deleteTitle": "Supprimer le dépôt",
-        "deleteDescription": "Êtes-vous sûr de vouloir supprimer ce dépôt ? Toutes les notes de changement associées seront dissociées. Cette action ne peut pas être annulée."
+        "deleteDescription": "Êtes-vous sûr de vouloir supprimer ce dépôt ? Toutes les notes de changement associées seront dissociées. Cette action ne peut pas être annulée.",
+        "changeNoteDirectory": "Répertoire des notes de changement",
+        "changeNoteDirectoryPlaceholder": "p. ex. change_notes",
+        "pat": "Jeton d'accès",
+        "patPlaceholder": "Jeton d'accès personnel",
+        "patSet": "Défini",
+        "patNotSet": "Non défini",
+        "updatePat": "Mettre à jour le jeton d'accès",
+        "updatePatTitle": "Mettre à jour le jeton d'accès",
+        "updatePatDescription": "Saisissez un nouveau jeton d'accès personnel pour ce dépôt. Le jeton précédent sera remplacé.",
+        "updatePatSuccess": "Jeton d'accès mis à jour avec succès",
+        "updatePatError": "Une erreur s'est produite lors de la mise à jour du jeton d'accès"
     },
     "ai": {
         "translationDisclaimer": "Cette traduction est générée par l'IA. Veuillez vérifier les informations importantes."

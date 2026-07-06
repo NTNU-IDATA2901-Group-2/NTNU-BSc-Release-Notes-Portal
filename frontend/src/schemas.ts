@@ -47,6 +47,8 @@ export const EditChangeNoteSchema = z.object({
 export const CreateGitRepositorySchema = z.object({
   name: z.string().min(1, { message: "Required" }),
   url: z.string().min(1, { message: "Required" }),
+  changeNoteDirectory: z.string().min(1, { message: "Required" }),
+  pat: z.string().optional(),
 })
 
 export const UpdatePromptsSchema = z.object({
