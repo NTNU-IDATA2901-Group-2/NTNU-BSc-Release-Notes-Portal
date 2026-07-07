@@ -253,8 +253,7 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
   /**
    * Synchronizes change notes from a Git repository by checking for new commits since the last checked commit, and creating change notes from any new change note files found in those commits.
    *
-   * The last checked commit hash is updated after processing the commits, ensuring that only new commits are processed in the next synchronization.
-   * Any trailing commits behind the last change note commit are not considered for being marked as last checked, and will be re-checked in the next synchronization.
+   * The last checked commit hash is updated to the newest commit in the processed range, ensuring that only new commits are processed in the next synchronization.
    * @param gitRepository the Git repository to synchronize, must not be null
    * @param repositoryDirectory the local directory for the repository, must not be null
    */
@@ -296,7 +295,7 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
    * @param repositoryDirectory the local directory for the repository, must not be null
    * @param repository the JGit Repository object, must not be null
    * @param gitRepository the Git repository entity, must not be null
-   * @return the ObjectId of the last commit that was processed for change notes, or null if no commits with change notes were found
+   * @return the ObjectId of the newest commit in the walk, whether or not it contained change notes, or null if the walk contained no commits
    */
   private ObjectId createChangeNotesFromCommits(RevWalk revWalk, File repositoryDirectory, Repository repository, GitRepository gitRepository) {
     if (revWalk == null) {
@@ -360,7 +359,7 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
     }
 
     if (lastCheckedCommit == null) {
-      logger.warn("No commits with change notes found in repository at {}", repositoryDirectory.getPath());
+      logger.warn("No new commits found in repository at {}", repositoryDirectory.getPath());
       return null;
     }
     return lastCheckedCommit.getId();

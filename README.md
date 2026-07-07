@@ -19,7 +19,7 @@ This project supports three runtime modes:
 |---|---|
 | Java | 25 |
 | Maven | 3.9+ |
-| Node.js | 20+ |
+| Node.js | 20.19+ |
 | pnpm | 10+ |
 | Docker + Docker Compose | Recent version |
 
@@ -79,7 +79,7 @@ After first startup, configure Keycloak (required in dev):
 4. If needed, verify the client matching `OIDC_CLIENT_ID` exists and is configured for browser login flow (standard flow + PKCE for SPA usage).
 5. Verify redirect URI for frontend dev server, for example `http://localhost:5173/*`.
 6. Verify web origin for frontend dev server, for example `http://localhost:5173`.
-7. Create a user for test purposes and assign roles under the `release-note` client: at minimum `Admin`, and customer roles when required.
+7. Create a user for test purposes and assign the `Admin` role under the `release-note` client. For customer access, add the user to a subgroup of `/Customers` (e.g. `/Customers/ACME`) instead of assigning a role.
 
 ### 3) Start frontend
 

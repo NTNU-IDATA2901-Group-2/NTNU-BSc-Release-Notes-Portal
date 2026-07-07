@@ -96,7 +96,7 @@ public class ScopeController {
    *
    * @param id the ID of the scope to be updated
    * @param scopeDetails the new details of the scope
-   * @return a ResponseEntity containing the updated scope details
+   * @return a ResponseEntity containing a confirmation message with the updated scope's ID
    */
   @Operation(summary = "Update scope", description = "Updates an existing scope with new details")
   @ApiResponses(value = {
