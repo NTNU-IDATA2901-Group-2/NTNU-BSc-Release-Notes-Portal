@@ -1,6 +1,11 @@
 services:
   caddy:
     image: caddy:2
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
     ports:
       - "80:80"
       - "443:443"
@@ -14,6 +19,11 @@ services:
 
   app:
     image: ghcr.io/ntnu-idata2901-group-2/ntnu-bsc-release-notes-portal:latest
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
     depends_on:
       db:
         condition: service_started
@@ -49,6 +59,11 @@ services:
   # external OIDC provider such as Entra ID
   keycloak:
     image: quay.io/keycloak/keycloak:26.5.2
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME:
       KC_BOOTSTRAP_ADMIN_PASSWORD:
@@ -63,6 +78,11 @@ services:
 
   db:
     image: postgres:latest
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
     environment:
       POSTGRES_USER:
       POSTGRES_PASSWORD:

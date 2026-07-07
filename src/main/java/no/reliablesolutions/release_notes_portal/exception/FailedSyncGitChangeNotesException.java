@@ -15,7 +15,7 @@ public class FailedSyncGitChangeNotesException extends RuntimeException {
   }
 
   /**
-   * Creates a new FailedSyncGitChangeNotesException with the specified detail message and cause.
+   * Constructs a new FailedSyncGitChangeNotesException with the specified detail message and cause.
    *
    * @param message the detail message explaining the reason for the failure
    * @param cause the underlying cause of the failure

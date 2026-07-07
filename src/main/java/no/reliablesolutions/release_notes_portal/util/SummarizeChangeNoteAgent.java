@@ -3,8 +3,6 @@ package no.reliablesolutions.release_notes_portal.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -26,7 +24,6 @@ public class SummarizeChangeNoteAgent {
   private final GitRepositoryService gitRepositoryService;
   private final ChangeNoteGitInspectionService changeNoteGitInspectionService;
   private final PromptRepository promptRepository;
-  private final Logger logger = LoggerFactory.getLogger(SummarizeChangeNoteAgent.class);
 
   public SummarizeChangeNoteAgent(ChatClient.Builder chatClientBuilder, ChangeNoteService changeNoteService,
       GitRepositoryService gitRepositoryService, ChangeNoteGitInspectionService changeNoteGitInspectionService, PromptRepository promptRepository) {
@@ -49,7 +46,6 @@ public class SummarizeChangeNoteAgent {
     .call()
     .entity(AgentResponse.class);
 
-    logger.info("Agent response: {}", response);
     return response.answer();
   }
 

@@ -51,8 +51,8 @@ public class GitRepositoryService {
         gitRepository.setPat(dto.pat());
         try {
             return gitRepositoryRepository.save(gitRepository).getId();
-        } catch (Exception _) {
-            throw new FailedToSaveEntityException("Failed to create Git repository");
+        } catch (Exception e) {
+            throw new FailedToSaveEntityException("Failed to create Git repository", e);
         }
     }
 
@@ -94,8 +94,8 @@ public class GitRepositoryService {
         gitRepository.setPat(pat);
         try {
             gitRepositoryRepository.save(gitRepository);
-        } catch (Exception _) {
-            throw new FailedToSaveEntityException("Failed to update Git repository with id " + id);
+        } catch (Exception e) {
+            throw new FailedToSaveEntityException("Failed to update Git repository with id " + gitRepository.getId(), e);
         }
     }
 
@@ -112,7 +112,7 @@ public class GitRepositoryService {
             }
             syncGitChangeNotes.syncAllGitRepositories();
         } catch (Exception e) {
-            throw new FailedSyncGitChangeNotesException(e.getMessage());
+            throw new FailedSyncGitChangeNotesException(e.getMessage(), e);
         }
     }
 
@@ -135,7 +135,7 @@ public class GitRepositoryService {
         } catch (GitRepositoryNotFoundException e) {
             throw e; // rethrow to handle in global exception handler
         } catch (Exception e) {
-            throw new FailedSyncGitChangeNotesException(e.getMessage());
+            throw new FailedSyncGitChangeNotesException(e.getMessage(), e);
         }
     }
 

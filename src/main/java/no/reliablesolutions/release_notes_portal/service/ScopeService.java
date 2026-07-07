@@ -31,8 +31,8 @@ public class ScopeService {
     scope.setName(scopeDTO.name());
     try {
       return scopeRepository.save(scope).getId();
-    } catch (Exception _) {
-      throw new FailedToSaveEntityException("Failed to create scope");
+    } catch (Exception e) {
+      throw new FailedToSaveEntityException("Failed to create scope", e);
     }
   }
 
@@ -80,8 +80,8 @@ public class ScopeService {
 
     try {
       scopeRepository.save(scope);
-    } catch (Exception _) {
-      throw new FailedToSaveEntityException("Failed to update scope with ID " + id);
+    } catch (Exception e) {
+      throw new FailedToSaveEntityException("Failed to update scope with ID " + id, e);
     }
 
     return ScopeDTO.fromScope(scope);
