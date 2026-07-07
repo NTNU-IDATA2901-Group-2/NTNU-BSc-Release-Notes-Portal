@@ -150,7 +150,8 @@
             "whatIsChanged": "Please describe what is changed for every change impact",
             "whatShouldBeTested": "Please describe what should be tested for every change impact",
             "testingNeed": "Please select a testing need for every change impact"
-        }
+        },
+        "required": "Required"
     },
     "deletePrompt": {
         "title": "Are you sure you want to delete?",
@@ -222,8 +223,6 @@
         "deleteError": "An error occurred while removing the repository",
         "createSuccess": "Repository added successfully",
         "createError": "An error occurred while adding the repository",
-        "nameRequired": "Name is required",
-        "urlRequired": "URL is required",
         "error": "An error occurred while loading repositories",
         "syncAll": "Sync all repositories",
         "syncSuccess": "Repositories synchronized successfully",

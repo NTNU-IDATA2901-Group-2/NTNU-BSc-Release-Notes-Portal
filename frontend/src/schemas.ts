@@ -45,9 +45,9 @@ export const EditChangeNoteSchema = z.object({
 })
 
 export const CreateGitRepositorySchema = z.object({
-  name: z.string().min(1, { message: "Required" }),
-  url: z.string().min(1, { message: "Required" }),
-  changeNoteDirectory: z.string().min(1, { message: "Required" }),
+  name: z.string({ required_error: 'validation.required' }).min(1, { message: 'validation.required' }),
+  url: z.string({ required_error: 'validation.required' }).min(1, { message: 'validation.required' }),
+  changeNoteDirectory: z.string({ required_error: 'validation.required' }).min(1, { message: 'validation.required' }),
   pat: z.string().optional(),
 })
 

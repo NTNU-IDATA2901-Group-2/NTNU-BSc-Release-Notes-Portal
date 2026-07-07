@@ -150,7 +150,8 @@
             "whatIsChanged": "Veuillez décrire ce qui a changé pour chaque changement",
             "whatShouldBeTested": "Veuillez décrire ce qui doit être testé pour chaque changement",
             "testingNeed": "Veuillez sélectionner un besoin de test pour chaque changement"
-        }
+        },
+        "required": "Requis"
     },
     "deletePrompt": {
         "title": "Êtes-vous sûr de vouloir supprimer ?",
@@ -222,8 +223,6 @@
         "deleteError": "Une erreur s'est produite lors de la suppression du dépôt",
         "createSuccess": "Dépôt ajouté avec succès",
         "createError": "Une erreur s'est produite lors de l'ajout du dépôt",
-        "nameRequired": "Le nom est requis",
-        "urlRequired": "L'URL est requise",
         "error": "Une erreur s'est produite lors du chargement des dépôts",
         "syncAll": "Synchroniser tous les dépôts",
         "syncSuccess": "Dépôts synchronisés avec succès",

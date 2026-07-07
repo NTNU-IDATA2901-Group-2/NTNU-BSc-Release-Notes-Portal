@@ -151,7 +151,8 @@
             "whatIsChanged": "Beskriv hva som er endret for hver endring",
             "whatShouldBeTested": "Beskriv hva som bør testes for hver endring",
             "testingNeed": "Velg et testbehov for hver endring"
-        }
+        },
+        "required": "Påkrevd"
     },
     "deletePrompt": {
         "title": "Er du sikker på at du vil slette?",
@@ -223,8 +224,6 @@
         "deleteError": "Det oppsto en feil under fjerning av repository",
         "createSuccess": "Repository lagt til",
         "createError": "Det oppsto en feil under tillegg av repository",
-        "nameRequired": "Navn er påkrevd",
-        "urlRequired": "URL er påkrevd",
         "error": "Det oppsto en feil under innlastning av repositoryer",
         "syncAll": "Synkroniser alle repositoryer",
         "syncSuccess": "Repositoryer synkronisert",
