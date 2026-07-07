@@ -1,0 +1,30 @@
+meta {
+  name: negative_patch_git-repository_pat_invalid_id
+  type: http
+  seq: 7
+}
+
+patch {
+  url: {{baseurl}}/git-repositories/999999/pat
+  body: json
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "pat": "replacement_test_pat"
+  }
+}
+
+assert {
+  res.status: eq 404
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

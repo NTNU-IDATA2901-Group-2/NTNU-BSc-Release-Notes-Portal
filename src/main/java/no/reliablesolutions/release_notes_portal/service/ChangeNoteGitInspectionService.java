@@ -22,10 +22,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
+import no.reliablesolutions.release_notes_portal.domain.repository.GitRepositoryRepository;
 import no.reliablesolutions.release_notes_portal.exception.GitInspectionException;
 
 /**
@@ -39,18 +40,29 @@ import no.reliablesolutions.release_notes_portal.exception.GitInspectionExceptio
 @Profile("!ci")
 public class ChangeNoteGitInspectionService {
   private final Logger logger = LoggerFactory.getLogger(ChangeNoteGitInspectionService.class);
-  private final String changeNoteDirectory;
+  private final GitRepositoryRepository gitRepositoryRepository;
 
   /**
    * Constructor for ChangeNoteGitInspectionService.
    *
-   * @param changeNoteDirectory the repository-relative directory holding change
-   *                            note files, excluded from generated diffs;
-   *                            injected from application properties
+   * @param gitRepositoryRepository the repository for accessing GitRepository entities
    */
-  public ChangeNoteGitInspectionService(
-      @Value("${CHANGE_NOTE_DIRECTORY}") String changeNoteDirectory) {
-    this.changeNoteDirectory = changeNoteDirectory;
+  public ChangeNoteGitInspectionService(GitRepositoryRepository gitRepositoryRepository) {
+    this.gitRepositoryRepository = gitRepositoryRepository;
+  }
+
+  /**
+   * Resolves the change note directory of the Git repository at the given local path. Used to exclude change note files from generated diffs.
+   *
+   * @param repositoryPath the local path of the git repository
+   * @return the repository's change note directory, or null if the repository is unknown or has none configured
+   */
+  private String resolveChangeNoteDirectory(String repositoryPath) {
+    GitRepository gitRepository = gitRepositoryRepository.findFirstByName(new File(repositoryPath).getName());
+    if (gitRepository == null || gitRepository.getChangeNoteDirectory() == null || gitRepository.getChangeNoteDirectory().isBlank()) {
+      return null;
+    }
+    return gitRepository.getChangeNoteDirectory();
   }
 
   /**
@@ -89,6 +101,7 @@ public class ChangeNoteGitInspectionService {
     }
 
     StringBuilder diffStringBuilder = new StringBuilder();
+    String changeNoteDirectory = resolveChangeNoteDirectory(repositoryPath);
 
     try (Git git = Git.open(repositoryDirectory);
         OutputStream outputStream = new ByteArrayOutputStream();
@@ -102,7 +115,7 @@ public class ChangeNoteGitInspectionService {
 
       List<DiffEntry> diffs = diffFormatter.scan(oldCommit.getTree(), newCommit.getTree());
       for (DiffEntry diff : diffs) {
-        if (diff.getNewPath().startsWith(changeNoteDirectory)
+        if ((changeNoteDirectory != null && diff.getNewPath().startsWith(changeNoteDirectory))
             || (filePath != null && !diff.getNewPath().equals(filePath))) {
           continue;
         }
@@ -310,6 +323,8 @@ public class ChangeNoteGitInspectionService {
           "Repository directory does not exist: " + repositoryDirectory.getAbsolutePath());
     }
 
+    String changeNoteDirectory = resolveChangeNoteDirectory(repositoryPath);
+
     try (Git git = Git.open(repositoryDirectory)) {
       Repository repository = git.getRepository();
 
@@ -330,7 +345,7 @@ public class ChangeNoteGitInspectionService {
             .setNewTree(newTreeIter)
             .call()
             .stream()
-            .filter(diff -> !diff.getNewPath().startsWith(changeNoteDirectory))
+            .filter(diff -> changeNoteDirectory == null || !diff.getNewPath().startsWith(changeNoteDirectory))
             .toList();
 
         logger.info("Found {} changed files between {} and {} in repository {}",

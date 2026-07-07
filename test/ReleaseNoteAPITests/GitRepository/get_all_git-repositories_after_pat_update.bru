@@ -1,7 +1,7 @@
 meta {
-  name: get_all_git-repositories_after_addition
+  name: get_all_git-repositories_after_pat_update
   type: http
-  seq: 4
+  seq: 8
 }
 
 get {
@@ -15,16 +15,14 @@ headers {
 }
 
 assert {
-  res.body.length: eq {{gitRepositoryCountPlusOne}}
   res.status: eq 200
 }
 
 tests {
-  // The PAT itself must never be exposed through the API, only the patSet flag.
+  // The updated PAT must be reflected in patSet without ever being exposed.
   res.body.forEach(repo => expect(repo).to.not.have.property("pat"))
   const created = res.body.find(repo => String(repo.id) === String(bru.getEnvVar("createdGitRepositoryId")))
-  expect(created.changeNoteDirectory).to.equal("change_notes")
-  expect(created.patSet).to.equal(false)
+  expect(created.patSet).to.equal(true)
 }
 
 settings {

@@ -150,7 +150,8 @@
             "whatIsChanged": "Please describe what is changed for every change impact",
             "whatShouldBeTested": "Please describe what should be tested for every change impact",
             "testingNeed": "Please select a testing need for every change impact"
-        }
+        },
+        "required": "Required"
     },
     "deletePrompt": {
         "title": "Are you sure you want to delete?",
@@ -222,8 +223,6 @@
         "deleteError": "An error occurred while removing the repository",
         "createSuccess": "Repository added successfully",
         "createError": "An error occurred while adding the repository",
-        "nameRequired": "Name is required",
-        "urlRequired": "URL is required",
         "error": "An error occurred while loading repositories",
         "syncAll": "Sync all repositories",
         "syncSuccess": "Repositories synchronized successfully",
@@ -232,7 +231,18 @@
         "noGitRepositories": "No git repositories available, please add a repository on the repositories page",
         "noChangeNotesInRepository": "No change notes found in the selected repository",
         "deleteTitle": "Delete Repository",
-        "deleteDescription": "Are you sure you want to delete this repository? Any related change notes will be unlinked. This action cannot be undone."
+        "deleteDescription": "Are you sure you want to delete this repository? Any related change notes will be unlinked. This action cannot be undone.",
+        "changeNoteDirectory": "Change note directory",
+        "changeNoteDirectoryPlaceholder": "e.g. change_notes",
+        "pat": "Access token",
+        "patPlaceholder": "Personal access token",
+        "patSet": "Set",
+        "patNotSet": "Not set",
+        "updatePat": "Update access token",
+        "updatePatTitle": "Update access token",
+        "updatePatDescription": "Enter a new personal access token for this repository. The previous token will be replaced.",
+        "updatePatSuccess": "Access token updated successfully",
+        "updatePatError": "An error occurred while updating the access token"
     },
     "ai": {
         "translationDisclaimer": "This translation is AI generated. Please check important facts."

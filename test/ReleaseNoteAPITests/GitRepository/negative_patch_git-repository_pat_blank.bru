@@ -1,0 +1,30 @@
+meta {
+  name: negative_patch_git-repository_pat_blank
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseurl}}/git-repositories/{{createdGitRepositoryId}}/pat
+  body: json
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "pat": ""
+  }
+}
+
+assert {
+  res.status: eq 400
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

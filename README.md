@@ -50,8 +50,7 @@ Main variables used by the backend and compose:
 | `DB_URL` | JDBC URL for Spring datasource |
 | `OPENAI_URL` / `OPENAI_API_KEY` / `OPENAI_CHAT_COMPLETIONS_PATH` / `OPENAI_MODEL` | AI integration settings. During development the Groq API (OpenAI-compatible) was used; this requires signing up to acquire an API key. `OPENAI_CHAT_COMPLETIONS_PATH` sets the chat completions endpoint path. |
 | `JIRA_BASE_URL` / `JIRA_EMAIL` / `JIRA_API_TOKEN` | Jira integration base URL and API credentials |
-| `CHANGE_NOTE_DIRECTORY` / `RELEASE_NOTE_DIRECTORY` | Relative change note and release note directories used by git features |
-| `GITHUB_RW_PAT` | GitHub read/write personal access token used to push release notes |
+| `RELEASE_NOTE_DIRECTORY` | Relative release note directory used by git features. The change note directory and personal access token are configured per git repository in the portal |
 
 ## Development Mode (dev)
 

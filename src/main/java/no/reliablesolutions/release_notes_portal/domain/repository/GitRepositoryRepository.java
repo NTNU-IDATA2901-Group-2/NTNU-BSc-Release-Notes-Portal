@@ -24,4 +24,12 @@ public interface GitRepositoryRepository extends JpaRepository<GitRepository, Lo
       """)
   GitRepository findByChangeNoteId(long changeNoteId);
 
+  /**
+   * Finds a Git repository by its name.
+   *
+   * @param name the name of the Git repository
+   * @return the Git repository with the specified name, or null if none exists
+   */
+  GitRepository findFirstByName(String name);
+
 }
