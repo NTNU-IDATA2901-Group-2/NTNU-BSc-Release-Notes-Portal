@@ -115,7 +115,9 @@ const onSubmit = handleSubmit((values) => {
 
 <template>
   <div class="flex flex-col items-center mt-20 w-full">
-    <form class="flex flex-row gap-8" @submit="onSubmit">
+    <form
+class="flex flex-col items-center gap-4 px-4 sm:flex-row sm:flex-wrap sm:items-stretch sm:justify-center sm:gap-8"
+      @submit="onSubmit">
       <div class="flex flex-col gap-2">
         <h2 class="text-lg">{{ t('diffReleaseNotes.product') }}</h2>
         <TagCombobox mode="product" v-model="productId" />
