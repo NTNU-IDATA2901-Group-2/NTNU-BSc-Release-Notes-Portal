@@ -3,15 +3,22 @@ package no.reliablesolutions.release_notes_portal.runner;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ResetCommand.ResetType;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
+import org.eclipse.jgit.lib.BranchConfig;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.RepositoryState;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevSort;
 import org.eclipse.jgit.revwalk.RevWalk;
@@ -26,12 +33,13 @@ import org.springframework.stereotype.Component;
 import no.reliablesolutions.release_notes_portal.domain.entity.ChangeNote;
 import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
 import no.reliablesolutions.release_notes_portal.domain.repository.GitRepositoryRepository;
+import no.reliablesolutions.release_notes_portal.exception.FailedSyncGitChangeNotesException;
 import no.reliablesolutions.release_notes_portal.exception.InvalidChangeNoteYamlException;
 import no.reliablesolutions.release_notes_portal.service.ChangeNoteService;
 import no.reliablesolutions.release_notes_portal.util.ChangeNoteFileHandler;
 
 /**
- * This class is responsible for synchronizing change notes from Git repositories. It will clone or pull the repositories, check for new commits, and create change notes from any new change note files found in the commits.
+ * This class is responsible for synchronizing change notes from Git repositories. It will clone or update the repositories, check for new commits, and create change notes from any new change note files found in the commits.
  */
 @Component
 @Profile("!ci")
@@ -63,19 +71,38 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
   }
 
   /**
-   * Runs the synchronization process for Git change notes on all Git repositories.
+   * Runs the synchronization process for Git change notes on all Git repositories at application startup. Failures are logged without aborting startup.
    */
   @Override
-  public void run(String... args) throws Exception {    
+  public void run(String... args) throws Exception {
+    try {
+      this.syncAllGitRepositories();
+    } catch (FailedSyncGitChangeNotesException e) {
+      logger.error("Git repository synchronization at startup finished with failures: {}", e.getMessage());
+    }
+  }
+
+  /**
+   * Synchronizes change notes from all Git repositories. Every repository is attempted, even if some fail.
+   *
+   * @throws FailedSyncGitChangeNotesException if one or more repositories failed to synchronize
+   */
+  public void syncAllGitRepositories() {
     List<GitRepository> gitRepositories = gitRepositoryRepository.findAll();
     logger.info("Found {} git repositories", gitRepositories.size());
-    gitRepositories.forEach(gitRepository -> {
+    List<String> failedRepositoryNames = new ArrayList<>();
+    for (GitRepository gitRepository : gitRepositories) {
       try {
         this.syncGitRepository(gitRepository);
       } catch (Exception e) {
-        logger.error("Failed to synchronize Git repository with id {} due to unexpected error", gitRepository.getId(), e);
+        logger.error("Failed to synchronize Git repository with id {}", gitRepository.getId(), e);
+        failedRepositoryNames.add(gitRepository.getName());
       }
-    });
+    }
+    if (!failedRepositoryNames.isEmpty()) {
+      throw new FailedSyncGitChangeNotesException(String.format("Failed to synchronize %d of %d Git repositories: %s",
+          failedRepositoryNames.size(), gitRepositories.size(), String.join(", ", failedRepositoryNames)));
+    }
   }
   
 
@@ -110,7 +137,7 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
   }
 
   /**
-   * Prepares a Git repository by cloning it if it does not exist locally, or pulling the latest changes if it does.
+   * Prepares a Git repository by cloning it if it does not exist locally, or updating it from the remote if it does.
    * 
    * A new local directory is created if it is not already present.
    * The last checked commit hash is wiped if the repository is being cloned, ensuring that the persisted data is correct.
@@ -135,7 +162,7 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
       gitRepositoryRepository.save(gitRepository);
       cloneRepository(gitRepository, repositoryDirectory);
     } else {
-      pullRepository(gitRepository, repositoryDirectory);
+      fetchAndResetRepository(gitRepository, repositoryDirectory);
     }
   }
   
@@ -158,33 +185,71 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
         .setURI(gitRepository.getUrl())
         .setDirectory(repositoryDirectory)
         .call()) {
-    } catch (GitAPIException e) {
-      logger.error("Failed to clone repository with id {}", gitRepository.getId(), e);
     } catch (Exception e) {
-      logger.error("Failed to clone repository with id {} due to unexpected error", gitRepository.getId(), e);
+      logger.error("Failed to clone repository with id {}", gitRepository.getId(), e);
+      throw new FailedSyncGitChangeNotesException("Failed to clone Git repository " + gitRepository.getName(), e);
     }
   }
   
   /**
-   * Pulls the latest changes for a Git repository from the remote.
+   * Updates a Git repository by fetching and hard-resetting the checked-out branch to its remote tracking branch, discarding any local-only changes.
    *
-   * @param gitRepository the Git repository to pull, must not be null
+   * @param gitRepository the Git repository to update, must not be null
    * @param repositoryDirectory the local directory for the repository, must not be null
    */
-  private void pullRepository(GitRepository gitRepository, File repositoryDirectory) {
+  private void fetchAndResetRepository(GitRepository gitRepository, File repositoryDirectory) {
     if (gitRepository == null) {
       throw new IllegalArgumentException("Git repository cannot be null");
     }
     if (repositoryDirectory == null) {
       throw new IllegalArgumentException("Repository directory cannot be null");
     }
-    
+
     try (Git git = Git.open(repositoryDirectory);) {
-      logger.info("Pulling repository {} with id {}", gitRepository.getName(), gitRepository.getId());
-      git.pull().call();
+      RepositoryState repositoryState = git.getRepository().getRepositoryState();
+      if (repositoryState != RepositoryState.SAFE) {
+        logger.warn("Repository {} with id {} is in state {}. Resetting it to recover", gitRepository.getName(), gitRepository.getId(), repositoryState);
+        git.reset().setMode(ResetType.HARD).call();
+      }
+      logger.info("Fetching repository {} with id {}", gitRepository.getName(), gitRepository.getId());
+      git.fetch().call();
+      String trackingBranch = new BranchConfig(git.getRepository().getConfig(), git.getRepository().getBranch()).getTrackingBranch();
+      if (trackingBranch == null) {
+        checkoutDefaultBranch(git, gitRepository);
+        trackingBranch = new BranchConfig(git.getRepository().getConfig(), git.getRepository().getBranch()).getTrackingBranch();
+      }
+      if (trackingBranch == null) {
+        throw new FailedSyncGitChangeNotesException("No remote tracking branch configured for the checked-out branch in Git repository " + gitRepository.getName());
+      }
+      git.reset().setMode(ResetType.HARD).setRef(trackingBranch).call();
+    } catch (FailedSyncGitChangeNotesException e) {
+      throw e;
     } catch (Exception e) {
-      logger.error("Failed to pull repository with id {} due to unexpected error", gitRepository.getId(), e);
+      logger.error("Failed to update repository with id {} from remote due to unexpected error", gitRepository.getId(), e);
+      throw new FailedSyncGitChangeNotesException("Failed to update Git repository " + gitRepository.getName() + " from remote", e);
     }
+  }
+
+  /**
+   * Force-checks out the default branch (main or master) of a Git repository.
+   *
+   * @param git the open Git handle, must not be null
+   * @param gitRepository the Git repository entity, must not be null
+   */
+  private void checkoutDefaultBranch(Git git, GitRepository gitRepository) throws GitAPIException {
+    Set<String> branchNames = git.branchList().call().stream()
+        .map(Ref::getName)
+        .collect(Collectors.toSet());
+    String defaultBranch;
+    if (branchNames.contains("refs/heads/main")) {
+      defaultBranch = "main";
+    } else if (branchNames.contains("refs/heads/master")) {
+      defaultBranch = "master";
+    } else {
+      throw new FailedSyncGitChangeNotesException("No default branch (main or master) found in Git repository " + gitRepository.getName());
+    }
+    logger.warn("Repository {} with id {} has no remote tracking branch for the checked-out branch. Checking out {}", gitRepository.getName(), gitRepository.getId(), defaultBranch);
+    git.checkout().setName(defaultBranch).setForced(true).call();
   }
   
   /**
@@ -220,9 +285,8 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
       }
     } catch (IOException e) {
       logger.error("Failed to open repository with id {} due to IO error", gitRepository.getId(), e);
-    } 
-    
-    
+      throw new FailedSyncGitChangeNotesException("Failed to open Git repository " + gitRepository.getName(), e);
+    }
   }
   
   /**
@@ -296,8 +360,9 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
       
     } catch (IOException e) {
       logger.error("Failed to check new commits for repository at {} due to IO error", repositoryDirectory.getPath(), e);
+      throw new FailedSyncGitChangeNotesException("Failed to check new commits for Git repository " + gitRepository.getName(), e);
     }
-    
+
     if (lastCheckedCommit == null) {
       logger.warn("No commits with change notes found in repository at {}", repositoryDirectory.getPath());
       return null;

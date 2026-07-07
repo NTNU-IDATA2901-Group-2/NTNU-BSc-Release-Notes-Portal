@@ -100,9 +100,9 @@ public class GitRepositoryService {
     }
 
     /**
-     * Synchronizes Git repositories by running SyncGitChangeNotes.
-     * 
-     * @throws FailedSyncGitChangeNotesException if syncing Git change notes fails
+     * Synchronizes all Git repositories. Every repository is attempted, even if some fail.
+     *
+     * @throws FailedSyncGitChangeNotesException if syncing one or more Git repositories fails
      */
     public void syncGitRepositories() {
         try {
@@ -110,7 +110,7 @@ public class GitRepositoryService {
             if (syncGitChangeNotes == null) {
                 throw new IllegalStateException("SyncGitChangeNotes is not available. Cannot sync Git repositories.");
             }
-            syncGitChangeNotes.run();
+            syncGitChangeNotes.syncAllGitRepositories();
         } catch (Exception e) {
             throw new FailedSyncGitChangeNotesException(e.getMessage());
         }
