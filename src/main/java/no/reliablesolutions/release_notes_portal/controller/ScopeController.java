@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -88,7 +89,7 @@ public class ScopeController {
   public ResponseEntity<Long> createScope(@Valid @RequestBody CreateTagDTO scopeDetails) {
     logger.info("Created scope with details: {}", scopeDetails);
     long createdScope = scopeService.createScope(scopeDetails);
-    return ResponseEntity.ok(createdScope);
+    return ResponseEntity.status(HttpStatus.CREATED).body(createdScope);
   }
 
   /**
@@ -96,7 +97,7 @@ public class ScopeController {
    *
    * @param id the ID of the scope to be updated
    * @param scopeDetails the new details of the scope
-   * @return a ResponseEntity containing the updated scope details
+   * @return a ResponseEntity containing a confirmation message with the updated scope's ID
    */
   @Operation(summary = "Update scope", description = "Updates an existing scope with new details")
   @ApiResponses(value = {

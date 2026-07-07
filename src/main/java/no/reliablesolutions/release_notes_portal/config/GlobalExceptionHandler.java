@@ -327,7 +327,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(value = {no.reliablesolutions.release_notes_portal.exception.LocaleNotSupportedException.class})
   public ResponseEntity<String> handleLocaleNotSupportedException(no.reliablesolutions.release_notes_portal.exception.LocaleNotSupportedException e) {
     logger.warn("Locale not supported: {}", e.getLocale());
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(String.format("Locale '%s' is not supported. Supported locales are: en (English), no (Norwegian Bokmål), fr (French)", e.getLocale()));
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(String.format("Locale '%s' is not supported. Supported locales are: en-GB (English), nb-NO (Norwegian Bokmål), fr-FR (French)", e.getLocale()));
   }
 
   /**

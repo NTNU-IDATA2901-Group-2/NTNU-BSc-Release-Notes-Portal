@@ -15,7 +15,7 @@ services:
       - caddy_config:/config
     depends_on:
       - app
-      - keycloak
+      - keycloak # remove if using an external OIDC provider
 
   app:
     image: ghcr.io/ntnu-idata2901-group-2/ntnu-bsc-release-notes-portal:latest
@@ -35,13 +35,7 @@ services:
       - OIDC_ISSUER_URI=
       - OIDC_CLIENT_ID=
       - OIDC_SCOPES=openid profile
-      # - OIDC_AUDIENCE=
-      # - OIDC_ROLES_CLAIM=roles
-      # - OIDC_CUSTOMER_CLAIM=groups
-      # - OIDC_CUSTOMER_PREFIX=/Customers/
-      # Set only if the app must fetch the JWKS from an internal URL that
-      # differs from the public issuer (e.g. IdP behind the reverse proxy)
-      # - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=
+      - OIDC_AUDIENCE=
       - DB_USERNAME=
       - DB_PASSWORD=
       - DB_DATABASE=
@@ -74,7 +68,7 @@ services:
     expose:
       - "8080"
     volumes:
-      - keycloak_data:/opt/keycloak/release-notes-data
+      - keycloak_data:/opt/keycloak/data
 
   db:
     image: postgres:latest
@@ -90,10 +84,10 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - db_data:/var/lib/postgresql/release-notes-data
+      - db_data:/var/lib/postgresql
 
 volumes:
   db_data:
-  keycloak_data:
+  keycloak_data: # remove if using an external OIDC provider
   caddy_data:
   caddy_config:

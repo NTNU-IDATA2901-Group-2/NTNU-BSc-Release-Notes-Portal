@@ -321,10 +321,10 @@ public class ChangeNoteService {
   }
 
   /**
-   * Checks if a list of change notes all have associated git commit hashes.
+   * Checks if any of the given change notes has a git commit hash and a preceding commit in the same repository.
    *
    * @param changeNoteIds the IDs of the change notes
-   * @return true if the change notes have associated git commit hashes, false otherwise
+   * @return true if at least one non-archived change note has a git commit hash and its repository contains an earlier change note commit, false otherwise
    */
   public boolean hasCommitHash(List<Long> changeNoteIds) {
     return changeNoteRepository.hasCommitHashAndPreviousCommitHash(changeNoteIds);
