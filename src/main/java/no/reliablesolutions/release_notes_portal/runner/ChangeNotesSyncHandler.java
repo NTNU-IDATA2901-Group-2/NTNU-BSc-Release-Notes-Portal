@@ -78,7 +78,7 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
     try {
       this.syncAllGitRepositories();
     } catch (FailedSyncGitChangeNotesException e) {
-      logger.error("Git repository synchronization at startup finished with failures: {}", e.getMessage());
+      logger.error("Git repository synchronization at startup finished with failures", e);
     }
   }
 
@@ -186,7 +186,6 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
         .setDirectory(repositoryDirectory)
         .call()) {
     } catch (Exception e) {
-      logger.error("Failed to clone repository with id {}", gitRepository.getId(), e);
       throw new FailedSyncGitChangeNotesException("Failed to clone Git repository " + gitRepository.getName(), e);
     }
   }
@@ -225,7 +224,6 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
     } catch (FailedSyncGitChangeNotesException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Failed to update repository with id {} from remote due to unexpected error", gitRepository.getId(), e);
       throw new FailedSyncGitChangeNotesException("Failed to update Git repository " + gitRepository.getName() + " from remote", e);
     }
   }
@@ -284,7 +282,6 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
         updateLastCheckedCommitHash(gitRepository, lastCheckedCommitId);
       }
     } catch (IOException e) {
-      logger.error("Failed to open repository with id {} due to IO error", gitRepository.getId(), e);
       throw new FailedSyncGitChangeNotesException("Failed to open Git repository " + gitRepository.getName(), e);
     }
   }
@@ -359,7 +356,6 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
       }
       
     } catch (IOException e) {
-      logger.error("Failed to check new commits for repository at {} due to IO error", repositoryDirectory.getPath(), e);
       throw new FailedSyncGitChangeNotesException("Failed to check new commits for Git repository " + gitRepository.getName(), e);
     }
 
