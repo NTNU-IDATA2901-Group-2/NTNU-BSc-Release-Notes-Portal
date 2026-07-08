@@ -33,12 +33,16 @@ export interface PersistChangeNoteDTO {
 export interface GitRepository {
     id: number,
     name: string,
-    url: string
+    url: string,
+    changeNoteDirectory: string,
+    patSet: boolean
 }
 
 export interface PersistGitRepositoryDTO {
     name: string,
-    url: string
+    url: string,
+    changeNoteDirectory: string,
+    pat?: string
 }
 
 export interface Customer {

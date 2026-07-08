@@ -3,22 +3,28 @@ package no.reliablesolutions.release_notes_portal.runner;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ResetCommand.ResetType;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
+import org.eclipse.jgit.lib.BranchConfig;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.RepositoryState;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevSort;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -27,12 +33,13 @@ import org.springframework.stereotype.Component;
 import no.reliablesolutions.release_notes_portal.domain.entity.ChangeNote;
 import no.reliablesolutions.release_notes_portal.domain.entity.GitRepository;
 import no.reliablesolutions.release_notes_portal.domain.repository.GitRepositoryRepository;
+import no.reliablesolutions.release_notes_portal.exception.FailedSyncGitChangeNotesException;
 import no.reliablesolutions.release_notes_portal.exception.InvalidChangeNoteYamlException;
 import no.reliablesolutions.release_notes_portal.service.ChangeNoteService;
 import no.reliablesolutions.release_notes_portal.util.ChangeNoteFileHandler;
 
 /**
- * This class is responsible for synchronizing change notes from Git repositories. It will clone or pull the repositories, check for new commits, and create change notes from any new change note files found in the commits.
+ * This class is responsible for synchronizing change notes from Git repositories. It will clone or update the repositories, check for new commits, and create change notes from any new change note files found in the commits.
  */
 @Component
 @Profile("!ci")
@@ -45,42 +52,57 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
   
   // local directory for git repositories, relative to the application working directory
   public static final String REPOSITORY_DIRECTORIES_PATH = "git_repositories";
-  private final String changeNoteDirectory;
 
   /**
    * Constructor for SyncGitChangeNotes.
-   * 
+   *
    * @param gitRepositoryRepository the repository for accessing GitRepository entities
    * @param changeNoteService the service for managing change notes
    * @param changeNoteFileHandler the utility for handling change note files
-   * @param changeNoteDirectory the directory within the Git repository where change note files are located, injected from environment variable, must be set
    */
   public ChangeNotesSyncHandler(
     GitRepositoryRepository gitRepositoryRepository,
     ChangeNoteService changeNoteService,
-    ChangeNoteFileHandler changeNoteFileHandler,
-    @Value("${CHANGE_NOTE_DIRECTORY}") String changeNoteDirectory
+    ChangeNoteFileHandler changeNoteFileHandler
   ) {
     this.gitRepositoryRepository = gitRepositoryRepository;
     this.changeNoteService = changeNoteService;
     this.changeNoteFileHandler = changeNoteFileHandler;
-    this.changeNoteDirectory = changeNoteDirectory;
   }
 
   /**
-   * Runs the synchronization process for Git change notes on all Git repositories.
+   * Runs the synchronization process for Git change notes on all Git repositories at application startup. Failures are logged without aborting startup.
    */
   @Override
-  public void run(String... args) throws Exception {    
+  public void run(String... args) throws Exception {
+    try {
+      this.syncAllGitRepositories();
+    } catch (FailedSyncGitChangeNotesException e) {
+      logger.error("Git repository synchronization at startup finished with failures", e);
+    }
+  }
+
+  /**
+   * Synchronizes change notes from all Git repositories. Every repository is attempted, even if some fail.
+   *
+   * @throws FailedSyncGitChangeNotesException if one or more repositories failed to synchronize
+   */
+  public void syncAllGitRepositories() {
     List<GitRepository> gitRepositories = gitRepositoryRepository.findAll();
     logger.info("Found {} git repositories", gitRepositories.size());
-    gitRepositories.forEach(gitRepository -> {
+    List<String> failedRepositoryNames = new ArrayList<>();
+    for (GitRepository gitRepository : gitRepositories) {
       try {
         this.syncGitRepository(gitRepository);
       } catch (Exception e) {
-        logger.error("Failed to synchronize Git repository with id {} due to unexpected error", gitRepository.getId(), e);
+        logger.error("Failed to synchronize Git repository with id {}", gitRepository.getId(), e);
+        failedRepositoryNames.add(gitRepository.getName());
       }
-    });
+    }
+    if (!failedRepositoryNames.isEmpty()) {
+      throw new FailedSyncGitChangeNotesException(String.format("Failed to synchronize %d of %d Git repositories: %s",
+          failedRepositoryNames.size(), gitRepositories.size(), String.join(", ", failedRepositoryNames)));
+    }
   }
   
 
@@ -99,20 +121,23 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
     if (gitRepository == null) {
       throw new IllegalArgumentException("Git repository cannot be null");
     }
+    if (gitRepository.getChangeNoteDirectory() == null || gitRepository.getChangeNoteDirectory().isBlank()) {
+      throw new IllegalStateException("No change note directory configured for Git repository " + gitRepository.getName());
+    }
 
     File repositoriesDirectory = new File(REPOSITORY_DIRECTORIES_PATH);
     if (!repositoriesDirectory.exists()) {
       repositoriesDirectory.mkdirs();
     }
 
-    logger.info("Updating Git repository {} using change note directory: {}", gitRepository.getName(), changeNoteDirectory);
+    logger.info("Updating Git repository {} using change note directory: {}", gitRepository.getName(), gitRepository.getChangeNoteDirectory());
     File repositoryDirectory = new File(gitRepository.getLocalPath());
     prepareGitRepository(gitRepository, repositoryDirectory);
     syncFromGitRepository(gitRepository, repositoryDirectory);
   }
 
   /**
-   * Prepares a Git repository by cloning it if it does not exist locally, or pulling the latest changes if it does.
+   * Prepares a Git repository by cloning it if it does not exist locally, or updating it from the remote if it does.
    * 
    * A new local directory is created if it is not already present.
    * The last checked commit hash is wiped if the repository is being cloned, ensuring that the persisted data is correct.
@@ -137,7 +162,7 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
       gitRepositoryRepository.save(gitRepository);
       cloneRepository(gitRepository, repositoryDirectory);
     } else {
-      pullRepository(gitRepository, repositoryDirectory);
+      fetchAndResetRepository(gitRepository, repositoryDirectory);
     }
   }
   
@@ -160,40 +185,75 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
         .setURI(gitRepository.getUrl())
         .setDirectory(repositoryDirectory)
         .call()) {
-    } catch (GitAPIException e) {
-      logger.error("Failed to clone repository with id {}", gitRepository.getId(), e);
     } catch (Exception e) {
-      logger.error("Failed to clone repository with id {} due to unexpected error", gitRepository.getId(), e);
+      throw new FailedSyncGitChangeNotesException("Failed to clone Git repository " + gitRepository.getName(), e);
     }
   }
   
   /**
-   * Pulls the latest changes for a Git repository from the remote.
+   * Updates a Git repository by fetching and hard-resetting the checked-out branch to its remote tracking branch, discarding any local-only changes.
    *
-   * @param gitRepository the Git repository to pull, must not be null
+   * @param gitRepository the Git repository to update, must not be null
    * @param repositoryDirectory the local directory for the repository, must not be null
    */
-  private void pullRepository(GitRepository gitRepository, File repositoryDirectory) {
+  private void fetchAndResetRepository(GitRepository gitRepository, File repositoryDirectory) {
     if (gitRepository == null) {
       throw new IllegalArgumentException("Git repository cannot be null");
     }
     if (repositoryDirectory == null) {
       throw new IllegalArgumentException("Repository directory cannot be null");
     }
-    
+
     try (Git git = Git.open(repositoryDirectory);) {
-      logger.info("Pulling repository {} with id {}", gitRepository.getName(), gitRepository.getId());
-      git.pull().call();
+      RepositoryState repositoryState = git.getRepository().getRepositoryState();
+      if (repositoryState != RepositoryState.SAFE) {
+        logger.warn("Repository {} with id {} is in state {}. Resetting it to recover", gitRepository.getName(), gitRepository.getId(), repositoryState);
+        git.reset().setMode(ResetType.HARD).call();
+      }
+      logger.info("Fetching repository {} with id {}", gitRepository.getName(), gitRepository.getId());
+      git.fetch().call();
+      String trackingBranch = new BranchConfig(git.getRepository().getConfig(), git.getRepository().getBranch()).getTrackingBranch();
+      if (trackingBranch == null) {
+        checkoutDefaultBranch(git, gitRepository);
+        trackingBranch = new BranchConfig(git.getRepository().getConfig(), git.getRepository().getBranch()).getTrackingBranch();
+      }
+      if (trackingBranch == null) {
+        throw new FailedSyncGitChangeNotesException("No remote tracking branch configured for the checked-out branch in Git repository " + gitRepository.getName());
+      }
+      git.reset().setMode(ResetType.HARD).setRef(trackingBranch).call();
+    } catch (FailedSyncGitChangeNotesException e) {
+      throw e;
     } catch (Exception e) {
-      logger.error("Failed to pull repository with id {} due to unexpected error", gitRepository.getId(), e);
+      throw new FailedSyncGitChangeNotesException("Failed to update Git repository " + gitRepository.getName() + " from remote", e);
     }
+  }
+
+  /**
+   * Force-checks out the default branch (main or master) of a Git repository.
+   *
+   * @param git the open Git handle, must not be null
+   * @param gitRepository the Git repository entity, must not be null
+   */
+  private void checkoutDefaultBranch(Git git, GitRepository gitRepository) throws GitAPIException {
+    Set<String> branchNames = git.branchList().call().stream()
+        .map(Ref::getName)
+        .collect(Collectors.toSet());
+    String defaultBranch;
+    if (branchNames.contains("refs/heads/main")) {
+      defaultBranch = "main";
+    } else if (branchNames.contains("refs/heads/master")) {
+      defaultBranch = "master";
+    } else {
+      throw new FailedSyncGitChangeNotesException("No default branch (main or master) found in Git repository " + gitRepository.getName());
+    }
+    logger.warn("Repository {} with id {} has no remote tracking branch for the checked-out branch. Checking out {}", gitRepository.getName(), gitRepository.getId(), defaultBranch);
+    git.checkout().setName(defaultBranch).setForced(true).call();
   }
   
   /**
    * Synchronizes change notes from a Git repository by checking for new commits since the last checked commit, and creating change notes from any new change note files found in those commits.
    *
-   * The last checked commit hash is updated after processing the commits, ensuring that only new commits are processed in the next synchronization.
-   * Any trailing commits behind the last change note commit are not considered for being marked as last checked, and will be re-checked in the next synchronization.
+   * The last checked commit hash is updated to the newest commit in the processed range, ensuring that only new commits are processed in the next synchronization.
    * @param gitRepository the Git repository to synchronize, must not be null
    * @param repositoryDirectory the local directory for the repository, must not be null
    */
@@ -221,10 +281,8 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
         updateLastCheckedCommitHash(gitRepository, lastCheckedCommitId);
       }
     } catch (IOException e) {
-      logger.error("Failed to open repository with id {} due to IO error", gitRepository.getId(), e);
-    } 
-    
-    
+      throw new FailedSyncGitChangeNotesException("Failed to open Git repository " + gitRepository.getName(), e);
+    }
   }
   
   /**
@@ -237,7 +295,7 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
    * @param repositoryDirectory the local directory for the repository, must not be null
    * @param repository the JGit Repository object, must not be null
    * @param gitRepository the Git repository entity, must not be null
-   * @return the ObjectId of the last commit that was processed for change notes, or null if no commits with change notes were found
+   * @return the ObjectId of the newest commit in the walk, whether or not it contained change notes, or null if the walk contained no commits
    */
   private ObjectId createChangeNotesFromCommits(RevWalk revWalk, File repositoryDirectory, Repository repository, GitRepository gitRepository) {
     if (revWalk == null) {
@@ -268,7 +326,7 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
         List<DiffEntry> diffEntries = diffFormatter.scan(parentCommit.getTree(), commit.getTree());
         List<File> newChangeNoteFiles = diffEntries.stream()
           .filter(diffEntry -> diffEntry.getChangeType() == DiffEntry.ChangeType.ADD)
-          .filter(diffEntry -> diffEntry.getNewPath().startsWith(changeNoteDirectory + "/"))
+          .filter(diffEntry -> diffEntry.getNewPath().startsWith(gitRepository.getChangeNoteDirectory() + "/"))
           .filter(diffEntry -> diffEntry.getNewPath().endsWith(".yaml") || diffEntry.getNewPath().endsWith(".yml"))
           .map(diffEntry -> new File(repositoryDirectory, diffEntry.getNewPath()))
           .toList();
@@ -297,11 +355,11 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
       }
       
     } catch (IOException e) {
-      logger.error("Failed to check new commits for repository at {} due to IO error", repositoryDirectory.getPath(), e);
+      throw new FailedSyncGitChangeNotesException("Failed to check new commits for Git repository " + gitRepository.getName(), e);
     }
-    
+
     if (lastCheckedCommit == null) {
-      logger.warn("No commits with change notes found in repository at {}", repositoryDirectory.getPath());
+      logger.warn("No new commits found in repository at {}", repositoryDirectory.getPath());
       return null;
     }
     return lastCheckedCommit.getId();

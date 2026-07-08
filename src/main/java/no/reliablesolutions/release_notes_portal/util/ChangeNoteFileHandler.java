@@ -55,7 +55,7 @@ public class ChangeNoteFileHandler {
    * The YAML file must be formatted correctly, using the follwing fields:
    * <ul>
    * <li>reference (optional): a string reference for the change note, e.g. a JIRA ticket number</li>
-   * <li>scope (required): the name of the scope for the change note, must correspond to an existing scope
+   * <li>scope (optional): the name of the scope for the change note; left unset if absent or no scope with that name exists
    * <li>product (optional): the name of the product for the change note, must correspond to an existing product if provided</li>
    * <li>feature (optional): the name of the feature for the change note, must correspond to an existing feature if provided</li>
    * <li>customer (optional): the name of the customer for the change note, must correspond to an existing customer if provided</li>
@@ -147,7 +147,7 @@ public class ChangeNoteFileHandler {
     } catch (IOException e) {
       logger.error("Error reading file {}", changeNoteFile.getName(), e);
     } catch (ClassCastException e) {
-      throw new InvalidChangeNoteYamlException("Invalid data type for one or more fields in the YAML file: " + e.getMessage());
+      throw new InvalidChangeNoteYamlException("Invalid data type for one or more fields in the YAML file: " + e.getMessage(), e);
     }
 
     return changeNote;

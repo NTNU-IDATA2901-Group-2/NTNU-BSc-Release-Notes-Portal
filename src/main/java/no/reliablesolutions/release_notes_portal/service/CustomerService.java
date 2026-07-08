@@ -32,8 +32,8 @@ public class CustomerService {
     customer.setName(customerDTO.name());
     try {
       return customerRepository.save(customer).getId();
-    } catch (Exception _) {
-      throw new FailedToSaveEntityException("Failed to create customer");
+    } catch (Exception e) {
+      throw new FailedToSaveEntityException("Failed to create customer", e);
     }
   }
 
@@ -75,8 +75,8 @@ public class CustomerService {
     customer.setName(customerDTO.name());
     try {
       return CustomerDTO.fromCustomer(customerRepository.save(customer));
-    } catch (Exception _) {
-      throw new FailedToSaveEntityException("Failed to update customer with ID " + id);
+    } catch (Exception e) {
+      throw new FailedToSaveEntityException("Failed to update customer with ID " + id, e);
     }
   }
 

@@ -47,10 +47,12 @@ public class GitRepositoryService {
         var gitRepository = new GitRepository();
         gitRepository.setName(dto.name());
         gitRepository.setUrl(dto.url());
+        gitRepository.setChangeNoteDirectory(dto.changeNoteDirectory());
+        gitRepository.setPat(dto.pat());
         try {
             return gitRepositoryRepository.save(gitRepository).getId();
-        } catch (Exception _) {
-            throw new FailedToSaveEntityException("Failed to create Git repository");
+        } catch (Exception e) {
+            throw new FailedToSaveEntityException("Failed to create Git repository", e);
         }
     }
 
@@ -76,23 +78,31 @@ public class GitRepositoryService {
     }
 
     /**
-     * Updates an existing Git repository.
+     * Replaces the personal access token of an existing Git repository.
      *
-     * @param gitRepository the Git repository to update
+     * @param id the ID of the Git repository to update
+     * @param pat the new personal access token
+     * @throws IllegalArgumentException if the personal access token is null or blank
+     * @throws GitRepositoryNotFoundException if the Git repository with the specified ID is not found
      * @throws FailedToSaveEntityException if saving the Git repository to the database fails
      */
-    public void updateGitRepository(GitRepository gitRepository) {
+    public void updateGitRepositoryPat(long id, String pat) {
+        if (pat == null || pat.isBlank()) {
+            throw new IllegalArgumentException("Personal access token cannot be blank");
+        }
+        GitRepository gitRepository = gitRepositoryRepository.findById(id).orElseThrow(() -> new GitRepositoryNotFoundException(id));
+        gitRepository.setPat(pat);
         try {
             gitRepositoryRepository.save(gitRepository);
-        } catch (Exception _) {
-            throw new FailedToSaveEntityException("Failed to update Git repository with id " + gitRepository.getId());
+        } catch (Exception e) {
+            throw new FailedToSaveEntityException("Failed to update Git repository with id " + gitRepository.getId(), e);
         }
     }
 
     /**
-     * Synchronizes Git repositories by running SyncGitChangeNotes.
-     * 
-     * @throws FailedSyncGitChangeNotesException if syncing Git change notes fails
+     * Synchronizes all Git repositories. Every repository is attempted, even if some fail.
+     *
+     * @throws FailedSyncGitChangeNotesException if syncing one or more Git repositories fails
      */
     public void syncGitRepositories() {
         try {
@@ -100,9 +110,9 @@ public class GitRepositoryService {
             if (syncGitChangeNotes == null) {
                 throw new IllegalStateException("SyncGitChangeNotes is not available. Cannot sync Git repositories.");
             }
-            syncGitChangeNotes.run();
+            syncGitChangeNotes.syncAllGitRepositories();
         } catch (Exception e) {
-            throw new FailedSyncGitChangeNotesException(e.getMessage());
+            throw new FailedSyncGitChangeNotesException(e.getMessage(), e);
         }
     }
 
@@ -125,7 +135,7 @@ public class GitRepositoryService {
         } catch (GitRepositoryNotFoundException e) {
             throw e; // rethrow to handle in global exception handler
         } catch (Exception e) {
-            throw new FailedSyncGitChangeNotesException(e.getMessage());
+            throw new FailedSyncGitChangeNotesException(e.getMessage(), e);
         }
     }
 

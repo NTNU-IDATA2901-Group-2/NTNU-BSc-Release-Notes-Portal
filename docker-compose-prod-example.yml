@@ -1,6 +1,11 @@
 services:
   caddy:
     image: caddy:2
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
     ports:
       - "80:80"
       - "443:443"
@@ -10,10 +15,15 @@ services:
       - caddy_config:/config
     depends_on:
       - app
-      - keycloak
+      - keycloak # remove if using an external OIDC provider
 
   app:
     image: ghcr.io/ntnu-idata2901-group-2/ntnu-bsc-release-notes-portal:latest
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
     depends_on:
       db:
         condition: service_started
@@ -25,13 +35,7 @@ services:
       - OIDC_ISSUER_URI=
       - OIDC_CLIENT_ID=
       - OIDC_SCOPES=openid profile
-      # - OIDC_AUDIENCE=
-      # - OIDC_ROLES_CLAIM=roles
-      # - OIDC_CUSTOMER_CLAIM=groups
-      # - OIDC_CUSTOMER_PREFIX=/Customers/
-      # Set only if the app must fetch the JWKS from an internal URL that
-      # differs from the public issuer (e.g. IdP behind the reverse proxy)
-      # - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=
+      - OIDC_AUDIENCE=
       - DB_USERNAME=
       - DB_PASSWORD=
       - DB_DATABASE=
@@ -43,14 +47,17 @@ services:
       - JIRA_BASE_URL=
       - JIRA_EMAIL=
       - JIRA_API_TOKEN=
-      - CHANGE_NOTE_DIRECTORY=
       - RELEASE_NOTE_DIRECTORY=
-      - GITHUB_RW_PAT=
 
   # Example IdP — remove this service (and the Caddy auth host) when using an
   # external OIDC provider such as Entra ID
   keycloak:
     image: quay.io/keycloak/keycloak:26.5.2
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME:
       KC_BOOTSTRAP_ADMIN_PASSWORD:
@@ -61,10 +68,15 @@ services:
     expose:
       - "8080"
     volumes:
-      - keycloak_data:/opt/keycloak/release-notes-data
+      - keycloak_data:/opt/keycloak/data
 
   db:
     image: postgres:latest
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
     environment:
       POSTGRES_USER:
       POSTGRES_PASSWORD:
@@ -72,10 +84,10 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - db_data:/var/lib/postgresql/release-notes-data
+      - db_data:/var/lib/postgresql
 
 volumes:
   db_data:
-  keycloak_data:
+  keycloak_data: # remove if using an external OIDC provider
   caddy_data:
   caddy_config:

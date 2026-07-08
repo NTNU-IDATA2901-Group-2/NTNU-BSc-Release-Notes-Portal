@@ -113,7 +113,7 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler(value = {FailedSyncGitChangeNotesException.class})
   public ResponseEntity<String> handleFailedSyncGitChangeNotesException(FailedSyncGitChangeNotesException e) {
-    logger.warn("Failed to sync Git change notes", e);
+    logger.error("Failed to sync Git change notes", e);
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to sync Git change notes: " + e.getMessage());
   }
 
@@ -124,7 +124,7 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler(value = {DataIntegrityViolationException.class})
   public ResponseEntity<String> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
-    logger.warn("Data integrity violation: {}", e.getMessage());
+    logger.error("Data integrity violation", e);
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Data integrity violation: " + e.getMessage());
   }
   
@@ -146,7 +146,7 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler(value = {GitInspectionException.class})
   public ResponseEntity<String> handleGitInspectionException(GitInspectionException e) {
-    logger.warn("Error during git inspection: {}", e.getMessage());
+    logger.error("Error during git inspection", e);
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error during git inspection");
   }
 
@@ -246,7 +246,7 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler(value = {IllegalStateException.class})
   public ResponseEntity<String> handleIllegalStateException(IllegalStateException e) {
-    logger.warn("Illegal state: {}", e.getMessage());
+    logger.error("Illegal state", e);
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Illegal internal server state");
   }
 
@@ -257,7 +257,7 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler(value = {FailedToSaveEntityException.class})
   public ResponseEntity<String> handleFailedToSaveEntityException(FailedToSaveEntityException e) {
-    logger.warn("Failed to save entity: {}", e.getMessage());
+    logger.error("Failed to save entity", e);
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to save entity: " + e.getMessage());
   }
 
@@ -327,7 +327,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(value = {no.reliablesolutions.release_notes_portal.exception.LocaleNotSupportedException.class})
   public ResponseEntity<String> handleLocaleNotSupportedException(no.reliablesolutions.release_notes_portal.exception.LocaleNotSupportedException e) {
     logger.warn("Locale not supported: {}", e.getLocale());
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(String.format("Locale '%s' is not supported. Supported locales are: en (English), no (Norwegian Bokmål), fr (French)", e.getLocale()));
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(String.format("Locale '%s' is not supported. Supported locales are: en-GB (English), nb-NO (Norwegian Bokmål), fr-FR (French)", e.getLocale()));
   }
 
   /**
@@ -337,7 +337,7 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler(value = {NonTransientAiException.class})
   public ResponseEntity<String> handleNonTransientAiException(NonTransientAiException e) {
-    logger.warn("Non-transient AI exception: {}", e.getMessage());
+    logger.error("Non-transient AI exception", e);
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Non-transient AI exception: " + e.getMessage());
   }
 

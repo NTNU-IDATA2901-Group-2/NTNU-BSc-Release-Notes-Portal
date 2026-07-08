@@ -38,7 +38,7 @@ public class SecurityConfigCi {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) {
-    logger.info("Applying NoSecurityConfig for CI profile");
+    logger.info("Applying SecurityConfigCi for CI profile");
     http.csrf(csrf -> csrf.disable())
         .addFilterBefore(new DummyRolesFilter(), UsernamePasswordAuthenticationFilter.class)
         .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());

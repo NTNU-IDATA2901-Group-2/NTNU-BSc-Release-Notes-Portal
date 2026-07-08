@@ -19,7 +19,7 @@ This project supports three runtime modes:
 |---|---|
 | Java | 25 |
 | Maven | 3.9+ |
-| Node.js | 20+ |
+| Node.js | 20.19+ |
 | pnpm | 10+ |
 | Docker + Docker Compose | Recent version |
 
@@ -48,10 +48,9 @@ Main variables used by the backend and compose:
 | `OIDC_CUSTOMER_PREFIX` | Optional prefix marking customer entries (default `/Customers/`) |
 | `DB_USERNAME` / `DB_PASSWORD` / `DB_DATABASE` | PostgreSQL credentials |
 | `DB_URL` | JDBC URL for Spring datasource |
-| `OPENAI_URL` / `OPENAI_API_KEY` / `OPENAI_CHAT_COMPLETIONS_PATH` / `OPENAI_MODEL` | AI integration settings. During development the Groq API (OpenAI-compatible) was used; this requires signing up to acquire an API key. `OPENAI_CHAT_COMPLETIONS_PATH` sets the chat completions endpoint path. |
+| `OPENAI_URL` / `OPENAI_API_KEY` / `OPENAI_CHAT_COMPLETIONS_PATH` / `OPENAI_MODEL` | AI integration settings for any OpenAI-compatible API. `OPENAI_CHAT_COMPLETIONS_PATH` sets the chat completions endpoint path. |
 | `JIRA_BASE_URL` / `JIRA_EMAIL` / `JIRA_API_TOKEN` | Jira integration base URL and API credentials |
-| `CHANGE_NOTE_DIRECTORY` / `RELEASE_NOTE_DIRECTORY` | Relative change note and release note directories used by git features |
-| `GITHUB_RW_PAT` | GitHub read/write personal access token used to push release notes |
+| `RELEASE_NOTE_DIRECTORY` | Relative release note directory used by git features. The change note directory and personal access token are configured per git repository in the portal |
 
 ## Development Mode (dev)
 
@@ -80,7 +79,7 @@ After first startup, configure Keycloak (required in dev):
 4. If needed, verify the client matching `OIDC_CLIENT_ID` exists and is configured for browser login flow (standard flow + PKCE for SPA usage).
 5. Verify redirect URI for frontend dev server, for example `http://localhost:5173/*`.
 6. Verify web origin for frontend dev server, for example `http://localhost:5173`.
-7. Create a user for test purposes and assign roles under the `release-note` client: at minimum `Admin`, and customer roles when required.
+7. Create a user for test purposes and assign the `Admin` role under the `release-note` client. For customer access, add the user to a subgroup of `/Customers` (e.g. `/Customers/ACME`) instead of assigning a role.
 
 ### 3) Start frontend
 

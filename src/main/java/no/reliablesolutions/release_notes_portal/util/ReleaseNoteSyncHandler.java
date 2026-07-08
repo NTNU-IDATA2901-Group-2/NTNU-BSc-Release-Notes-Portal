@@ -40,18 +40,15 @@ public class ReleaseNoteSyncHandler {
   private final ChangeNotesSyncHandler syncGitChangeNotes;
 
   private final String releaseNoteDirectory;
-  private final String githubPat;
 
   private final String git_author_committer_name = "Release Notes Portal";
   private final String git_author_committer_email = "release-notes-portal@example.com"; //TODO: Use actual email
 
   public ReleaseNoteSyncHandler(
     @Value("${RELEASE_NOTE_DIRECTORY}") String releaseNoteDirectory,
-    @Value("${GITHUB_RW_PAT}") String githubPat,
     ChangeNotesSyncHandler syncGitChangeNotes
   ) {
     this.releaseNoteDirectory = releaseNoteDirectory;
-    this.githubPat = githubPat;
     this.syncGitChangeNotes = syncGitChangeNotes;
   }
 
@@ -70,8 +67,8 @@ public class ReleaseNoteSyncHandler {
    */
   public boolean syncReleaseNoteToGit(ReleaseNote releaseNote, List<GitRepository> gitRepositories) {
     List<Pair<GitRepository, File>> preparedRepositoriesDirectories = new ArrayList<>();
-    List<File> committedRepositoriesDirectories = new ArrayList<>();
-    List<File> pushedRepositoriesDirectories = new ArrayList<>();
+    List<Pair<GitRepository, File>> committedRepositoriesDirectories = new ArrayList<>();
+    List<Pair<GitRepository, File>> pushedRepositoriesDirectories = new ArrayList<>();
 
     boolean isSuccess = true;
     String branchName = getBranchNameForReleaseNote(releaseNote);
@@ -95,15 +92,15 @@ public class ReleaseNoteSyncHandler {
           .filter(changeNote -> changeNote.getGitRepository() == null || changeNote.getGitRepository().getId() != gitRepository.getId())
           .toList();
         checkoutNewBranch(repositoryDirectory, branchName);
-        committedRepositoriesDirectories.add(repositoryDirectory);
+        committedRepositoriesDirectories.add(repoPair);
         commit(repositoryDirectory, releaseNote, changeNotesInThisGitRepo, changeNotesNotInThisGitRepo, gitRepository);
       }
-      for (File dir : committedRepositoriesDirectories) {
-        pushToRemote(dir, releaseNote);
-        pushedRepositoriesDirectories.add(dir);
+      for (Pair<GitRepository, File> repoPair : committedRepositoriesDirectories) {
+        pushToRemote(repoPair.key(), repoPair.value(), releaseNote);
+        pushedRepositoriesDirectories.add(repoPair);
       }
     } catch (Exception e) {
-      logger.error("Failed to sync release note with id {} to Git: {}. Reverting changes", releaseNote.getId(), e.getMessage());
+      logger.error("Failed to sync release note with id {} to Git. Reverting changes", releaseNote.getId(), e);
       String completeBranchName = String.format("refs/heads/%s", branchName);
       deleteLocalBranches(committedRepositoriesDirectories, completeBranchName);
       deletePushedBranches(pushedRepositoriesDirectories, completeBranchName);
@@ -136,7 +133,6 @@ public class ReleaseNoteSyncHandler {
         .setName(branchName)
         .call();
     } catch (Exception e) {
-      logger.error("Failed to checkout new branch {} in Git repository at {}: {}", branchName, repositoryDirectory.getAbsolutePath(), e.getMessage());
       throw new FailedSyncReleaseNoteException(
         "Failed to checkout new branch " + branchName + " in Git repository at " + repositoryDirectory.getAbsolutePath(), e);
     }
@@ -170,7 +166,6 @@ public class ReleaseNoteSyncHandler {
         .call();
       logger.info("Release note with id {} committed to Git repository {}", releaseNote.getId(), gitRepository.getName());
     } catch (Exception e) {
-      logger.error("Failed to commit release note with id {} to Git for repository {}: {}", releaseNote.getId(), gitRepository.getName(), e.getMessage());
       throw new FailedSyncReleaseNoteException(
         "Failed to commit release note with id " + releaseNote.getId() + " to Git repository " + gitRepository.getName(), e);
     }
@@ -194,30 +189,32 @@ public class ReleaseNoteSyncHandler {
       Yaml yaml = new Yaml();
       yaml.dump(yamlContent, writer);
     } catch (Exception e) {
-      logger.error("Failed to write release note to file {}: {}", file.getAbsolutePath(), e.getMessage());
       throw new FailedSyncReleaseNoteException("Failed to write release note to file " + file.getAbsolutePath(), e);
     }
   }
 
-  private void pushToRemote(File releaseNoteDirectory, ReleaseNote releaseNote) {
+  private void pushToRemote(GitRepository gitRepository, File releaseNoteDirectory, ReleaseNote releaseNote) {
     if (releaseNoteDirectory == null) {
       throw new IllegalArgumentException("Repository directory must be prepared before pushing");
+    }
+    if (!gitRepository.isPatSet()) {
+      throw new FailedSyncReleaseNoteException("No personal access token configured for Git repository " + gitRepository.getName());
     }
 
     try (Git git = Git.open(releaseNoteDirectory)) {
       git.push()
         .setRemote("origin")
         .setRefSpecs(new RefSpec(getBranchNameForReleaseNote(releaseNote)))
-        .setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubPat, ""))
+        .setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitRepository.getPat(), ""))
         .call();
     } catch (Exception e) {
-      logger.error("Failed to push committed release note to remote Git repository: {}", e.getMessage());
       throw new FailedSyncReleaseNoteException("Failed to push committed release note to remote Git repository", e);
     }
   }
 
-  private void deleteLocalBranches(List<File> committedRepositoriesDirectories, String completeBranchName) {
-    for (File repositoryDirectory : committedRepositoriesDirectories) {
+  private void deleteLocalBranches(List<Pair<GitRepository, File>> committedRepositoriesDirectories, String completeBranchName) {
+    for (Pair<GitRepository, File> repoPair : committedRepositoriesDirectories) {
+      File repositoryDirectory = repoPair.value();
       try (Git git = Git.open(repositoryDirectory)) {
         String mainBranchName;
         List<Ref> branches = git.branchList().call();  // local branches
@@ -242,13 +239,14 @@ public class ReleaseNoteSyncHandler {
           .call(); //delete branch locally
         logger.info("Deleted local branch {} in Git repository at {}", completeBranchName, repositoryDirectory.getAbsolutePath());
       } catch (Exception e) {
-        logger.error("Failed to delete local branch in Git repository at {}: {}", repositoryDirectory.getAbsolutePath(), e.getMessage());
+        logger.error("Failed to delete local branch in Git repository at {}", repositoryDirectory.getAbsolutePath(), e);
       }
     }
   }
 
-  private void deletePushedBranches(List<File> pushedRepositoriesDirectories, String completeBranchName) {
-    for (File repositoryDirectory : pushedRepositoriesDirectories) {
+  private void deletePushedBranches(List<Pair<GitRepository, File>> pushedRepositoriesDirectories, String completeBranchName) {
+    for (Pair<GitRepository, File> repoPair : pushedRepositoriesDirectories) {
+      File repositoryDirectory = repoPair.value();
       try (Git git = Git.open(repositoryDirectory)) {
 
         RefSpec refSpec = new RefSpec()
@@ -257,13 +255,13 @@ public class ReleaseNoteSyncHandler {
 
         git.push()
           .setRefSpecs(refSpec)
-          .setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubPat, ""))
+          .setCredentialsProvider(new UsernamePasswordCredentialsProvider(repoPair.key().getPat(), ""))
           .setRemote("origin")
           .call(); //delete branch remotely
 
         logger.info("Deleted pushed branch {} in Git repository at {}", completeBranchName, repositoryDirectory.getAbsolutePath());
       } catch (Exception e) {
-        logger.error("Failed to delete pushed branch in Git repository at {}: {}", repositoryDirectory.getAbsolutePath(), e.getMessage());
+        logger.error("Failed to delete pushed branch in Git repository at {}", repositoryDirectory.getAbsolutePath(), e);
       }
     }
   }

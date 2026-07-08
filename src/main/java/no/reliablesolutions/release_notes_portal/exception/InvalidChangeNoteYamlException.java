@@ -20,4 +20,15 @@ public class InvalidChangeNoteYamlException extends RuntimeException  {
     this.reason = reason;
     super("Invalid change note YAML: " + reason);
   }
+
+  /**
+   * Creates a new InvalidChangeNoteYamlException with the given reason for the invalidity of the change note YAML file and the underlying cause.
+   *
+   * @param reason the reason why the change note YAML file is invalid
+   * @param cause the underlying cause of the failure
+   */
+  public InvalidChangeNoteYamlException(String reason, Throwable cause) {
+    this.reason = reason;
+    super("Invalid change note YAML: " + reason, cause);
+  }
 }
