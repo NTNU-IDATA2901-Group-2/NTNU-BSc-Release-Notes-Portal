@@ -201,7 +201,7 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
    */
   private CredentialsProvider getCredentialsProvider(GitRepository gitRepository) {
     return gitRepository.isPatSet()
-        ? new UsernamePasswordCredentialsProvider(gitRepository.getPat(), "")
+        ? new UsernamePasswordCredentialsProvider("oauth2", gitRepository.getPat())
         : null;
   }
 
