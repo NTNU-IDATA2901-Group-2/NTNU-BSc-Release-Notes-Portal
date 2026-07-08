@@ -22,6 +22,8 @@ import org.eclipse.jgit.lib.RepositoryState;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevSort;
 import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.transport.CredentialsProvider;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -184,12 +186,25 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
     try (Git git = Git.cloneRepository()
         .setURI(gitRepository.getUrl())
         .setDirectory(repositoryDirectory)
+        .setCredentialsProvider(getCredentialsProvider(gitRepository))
         .call()) {
     } catch (Exception e) {
       throw new FailedSyncGitChangeNotesException("Failed to clone Git repository " + gitRepository.getName(), e);
     }
   }
   
+  /**
+   * Returns a credentials provider authenticating with the personal access token of a Git repository, or null if no token is set, so that public repositories are accessed anonymously.
+   *
+   * @param gitRepository the Git repository to authenticate against, must not be null
+   * @return a credentials provider using the personal access token, or null if none is set
+   */
+  private CredentialsProvider getCredentialsProvider(GitRepository gitRepository) {
+    return gitRepository.isPatSet()
+        ? new UsernamePasswordCredentialsProvider(gitRepository.getPat(), "")
+        : null;
+  }
+
   /**
    * Updates a Git repository by fetching and hard-resetting the checked-out branch to its remote tracking branch, discarding any local-only changes.
    *
@@ -211,7 +226,7 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
         git.reset().setMode(ResetType.HARD).call();
       }
       logger.info("Fetching repository {} with id {}", gitRepository.getName(), gitRepository.getId());
-      git.fetch().call();
+      git.fetch().setCredentialsProvider(getCredentialsProvider(gitRepository)).call();
       String trackingBranch = new BranchConfig(git.getRepository().getConfig(), git.getRepository().getBranch()).getTrackingBranch();
       if (trackingBranch == null) {
         checkoutDefaultBranch(git, gitRepository);
