@@ -205,7 +205,7 @@ public class ReleaseNoteSyncHandler {
       git.push()
         .setRemote("origin")
         .setRefSpecs(new RefSpec(getBranchNameForReleaseNote(releaseNote)))
-        .setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitRepository.getPat(), ""))
+        .setCredentialsProvider(new UsernamePasswordCredentialsProvider("oauth2", gitRepository.getPat()))
         .call();
     } catch (Exception e) {
       throw new FailedSyncReleaseNoteException("Failed to push committed release note to remote Git repository", e);
@@ -255,7 +255,7 @@ public class ReleaseNoteSyncHandler {
 
         git.push()
           .setRefSpecs(refSpec)
-          .setCredentialsProvider(new UsernamePasswordCredentialsProvider(repoPair.key().getPat(), ""))
+          .setCredentialsProvider(new UsernamePasswordCredentialsProvider("oauth2", repoPair.key().getPat()))
           .setRemote("origin")
           .call(); //delete branch remotely
 
