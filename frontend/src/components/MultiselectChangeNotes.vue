@@ -36,14 +36,14 @@ const changeNoteOptions = computed(() =>
     .map((cn) => ({ value: cn.id, label: getLabelFromChangeNote(cn) }))
 )
 
-const initialFilter = ref({ filteredIds: model.value.join(',') })
-const { data: initialSelected } = useGetChangeNotes(initialFilter, model.value.length > 0)
+const selectedFilter = computed(() => ({ filteredIds: model.value.join(',') }))
+const { data: selectedChangeNotes } = useGetChangeNotes(selectedFilter, () => model.value.length > 0)
 
 const referenceById = reactive(new Map<number, string>())
 watchEffect(() => {
   const notes = [
     ...(availableChangeNotes.value?.pages.flatMap((page) => page.content) ?? []),
-    ...(initialSelected.value?.content ?? []),
+    ...(selectedChangeNotes.value?.content ?? []),
   ]
   for (const cn of notes) referenceById.set(cn.id, cn.reference)
 })

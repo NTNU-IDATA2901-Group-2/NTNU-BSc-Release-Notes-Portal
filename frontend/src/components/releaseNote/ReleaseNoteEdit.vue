@@ -5,7 +5,7 @@ import { type GitRepository, type ChangeNote, type ReleaseNote, type ChangeImpac
 import { z } from 'zod';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
-import { onBeforeUnmount, onMounted, computed, ref } from 'vue';
+import { onBeforeUnmount, onMounted, computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { toast } from 'vue-sonner';
 import { Button } from '../ui/button';
@@ -14,8 +14,8 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbS
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
 import MultiselectChangeNotes from '../MultiselectChangeNotes.vue';
-import SelectChangeNotes from '../SelectChangeNotes.vue';
-import { useGetChangeNotes, useGetHasCommits } from '@/api/change-note-api';
+import ComboboxChangeNote from '../ComboboxChangeNote.vue';
+import { getChangeNotes, useGetHasCommits } from '@/api/change-note-api';
 import { onBeforeRouteLeave } from 'vue-router';
 import SelectGitRepository from '../SelectGitRepository.vue';
 import { useSummarizeChangeNotes } from '@/api/ai-api';
@@ -43,18 +43,20 @@ const releaseNote = props.releaseNote;
 const changeNoteIdsWithinReleaseNote = ref<number[]>(releaseNote.changeNotes?.map(cn => cn.id) || [])
 
 const { data: availableGitRepositories } = useGetGitRepositories()
-const { data: availableChangeNotesPage } = useGetChangeNotes()
-const availableChangeNotes = computed(() => availableChangeNotesPage.value?.content ?? [])
 
 const gitRepository = ref<GitRepository | null>(null)
-const params = computed(() => {
+const rangeSearchParams = computed(() => {
   return { gitRepositoryIds: gitRepository.value?.id ? gitRepository.value?.id.toString() : '' }
 });
-const { data: currentGitRepositoryChangeNotesPage, isFetched: isCurrentGitRepositoryChangeNotesFetched } = useGetChangeNotes(params)
-const currentGitRepositoryChangeNotes = computed(() => currentGitRepositoryChangeNotesPage.value?.content ?? [])
 
 const fromChangeNote = ref<ChangeNote | null>(null);
 const toChangeNote = ref<ChangeNote | null>(null);
+const isUpdatingRange = ref(false);
+
+watch(gitRepository, () => {
+  fromChangeNote.value = null;
+  toChangeNote.value = null;
+})
 
 const onChangeNotesUpdate = (value: number[]) => {
   changeNoteIdsWithinReleaseNote.value = value;
@@ -62,31 +64,39 @@ const onChangeNotesUpdate = (value: number[]) => {
   toChangeNote.value = null;
 }
 
-const onChangeNoteRangeChange = (gitRepositoryId: number) => {
-  const fromChangeNoteValue = fromChangeNote.value
-  const toChangeNoteValue = toChangeNote.value
-  const fromIndex = availableChangeNotes.value?.findIndex((cn) => cn.id === fromChangeNoteValue?.id) ?? -1;
-  const toIndex = availableChangeNotes.value?.findIndex((cn) => cn.id === toChangeNoteValue?.id) ?? -1;
-
-  if (gitRepositoryId !== -1) { // remove old change notes on the same repository before adding new range
-    changeNoteIdsWithinReleaseNote.value = changeNoteIdsWithinReleaseNote.value.filter(id => {
-      const cn = availableChangeNotes.value?.find(cn => cn.id === id)
-      return cn?.gitRepositoryId !== gitRepositoryId
-    })
+const onChangeNoteRangeChange = async (gitRepositoryId: number) => {
+  if (gitRepositoryId === -1) {
+    return;
   }
+  isUpdatingRange.value = true;
+  try {
+    const repositoryChangeNotes = (await getChangeNotes(new URLSearchParams({ gitRepositoryIds: gitRepositoryId.toString() }))).content;
+    const fromChangeNoteValue = fromChangeNote.value
+    const toChangeNoteValue = toChangeNote.value
+    const fromIndex = repositoryChangeNotes.findIndex((cn) => cn.id === fromChangeNoteValue?.id);
+    const toIndex = repositoryChangeNotes.findIndex((cn) => cn.id === toChangeNoteValue?.id);
 
-  let newChangeNoteIds: number[];
-  if (fromChangeNoteValue !== null && toChangeNoteValue !== null && fromIndex !== -1 && toIndex !== -1) {
-    newChangeNoteIds = availableChangeNotes.value?.map(cn => cn.id).slice(fromIndex, toIndex + 1) ?? []
-  } else if (fromChangeNoteValue !== null && toChangeNoteValue === null && fromIndex !== -1) {
-    newChangeNoteIds = availableChangeNotes.value?.map(cn => cn.id).slice(fromIndex) ?? []
-  } else if (fromChangeNoteValue === null && toChangeNoteValue !== null && toIndex !== -1) {
-    newChangeNoteIds = availableChangeNotes.value?.map(cn => cn.id).slice(0, toIndex + 1) ?? []
-  } else {
-    newChangeNoteIds = []
+    // remove old change notes on the same repository before adding new range
+    const repositoryChangeNoteIds = new Set(repositoryChangeNotes.map(cn => cn.id));
+    changeNoteIdsWithinReleaseNote.value = changeNoteIdsWithinReleaseNote.value.filter(id => !repositoryChangeNoteIds.has(id));
+
+    let newChangeNoteIds: number[];
+    if (fromChangeNoteValue !== null && toChangeNoteValue !== null && fromIndex !== -1 && toIndex !== -1) {
+      newChangeNoteIds = repositoryChangeNotes.map(cn => cn.id).slice(fromIndex, toIndex + 1)
+    } else if (fromChangeNoteValue !== null && toChangeNoteValue === null && fromIndex !== -1) {
+      newChangeNoteIds = repositoryChangeNotes.map(cn => cn.id).slice(fromIndex)
+    } else if (fromChangeNoteValue === null && toChangeNoteValue !== null && toIndex !== -1) {
+      newChangeNoteIds = repositoryChangeNotes.map(cn => cn.id).slice(0, toIndex + 1)
+    } else {
+      newChangeNoteIds = []
+    }
+
+    changeNoteIdsWithinReleaseNote.value = [...new Set([...(changeNoteIdsWithinReleaseNote.value ?? []), ...newChangeNoteIds])];
+  } catch {
+    toast.error(t('loadingError.changeNotes'));
+  } finally {
+    isUpdatingRange.value = false;
   }
-
-  changeNoteIdsWithinReleaseNote.value = [...new Set([...(changeNoteIdsWithinReleaseNote.value ?? []), ...newChangeNoteIds])];
 }
 
 const loadingSummary = ref(false);
@@ -375,21 +385,19 @@ const changeImpacts = ref<ChangeImpact[]>([...(releaseNote.changeImpacts ?? [])]
                 {{ t('repositories.noGitRepositories') }}</p>
               <div v-else class="flex flex-col sm:flex-row gap-2 justify-between">
                 <SelectGitRepository v-model="gitRepository" />
-                <SelectChangeNotes 
+                <ComboboxChangeNote
                 :placeholder="t('title.from')" :disabled="gitRepository === null"
-                  :change-notes="currentGitRepositoryChangeNotes ?? []" v-model="fromChangeNote" />
-                <SelectChangeNotes 
+                  :search-params="rangeSearchParams" v-model="fromChangeNote" />
+                <ComboboxChangeNote
                 :placeholder="t('title.to')" :disabled="gitRepository === null"
-                  :change-notes="currentGitRepositoryChangeNotes ?? []" v-model="toChangeNote" />
-                <Button 
-                class="w-45" :disabled="gitRepository === null || currentGitRepositoryChangeNotes === undefined || currentGitRepositoryChangeNotes.length === 0" type="button"
+                  :search-params="rangeSearchParams" v-model="toChangeNote" />
+                <Button
+                class="w-45" :disabled="gitRepository === null || (fromChangeNote === null && toChangeNote === null) || isUpdatingRange" type="button"
                   variant="outline"
-                  @click.stop="onChangeNoteRangeChange(gitRepository?.id ?? -1)">{{
-                    t('button.updateRange') }}</Button>
+                  @click.stop="onChangeNoteRangeChange(gitRepository?.id ?? -1)">
+                  <Spinner v-if="isUpdatingRange" />
+                  {{ t('button.updateRange') }}</Button>
               </div>
-              <p v-if="gitRepository !== null && !currentGitRepositoryChangeNotes?.length && isCurrentGitRepositoryChangeNotesFetched">
-                {{ t('repositories.noChangeNotesInRepository') }}
-              </p>
             </div>
           </div>
         </div>
