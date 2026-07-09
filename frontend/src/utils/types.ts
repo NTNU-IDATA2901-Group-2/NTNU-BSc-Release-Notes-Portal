@@ -137,10 +137,14 @@ export interface Tag {
     name: string
 }
 
+export interface PersistTagDTO {
+    name: string
+}
+
 export interface OnMutationApiCallFinished {
     onSettled?: () => void,
     onSuccess: (data?: string) => void,
-    onError: () => void
+    onError: (error?: unknown) => void
 }
 
 export interface Prompt {

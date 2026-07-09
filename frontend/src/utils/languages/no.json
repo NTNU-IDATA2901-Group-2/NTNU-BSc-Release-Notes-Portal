@@ -33,7 +33,8 @@
         "english": "Engelsk",
         "norwegian": "Norsk",
         "repositories": "Repositorier",
-        "editPrompts": "Prompts"
+        "editPrompts": "Prompts",
+        "entityManagement": "Entiteter"
     },
     "button": {
         "previous": "Forrige",
@@ -244,6 +245,29 @@
         "updatePatDescription": "Skriv inn et nytt personlig tilgangstoken for dette repositoryet. Det forrige tokenet vil bli erstattet.",
         "updatePatSuccess": "Tilgangstoken oppdatert",
         "updatePatError": "Det oppsto en feil under oppdatering av tilgangstokenet"
+    },
+    "entityManagement": {
+        "title": "Administrer entiteter",
+        "tabs": {
+            "products": "Produkter",
+            "features": "Funksjoner",
+            "customers": "Kunder",
+            "scopes": "Omfang"
+        },
+        "name": "Navn",
+        "namePlaceholder": "Navn",
+        "add": "Legg til {entity}",
+        "editTitle": "Rediger {entity}",
+        "editDescription": "Endre navnet og lagre.",
+        "empty": "Ingen oppføringer ennå. Legg til en ovenfor.",
+        "loadError": "Det oppstod en feil under lasting av data",
+        "createSuccess": "{entity} ble opprettet",
+        "createError": "Det oppstod en feil under oppretting av {entity}",
+        "updateSuccess": "{entity} ble oppdatert",
+        "updateError": "Det oppstod en feil under oppdatering av {entity}",
+        "deleteSuccess": "{entity} ble slettet",
+        "deleteError": "Det oppstod en feil under sletting av {entity}",
+        "deleteConflictError": "Kan ikke slette {entity}: den brukes av eksisterende endringsnotater eller utgivelsesnotater"
     },
     "ai": {
         "translationDisclaimer": "Oversettelsen er generert av KI. Vennligst sjekk viktige fakta."
