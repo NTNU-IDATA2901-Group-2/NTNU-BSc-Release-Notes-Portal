@@ -2,6 +2,7 @@ package no.reliablesolutions.release_notes_portal.service;
 
 import java.util.List;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import no.reliablesolutions.release_notes_portal.domain.repository.CustomerRepos
 import no.reliablesolutions.release_notes_portal.dto.CreateTagDTO;
 import no.reliablesolutions.release_notes_portal.dto.CustomerDTO;
 import no.reliablesolutions.release_notes_portal.exception.CustomerNotFoundException;
+import no.reliablesolutions.release_notes_portal.exception.EntityInUseException;
 import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityException;
 
 /**
@@ -85,11 +87,16 @@ public class CustomerService {
    *
    * @param id the ID of the customer to delete
    * @throws CustomerNotFoundException if no customer with the given ID exists
+   * @throws EntityInUseException if the customer is still referenced by other data
    */
   public void deleteCustomer(long id) {
     Customer customer = customerRepository.findById(id)
         .orElseThrow(() -> new CustomerNotFoundException(id));
-    customerRepository.delete(customer);
+    try {
+      customerRepository.delete(customer);
+    } catch (DataIntegrityViolationException e) {
+      throw new EntityInUseException("Customer", id, e);
+    }
   }
 
 

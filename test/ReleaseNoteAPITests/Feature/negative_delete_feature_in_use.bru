@@ -1,0 +1,24 @@
+meta {
+  name: negative_delete_feature_in_use
+  type: http
+  seq: 18
+}
+
+delete {
+  url: {{baseurl}}/features/{{feature_in_use_id}}
+  body: none
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 409
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

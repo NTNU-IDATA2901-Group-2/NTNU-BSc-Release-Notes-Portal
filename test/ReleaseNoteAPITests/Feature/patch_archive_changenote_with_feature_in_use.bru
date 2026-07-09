@@ -1,0 +1,24 @@
+meta {
+  name: patch_archive_changenote_with_feature_in_use
+  type: http
+  seq: 17
+}
+
+patch {
+  url: {{baseurl}}/changenotes/{{feature_in_use_change_id}}/archive
+  body: none
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

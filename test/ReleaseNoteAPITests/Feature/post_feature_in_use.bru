@@ -1,0 +1,34 @@
+meta {
+  name: post_feature_in_use
+  type: http
+  seq: 15
+}
+
+post {
+  url: {{baseurl}}/features
+  body: json
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "name" : "inUseFeature"
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+script:post-response {
+  bru.setEnvVar("feature_in_use_id", res.body)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
