@@ -36,7 +36,7 @@ const handleCheckboxClick = (event: Event) => {
             <Checkbox v-model="selected" :disabled="false" />
           </div>
 
-          <h3 v-if="changeNote.title" class="text-xl whitespace-nowrap overflow-hidden text-ellipsis">{{ changeNote.title }}</h3>
+          <h3 v-if="changeNote.title || changeNote.reference" class="text-xl whitespace-nowrap overflow-hidden text-ellipsis">{{ changeNote.title || changeNote.reference }}</h3>
           <h3 v-else class="text-xl text-text-primary/50">{{ t('placeholder.noTitle') }}</h3>
         </div>
         <div class="flex gap-2 items-center">
