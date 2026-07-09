@@ -28,6 +28,8 @@ export const useCreateReleaseNote = (onFinished: OnMutationApiCallFinished) => {
     onSettled: () => onFinished.onSettled?.(),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['releaseNotes'] });
+      queryClient.invalidateQueries({ queryKey: ['changeNote'] });
+      queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
       onFinished.onSuccess(data.toString());
     },
     onError: () => {
@@ -91,7 +93,7 @@ export const useGetReleaseNotes = (searchParams?: MaybeRefOrGetter<Record<string
 const RELEASE_NOTES_PAGE_SIZE = 20;
 
 export const useGetReleaseNotesInfinite = (searchParams?: MaybeRefOrGetter<Record<string, string>>) => useInfiniteQuery({
-  queryKey: ['releaseNotesInfinite', searchParams],
+  queryKey: ['releaseNotes', 'infinite', searchParams],
   queryFn: ({ pageParam }) => {
     const params = new URLSearchParams(toValue(searchParams));
     params.set('page', String(pageParam));
@@ -147,7 +149,10 @@ export const useArchiveReleaseNote = (id: string, onFinished: OnMutationApiCallF
   mutationFn: () => archiveReleaseNote(id),
   onSettled: () => onFinished.onSettled?.(),
   onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['releaseNote'] });
     queryClient.invalidateQueries({ queryKey: ['releaseNotes'] });
+    queryClient.invalidateQueries({ queryKey: ['changeNote'] });
+    queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
     onFinished.onSuccess();
   },
   onError: () => {
@@ -193,6 +198,9 @@ export const useUpdateReleaseNote = (onFinished: OnMutationApiCallFinished) => {
     onSettled: () => onFinished.onSettled?.(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['releaseNote', `${updateId}`] });
+      queryClient.invalidateQueries({ queryKey: ['releaseNotes'] });
+      queryClient.invalidateQueries({ queryKey: ['changeNote'] });
+      queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
       onFinished.onSuccess();
     },
     onError: () => {
@@ -256,6 +264,7 @@ export const usePublishReleaseNote = (onFinished: OnMutationApiCallFinished) => 
     onSettled: () => onFinished.onSettled?.(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['releaseNote'] });
+      queryClient.invalidateQueries({ queryKey: ['releaseNotes'] });
       onFinished.onSuccess();
     },
     onError: () => {

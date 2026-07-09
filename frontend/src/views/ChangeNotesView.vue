@@ -70,8 +70,8 @@ if (isAdmin.value && params.value.hasReleaseNote === undefined) {
 }
 
 const defaultPage = 1;
-const defaultPageSize = 10;
-const pageSizeOptions = [10, 20, 50, 100];
+const defaultPageSize = 50;
+const pageSizeOptions = [50, 100, 150, 200];
 // <Pagination> is 1-based; the backend `page` query param is 0-based.
 const page = ref(params.value.page ? parseInt(params.value.page) + 1 : defaultPage);
 const pageSize = ref(params.value.size ? parseInt(params.value.size) : defaultPageSize);

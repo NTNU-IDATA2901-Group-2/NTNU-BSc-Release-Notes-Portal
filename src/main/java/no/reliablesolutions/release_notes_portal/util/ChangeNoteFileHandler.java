@@ -5,8 +5,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +51,8 @@ public class ChangeNoteFileHandler {
   private static final String CHANGE_FIELD = "change";
   private static final String TECHNICAL_CHANGE_FIELD = "technical-change";
   private static final String UPGRADE_REQUIREMENTS_FIELD = "upgrade-requirements";
+  private static final Set<String> KNOWN_FIELDS = Set.of(REFERENCE_FIELD, SCOPE_FIELD, PRODUCT_FIELD,
+      FEATURE_FIELD, CUSTOMER_FIELD, CHANGE_FIELD, TECHNICAL_CHANGE_FIELD, UPGRADE_REQUIREMENTS_FIELD);
   
   /**
    * Parses a change note YAML file and creates a ChangeNote entity from the data in the file.
@@ -55,15 +60,19 @@ public class ChangeNoteFileHandler {
    * The YAML file must be formatted correctly, using the follwing fields:
    * <ul>
    * <li>reference (optional): a string reference for the change note, e.g. a JIRA ticket number</li>
-   * <li>scope (optional): the name of the scope for the change note; left unset if absent or no scope with that name exists
-   * <li>product (optional): the name of the product for the change note, must correspond to an existing product if provided</li>
-   * <li>feature (optional): the name of the feature for the change note, must correspond to an existing feature if provided</li>
-   * <li>customer (optional): the name of the customer for the change note, must correspond to an existing customer if provided</li>
+   * <li>scope (optional): the name of the scope for the change note</li>
+   * <li>product (optional): the name of the product for the change note</li>
+   * <li>feature (optional): the name of the feature for the change note</li>
+   * <li>customer (optional): the name of the customer for the change note</li>
    * <li>change (optional): a description of the change</li>
    * <li>technical-change (optional): technical notes about the change, to be viewed by developers</li>
    * <li>upgrade-requirements (optional): notes about upgrade requirements for the change</li>
    * </ul>
-   * 
+   *
+   * If a scope, product, feature or customer name does not match an existing entity, the tag is left
+   * unset and the name is kept in the description as a marker like {@code {{Product: PMS}}}. Any field
+   * not listed above is kept in the description the same way, as {@code {{key: value}}}.
+   *
    * @param changeNoteFile the YAML file containing the change note data
    * @throws InvalidChangeNoteYamlException if the YAML file is empty, has invalid format, or contains invalid data types for any of the fields
    */
@@ -78,6 +87,8 @@ public class ChangeNoteFileHandler {
       }
 
       changeNote.setReference((String) changeNoteData.getOrDefault(REFERENCE_FIELD, null)); // optional
+      List<String> unmatchedTags = new ArrayList<>();
+
       String scope = (String) changeNoteData.get(SCOPE_FIELD);
       if (scope == null) {
         changeNote.setScope(null);
@@ -85,6 +96,7 @@ public class ChangeNoteFileHandler {
         List<Scope> scopes = scopeService.getScopeByName(scope);
         if (scopes.isEmpty()) {
           changeNote.setScope(null);
+          unmatchedTags.add(formatUnmatchedTag("Scope", scope));
         } else {
           if (scopes.size() > 1) {
             logger.warn("Multiple scopes found with name '{}', using the first one with id {}", scope, scopes.get(0).getId());
@@ -100,6 +112,7 @@ public class ChangeNoteFileHandler {
         List<Product> products = productService.getProductByName(product);
         if (products.isEmpty()) {
           changeNote.setProduct(null);
+          unmatchedTags.add(formatUnmatchedTag("Product", product));
         } else {
           if (products.size() > 1) {
             logger.warn("Multiple products found with name '{}', using the first one with id {}", product, products.get(0).getId());
@@ -115,6 +128,7 @@ public class ChangeNoteFileHandler {
         List<Feature> features = featureService.getFeatureByName(feature);
         if (features.isEmpty()) {
           changeNote.setFeature(null);
+          unmatchedTags.add(formatUnmatchedTag("Feature", feature));
         } else {
           if (features.size() > 1) {
             logger.warn("Multiple features found with name '{}', using the first one with id {}", feature, features.get(0).getId());
@@ -130,6 +144,7 @@ public class ChangeNoteFileHandler {
         List<Customer> customers = customerService.getCustomerByName(customer);
         if (customers.isEmpty()) {
           changeNote.setCustomer(null);
+          unmatchedTags.add(formatUnmatchedTag("Customer", customer));
         } else {
           if (customers.size() > 1) {
             logger.warn("Multiple customers found with name '{}', using the first one with id {}", customer, customers.get(0).getId());
@@ -138,7 +153,19 @@ public class ChangeNoteFileHandler {
         }
       }
 
-      changeNote.setDescription((String) changeNoteData.getOrDefault(CHANGE_FIELD, null)); // optional
+      for (Map.Entry<String, Object> entry : changeNoteData.entrySet()) {
+        if (!KNOWN_FIELDS.contains(entry.getKey())) {
+          unmatchedTags.add(formatUnmatchedTag(entry.getKey(), Objects.toString(entry.getValue(), "")));
+        }
+      }
+
+      String description = (String) changeNoteData.getOrDefault(CHANGE_FIELD, null); // optional
+      if (!unmatchedTags.isEmpty()) {
+        String tags = String.join(" ", unmatchedTags);
+        description = (description == null || description.isBlank()) ? tags : description + "\n\n" + tags;
+        logger.info("Keeping unmatched tags of change note file {} in the description: {}", changeNoteFile.getName(), tags);
+      }
+      changeNote.setDescription(description);
       changeNote.setDeveloperNotes((String) changeNoteData.getOrDefault(TECHNICAL_CHANGE_FIELD, null)); // optional
       changeNote.setUpgradeNotes((String) changeNoteData.getOrDefault(UPGRADE_REQUIREMENTS_FIELD, null)); // optional
       
@@ -151,5 +178,9 @@ public class ChangeNoteFileHandler {
     }
 
     return changeNote;
+  }
+
+  private String formatUnmatchedTag(String field, String name) {
+    return "{{" + field + ": " + name + "}}";
   }
 }
