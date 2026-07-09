@@ -38,9 +38,9 @@ const published = single('published');
 const fromDate = single('fromDate');
 const toDate = single('toDate');
 
-const pageSizeOptions = [10, 20, 50, 100];
+const pageSizeOptions = [50, 100, 150, 200];
 const defaultPage = 1;
-const defaultPageSize = 10;
+const defaultPageSize = 50;
 // <Pagination> is 1-based; the backend `page` query param is 0-based.
 const page = ref(params.value.page ? parseInt(params.value.page) + 1 : defaultPage);
 const pageSize = ref(params.value.size ? parseInt(params.value.size) : defaultPageSize);
