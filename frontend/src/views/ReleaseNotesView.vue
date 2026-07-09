@@ -130,7 +130,7 @@ const createReleaseNoteMutation = useCreateReleaseNote({
           <Spinner v-if="isLoading || isFetching" class="w-full"/>
           <p v-else-if="isError">{{ t('loadingError.releaseNotes') }}</p>
           <div v-else>
-            <ScrollArea class="h-[70vh] w-full">
+            <ScrollArea class="h-[67vh] w-full">
             <p v-if="data?.content.length === 0" class="text-center">{{ t('placeholder.noReleaseNotesFound') }}</p>
             <div v-for="releaseNote in data?.content" :key="releaseNote.id" class="flex flex-col">
               <ReleaseNoteCard 
