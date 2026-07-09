@@ -34,6 +34,9 @@ export const usePublishChangeNote = (id: number, publish: boolean, onFinished: O
     onSettled: () => onFinished.onSettled?.(),
     onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['changeNote'] })
+      queryClient.invalidateQueries({ queryKey: ['changeNotes'] })
+      queryClient.invalidateQueries({ queryKey: ['releaseNote'] })
+      queryClient.invalidateQueries({ queryKey: ['releaseNotes'] })
       onFinished.onSuccess();
     },
     onError: () => {
@@ -69,7 +72,10 @@ export const usePublishChangeNotes = (ids: number[], publish: boolean, onFinishe
     mutationFn: (variables: MutationVariables) => publishChangeNotes(variables.ids, variables.publish),
     onSettled: () => onFinished.onSettled?.(),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['changeNote'] });
       queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
+      queryClient.invalidateQueries({ queryKey: ['releaseNote'] });
+      queryClient.invalidateQueries({ queryKey: ['releaseNotes'] });
       onFinished.onSuccess();
     },
     onError: () => {
@@ -139,7 +145,10 @@ export const useArchiveChangeNote = (id: number, onFinished: OnMutationApiCallFi
     mutationFn: () => archiveChangeNote(id),
     onSettled: () => onFinished.onSettled?.(),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['changeNote'] });
       queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
+      queryClient.invalidateQueries({ queryKey: ['releaseNote'] });
+      queryClient.invalidateQueries({ queryKey: ['releaseNotes'] });
       onFinished.onSuccess();
     },
     onError: () => {
@@ -179,27 +188,21 @@ export const useUpdateChangeNote = (onFinished: OnMutationApiCallFinished) => {
   const queryClient = useQueryClient();
   interface MutationVariables {
     id: string;
-    relatedReleaseNoteIds?: string[];
     dto: PersistChangeNoteDTO;
   }
 
   let updateId: string | undefined;
-  let releaseNoteIds: string[] | undefined;
   return useMutation<void, unknown, MutationVariables>({
-    mutationFn: ({ id, relatedReleaseNoteIds, dto }: MutationVariables) => {
+    mutationFn: ({ id, dto }: MutationVariables) => {
       updateId = id;
-      releaseNoteIds = relatedReleaseNoteIds;
       return updateChangeNote(id, dto)
     },
     onSettled: () => onFinished.onSettled?.(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['changeNote', `${updateId}`] });
+      queryClient.invalidateQueries({ queryKey: ['changeNote'] });
       queryClient.invalidateQueries({ queryKey: ['changeNotes'] });
-      if (releaseNoteIds !== undefined) {
-        releaseNoteIds.forEach((id) => {
-          queryClient.invalidateQueries({ queryKey: ['releaseNote', id] });
-        });
-      }
+      queryClient.invalidateQueries({ queryKey: ['releaseNote'] });
+      queryClient.invalidateQueries({ queryKey: ['releaseNotes'] });
       onFinished.onSuccess();
     },
     onError: () => {

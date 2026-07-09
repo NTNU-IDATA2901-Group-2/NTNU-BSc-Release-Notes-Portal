@@ -82,7 +82,7 @@ const onSubmit = handleSubmit((values : PersistChangeNoteDTO) => {
     values.featureId = values.featureId === -1 ? undefined : values.featureId;
     values.customerId = values.customerId === -1 ? undefined : values.customerId;
     values.viewableByEveryone = values.customerId === -1 ? undefined : viewAbleByEveryone.value;
-    updateChangeNoteMutation.mutate({ id: props.changeNote.id.toString(), relatedReleaseNoteIds: props.changeNote.relatedReleaseNoteIds?.map(String), dto: values });
+    updateChangeNoteMutation.mutate({ id: props.changeNote.id.toString(), dto: values });
 }, ({ errors }) => {
     console.error('Change note edit validation failed', errors);
     toast.error(t('toast.changeNoteUpdateError'));
