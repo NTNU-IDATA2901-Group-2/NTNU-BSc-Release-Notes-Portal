@@ -1,3 +1,21 @@
+INSERT INTO product (id, name) VALUES
+(1, 'WMS'), (2, 'TMS'), (3, 'OMS')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO feature (id, name) VALUES
+(1, 'Invoicing'), (2, 'Picking'), (3, 'Putaway'), (4, 'Receiving'), (5, 'Cycle Counting'),
+(6, 'Replenishment'), (7, 'Route Planning'), (8, 'Carrier Management'), (9, 'Freight Tracking'),
+(10, 'Load Optimization'), (11, 'Order Fulfillment'), (12, 'Returns Management'), (13, 'Backorder Handling')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO customer (id, name) VALUES
+(1, 'Liddle'), (2, 'MaksiMatt'), (3, 'Whalemart'), (4, 'Coup')
+ON CONFLICT (id) DO NOTHING;
+
+SELECT setval('product_id_seq', (SELECT MAX(id) FROM product));
+SELECT setval('feature_id_seq', (SELECT MAX(id) FROM feature));
+SELECT setval('customer_id_seq', (SELECT MAX(id) FROM customer));
+
 -- AI generated sample data for change_note and release_note tables
 INSERT INTO change_note (id, archived, published, title, reference, description, developer_notes, upgrade_notes, product_id, customer_id, feature_id, scope_id, creation_timestamp, viewable_by_everyone) VALUES
 (1, false, true, 'Initial Release', 'REF-001', 'Initial release', 'Dev notes 1', 'Upgrade notes 1', 1, 1, 1, 1, to_timestamp(1706745600), false),

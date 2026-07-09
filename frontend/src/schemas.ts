@@ -51,6 +51,10 @@ export const CreateGitRepositorySchema = z.object({
   pat: z.string().optional(),
 })
 
+export const PersistTagSchema = z.object({
+  name: z.string({ required_error: 'validation.required' }).min(1, { message: 'validation.required' }),
+})
+
 export const UpdatePromptsSchema = z.object({
   prompts: z.array(z.object({
     id: z.number(),

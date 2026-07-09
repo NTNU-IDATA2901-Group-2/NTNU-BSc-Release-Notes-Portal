@@ -1,0 +1,37 @@
+meta {
+  name: post_changenote_with_customer_in_use
+  type: http
+  seq: 16
+}
+
+post {
+  url: {{baseurl}}/changenotes
+  body: json
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "title": "Change note referencing in-use customer",
+    "reference": "REF-IN-USE-CUSTOMER",
+    "description": "Blocks deletion of the referenced customer",
+    "customerId": {{customer_in_use_id}}
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+script:post-response {
+  bru.setEnvVar("customer_in_use_change_id", res.body)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

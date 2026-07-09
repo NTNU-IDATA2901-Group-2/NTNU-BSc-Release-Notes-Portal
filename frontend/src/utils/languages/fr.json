@@ -33,7 +33,8 @@
         "english": "Anglais",
         "norwegian": "Norvégien",
         "repositories": "Dépôts",
-        "editPrompts": "Prompts"
+        "editPrompts": "Prompts",
+        "entityManagement": "Entités"
     },
     "button": {
         "previous": "Précédent",
@@ -243,6 +244,29 @@
         "updatePatDescription": "Saisissez un nouveau jeton d'accès personnel pour ce dépôt. Le jeton précédent sera remplacé.",
         "updatePatSuccess": "Jeton d'accès mis à jour avec succès",
         "updatePatError": "Une erreur s'est produite lors de la mise à jour du jeton d'accès"
+    },
+    "entityManagement": {
+        "title": "Gestion des entités",
+        "tabs": {
+            "products": "Produits",
+            "features": "Fonctionnalités",
+            "customers": "Clients",
+            "scopes": "Portées"
+        },
+        "name": "Nom",
+        "namePlaceholder": "Nom",
+        "add": "Ajouter {entity}",
+        "editTitle": "Modifier {entity}",
+        "editDescription": "Modifiez le nom et enregistrez.",
+        "empty": "Aucune entrée pour le moment. Ajoutez-en une ci-dessus.",
+        "loadError": "Une erreur est survenue lors du chargement des données",
+        "createSuccess": "{entity} créé avec succès",
+        "createError": "Une erreur est survenue lors de la création de {entity}",
+        "updateSuccess": "{entity} mis à jour avec succès",
+        "updateError": "Une erreur est survenue lors de la mise à jour de {entity}",
+        "deleteSuccess": "{entity} supprimé avec succès",
+        "deleteError": "Une erreur est survenue lors de la suppression de {entity}",
+        "deleteConflictError": "Impossible de supprimer {entity} : utilisé par des notes de changement ou de version existantes"
     },
     "ai": {
         "translationDisclaimer": "Cette traduction est générée par l'IA. Veuillez vérifier les informations importantes."

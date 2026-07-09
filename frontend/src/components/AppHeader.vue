@@ -4,7 +4,7 @@ import { routeNames, router } from '../utils/router';
 import logoSvg from '../assets/solwr_logo.svg';
 import Avatar from './ui/avatar/Avatar.vue';
 import Separator from './ui/separator/Separator.vue';
-import { GitBranch, SunMoon, LogOut, Sparkles } from "lucide-vue-next"
+import { GitBranch, SunMoon, LogOut, Sparkles, Tags } from "lucide-vue-next"
 import { useTheme } from '@/utils/theme';
 import { isAuthenticated, userProfile, isAdmin, logout } from '@/utils/auth';
 import { computed } from 'vue';
@@ -104,6 +104,13 @@ const handleLogoClick = () => {
 							<div class="w-full flex justify-end gap-2">
 								<p class="text-md">{{ t('header.editPrompts') }}</p>
 								<Sparkles class="text-text-primary"/>
+							</div>
+						</MenubarItem>
+						<MenubarSeparator />
+						<MenubarItem @click="router.push(routeNames.entityManagement)">
+							<div class="w-full flex justify-end gap-2">
+								<p class="text-md">{{ t('header.entityManagement') }}</p>
+								<Tags class="text-text-primary"/>
 							</div>
 						</MenubarItem>
 					</template>
