@@ -44,7 +44,7 @@ Dev first-run: copy `.env.example` → `.env`, fill it, then import `dev-realm.j
 Single-JAR deployment: the Vue build is copied into `src/main/resources/static/` and served by `SpaWebMvcConfig`. Root package `no.reliablesolutions.release_notes_portal`, layered `controller → service → domain/{entity,repository}`, with `config/` (security), `runner/` (startup sync), `util/` (git/YAML/AI helpers).
 
 ### Domain model
-- `ChangeNote` is central: optional `@ManyToOne` to `Product`/`Scope`/`Feature`/`Customer`, tied to a `GitRepository` + commit hash (unique per repo), flags `published`/`archived`/`viewableByEveryone`.
+- `ChangeNote` is central: optional `@ManyToOne` to `Product`/`Scope`/`Feature`/`Customer`, tied to a `GitRepository` + commit hash + note file path (unique per repo; a merge commit can yield several notes), flags `published`/`archived`/`viewableByEveryone`.
 - `ReleaseNote` owns a `@ManyToMany` to `ChangeNote`, an embedded `ReleaseTimeline`, and cascade-owned `ChangeImpact` children; flag `syncedToGit`.
 - `Prompt` rows (seeded by `data.sql`) hold the AI prompts, looked up by name ("Translation Prompt", "Change Notes Summary") — AI features break without seed data.
 

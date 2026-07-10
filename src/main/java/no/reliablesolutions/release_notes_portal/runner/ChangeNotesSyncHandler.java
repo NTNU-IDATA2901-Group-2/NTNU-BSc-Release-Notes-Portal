@@ -21,6 +21,7 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryState;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevSort;
+import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -283,14 +284,15 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
     try (Git git = Git.open(repositoryDirectory);
     RevWalk revWalk = new RevWalk(git.getRepository());) {
       Repository repository = git.getRepository();
+      revWalk.setFirstParent(true); // walk only the first-parent chain of the branch; must be set before any commit is marked
+      revWalk.sort(RevSort.TOPO);
+      revWalk.sort(RevSort.REVERSE, true); // additive, keeps TOPO; sort commits from oldest to newest
       if (gitRepository.getLastCheckedCommitHash() != null) {
-        ObjectId lastCheckedCommitId = repository.resolve(gitRepository.getLastCheckedCommitHash()); 
-        RevCommit lastCheckedCommit = revWalk.parseCommit(lastCheckedCommitId);       
+        ObjectId lastCheckedCommitId = repository.resolve(gitRepository.getLastCheckedCommitHash());
+        RevCommit lastCheckedCommit = revWalk.parseCommit(lastCheckedCommitId);
         revWalk.markUninteresting(lastCheckedCommit); // only keep commits after the last checked commit
       }
       revWalk.markStart(revWalk.parseCommit(repository.resolve(Constants.HEAD)));
-      revWalk.sort(RevSort.TOPO);
-      revWalk.sort(RevSort.REVERSE); // sort commits from oldest to newest
       ObjectId lastCheckedCommitId = createChangeNotesFromCommits(revWalk, repositoryDirectory, repository, gitRepository);
       if (lastCheckedCommitId != null) {
         updateLastCheckedCommitHash(gitRepository, lastCheckedCommitId);
@@ -302,10 +304,10 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
   
   /**
    * Creates change notes from commits in a Git repository by checking for new change note files in the commits and creating change notes from those files.
-   * 
-   * If multiple change note files are found in the same commit, only the first one will be processed.
+   *
+   * Every matching added file in a commit produces its own change note, so a merge commit bringing in several change note files creates one change note per file.
    * The created change note entities are persisted in the database.
-   * 
+   *
    * @param revWalk the RevWalk to iterate over the commits, must not be null, must be ordered from oldest to newest
    * @param repositoryDirectory the local directory for the repository, must not be null
    * @param repository the JGit Repository object, must not be null
@@ -332,37 +334,34 @@ public class ChangeNotesSyncHandler implements CommandLineRunner {
       diffFormatter.setRepository(repository);
 
       for (RevCommit commit : revWalk) {
-        if (commit.getParentCount() == 0) {
-          logger.warn("No parent commit for commit {} with message '{}'. Skipping diff", commit.getName(), commit.getShortMessage());
-          continue;
+        RevTree parentTree = null; // a null parent tree diffs against the empty tree, so files in a root commit are included
+        if (commit.getParentCount() > 0) {
+          parentTree = revWalk.parseCommit(commit.getParent(0).getId()).getTree();
         }
-
-        RevCommit parentCommit = revWalk.parseCommit(commit.getParent(0).getId());
-        List<DiffEntry> diffEntries = diffFormatter.scan(parentCommit.getTree(), commit.getTree());
-        List<File> newChangeNoteFiles = diffEntries.stream()
+        List<DiffEntry> diffEntries = diffFormatter.scan(parentTree, commit.getTree());
+        List<String> newChangeNotePaths = diffEntries.stream()
           .filter(diffEntry -> diffEntry.getChangeType() == DiffEntry.ChangeType.ADD)
           .filter(diffEntry -> diffEntry.getNewPath().startsWith(gitRepository.getChangeNoteDirectory() + "/"))
           .filter(diffEntry -> diffEntry.getNewPath().endsWith(".yaml") || diffEntry.getNewPath().endsWith(".yml"))
-          .map(diffEntry -> new File(repositoryDirectory, diffEntry.getNewPath()))
+          .map(DiffEntry::getNewPath)
           .toList();
 
-        if (newChangeNoteFiles.isEmpty()) {
+        if (newChangeNotePaths.isEmpty()) {
           logger.debug("No new change note files found in commit {} with message '{}'", commit.getName(), commit.getShortMessage());
-        } else {
-          if (newChangeNoteFiles.size() > 1) {
-            logger.warn("Found multiple new change note files for commit {}: {}. Only the first will be processed", commit.getName(), newChangeNoteFiles.stream().map(File::getPath).toList());
-          }
-          File changeNoteFile = newChangeNoteFiles.get(0);
+        }
+        for (String changeNotePath : newChangeNotePaths) {
+          File changeNoteFile = new File(repositoryDirectory, changeNotePath);
           ChangeNote changeNote = getChangeNoteFromFile(changeNoteFile);
           if (changeNote != null) {
             changeNote.setGitRepository(gitRepository);
             changeNote.setGitCommitHash(commit.getName());
+            changeNote.setGitFilePath(changeNotePath); // repo-relative path, stable across clones
             changeNote.setGitCommitTimestamp(Instant.ofEpochSecond(commit.getCommitTime())); // git commit time is epoch seconds
             try {
               changeNoteService.updateChangeNote(changeNote);
-              logger.info("Created change note from file {} for commit {} in repository with id {}", changeNoteFile.getPath(), commit.getName(), gitRepository.getId());
+              logger.info("Created change note from file {} for commit {} in repository with id {}", changeNotePath, commit.getName(), gitRepository.getId());
             } catch (DataIntegrityViolationException e) {
-              logger.warn("Failed to create change note from file {} for commit {} in repository with id {} due to data integrity violation. This is likely caused by a duplicate git commit hash. Skipping this change note file", changeNoteFile.getPath(), commit.getName(), gitRepository.getId());
+              logger.warn("Failed to create change note from file {} for commit {} in repository with id {} due to data integrity violation. This is likely caused by an already imported change note for the same commit and file path. Skipping this change note file", changeNotePath, commit.getName(), gitRepository.getId());
             }
           }
         }
