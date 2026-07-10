@@ -23,8 +23,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(uniqueConstraints = @UniqueConstraint(name = "unique_git_commit_repository", columnNames = { "gitCommitHash",
-    "gitRepository_id" }))
+@Table(uniqueConstraints = @UniqueConstraint(name = "unique_git_commit_repository_file", columnNames = { "gitCommitHash",
+    "gitRepository_id", "gitFilePath" }))
 public class ChangeNote {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -58,6 +58,8 @@ public class ChangeNote {
   private Customer customer;
 
   private String gitCommitHash;
+
+  private String gitFilePath;
 
   private Instant gitCommitTimestamp;
 
