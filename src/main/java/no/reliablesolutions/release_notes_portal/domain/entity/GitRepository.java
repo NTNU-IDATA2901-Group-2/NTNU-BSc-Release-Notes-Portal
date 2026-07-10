@@ -5,6 +5,7 @@ import java.io.File;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,8 +28,12 @@ public class GitRepository {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    /**
+     * Unique repository name; it determines the local clone directory, so two repositories must never share a name.
+     */
     @Setter
     @NotBlank
+    @Column(unique = true)
     private String name;
 
     @Setter

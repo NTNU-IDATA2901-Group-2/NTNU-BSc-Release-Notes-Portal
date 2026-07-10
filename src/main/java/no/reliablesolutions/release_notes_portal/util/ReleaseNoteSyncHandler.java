@@ -11,7 +11,9 @@ import java.util.stream.Collectors;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.transport.PushResult;
 import org.eclipse.jgit.transport.RefSpec;
+import org.eclipse.jgit.transport.RemoteRefUpdate;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -202,13 +204,37 @@ public class ReleaseNoteSyncHandler {
     }
 
     try (Git git = Git.open(releaseNoteDirectory)) {
-      git.push()
+      Iterable<PushResult> pushResults = git.push()
         .setRemote("origin")
         .setRefSpecs(new RefSpec(getBranchNameForReleaseNote(releaseNote)))
         .setCredentialsProvider(new UsernamePasswordCredentialsProvider("oauth2", gitRepository.getPat()))
         .call();
+      verifyPushResults(pushResults, gitRepository);
+    } catch (FailedSyncReleaseNoteException e) {
+      throw e;
     } catch (Exception e) {
       throw new FailedSyncReleaseNoteException("Failed to push committed release note to remote Git repository", e);
+    }
+  }
+
+  /**
+   * Verifies that every ref update of a push was accepted by the remote. JGit does not throw on rejected ref updates (e.g. non-fast-forward); rejections are only reported in the push results.
+   *
+   * @param pushResults the results returned by the push call
+   * @param gitRepository the Git repository that was pushed to, used for the error message
+   * @throws FailedSyncReleaseNoteException if any ref update was not accepted
+   */
+  private void verifyPushResults(Iterable<PushResult> pushResults, GitRepository gitRepository) {
+    for (PushResult pushResult : pushResults) {
+      for (RemoteRefUpdate refUpdate : pushResult.getRemoteUpdates()) {
+        if (refUpdate.getStatus() != RemoteRefUpdate.Status.OK
+            && refUpdate.getStatus() != RemoteRefUpdate.Status.UP_TO_DATE) {
+          throw new FailedSyncReleaseNoteException(String.format(
+            "Push of %s to remote Git repository %s was rejected with status %s%s",
+            refUpdate.getRemoteName(), gitRepository.getName(), refUpdate.getStatus(),
+            refUpdate.getMessage() != null ? ": " + refUpdate.getMessage() : ""));
+        }
+      }
     }
   }
 
@@ -253,11 +279,12 @@ public class ReleaseNoteSyncHandler {
           .setSource(null)
           .setDestination(completeBranchName);
 
-        git.push()
+        Iterable<PushResult> pushResults = git.push()
           .setRefSpecs(refSpec)
           .setCredentialsProvider(new UsernamePasswordCredentialsProvider("oauth2", repoPair.key().getPat()))
           .setRemote("origin")
           .call(); //delete branch remotely
+        verifyPushResults(pushResults, repoPair.key());
 
         logger.info("Deleted pushed branch {} in Git repository at {}", completeBranchName, repositoryDirectory.getAbsolutePath());
       } catch (Exception e) {
@@ -267,7 +294,7 @@ public class ReleaseNoteSyncHandler {
   }
   
   private String getBranchNameForReleaseNote(ReleaseNote releaseNote) {
-    return "release-note-" + releaseNote.getId();
+    return "release-notes-portal-" + releaseNote.getId();
   }
 
   /**
