@@ -20,6 +20,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteHasNoGitCommitsException;
 import no.reliablesolutions.release_notes_portal.exception.ChangeNoteNotFoundException;
 import no.reliablesolutions.release_notes_portal.exception.CustomerNotFoundException;
+import no.reliablesolutions.release_notes_portal.exception.EntityInUseException;
 import no.reliablesolutions.release_notes_portal.exception.GitInspectionException;
 import no.reliablesolutions.release_notes_portal.exception.FailedSyncGitChangeNotesException;
 import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityException;
@@ -128,6 +129,17 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Data integrity violation: " + e.getMessage());
   }
   
+  /**
+   * Handles the case where an entity cannot be deleted because it is still referenced by other data. Logs the event and returns a 409 response with a message indicating the entity is in use.
+   * @param e the exception containing details about the entity in use
+   * @return a ResponseEntity with a 409 status and a message indicating the entity is in use
+   */
+  @ExceptionHandler(value = {EntityInUseException.class})
+  public ResponseEntity<String> handleEntityInUseException(EntityInUseException e) {
+    logger.warn("Entity in use: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(String.format("Cannot delete %s with ID %d: it is referenced by existing change notes or release notes", e.getEntityName(), e.getEntityId()));
+  }
+
   /**
    * Handles the case where a change note has no associated git commits. Logs the event and returns a 400 response with a message indicating that the change note has no associated git commits.
    * @param e the exception containing details about the change note with no git commits

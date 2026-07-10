@@ -2,6 +2,7 @@ package no.reliablesolutions.release_notes_portal.service;
 
 import java.util.List;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import no.reliablesolutions.release_notes_portal.domain.entity.Scope;
 import no.reliablesolutions.release_notes_portal.domain.repository.ScopeRepository;
 import no.reliablesolutions.release_notes_portal.dto.CreateTagDTO;
 import no.reliablesolutions.release_notes_portal.dto.ScopeDTO;
+import no.reliablesolutions.release_notes_portal.exception.EntityInUseException;
 import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityException;
 import no.reliablesolutions.release_notes_portal.exception.ScopeNotFoundException;
 
@@ -92,10 +94,15 @@ public class ScopeService {
    *
    * @param id the ID of the scope to delete
    * @throws ScopeNotFoundException if no scope with the given ID exists
+   * @throws EntityInUseException if the scope is still referenced by other data
    */
   public void deleteScope(long id) {
     Scope scope = scopeRepository.findById(id)
         .orElseThrow(() -> new ScopeNotFoundException(id));
-    scopeRepository.delete(scope);
+    try {
+      scopeRepository.delete(scope);
+    } catch (DataIntegrityViolationException e) {
+      throw new EntityInUseException("Scope", id, e);
+    }
   }
 }

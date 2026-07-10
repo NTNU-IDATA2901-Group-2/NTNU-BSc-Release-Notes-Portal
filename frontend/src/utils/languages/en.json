@@ -33,7 +33,8 @@
         "english": "English",
         "norwegian": "Norwegian",
         "repositories": "Repositories",
-        "editPrompts": "Prompts"
+        "editPrompts": "Prompts",
+        "entityManagement": "Entities"
     },
     "button": {
         "previous": "Previous",
@@ -243,6 +244,29 @@
         "updatePatDescription": "Enter a new personal access token for this repository. The previous token will be replaced.",
         "updatePatSuccess": "Access token updated successfully",
         "updatePatError": "An error occurred while updating the access token"
+    },
+    "entityManagement": {
+        "title": "Entity Management",
+        "tabs": {
+            "products": "Products",
+            "features": "Features",
+            "customers": "Customers",
+            "scopes": "Scopes"
+        },
+        "name": "Name",
+        "namePlaceholder": "Name",
+        "add": "Add {entity}",
+        "editTitle": "Edit {entity}",
+        "editDescription": "Change the name and save.",
+        "empty": "No entries yet. Add one above.",
+        "loadError": "An error occurred while loading data",
+        "createSuccess": "{entity} created successfully",
+        "createError": "An error occurred while creating the {entity}",
+        "updateSuccess": "{entity} updated successfully",
+        "updateError": "An error occurred while updating the {entity}",
+        "deleteSuccess": "{entity} deleted successfully",
+        "deleteError": "An error occurred while deleting the {entity}",
+        "deleteConflictError": "Cannot delete {entity}: it is used by existing change notes or release notes"
     },
     "ai": {
         "translationDisclaimer": "This translation is AI generated. Please check important facts."

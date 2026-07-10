@@ -2,6 +2,7 @@ package no.reliablesolutions.release_notes_portal.service;
 
 import java.util.List;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import no.reliablesolutions.release_notes_portal.domain.entity.Product;
 import no.reliablesolutions.release_notes_portal.domain.repository.ProductRepository;
 import no.reliablesolutions.release_notes_portal.dto.CreateTagDTO;
 import no.reliablesolutions.release_notes_portal.dto.ProductDTO;
+import no.reliablesolutions.release_notes_portal.exception.EntityInUseException;
 import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityException;
 import no.reliablesolutions.release_notes_portal.exception.ProductNotFoundException;
 
@@ -86,11 +88,16 @@ public class ProductService {
    *
    * @param id the ID of the product to delete
    * @throws ProductNotFoundException if no product with the given ID exists
+   * @throws EntityInUseException if the product is still referenced by other data
    */
   public void deleteProduct(long id) {
     Product product = productRepository.findById(id)
         .orElseThrow(() -> new ProductNotFoundException(id));
-    productRepository.delete(product);
+    try {
+      productRepository.delete(product);
+    } catch (DataIntegrityViolationException e) {
+      throw new EntityInUseException("Product", id, e);
+    }
   }
 
   /**

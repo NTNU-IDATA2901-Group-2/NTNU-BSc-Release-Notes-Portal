@@ -2,6 +2,7 @@ package no.reliablesolutions.release_notes_portal.service;
 
 import java.util.List;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import no.reliablesolutions.release_notes_portal.domain.entity.Feature;
 import no.reliablesolutions.release_notes_portal.domain.repository.FeatureRepository;
 import no.reliablesolutions.release_notes_portal.dto.CreateTagDTO;
 import no.reliablesolutions.release_notes_portal.dto.FeatureDTO;
+import no.reliablesolutions.release_notes_portal.exception.EntityInUseException;
 import no.reliablesolutions.release_notes_portal.exception.FailedToSaveEntityException;
 import no.reliablesolutions.release_notes_portal.exception.FeatureNotFoundException;
 
@@ -106,11 +108,16 @@ public class FeatureService {
    *
    * @param id the ID of the feature to delete
    * @throws FeatureNotFoundException if no feature with the given ID exists
+   * @throws EntityInUseException if the feature is still referenced by other data
    */
   public void deleteFeature(long id) {
     Feature feature = featureRepository.findById(id)
         .orElseThrow(() -> new FeatureNotFoundException(id));
-    featureRepository.delete(feature);
+    try {
+      featureRepository.delete(feature);
+    } catch (DataIntegrityViolationException e) {
+      throw new EntityInUseException("Feature", id, e);
+    }
   }
 
   /**

@@ -1,0 +1,34 @@
+meta {
+  name: post_customer_in_use
+  type: http
+  seq: 15
+}
+
+post {
+  url: {{baseurl}}/customers
+  body: json
+  auth: inherit
+}
+
+headers {
+  X-Test-Role: Admin
+}
+
+body:json {
+  {
+    "name" : "inUseCustomer"
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+script:post-response {
+  bru.setEnvVar("customer_in_use_id", res.body)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
